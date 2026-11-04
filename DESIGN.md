@@ -1,480 +1,534 @@
-# MultiMediaMemoryBench (MMMB): design for realism and speed
+# MultiMediaMemoryBench (MMMB): design
 
-Status: proposal, 4 November 2026. Nothing in it is built. The starting point is the copy, in this folder, of Multimem's
-`benchmarks/` (synthetic haystack generator 6, EgoLifeQA, the harness and the two published results). Sections 2 and 6.1 are
-measured; the rest is design, and every estimate is marked as one.
+Status: proposal, 4 November 2026. Nothing in it is built. This folder holds a copy of Multimem's benchmark, which tests one
+system (mm) and cannot run without it. This document makes MMMB a general benchmark, and section 10 says how the copied code
+gets there. Section 8.1 is measured; the rest is design, and every estimate is marked as one.
 
 ## 1. What MMMB is for
 
-**The point of mm:** a user dumps very large video, picture and sound files on their laptop (an NVR export, a phone's
-camera roll, a day of microphone, a folder of robot logs) and asks their agent to find something in them. mm cuts the
-files into time windows, and a small local decision model reads every window in the range the agent names and returns
-the likeliest moments. The agent looks at those and answers. The model is the eyes and ears. The agent's job is to aim
-it and check what it finds.
+**The task:** a user hands an AI agent a large dump of their own media and asks for something in it. The dump might be an
+NVR export, a phone's camera roll, a day of microphone recording, a folder of robot logs or a meeting archive. The question
+might be "when did the courier come?", "what level did I park on at the airport?" or "did the smoke alarm go off while I was
+out?".
 
-**The question MMMB answers:** when a user gives an agent a pile of large media and asks for something in it, does
-attaching mm make the agent right more often, sooner and more cheaply?
+**The question MMMB answers:** with each search system attached, how often does an agent answer right, with evidence, how
+soon, and at what cost? A search system is anything that ingests a dump and gives the agent tools to search it, for example:
+- a local decision model that scans windows (Multimem);
+- an embedding index;
+- a transcript search;
+- a long-context model.
 
-**What it measures, per question and arm:**
+The baseline is the agent alone with the files and its own tools.
+
+MMMB is neutral between systems. No system's code is in the core. Every system plugs in through one contract (section 3) and
+is scored by the same rules.
+
+**What it measures, per question and configuration:**
 
 | Measure | Why |
 | --- | --- |
-| Grounded accuracy: the answer is right and the evidence it cites (file and time) is where the answer is | a right answer with the wrong evidence is a guess (section 5) |
+| Grounded accuracy: the answer is right and the evidence it cites (file and time) holds it | a right answer with the wrong evidence is a guess |
 | Seconds to answer | the user waits for it |
-| Tokens and dollars | the user pays for it |
-| GPU seconds | local, free in money, not in time or heat |
-| Dump cost: seconds from dump to first answer, disk used | a real user pays it once per dump; the current bench never measures it |
+| Agent tokens and dollars | the user pays for them |
+| System cost per question: GPU seconds, API dollars | local GPU time is free in money, not in time or heat |
+| Ingest cost per dump: seconds, GPU seconds, disk, files refused or misdated | the user pays it once per dump, before the first answer |
 
-**Arms.** Each question runs in a fresh agent session per arm:
+## 2. How it is built
 
-| Arm | The agent has | Role |
+Six layers. Only the last one knows any system.
+
+| Layer | Holds | Knows about systems? |
 | --- | --- | --- |
-| `listing` (was `blind`) | the folder's listing: names, sizes, times, EXIF; no pixels or sound | the floor, and the leak filter: a question it answers is flagged (section 8.4) |
-| `files` | the files and its own tools (Read, shell, ffmpeg) | the baseline |
-| `files+mm` (new) | its own tools and mm's | **the headline arm**: this is what a user who installs mm has |
-| `mm` | mm's tools only | as now, for attributing a gain to mm's tools; smoke tier only |
+| **Dumps** | folders of real files as a user would hand them over, with a manifest of hashes | no |
+| **Questions** | one JSONL file per scenario: the question, its "now", the truth with evidence spans, the grading rule, tags (section 6) | no |
+| **Grader** | rules only, no model grades another | no |
+| **Agents** | locked-down Claude Code and Codex sessions, one per question and configuration | only through the tools a system hands over |
+| **Runner** | scheduling, resource pools, budgets, resume, statistics, report | only through the contract |
+| **Systems** | one plug-in per system: `files`, `listing`, `embed`, `transcript`, `mm`, ... | each knows itself |
+
+**Proposed layout:**
+
+```
+MultiMediaMemoryBench/
+  DESIGN.md  README.md  pyproject.toml          # mmmb[mm], mmmb[embed]: each system's dependencies are an optional extra
+  mmmb/core/        runner, schedule, agents/claude.py, agents/codex.py, grade, probe, stats, report
+  mmmb/systems/     files/  listing/  embed/  transcript/  mm/        # one folder per plug-in
+  mmmb/scenarios/   synthetic_week/  egolife/  security/  household/  ...   # recipe, builder, questions
+  results/          <date>-<scenario>/<agent>/<config>/                  # published reports
+```
+
+Dumps live in `D:\bench-data` (downloaded once, content-hashed). Runs go to `D:\mmmb-runs`.
+
+**The test of neutrality:** the core, the `files` and `listing` systems and every scenario install and run on a machine where
+Multimem has never been installed. A CI check imports `mmmb.core` and each scenario with no extras.
+
+## 3. Systems
+
+### 3.1 The contract
+
+A system is a folder under `mmmb/systems/` with a `system.toml` and a class with these operations:
+
+| Operation | Does | Rules |
+| --- | --- | --- |
+| `describe()` | name, version, media it reads (image, video, audio, text), whether it is local, what it needs (GPU, GPU memory, network), licence | the version is recorded with every result |
+| `ingest(dump, store)` | builds the system's own state in `store` from a read-only dump | sees the dump only, never the questions; timed; returns seconds, GPU seconds, bytes written, and each file refused or given a time it could not believe, with the reason |
+| `serve(store, now)` | returns the agent's tools: an MCP server's command, args and environment, plus the system's own instructions text | only media before `now` may be answered from. A system that cannot cut by time declares `horizon = "view"`, and the runner ingests a view of the dump up to each distinct `now` instead |
+| `reset(store)` | returns the store to its state after ingest, between questions | or `reset = "copy"`: the runner hard-links a fresh copy of the store for each question |
+| `usage()` | GPU seconds, GPU queue seconds and API dollars since the last call | the runner cross-checks GPU seconds against its own sampling of the GPU |
+| `oracle(query, since, until, k)` | optional: the system's own ranked moments for a plain query, with no agent | lets the retrieval tier (section 8) compare systems without paid agent runs |
+
+**Rules every system follows:**
+- **Ingest is blind.** It runs before any question is known. It may take as long as it likes, and the time is reported as the
+  user's wait.
+- **Systems are frozen before a test run.** Their version and configuration hash go with each result. Tuning happens on the
+  dev split only (section 6.4).
+- **Instructions are general.** A system's instructions text is at most about 2,000 tokens and the same for every scenario.
+  It may teach the agent how to use the tools, never what is in a scenario.
+- **No network,** unless the system declares itself hosted. Hosted systems run only on public scenarios, never on
+  private ones, and their API dollars are reported.
+- **GPU work goes through the runner.**
+  - In `exclusive` mode (the default), the scheduler gives the GPU to one system at a time.
+  - In `lease` mode, the system asks the runner for the GPU around each piece of work, through a small local endpoint given
+    in its environment. The runner then knows queue time exactly (section 8.2).
+
+### 3.2 The systems to ship
+
+A benchmark with one contestant tests that contestant. MMMB ships cheap, common baselines beside mm:
+
+| System | What it is | Tools it gives the agent | Ingest |
+| --- | --- | --- | --- |
+| `files` | the baseline: no system | none beyond the agent's own (shell, file reads, ffmpeg) | none |
+| `listing` | the floor and the leak filter (section 7.3) | a listing of names, sizes, times, EXIF and container fields; no pixels or sound | seconds |
+| `embed` | the common "multimodal RAG" setup | `search(text or picture, since, until, k)` over frames at 1 fps and photos (SigLIP or CLIP) and 5 s sound windows (CLAP); `frame(file, t)` | GPU: every frame and window once |
+| `transcript` | speech made searchable | `search(words, since, until)` over a timestamped transcript (Whisper); `listen` is not offered | GPU: all sound once |
+| `mm` | Multimem: a small local model reads each window in a range against the agent's question at ask time | `find`, `ask`, `look` (`label` off) and mm's skill | CPU only (indexing); the GPU works at question time |
+| hosted (later) | a long-context model given the dump in chunks | `ask(question, files)` | none; API dollars per question |
+
+`embed` and `transcript` pay the GPU once at ingest, and `mm` pays it on every question. The report shows both, so a user can
+see which is cheaper for one question or for fifty.
+
+Each model inside a system is a variant: `mm/d1-3B`, `mm/d1-Omni-2B`, `embed/siglip2-base`. Every variant is reported
+apart.
+
+## 4. Configurations and agents
+
+Each question runs in a fresh agent session per configuration:
+
+| Configuration | The agent has | Role |
+| --- | --- | --- |
+| `listing` | the listing only | the floor; a question it answers is flagged as answerable from metadata or prior knowledge |
+| `files` | the files and its own tools | the baseline |
+| `S+files` | its own tools and system S's tools | **the headline for each system**: what a user who installs S has |
+| `S` | S's tools only | diagnostic, smoke tier only: what S's tools do alone |
 | `gold` | the evidence clips alone | diagnostic, smoke tier only: a miss here is the agent's reading, not the search |
 
-The headline comparison becomes `files` against `files+mm`. Today's `mm` arm takes the agent's shell away, which no user
-would do. Removing it measures mm's tools in isolation, not mm as installed.
+**Agents:** Claude Code and Codex for now. Each runs headless, locked down (no network, no access outside the run, no skills
+or plugins of the owner's), with the same model, effort and turn cap in every configuration. The prompt skeleton is shared:
+the user's question, the date and time "now", where the dump is, and the answer format (section 6.2). A system adds its own
+instructions and tool schemas. Other agents can be added through the same runner.
 
-## 2. Where the copied bench stands (measured)
+The headline is `files` against `S+files` for each system S. Taking the agent's shell away is not what any user does, so it
+is a diagnostic only.
 
-**Results** (the README has the full tables): on the 3-day synthetic pilot (24 paired questions, d1-3B), Codex went
-22/24 → 23/24 with mm and Claude 18/24 → 22/24. mm never cost a right answer, and it halved Codex's tokens and cut
-Claude's about 8×. Neither result is significant (McNemar p = 1.0 and 0.125). On EgoLifeQA (real egocentric video, 40
-video questions), mm tied the files arm (34 vs 36) at twice the tokens per correct answer. The transcripts carried most
-of the answers.
+## 5. Scenarios
 
-**Time** (pilot seed 1, `D:\mm-bench\20261104-0314-pilot-s1`, from the result files):
+Each scenario is a **dump** plus 15-40 questions about it. Questions share the dump, so it is built, ingested and probed once
+per system.
 
-| Step | Wall time | What bounds it |
-| --- | --- | --- |
-| `build` (write, freeze, load, shortcut probe) | 11 min 23 s | CPU, one process for most of it |
-| Codex files arm, 31 execs, 3 at a time | ~14 min (1,896 exec-seconds) | the API |
-| Claude files arm, 31 execs, 3 at a time | ~85 min (6,693 exec-seconds; its longest exec hit the 900 s limit) | the API, and Claude's brute force over frames |
-| Codex mm arm, 24 execs, 1 at a time | ~25 min: 1,513 exec-s, of which **1,156 GPU-s (76%)** | the GPU |
-| Claude mm arm, 24 execs, 1 at a time | ~49 min: 2,942 exec-s, of which **2,499 GPU-s (85%)** | the GPU |
-
-The mm arms run one exec at a time because the laptop's NVIDIA driver crashed with three concurrent asks, and has
-crashed with one as well. The run took about 4 hours, including a driver crash and a reboot. **In the mm arms the GPU is
-already busy 76-85% of the time**, so running agents in parallel against it can save at most the remaining 15-25%. The
-large savings have to come from elsewhere (section 6):
-- running the arms side by side rather than in phases;
-- not rebuilding or re-reading what has not changed;
-- not spending execs on questions that never tell the arms apart.
-
-**What is not realistic yet:**
-
-1. **Synthetic needles.** A drawn red dialog and a pure tone are easier to filter than a real error or a real alarm in a
-   real room. The README already says this favours the files arm.
-2. **No large files.** The biggest file is a 1-minute screen segment or a 30 s porch clip. mm's handling of big files is
-   never exercised, and today it is the weakest part of the dump story:
-   - `remember` refuses any file over `remember_max_mb` (2,000 MB by default; the bench's snapshot sets 500)
-     (`src/multimem/ingest.py:433`). A 4 GB GoPro file or an NVR day export is `too_big`.
-   - A folder source indexes a file over `copy_max_mb` (50 MB) **in place, at the time mm saw it**
-     (`ingest.py:250`), not at the file's own `creation_time`. Per DESIGN.md §13.2 every window of such a file sits at
-     that one time, with `at` its offset into the file. So `since` and `until` cannot narrow inside a 3-hour video, and
-     its moments carry the ingest time, not the recording time.
-
-   "mm chops large files" holds for reading (windows of 1 s of video, 5 s of sound) but not for storing or dating them.
-   MMMB should measure this before anyone relies on it (section 4, track L).
-3. **No messy dumps.** Real dumps mix HEIC, JPEG and PNG screenshots, rotated HEVC `.MOV`, variable frame rate,
-   `.m4a` voice memos, WhatsApp copies with their EXIF stripped, duplicates, cameras with a wrong clock, and meaningless
-   names (`IMG_4821.HEIC`).
-4. **Narrow questions.** There are 10 templates, each with one needle and one value. Missing kinds: find-all, query by
-   example ("this bike"), cross-camera ("which camera saw him first"), cross-modal ("what was at the door when the bell
-   rang"), and order ("before or after the rain").
-5. **Answers are not grounded.** The grader checks the value and, for some kinds, a time. It does not check that the
-   agent's evidence is where the answer is.
-6. **Too few discriminating questions.** 8 of the pilot's 24 (text and records) are right in both arms every time, and
-   tell the arms apart in no run.
-7. **The dump step is untimed.** Ingest happens at build time, so time-to-first-answer after a dump is not measured.
-8. **EgoLifeQA is multiple choice** (the blind arm scores 40%) and transcript-heavy (agents asked mm to look at video in
-   14 of 40 questions).
-9. **It cannot run from this folder yet.** `bench.py`, `haystack.py`, `haystack_media.py` and `shortcuts.py` import
-   `multimem` and add `../tests` to `sys.path` for `conftest`, `day` and `fake_decider`. `codex_run.ROOT` is
-   `parents[1]`. Here, `parents[1]` is `D:\robotics`.
-
-## 3. Principles
-
-1. **Real pixels and real sound in the haystack.** The synthetic week stays as a control with every answer known. Each
-   other scenario uses real footage, real photos and real recordings, with needles that are real objects and sounds.
-2. **Every answer is known, checked by rule, and carries evidence.** No model grades another.
-3. **Dumps look like real dumps:** real sizes, formats, timestamps and mess.
-4. **Questions sound like users.** They are vague about time, name things rather than files, and sometimes ask about
-   things that are not there.
-5. **Build once, ask many.** Cache everything that does not change what is measured. Never cache what is measured.
-6. **One model process on the GPU, never idle while work waits.** Exactly one GPU job at a time, as now.
-7. **Spend execs where the arms can differ.** A question both arms always get right is a canary, not a data point.
-
-## 4. Scenarios
-
-Each scenario is a **dump** (a folder as the user would hand it over) plus 15-40 questions about it. Questions share a
-dump, so it is built, ingested and probed once.
-
-| # | Scenario | The user says | The dump | Real data to build it from | Priority |
+| # | Scenario | The user says | The dump | Built from | Priority |
 | --- | --- | --- | --- | --- | --- |
-| S1 | Home security export | "Someone took my parcel this week. Here's the export from my 3 cameras." | 3 cameras × 2-3 days, as an NVR exports them: 1-hour MP4s, or one 4-8 GB file per camera per day; day, night and IR | MEVA (328 h, overlapping cameras, 37 activity types with spans; open on AWS) | 1 |
-| S2 | Household sound | "Did the smoke alarm go off while I was away?" | 1-3 days of one room microphone, one file a day (a 24 h mono 16 kHz WAV is about 2.7 GB) | a real home's week of ambience (SINS) with real events (FSD50K) mixed Scaper-style at a set SNR; TV, music and near misses as decoys | 1 |
-| L | Large-file track | (all of the above, bigger) | the same needles in one 4 GB video, one 10 h audio file, a 50 MP panorama, a 30 GB folder | re-muxed from S1, S2, S3 | 1 |
-| S3 | Phone camera roll | "I dumped my phone. Find the photo of the parking sign at the airport." | 5-10k photos (HEIC, JPEG, PNG screenshots), 200 videos (rotated HEVC MOV, slow motion, a few over 2 GB), 50 voice memos, WhatsApp copies without EXIF, duplicates | YFCC100M single-user photostreams (real EXIF times and cameras); DISBench's 57 users and 122 verified queries; Dan's own phone (private; the most realistic) | 2 |
-| S4 | Robot logs | "Find the episodes where the gripper dropped the cup." | a few hundred episodes, 2-3 cameras each, MP4 per camera | DROID (language instructions per episode) | 2 |
-| S0 | Scripted real day | "When did the courier come? Did I leave the hob on?" | a day of Dan's home, recorded on his own cameras, phone and microphone, with about 30 planted events from a script | the truth is the script (M3-Bench's method); private | 2 |
-| S5 | Meetings and lectures | "When was the cost slide shown, and who drew on the whiteboard?" | 20-40 h of meeting video and audio, 30-90 min files, slides | AMI Meeting Corpus (room video, audio, slides, topic and decision annotations) | 3 |
-| S6 | Dashcam or road trip | "When did it start raining? What exit did we take for the fuel stop?" | 8-10 h in 1-3 min chunks, camera clock set wrong | comma2k19 or BDD100K | 3 |
-| S7 | Field recorder | "When did the fox first show up on the trap camera? When did the owl call?" | 20k trap images (90% empty, wind triggers), 3 nights of audio | Caltech Camera Traps (LILA BC); 33 annotated one-hour bird soundscapes | 3 |
-| S8 | Developer screen | "When did the borrow-checker error first appear?" | the synthetic week (gen 6), plus real screen video | `haystack.py`; the calibration stream; AgentNet's human screen recordings | kept |
-| S9 | Egocentric day | as EgoLifeQA | 3 days of glasses video | EgoLife (as now), turned into open answers with evidence where its annotations allow | kept |
-
-Licences and gating are in section 8. Dan reads each licence. No agent accepts one or makes an account.
+| S1 | Home security export | "Someone took my parcel this week. Here's the export from my 3 cameras." | 3 cameras × 2-3 days, as an NVR exports them: 1-hour MP4s, or one 4-8 GB file per camera per day; day, night and IR | MEVA (328 h, overlapping cameras, 37 activity types with time spans) | 1 |
+| S2 | Household sound | "Did the smoke alarm go off while I was away?" | 1-3 days of one room microphone, one file a day (24 h of mono 16 kHz WAV is about 2.7 GB) | a real home's week of ambience (SINS) with real events (FSD50K) mixed in at a set SNR; TV, music and near misses as decoys | 1 |
+| L | Large-file track | (the above, bigger) | the same needles in one 4 GB video, one 10 h sound file, a 50 MP panorama, a 30 GB folder | re-muxed from S1, S2, S3 | 1 |
+| S0 | Scripted real day | "When did the courier come? Did I leave the hob on?" | a day of Dan's home on his own cameras, phone and microphone, with about 30 planted events | the script is the truth (M3-Bench's method); private | 2 |
+| S3 | Phone camera roll | "I dumped my phone. Find the photo of the parking sign at the airport." | 5-10k photos (HEIC, JPEG, PNG screenshots), 200 videos (rotated HEVC MOV, slow motion, a few over 2 GB), 50 voice memos, WhatsApp copies without EXIF, duplicates | YFCC100M single-user photostreams; DISBench (57 users, 122 verified queries); Dan's own phone (private) | 2 |
+| S4 | Robot logs | "Find the episodes where the gripper dropped the cup." | a few hundred episodes, 2-3 cameras each, an MP4 per camera | DROID (an instruction per episode) | 2 |
+| S5 | Meetings and lectures | "When was the cost slide shown? Who drew on the whiteboard?" | 20-40 h of meeting video and sound, 30-90 min files, slides | AMI Meeting Corpus (topics, decisions, slides) | 3 |
+| S6 | Dashcam or road trip | "When did it start raining? Where did we stop for fuel?" | 8-10 h in 1-3 min chunks, camera clock set wrong | comma2k19 (GPS and CAN, no event labels) | 3 |
+| S7 | Field recorder | "When did the fox first show up on the trap camera? When did the owl call?" | 20k trap images (90% empty, wind triggers), 3 nights of sound | Caltech Camera Traps; 33 annotated one-hour bird soundscapes | 3 |
+| S8 | Developer screen | "When did the borrow-checker error first appear?" | a synthetic week of screen recording (the copied generator), plus real screen video | the copied `haystack.py`; AgentNet's human screen recordings | kept |
+| S9 | Egocentric days | as EgoLifeQA | 3 days of glasses video | EgoLife, with open answers and evidence where its annotations allow | kept |
 
 **What makes each one hard, on purpose:**
-- S1: night and IR, rain, headlights, many people and cars that are not the one asked about, and the same event on two
-  cameras at different times. The question's thing is small in the frame.
-- S2: needles at -5 to +10 dB below or above the ambience, TV and music that contain alarms and doorbells, the dog that
-  barks at everything. Agents cannot hear, so Dan checks the sound needles by ear before a run.
-- L: the needle a minute before the end of a 10-hour file, and needles that straddle a window or segment boundary.
-- S3: many near-duplicates (burst shots), screenshots of text, and photos whose time comes from the file, not EXIF.
-- S4: hundreds of near-identical episodes. Only the outcome differs.
-- S5: speech. mm is weak on long speech (VISION.md), so speech questions are reported apart from the rest.
-- S6: a camera clock that is wrong by a known offset: "what time" means the true time.
+- S1: night and IR, rain, headlights, many people and cars that are not the one asked about, the same event on two cameras
+  at different times, and a small subject.
+- S2: needles from -5 to +10 dB around the ambience, TV and music that hold alarms and doorbells, and a dog that barks at
+  everything. Agents cannot hear, so the sound needles come from a mix list or a script, never from a listen.
+- L: a needle a minute before the end of a 10-hour file, needles that straddle any fixed cut (1 s, 5 s, 60 s), a file larger
+  than 2 GB, and files whose only time is their mtime.
+- S3: burst shots and near-duplicates, screenshots of text, and photos whose time must come from the file, not EXIF.
+- S4: hundreds of near-identical episodes, where only the outcome differs.
+- S5: speech, which some systems handle and some do not. Speech questions are reported apart.
+- S6: a camera clock wrong by a known offset. "What time" means the true time.
 - S7: thousands of empty frames, animals at the edge of the frame or at night.
 
 ### Question kinds
 
-| Kind | The user says | Answer | Graded by | Borrowed from |
+| Kind | The user says | Answer | Graded by | From |
 | --- | --- | --- | --- | --- |
-| find and read | "What level did I park on at the airport?" | a value and its evidence | value rule, evidence overlap | CG-Bench (grounded answers) |
-| last seen | "When did I last have the blue backpack?" | a time and its evidence | time within a tolerance; earlier needles are wrong answers | Ego4D NLQ |
+| find and read | "What level did I park on at the airport?" | a value and its evidence | value rule and evidence overlap | CG-Bench |
+| last seen | "When did I last have the blue backpack?" | a time and its evidence | tolerance; earlier needles are wrong answers | Ego4D NLQ |
 | when | "What time did the white van arrive?" | a time | tolerance | |
 | count | "How many times did the dog bark last night?" | a number, with evidence for each | exact (±1 reported apart) | |
-| find all | "Show me every clip with the cat in it." | a list of (file, span) | event F1 with a time collar | VBS ad-hoc search, DCASE |
-| absent | "Did anyone open the side gate on Tuesday?" | "not there" | not there, no evidence | as now |
+| find all | "Show me every clip with the cat in it." | a list of moments | event F1 with a time collar | VBS ad-hoc search, DCASE |
+| absent | "Did anyone open the side gate on Tuesday?" | "not there" | not there, and no evidence | PhotoBench, MMNeedle |
 | query by example | "Find other photos with this bike." (a picture attached) | a list | F1 | Ego4D VQ2D, MomentSeeker |
-| cross-source | "Which camera saw the man with the bag first?" | source and time | both | MEVA's overlapping cameras |
+| cross-source | "Which camera saw the man with the bag first?" | source and time | both | MEVA |
 | cross-modal | "What was at the front door when the doorbell rang?" | a value | value rule, both spans | |
-| order | "Did the parcel arrive before or after it started raining?" | before or after, with both spans | answer and both spans | |
-| vague time | "the morning of the trip", "last weekend" | as its kind | as its kind | |
+| order | "Did the parcel come before or after it started raining?" | before or after, with both spans | answer and both spans | |
+| multi-hop | "How many times did the doorbell ring before the parcel came?" | a value | value rule, all spans | DISBench, LongVidSearch |
 
-About a quarter of all questions are absent ones. Agents and models force matches on them.
+About a quarter of all questions are absent ones. Agents and systems both force matches.
 
-Every question records these tags, and the report cuts accuracy and cost by each:
-- **haystack size:** hours, files, and the windows a full scan would read;
-- **certificate length:** seconds of media needed to verify the answer (EgoSchema);
-- **look-back:** how long before "now" the evidence is (EgoLifeQA: under 2 h, 2-6 h, 6-24 h, over 24 h);
-- **evidence:** how many pieces, and how far apart (EgoMemReason);
-- **needs audio:** whether a deaf model like d1-3B can answer it at all;
-- **needle salience:** share of the frame, or SNR in dB;
-- the modality and the time-hint level.
+**Tags on every question,** and the report cuts every measure by each:
+- haystack size (hours, files);
+- certificate length (seconds of media needed to check the answer: EgoSchema);
+- look-back (how long before "now" the evidence is: under 2 h, 2-6 h, 6-24 h, over 24 h);
+- evidence pieces and how far apart they are;
+- needs audio, needs speech, needs reading small text;
+- needle salience (share of the frame, or SNR);
+- kind, modality and how vague the time hint is (a part of a day, a day, none).
 
-## 5. Answers and grading
+## 6. Questions, answers and grading
 
-The agent ends with one JSON object:
+### 6.1 The question file
+
+One JSON object per line, kept outside the dump and never visible to a system or an agent:
 
 ```json
-{"answer": "level P3", "evidence": [{"file": "DCIM/100APPLE/IMG_4821.HEIC", "t": null},
-                                    {"file": "cam2/2026-11-03_14.mp4", "t0": "14:31:05", "t1": "14:31:20"}]}
+{"qid": "security-parcel-last-1", "scenario": "security", "split": "test",
+ "now": "2026-11-03T21:00:00+00:00", "question": "When was a parcel last left at the front door?",
+ "attachments": [], "kind": "last", "hint": "week",
+ "truth": {"value": "2026-11-02 07:30", "evidence": [{"file": "cam1/2026-11-02_07.mp4", "t0": 1788.0, "t1": 1802.0}],
+           "wrong": [{"file": "cam1/2026-11-01_18.mp4", "t0": 410.0, "t1": 425.0}]},
+ "grade": {"rule": "time", "tol_s": 120}, "tags": {"lookback_h": 37.5, "certificate_s": 14, "salience": 0.03}}
 ```
 
-- **Grounded accuracy** (the headline): the value passes its rule and every cited span overlaps a truth span within
-  the kind's tolerance (video 10 s, sound 5 s, a picture the same file). A right value with wrong evidence is counted
-  as `lucky` and shown apart.
-- **Find all, count:** event F1 by distinct moments, as DCASE scores sound events (DCASE's collars are 200 ms at the
-  onset and max(200 ms, 20% of the event) at the offset; MMMB widens them to mm's window, 1 s of video and 5 s of
-  sound). A count is also graded exactly.
+Evidence spans are in seconds into the file. The scenario's manifest maps each file to its true start time, so the
+grader can read a cited time either way.
+
+### 6.2 The answer
+
+Every agent ends with one JSON object:
+
+```json
+{"answer": "Monday 07:30", "evidence": [{"file": "cam1/2026-11-02_07.mp4", "t0": "07:29:50", "t1": "07:30:05"}]}
+```
+
+A cited span may be wall-clock times or seconds into the file. Systems that work in wall-clock time and agents that work in
+file offsets are graded alike.
+
+### 6.3 Scores
+
+- **Grounded accuracy** (the headline): the value passes its rule and every cited span overlaps a truth span within the
+  kind's tolerance (10 s for video, 5 s for sound, the same file for a picture). A right value with wrong evidence is
+  counted as `lucky` and shown apart.
+- **Find all and count:** event F1 by distinct moments, as DCASE scores sound events (with 1 s and 5 s collars in place of
+  DCASE's 200 ms). A count is also graded exactly.
 - **Absent:** right only with "not there" and no evidence. The report counts the searches each absent question drew.
-- **Time:** each correct answer's seconds feed a time-to-correct curve per arm (the share answered correctly within 30,
-  60, 180 and 600 s), read from data the bench already logs. A secondary score in the style of the Lifelog Search
-  Challenge, max(0, 100 - 50·t/T - 10·wrong), with `wrong` counting cited spans that hold nothing, is reported beside
-  it, never instead of accuracy.
-- **Cost:** tokens, dollars and GPU seconds per correct answer. The report shows a Pareto plot of accuracy against
-  seconds and dollars per arm.
+  Deep Video Discovery's main failure is the "search trap": searching again and again for what is not there.
+- **Time:** a time-to-correct curve per configuration, the share answered correctly within 30, 60, 180 and 600 s. Beside it,
+  a score in the style of the Lifelog Search Challenge, max(0, 100 - 50·t/T - 10·wrong), with `wrong` counting cited spans
+  that hold nothing. It is never shown instead of accuracy.
+- **Cost:** agent tokens and dollars, system GPU seconds and API dollars, per correct answer. Ingest cost is reported per
+  dump, and amortised over 1, 10 and 100 questions. The report draws a Pareto plot of accuracy against seconds and dollars.
 
-## 6. Speed
+### 6.4 Dev and test
 
-### 6.1 Where the time goes
+Every scenario has a public **dev** split and a **test** split, about 30% and 70% of its questions. Any system, mm included,
+is built and tuned on dev only. Test results are published only from a frozen system version.
+- For the synthetic week, seeds 1-10 are dev and the test seeds are drawn fresh per release. mm's skill and the copied
+  harness were adjusted after runs on pilot seed 1, so that seed is dev.
+- For public datasets, which questions are in test stays private to the run folder.
 
-See the table in section 2. In order of size:
-1. **GPU seconds in the mm arms:** 76-85% of their exec time. One `ask` over 3 days of screen needs more than the 900 s a
-   question gets.
-2. **Claude's files arm:** brute force over frames, 6,693 exec-seconds for 31 questions.
-3. **Build:** 11 min per seed and scale, repeated whenever the generator or mm's store changes.
-4. **Ceiling questions:** 8 of 24 paired questions per agent, right in both arms every time.
-5. **Serial phases:** the arms ran one after another, files arms first, then mm arms, one agent at a time.
+## 7. Building the dumps
 
-### 6.2 The plan
+### 7.1 Ways to know the answer
 
-**a. Three resource pools and one scheduler.** Every unit of work names the resource it uses:
+1. **Annotated real data.** A dataset's own time spans (MEVA's activities, AMI's topics and decisions, DROID's episode
+   instructions, camera-trap species labels) become questions through templates in user wording. Each is checked by rule
+   against the spans, and Dan spot-checks 10%.
+2. **Real needles in real backgrounds,** where annotations do not cover what users ask.
+   - Sound: real event clips mixed into real ambience at a set SNR, with exact onsets (the Scaper method).
+   - Video: real clips spliced at natural cuts, or a real object composited with blending. The probe must show that a splice
+     is not the most unusual moment in its scope.
+3. **Owner-written questions about the owner's own data** (S3 with Dan's phone, S4 with his robot logs). ScreenshotVQA,
+   camroll and ATM-Bench all chose this over LLM-written questions as more natural. These stay private.
+4. **A scripted real day (S0):** Dan follows a script of about 30 planted events while his own devices record. This gives
+   real light, real noise and real codecs, with the truth known by construction, and sound truth that nobody has to hear.
+5. **Real footage on a plausible schedule** for the synthetic week (X-LeBench's method): its porch camera becomes real clips
+   (MEVA, S0) laid on the plan's days, with the plan's needles and decoys.
+
+### 7.2 Real dumps
+
+Dumps keep what real ones have:
+- sizes from 1 MB photos to multi-GB videos and 10-hour sound files;
+- codecs and containers (H.264, HEVC, MP4, MOV, MKV, M4A, MP3, WAV, FLAC, Opus);
+- variable frame rate, rotation flags and HDR;
+- HEIC, JPEG and PNG;
+- EXIF present, stripped or wrong, time zones and daylight saving;
+- duplicates, nested folders, and names like `IMG_4821.HEIC` and `VID_20250612_181502.mp4`.
+
+### 7.3 The shortcut probe and leaks
+
+**The shortcut probe** (from the copied `shortcuts.py`) checks every dump before any run. No file name, file size, EXIF or
+container field, frame difference, splice seam, colour, loudness or frequency band may single out a needle.
+
+**Leaks:**
+- No network for agents or local systems, so no one looks up a public dataset's answers.
+- Files get the names a phone or NVR would give them, and dataset identifiers are removed.
+- The `listing` configuration runs on every scenario. A question it answers is flagged and kept out of the headline. This is
+  the blind filter of LVBench and HourVideo, and Daily-Omni's text-only filter, applied to what a dump really leaks.
+- Multiple-choice questions (EgoLifeQA) are asked in 4 rotations and count only if all 4 are right (VNBench).
+
+### 7.4 The ingest track
+
+Once per scenario per system version: seconds to ingest, GB per minute, GPU seconds, disk, files refused or misdated and
+why, and seconds from the end of the dump to the first answer. Every system meets large files here. The copied pilot already
+found two limits in mm this way (section 10.3).
+
+### 7.5 Scaling curves
+
+Each S1, S2 and S8 needle also sits in haystacks of 1 h, 4 h, 1 day and 3 days of the same source (Visual Haystacks,
+TimeScope). The curve shows, per system and agent, from what size of dump a system pays off against `files`. A system that
+pays once at ingest and one that pays per question cross at different sizes.
+
+## 8. Speed
+
+### 8.1 Where the time went in the copied pilot (measured)
+
+One system (mm with d1-3B) against `files`. 3 synthetic days, seed 1, `D:\mm-bench\20261104-0314-pilot-s1`:
+
+| Step | Wall time | Bounded by |
+| --- | --- | --- |
+| build (write, load, probe) | 11 min 23 s | CPU, mostly one process |
+| Codex `files`, 31 execs, 3 at a time | ~14 min (1,896 exec-s) | the API |
+| Claude `files`, 31 execs, 3 at a time | ~85 min (6,693 exec-s; its longest exec hit the 900 s limit) | the API, and brute force over frames |
+| Codex `mm`, 24 execs, 1 at a time | ~25 min: 1,513 exec-s, of which **1,156 GPU-s (76%)** | the GPU |
+| Claude `mm`, 24 execs, 1 at a time | ~49 min: 2,942 exec-s, of which **2,499 GPU-s (85%)** | the GPU |
+
+The run took about 3 hours of work, and 4 with a driver crash and a reboot. The laptop's NVIDIA driver has crashed under one
+GPU job and under three, so **exactly one GPU job runs at a time**, whatever the system. A per-question GPU system already
+keeps the GPU busy 76-85% of the time, so running more agents against it saves little. The large savings are in:
+- running GPU-free work beside GPU work;
+- ingesting once;
+- not spending runs on questions that do not separate configurations.
+
+### 8.2 The plan
+
+**a. Three resource pools and one scheduler.**
 
 | Pool | Size | Work |
 | --- | --- | --- |
-| CPU | at most 4 processes (the laptop rule) | download, re-mux, generate, ingest, shortcut probe |
-| Agents | per CLI, up to 4 sessions (quota and rate limits) | every arm's agent turns |
-| GPU | **exactly 1 job at a time** | every `ask`, the decider tier |
+| CPU | at most 4 processes (the laptop's rule) | download, re-mux, generate, CPU ingest, probe |
+| Agents | per CLI, up to 4 sessions (quota and rate limits) | every configuration's agent turns |
+| GPU | exactly 1 job, for every system together | GPU ingest (`embed`, `transcript`), question-time GPU (`mm`), the retrieval tier |
 
-The scheduler runs the `listing` and `files` arms (agents only), and the next scenario's build, at the same time as the
-mm arms (agents plus GPU). This is the largest single saving: the speed research estimates 25-35% of a run's wall
-time. The scheduler starts the longest expected execs first, so one heavy ask does not set the tail. Harbor calls the
-GPU pool a `concurrency_group`; Inspect AI uses `concurrency("gpu", 1)`.
+Configurations that need no GPU at question time (`listing`, `files`, `embed+files` once ingested) run beside those that do.
+The longest expected questions start first. Ingest of the next system or scenario fills the GPU's idle gaps. The speed
+research puts the saving of running side by side at 25-35% of a run's wall time.
 
 Two conditions:
-- **Dan's go-ahead.** Running ffmpeg-heavy files execs beside a GPU run goes against the current "GPU runs alone" rule.
-  Without it, the arms stay in phases and this saving is lost.
-- **The files arm is kept off the GPU:** CUDA hidden from its environment, and `-hwaccel` and `nvidia-smi` on its
-  deny list. An agent that decodes with the GPU would be a second GPU user, and the driver crashes.
+- **Dan's go-ahead.** CPU-heavy work beside a GPU job goes against the laptop's current "GPU runs alone" rule.
+- **Agents stay off the GPU:** CUDA is hidden from their environment, and `-hwaccel` and `nvidia-smi` are on their deny
+  list. An agent decoding on the GPU would be a second GPU user.
 
-CPU contention may slow mm's decoding (2-35 ms of a window's 50-60), so the report gives decode time beside GPU time.
-The harness already does what Harbor's error classes do: `setup`, `limit` and `auth` results are asked again and left
-out, and `escaped`, `timeout` and `capped` are wrong answers. Keep that, and add "daemon died" to the first group.
+The copied harness's error classes stay: `setup`, `limit` and `auth` results are retried and left out, and `escaped`,
+`timeout` and `capped` are wrong answers. A system that dies, or a lost GPU, is `setup`.
 
-**b. A GPU queue with a working-time clock.** Let 2-3 mm execs run at once against one daemon. Their asks wait in one FIFO
-queue and reach the GPU one job at a time, the same load as `--jobs 1` today. Waiting in the queue is an artefact of the
-benchmark, since a real user's agent has the GPU to itself, so neither the agent nor the clock should see it:
-- an exec is charged its own turns plus its own GPU service time, never queue time. This is Inspect AI's
-  `working_limit`: clock time minus waits for a shared resource, always paired with a wall-clock cap. For MMMB, 900
-  working seconds and a 2-3× wall cap. mm's job record needs queued, started and ended times, as vLLM logs
-  `request_queue_time` apart from service time. The harness enforces the working limit itself and sets the CLI's own
-  timeout to the wall cap;
-- `ask`'s "return within about 45 s with what it has" counts from the job's start, not its submission, so a queued ask
-  does not come back empty and invite polling;
-- **before trusting it,** run 10 questions both ways (alone and queued) and compare answers, tokens and charged seconds.
+**b. Working time, not wall time.** When several questions share the GPU, waiting for it is an artefact of the benchmark. A
+real user's system has the GPU to itself. So:
+- A question is charged its agent's turns plus its own GPU service time, never queue time. This is Inspect AI's
+  `working_limit`, paired with a wall-clock cap: 900 working seconds and a 2-3× wall cap. In `lease` mode the runner
+  measures the queue itself. In `exclusive` mode the system reports it through `usage()`, as vLLM reports queue time apart
+  from service time.
+- A system whose tool returns early with partial results counts that time from when its GPU work starts, not from when the
+  request was queued, so a queued request does not come back empty and invite polling.
+- Before trusting it, run 10 questions both alone and queued, and compare answers, tokens and charged seconds.
 
-Expected saving: up to the 15-25% of mm-arm time the GPU now sits idle, plus the overlap of two agents' mm arms (not
-measured). This is worth doing, but it is not the big lever.
+**c. Ingest once.**
+- Downloads are fetched once and content-hashed.
+- Each prepared dump is cached by the hash of its recipe.
+- Each system's store is cached by (system, version, configuration, dump hash), and hard-linked per question.
+- A system or recipe change rebuilds only what it touches.
+- The synthetic generator writes days and sources in up to 4 processes.
 
-**c. Fewer GPU seconds per question.** This is harder than it looks.
-- **Caching each window's encoding is ruled out for d1.** vLLM's encoder cache and SGLang's prefix cache reuse an
-  image's encoding across requests. DESIGN.md §16 lists "KV or vision-encoder caching" as not adopted, because under
-  d1's set attention the image's state depends on the questions after it. A window costs its full 50-60 ms on every
-  ask.
-- **No window read twice in one exec.** DESIGN.md §16 defers an answer cache keyed by window, model, profile and
-  question set ("built once re-asks are seen to repeat windows"). Claude made 5.2 asks per media exec in the pilot, many
-  over overlapping ranges, so MMMB can settle this first: count the repeated windows in the pilot's `tools.json`.
-  - In a scored run the cache is cleared with each exec's scrub, so no exec gains from another's.
-  - In replays (T0) it is kept and charges the recorded service time.
-  - Cross-agent hits would be rare anyway: the two CLIs word their questions differently.
-- **Batch windows,** only after a check. On armature's probe, 4 windows in one call took 298 ms against 368 ms
-  (-19%, at 0.4 GB more GPU memory), and that is about the ceiling, since window reads are prefill-bound. GPU kernels are
-  not batch-invariant: Thinking Machines found 80 distinct completions in 1,000 at temperature 0 until they used
-  batch-invariant kernels. So a batched verdict may differ from a single one, which would break the still gate's and
-  the answer cache's reliance on d1 being deterministic. Batch only if batched and single verdicts agree on a few
-  thousand real windows.
-- **Real footage gates more:** mm's still gate keeps 98% of the synthetic screen's seconds but 71-86% of a real one's,
-  and a still security camera keeps about 120 windows an hour rather than 3,600. Real scenarios will cost less GPU per
-  hour than the synthetic screen. This is a fact to report, not a lever.
+**d. GPU seconds are the system's business, and the bench reports them honestly.** Caches inside a system (encoder outputs,
+answer caches) are allowed if they would also serve a real user. Across questions, a cache may only keep what ingest built,
+so no question gains from another's run. Batching inside a system is the system's own choice, and the report records it.
 
-So the GPU's share is cut mostly by reading fewer windows, not by reading each one faster. The agent narrowing its range
-is in mm's skill and the lint, and the bench measures it.
-
-**d. Build and ingest once.** Downloads go once to `D:\bench-data`, content-hashed. Each scenario's prepared dump (renamed,
-re-muxed, metadata set) is cached by its recipe's hash. Each scenario's mm snapshot home is cached by (dump hash, mm store
-schema), since the index does not depend on the model, and is hard-linked into per-arm homes, as now. A rebuild happens
-only when the recipe or mm's store changes. The synthetic generator writes days and sources in up to 4 processes.
-
-**e. Spend execs where they count:**
-- **Canaries, not data:** text and records questions, and any question both arms passed in two earlier runs, leave the
-  routine tiers. Two stay as canaries.
-- **Enough discriminating questions.** Paired questions per agent and model needed at 80% power and α = 0.05, by
-  Connor's approximation for McNemar:
-
-  | Effect, and share of pairs right in one arm only | Questions |
-  | --- | --- |
-  | Claude's pilot (+17 points, all 4 discordant pairs for mm), optimistic | about 45 |
-  | +15 points, 20% discordant | about 70 |
-  | +10 points, 15-20% discordant | about 115-155 |
-  | Codex's pilot (+4 points, about 8% discordant) | about 390 |
-
-  So MMMB aims at effects of 10 points or more, from 70-150 media questions per run drawn from several scenarios. A gain
-  as small as Codex's will not be certified at any affordable size, and the report should say so rather than imply it.
-- **Distinct questions, not repeats.** Miller's "Adding Error Bars to Evals" shows that repeating a question shrinks only
-  its own run-to-run variance, never the spread between questions. Repeats go to a small reliability set: 3 runs of 10
-  questions per arm, reported as pass^k as τ-bench does.
-- **Drop questions that carry no information.** A pair right in both arms, or wrong in both, tells McNemar nothing.
-  Questions concordant in two earlier runs leave the routine tiers, and the effect is then reported as "on
-  discriminating questions". The speed research puts the saving at 30-60% of execs. Benchmark-compression work keeps
-  tasks with 30-70% pass rates; for agent benchmarks it compresses only 2-3.5×.
-- **Sequential stopping, pre-registered:** questions run in a random order, and a comparison stops when an
-  anytime-valid rule (an e-process or confidence sequence) decides it, capped at 150. Peeking without such a rule
-  inflates false positives. The saving is large when the effect is large and nothing when it is small. The
-  SpatiotemporalBench trial stopped at 21 of 24 by hand for the same reason.
-
-**f. Tiers.** Each tier has a wall-clock target (estimates, not measured):
+**e. Tiers.** Targets are estimates:
 
 | Tier | What | Resources | Target |
 | --- | --- | --- | --- |
-| T0 | unit tests, fake decider; recorded execs re-graded and re-reported (Harbor's `regrade`); recorded ask and look results replayed at their recorded latency for harness tests | CPU | minutes |
-| T1 | decider tier: each needle's oracle yes/no per model, no agent | GPU | under 1 h per model per scenario, cached |
-| T2 | smoke: one scenario, 8 discriminating questions, one agent, all arms | all | under 20 min |
-| T3 | standard: every scenario, both agents, `files` and `files+mm`, one pass | all | one night |
+| T0 | unit tests; recorded runs re-graded and re-reported (Harbor's `regrade`); recorded tool results replayed at their recorded latency | CPU | minutes |
+| T1 | retrieval tier: each system's `oracle()` per needle, no agent; recall at k, AP, seconds | GPU | under 1 h per system per scenario, cached |
+| T2 | smoke: one scenario's 1 h rung, 8 discriminating questions, one agent, every configuration | all | under 20 min |
+| T3 | standard: every scenario, both agents, `files` and each `S+files`, one pass | all | one night |
 | T4 | significance: T3 plus sequential top-up and repeats | all | a weekend |
 
-**g. Budgets sized to the haystack.** A question's time budget scales with what a brute-force scan would read: 300 s for
-an hour of media, 900 s for a day or more. The run flags any question whose oracle ask would exceed the budget before it
-starts, as `beyond_timeout` does now, and the T1 tier drops it from T2 and T3 or narrows its hint.
+**f. Budgets sized to the haystack:** 300 working seconds for an hour of media, 900 for a day or more. A question that
+T1 shows no system can scan within its budget gets its hint narrowed or is dropped from T2 and T3.
 
-**h. Session mode** (a second track, for realism): one agent session gets 5 questions about one dump in a row, as a user
-would ask them. Startup and the agent's learning of what is recorded are paid once. Reported apart from the independent
-questions, which keep the statistics clean.
+**g. Session mode** (a second track): one agent session gets 5 questions about one dump in a row, as a user asks them, so
+startup and learning the dump are paid once. Reported apart, since its questions are not independent.
 
-### 6.3 What the pilot would cost under the plan
+## 9. Statistics
 
-Estimates, not measured. The same 24 questions, both agents, one seed:
+Each system is compared with `files` per agent, question by question (paired, McNemar). The pre-registered comparisons are
+those pairs, corrected for multiplicity with Holm's method. Rankings between systems are given with bootstrap intervals over
+questions.
 
-| | Today | Plan |
-| --- | --- | --- |
-| Build | 11 min | 0 on a rerun (cached); about 4 min fresh (4 processes) |
-| Questions | 24 per agent | 16 media + 2 canaries (the controls are quick, so this saves quota more than time) |
-| Files arms | about 85 min (Claude sets it) | beside the mm arms, at 4 jobs |
-| mm arms | about 75 min, one agent after the other | about 60 min, both agents in one GPU queue (only the 15-25% idle is recovered) |
-| **Total** | **about 3 h** | **about 1.5 h**, mostly from running the arms side by side |
+**How many questions.** Paired questions per agent and comparison, at 80% power and α = 0.05 (Connor's approximation for
+McNemar):
 
-What would cut it further is fewer GPU seconds, and d1's design rules out the usual caches (6.2c). The answer cache is
-the one to measure. On a bigger run, dropping concordant questions and sequential stopping save more than any of
-these.
+| Effect, and share of pairs right in one configuration only | Questions |
+| --- | --- |
+| +17 points, all discordant pairs one way (Claude's pilot), optimistic | about 45 |
+| +15 points, 20% discordant | about 70 |
+| +10 points, 15-20% discordant | about 115-155 |
+| +4 points, 8% discordant (Codex's pilot) | about 390 |
 
-## 7. Building the haystacks
+So MMMB aims at effects of 10 points or more, from 70-150 media questions per run across scenarios. A smaller effect is
+reported as not certified, not implied.
 
-**Ways to know the answer:**
-1. **Annotated real data.** A dataset's own time spans (MEVA's activities, AMI's topics and decisions, DROID's episode
-   instructions, camera-trap species labels) become questions through templates in plain user wording. Each question
-   is checked by rule against the spans, and Dan spot-checks 10%.
-2. **Real needles inserted into real backgrounds,** where annotations do not cover what users ask. Sound: real event
-   clips mixed into real ambience at a set SNR (the Scaper method). Video: real clips spliced at a natural cut, or a real
-   object composited with blending. The shortcut probe must show that the splice is not the most unusual moment in
-   its scope.
-3. **Owner-written questions about the owner's own data:** S3 with Dan's phone, S4 with his robot logs. ScreenshotVQA,
-   camroll and ATM-Bench all chose this over LLM-written questions. These are the most realistic and stay private on the
-   laptop.
-4. **A scripted real day (S0):** Dan follows a script of about 30 planted events while his own cameras, phone and
-   microphone record, so the truth is known by construction (M3-Bench's method). This is real light, real noise and
-   real codecs, with known answers, which also gives the agents' sound answers a ground truth that nobody has to hear.
-5. **Real footage on a plausible schedule** for the synthetic week (X-LeBench's method): the porch camera's clips
-   become real ones (MEVA, S0), laid on the plan's days, with the plan's needles and decoys.
+- **Distinct questions, not repeats.** Repeating a question shrinks only its own run-to-run variance, never the spread between
+  questions (Miller, "Adding Error Bars to Evals"). Repeats go to a reliability set of 10 questions × 3 runs, reported as
+  pass^k (τ-bench).
+- **Drop questions that carry no information.** A question right in every configuration, or wrong in every one, in two
+  earlier runs leaves the routine tiers. Two stay as canaries. Results are then labelled "on discriminating questions". The
+  speed research puts the saving at 30-60% of runs.
+- **Sequential stopping, pre-registered:** questions run in a random order, and a comparison stops when an anytime-valid rule
+  (an e-process or a confidence sequence) decides it, capped at 150 questions. It saves most when the effect is large.
 
-**The shortcut probe** extends to real data. No file name, file size, EXIF or container field, frame difference, splice
-seam, colour, loudness or frequency band may single out a needle.
+## 10. Where the copied code stands, and how it becomes MMMB
 
-**Leaks:**
-- No network in either arm, so no agent can look up a public dataset's answers.
-- Files get the names a phone or NVR would give them, and dataset identifiers are removed.
-- The `listing` arm runs on every public-data scenario. A question it gets right is answerable from metadata or from
-  what the model already knows of the dataset, and is flagged.
+### 10.1 What is tied to Multimem today
 
-**The dump step as its own track** (once per scenario per mm version, CPU only): seconds to ingest, GB per minute, disk
-used, files refused or misdated (`too_big`, in-place, `time_from = now`), and seconds from the end of the dump to the
-first answer.
+| File | Lines | Tie to Multimem | Becomes |
+| --- | --- | --- | --- |
+| `grade.py` | 290 | none | `core/grade`, plus grounded scoring |
+| `shortcuts.py` | 643 | `RATE` from Multimem's `tests/day.py` | `core/probe` |
+| `haystack.py` | 1,814 | `multimem.reader` to check written frames and count mm's windows; `load` stores files through mm's `remember`; helpers from `tests/` (`day`, `fake_decider`, `conftest`) | `scenarios/synthetic_week`: the plan, files and questions. `load` and the window count move to `systems/mm`, frame checks use PyAV, and the helpers' constants are copied in |
+| `haystack_media.py` | 1,357 | `multimem.config.ffmpeg_exe`; `tests/day` fonts | `scenarios/synthetic_week/media`, with its own ffmpeg lookup |
+| `claude_run.py` | 511 | the `mm` arm's MCP server, tool names and prompt | `core/agents/claude`: tools and instructions come from `serve()` |
+| `codex_run.py` | 636 | the same, mm's server instructions, and mm's skill read from the Multimem repo | `core/agents/codex`, likewise |
+| `bench.py` | 2,390 | mm's daemon, snapshot homes, scrubbing mm's index between questions, cancelling mm's jobs, mm's GPU estimate, the decider tier, `tests/conftest` | split: `core/runner` (exec loop, slots, deny lists, resume, error classes, statistics, report) and `systems/mm` (everything about mm's daemon, which becomes `ingest`, `serve`, `reset`, `usage` and `oracle`) |
+| `egolife.py` | 1,229 | `multimem` config, media, reader and `ask` | `scenarios/egolife`, with mm's parts in `systems/mm` |
+| `README.md`, `results/` | | the published mm-against-files results | `results/2026-11-0x-*` labelled as system `mm`; a new README for MMMB |
 
-**Scaling curves:** each S1, S2 and S8 needle sits in haystacks of 1 h, 4 h, 1 day and 3 days of the same source. This
-shows from what size of dump mm pays off for each agent, the main claim a user cares about.
+### 10.2 The order of the work
 
-## 8. Ideas from other benchmarks, and datasets
+1. Copy in the few helpers from Multimem's `tests/` (font, sample rate, the shade and pitch constants) and give
+   `haystack_media` its own ffmpeg lookup. The synthetic week then builds with no Multimem.
+2. Write the question-file format, and make the synthetic week and EgoLife write it.
+3. Split `bench.py` into `core/runner` and `systems/mm`, and make the agent runners take tools from `serve()`.
+4. Re-run the copied pilot through the new runner: the same verdicts for `files` and `mm` (the copied pilot's mm-only
+   configuration) show that nothing was lost. Then `mm+files` runs for the first time.
+5. Add `listing`, then `embed` and `transcript`.
 
-From web research on 4 November 2026: three sweeps covering video, sound/pictures/lifelogs, and harness speed.
-Links are to the papers. "Unverified" means only a secondary source was found. Several 2026 papers postdate what this
-project has read before, so treat their numbers as theirs.
+### 10.3 What mm's plug-in will meet first
 
-### 8.1 The closest benchmarks, and what none of them does
+The ingest track (section 7.4) and track L will exercise two limits of mm today. These belong to mm's notes, not to MMMB's
+design:
+- `remember` refuses any file over 2 GB (`remember_max_mb`).
+- A folder source keeps a file over 50 MB in place, dated when mm saw it rather than by its recording time.
+
+Track L is built so that any system's handling of big files shows the same way.
+
+## 11. Ideas from other benchmarks, and datasets
+
+From web research on 4 November 2026, in three sweeps: video, sound/pictures/lifelogs, and harness speed. Links are to the
+papers. "Unverified" means only a secondary source was found. Several 2026 papers are recent, so treat their numbers as
+theirs.
+
+### 11.1 The closest benchmarks, and what none of them does
 
 | Benchmark | Close because | Scale |
 | --- | --- | --- |
 | [LVBench](https://arxiv.org/abs/2406.08035), [HourVideo](https://arxiv.org/abs/2411.04998), [EgoLifeQA](https://arxiv.org/abs/2503.03803), [EgoMonth](https://arxiv.org/abs/2608.13113) | hour-to-month video QA | 117 h / 500 videos / 266 h / 300+ h |
-| [Ego-R1 Bench](https://arxiv.org/abs/2506.13654) | an agent with tools much like mm's `find`, `ask` and `look` over a week of video | 300 questions, ~44 h each |
+| [Ego-R1 Bench](https://arxiv.org/abs/2506.13654) | an agent with search tools over a week of video | 300 questions, ~44 h each |
 | [M3-Bench](https://arxiv.org/abs/2508.09736) | memory agents over long robot-view video; questions asked at a time | 100 scripted videos + 920 web; 4,490 questions |
 | [LongVidSearch](https://arxiv.org/abs/2603.14468), [Deep Video Discovery](https://arxiv.org/abs/2505.18079) | agentic search, scored with its tool cost | 3,000 questions / LVBench |
 | [camroll](https://arxiv.org/abs/2606.05275), [DISBench](https://arxiv.org/abs/2602.10809), [ATM-Bench](https://arxiv.org/abs/2603.01990), [PhotoBench](https://arxiv.org/abs/2603.01493) | a real person's camera roll, with evidence | 31.5K / 109K / 3.8K photos + 533 videos / 3.6K photos |
-| [BLAB](https://arxiv.org/abs/2505.03054) | long audio, timestamps scored by F1 | 833 h, clips up to 2 h |
+| [BLAB](https://arxiv.org/abs/2505.03054) | long audio, timestamps scored by F1 | 833 h, files up to 2 h |
 | [Visual Haystacks](https://arxiv.org/abs/2407.13766) | accuracy against haystack size, 1 to 10K images | ~1K questions |
-| [Lifelog Search Challenge](https://arxiv.org/abs/2506.06743), [Video Browser Showdown](https://videobrowsershowdown.org/about-vbs/) | timed known-item search over months of images and thousands of hours of video | 725K images / ~2,300-3,800 h |
+| [Lifelog Search Challenge](https://arxiv.org/abs/2506.06743), [Video Browser Showdown](https://videobrowsershowdown.org/about-vbs/) | timed known-item search over months of images and thousands of hours of video, many systems on one task | 725K images / ~2,300-3,800 h |
 | [MIRIX ScreenshotVQA](https://arxiv.org/abs/2507.07957) | memory of one's own screen, owner-written questions (not released) | 5-18K screenshots per person |
 
-**What none of them does, and MMMB should:**
-- Pit an agent with its own shell against the same agent with a local search tool, on the same files.
-- Use real dump files at real size and in real mess.
-- Time the dump.
-- Report GPU seconds beside tokens.
+**What none of them does, and MMMB does:**
+- Hand an agent a real dump at real size and in real mess.
+- Compare search systems behind one plug-in contract, each against the agent's own tools on the same files.
+- Report the ingest wait and GPU seconds beside tokens and dollars.
 
-No benchmark of continuous screen-video memory (Screenpipe- or Recall-style) was found.
+LSC and VBS compare many systems on one task, but with people at the controls, not agents. No benchmark of continuous
+screen-video memory was found.
 
-### 8.2 What to take
+### 11.2 What to take
 
-Ranked by what each does for MMMB:
-
-| # | Idea | From | In MMMB | For |
-| --- | --- | --- | --- | --- |
-| 1 | **Grounded scoring.** Correct only if the cited file and span overlap the evidence. Report plain and grounded accuracy. | CG-Bench (white-box), Ego4D NLQ, TVR, ATM-Bench (Joint@k = answer × evidence recall) | section 5; mm already returns spans | realism |
-| 2 | **Real footage on a plausible schedule**, real needles spliced in at set depths | X-LeBench (LLM-written days filled with real Ego4D clips), TimeScope, MLVU | the porch camera becomes real clips (MEVA, a scripted capture) laid on the week's plan; needles at controlled depth | realism |
-| 3 | **Real sounds mixed into real rooms** at a set SNR, with exact onsets | Scaper, DESED, RealDESED | S2: FSD50K events into a real home's ambience (SINS), SNR swept down to 0 dB and below; near misses (phone ring vs doorbell, microwave vs smoke alarm) | realism |
-| 4 | **Scripted real capture.** Act out a day with planted events, so the truth is known by construction | M3-Bench (actors with head cameras following scripts of 70+ events) | Dan records a scripted day at home (cameras, phone, microphone) with 30 planted events; kept private | realism |
-| 5 | **Haystack-size ladder.** The same needle in 1 h, 8 h, 1 day, 1 week. The short rungs are the smoke runs. | TimeScope, Visual Haystacks, V-NIAH (by depth too) | section 7's scaling curves; T2 runs the 1 h rung | both |
-| 6 | **Absent needles, 20-30% of questions.** Agents and models force matches; DVD's main failure is the "search trap", searching again and again for what is not there. | PhotoBench, MMNeedle, Deep Video Discovery | absent questions raised from 7 in 24 to a quarter; the report counts searches per absent question | realism |
-| 7 | **Leak filters.** Drop or flag questions answered without the media, from names, times and EXIF alone. | HourVideo, LVBench (blind filter), Daily-Omni (text-only filter), VNBench (rotated options) | the `blind` arm becomes a `listing` arm (section 8.4); EgoLifeQA's choices are asked in 4 rotations, counted right only if all 4 are | realism |
-| 8 | **Penalise time and wrong evidence**, not only reward a right answer | LSC: max(0, 100 - 50·t/T - 10·wrong); VBS: max(0, 50 + 50·decay - 10·wrong) | a secondary score beside grounded accuracy; `wrong` counts cited spans that hold nothing | realism |
-| 9 | **Find-all by distinct moments**, with graded relevance | VBS ad-hoc search, MultiVENT 2.0, DCASE event F1 (onset collar 200 ms, offset max(200 ms, 20% of the event)) | find-all and count questions; collars widened to mm's window (1 s video, 5 s sound) | realism |
-| 10 | **Tag every question:** certificate length, look-back, needs-audio, evidence pieces and how far apart | EgoSchema, Video-MME, EgoLifeQA, EgoMemReason, TeleEgo | section 4's tags; the report cuts by each (mm should gain most at long look-back and wide spans) | realism |
-| 11 | **Multi-hop across files and days**, and aggregates | DISBench (inter-event), LongVidSearch (hop-k), TimelineQA, MVU-Eval | "how many times did the doorbell ring before the parcel came?" | realism |
-| 12 | **Query by example** | Ego4D VQ2D, MomentSeeker | "here is my blue mug; when was it last on the porch camera?" | realism |
-| 13 | **Owner-written questions about their own record.** ScreenshotVQA, camroll and ATM-Bench all turned down LLM-written questions as unnatural. | those three | Dan writes the questions for S3/S4/scripted day; an LLM may draft template wording for public sets, a person keeps or rewrites each | realism |
-| 14 | **Gold-evidence arm** (diagnostic): the agent is handed the right clips | LongVidSearch (GPT-5 near-perfect with gold clips, 42% without) | on T2 only: a miss with gold evidence is the agent's reading; a miss without it is the search | both |
-| 15 | **"As-of" questions.** Each question has a now, and only media before it counts. | TeleEgo, M3-Bench, EgoLifeQA | already in `egolife.py` (horizons); extend to every scenario so one dump serves many questions | speed |
-| 16 | **Score the model apart from the agent.** Threshold-free AP or PSDS on mm's raw p per needle | DCASE PSDS, LV-Haystack (search F1 and FLOPs) | the decider tier (T1) reports AP and seconds per window per model | speed |
+| # | Idea | From | In MMMB |
+| --- | --- | --- | --- |
+| 1 | Grounded scoring: correct only if the cited file and span hold the answer | CG-Bench, Ego4D NLQ, TVR, ATM-Bench (Joint@k) | section 6.3 |
+| 2 | Real footage on a plausible schedule, real needles spliced at set depths | X-LeBench, TimeScope, MLVU | 7.1 |
+| 3 | Real sounds mixed into real rooms at a set SNR, with exact onsets; near-miss decoys | Scaper, DESED, RealDESED | S2 |
+| 4 | Scripted real capture, the truth known by construction | M3-Bench | S0 |
+| 5 | Haystack-size ladder; the short rungs are smoke runs | TimeScope, Visual Haystacks, V-NIAH (by depth) | 7.5, T2 |
+| 6 | Absent questions, about a quarter; count the "search trap" | PhotoBench, MMNeedle, Deep Video Discovery | 5, 6.3 |
+| 7 | Leak filters: no media, metadata only, rotated options | HourVideo, LVBench, Daily-Omni, VNBench | `listing`, 7.3 |
+| 8 | Penalise time and wrong evidence | LSC, VBS | 6.3 |
+| 9 | Find-all by distinct moments; graded relevance | VBS, MultiVENT 2.0, DCASE | 6.3 |
+| 10 | Tags: certificate, look-back, needs-audio, evidence spread | EgoSchema, Video-MME, EgoLifeQA, EgoMemReason, TeleEgo | 5 |
+| 11 | Multi-hop across files and days; aggregates | DISBench, LongVidSearch, TimelineQA, MVU-Eval | 5 |
+| 12 | Query by example | Ego4D VQ2D, MomentSeeker | 5 |
+| 13 | Owner-written questions | ScreenshotVQA, camroll, ATM-Bench | 7.1 |
+| 14 | Gold-evidence configuration | LongVidSearch (GPT-5 near-perfect with gold clips, 42% without) | 4 |
+| 15 | "As-of" questions: each has a now; one dump serves many questions | TeleEgo, M3-Bench, EgoLifeQA | 3.1 `serve(now)`, 6.1 |
+| 16 | Score retrieval apart from the agent | DCASE PSDS, LV-Haystack | T1, `oracle()` |
+| 17 | One plug-in contract, many systems, one scorer | LSC, VBS, TRECVID AVS | 3 |
+| 18 | Resource groups, working-time limits, error classes, regrading | Harbor, Inspect AI, SWE-bench | 8.2 |
+| 19 | Accuracy against cost on a Pareto plot | AI Agents That Matter, HAL | 6.3 |
 
 **Taken as warnings:**
 - AudioMarathon builds long audio by concatenating clips. Its seams are the artificial shortcut MMMB avoids.
-- TV Needle concatenates videos into one. MMMB keeps the files separate, as a user's are.
+- TV Needle concatenates videos into one. MMMB keeps files separate, as a user's are.
 
-### 8.3 Datasets
+### 11.3 Datasets
 
 | Dataset | Licence and gating (as found) | Size and annotations | For |
 | --- | --- | --- | --- |
-| [MEVA](https://registry.opendata.aws/mevadata/) | CC BY 4.0; open on AWS, no account | ~328 h of multi-camera video (+4.6 h drone); 37 activity types with spatio-temporal boxes for ~184 h | S1 home and building security; real porch clips for S8 |
-| [AMI Meeting Corpus](https://groups.inf.ed.ac.uk/ami/corpus/) | CC BY 4.0 for signals, transcripts and some annotations; direct download | 100 h; room and personal video, close and far microphones, slides; word-level transcripts, dialogue acts | S5 meetings |
-| [FSD50K](https://zenodo.org/records/4060432) | CC BY 4.0 for the dataset, per-clip CC0, BY or BY-NC; no account | 51K clips, 108 h, 200 classes (doorbell and alarm classes: check `vocabulary.csv`) | S2 foreground events |
-| [SINS](https://zenodo.org/records/2555143) | licence in a PDF, unread | one continuous week in a real home, 13 nodes × 4 microphones, activity labels | S2 real backgrounds |
-| [DROID](https://arxiv.org/abs/2403.12945) | CC BY 4.0 | 76K episodes, 350 h, 3 cameras, an instruction per episode | S4 robot logs |
-| YFCC100M photostreams, or [DISBench](https://arxiv.org/abs/2602.10809) built on them | per-photo CC licences; the original metadata is under Yahoo's Webscope agreement (reports conflict) | real users' photos with EXIF time and camera; DISBench: 57 users, 109K photos, 122 verified queries with exhaustive targets | S3 phone roll |
-| [Annotated bird soundscapes](https://zenodo.org/records/7050014) | CC BY 4.0; no account | 33 one-hour recordings, 20,147 timed calls, 56 species | S7 night audio |
-| [Caltech Camera Traps](https://lila.science/) (LILA BC) | CDLA-Permissive; public cloud | 243K images from 140 places (per-image time fields unverified) | S7 trap camera |
-| [comma2k19](https://github.com/commaai/comma2k19) | MIT | 33 h of highway driving, ~100 GB, GPS and CAN, **no event labels** (questions from GPS and CAN: "when did we stop?") | S6 dashcam |
-| [AgentNet / OpenCUA](https://huggingface.co/datasets/xlangai/AgentNet) | MIT per its card; gating unverified | 22.6K human screen-video tasks on Windows, macOS and Ubuntu, with input events | S8 real screen video |
-| EPIC-KITCHENS-100 + EPIC-SOUNDS | CC BY-NC 4.0 | 100 h egocentric with sound, 78K timed sound events | a kitchen scenario, if non-commercial suits |
-| Gated: VIRAT, Ego4D, LSC/NTCIR, BirdCLEF (Kaggle), V3C | a signed agreement, an application or an account | | not without Dan |
+| [MEVA](https://registry.opendata.aws/mevadata/) | CC BY 4.0; open on AWS, no account | ~328 h multi-camera video; 37 activity types with spans for ~184 h | S1; real porch clips for S8 |
+| [AMI Meeting Corpus](https://groups.inf.ed.ac.uk/ami/corpus/) | CC BY 4.0 for signals, transcripts and some annotations | 100 h; room video, close and far microphones, slides; transcripts | S5 |
+| [FSD50K](https://zenodo.org/records/4060432) | CC BY 4.0; per clip CC0, BY or BY-NC; no account | 51K clips, 200 classes (doorbell and alarm classes: check `vocabulary.csv`) | S2 events |
+| [SINS](https://zenodo.org/records/2555143) | licence in a PDF, unread | a continuous week in a real home, 13 nodes × 4 microphones, activity labels | S2 ambience |
+| [DROID](https://arxiv.org/abs/2403.12945) | CC BY 4.0 | 76K episodes, 350 h, 3 cameras, an instruction each | S4 |
+| YFCC100M, or [DISBench](https://arxiv.org/abs/2602.10809) on it | per-photo CC; original metadata under Yahoo's Webscope agreement (reports conflict) | real users' photos with EXIF; DISBench: 57 users, 109K photos, 122 verified queries | S3 |
+| [Bird soundscapes](https://zenodo.org/records/7050014) | CC BY 4.0; no account | 33 one-hour recordings, 20,147 timed calls | S7 sound |
+| [Caltech Camera Traps](https://lila.science/) | CDLA-Permissive | 243K images, 140 places (time fields unverified) | S7 images |
+| [comma2k19](https://github.com/commaai/comma2k19) | MIT | 33 h of driving, ~100 GB, GPS and CAN, no event labels | S6 |
+| [AgentNet / OpenCUA](https://huggingface.co/datasets/xlangai/AgentNet) | MIT per its card; gating unverified | 22.6K human screen-video tasks with input events | S8 |
+| EPIC-KITCHENS-100 + EPIC-SOUNDS | CC BY-NC 4.0 | 100 h egocentric with sound; 78K timed sound events | a kitchen scenario, if non-commercial suits |
+| Gated: VIRAT, Ego4D, LSC/NTCIR, BirdCLEF, V3C | an agreement, an application or an account | | not without Dan |
 
-Dan reads each licence before anything is downloaded. Standing permission covers installing and paid runs of popular public
-benchmarks, never accepting a licence or making an account.
+Dan reads each licence before anything is downloaded. No agent accepts a licence or makes an account.
 
-### 8.4 Changes to the arms from this research
-
-- **`blind` becomes `listing`.** The agent gets the folder's listing (names, sizes, times, EXIF and container fields) but
-  no pixels or sound. A question it answers is flagged as metadata-answerable and kept out of the headline. This is
-  Daily-Omni's and LVBench's leak filter, applied to what a dump really leaks. Execs are short, about 1 minute.
-- **`gold` (T2 only):** the agent gets the evidence clips alone, to split search misses from reading misses.
-
-## 9. Fairness
-
-- Both arms run the same agent, model, effort and turn cap, with no network.
-- The `files` arm should get what a real user's agent has: Claude its whole shell, not "Bash for ffmpeg only". Today's
-  restriction exists to stop escapes. The deny list can do that job alone.
-- mm's model gets no hint the agent does not write. The agent gets mm's skill and the model's notes, as an installed mm
-  gives them.
-
-## 10. Phases
+## 12. Phases
 
 | Phase | What | Done when |
 | --- | --- | --- |
-| P0 | MMMB runs from this folder (vendor `conftest`'s `Api` and `Daemon`, `day` and `fake_decider`, or point at a Multimem checkout by setting); grounded answers; the `files+mm` and `listing` arms; canaries; the cached build; arms side by side; the GPU queue with its working-time clock, checked on 10 questions; count the pilot's repeated windows | the pilot reruns in about 1.5 h with the same verdicts |
-| P1 | Track L (large files), S2 household sound, S1 home security | each has 30+ questions, a passing probe and a T1 run |
-| P2 | S0 scripted day, S3 phone roll, S4 robot logs, scaling curves, session mode | the T3 run has 70+ discriminating questions per agent |
-| P3 | S5 meetings, S6 dashcam, S7 field recorder | as P1 |
+| P0 | The separation (section 10.2, steps 1-4); the question-file format; grounded answers; `listing`; the cached build; GPU-free configurations beside GPU ones; the working-time clock checked on 10 questions | the core runs without Multimem installed, and the copied pilot gives the same verdicts through `systems/mm` |
+| P1 | `embed` and `transcript`; track L; S2 household sound; S1 home security | each scenario has 30+ questions, a passing probe, and a T1 run for every system |
+| P2 | S0 scripted day, S3 phone roll, S4 robot logs; scaling curves; session mode | the T3 run has 70+ discriminating questions per agent |
+| P3 | S5 meetings, S6 dashcam, S7 field recorder; hosted systems if wanted | as P1 |
 
-## 11. Open questions for Dan
+## 13. Open questions for Dan
 
-1. **Licences.** Each dataset in section 8: Dan reads and accepts. No agent does.
-2. **CPU work beside a GPU run:** may `files` execs (ffmpeg on the CPU) run while an mm arm uses the GPU?
-3. **The answer cache** (DESIGN.md §16, deferred): build it if the pilot's own `tools.json` shows agents re-reading
-   windows? And may windows be batched once batched verdicts are shown to equal single ones?
-4. **Headline arm:** `files` against `files+mm`, with `mm` alone only on the smoke tier?
-5. **Big files in mm:** should `remember` cut a file over `remember_max_mb` into segments at its true times, and should a
-   folder source date an in-place file by its `creation_time`? MMMB's track L will show what breaks first.
-6. **Dan's own data:** a phone dump and robot logs, with questions he writes, kept private and never published.
-7. **Where MMMB lives:** its own repository here, or Multimem's `benchmarks/` with this folder as a copy?
+1. **Licences:** each dataset in section 11.3, read and accepted by Dan.
+2. **CPU work beside a GPU job:** may GPU-free configurations and builds run while a system holds the GPU?
+3. **Where mm's plug-in lives:** in MMMB as `systems/mm` with Multimem as an optional dependency (proposed), or in Multimem?
+4. **Which other systems:** `embed` (SigLIP or CLIP, plus CLAP) and `transcript` (Whisper) as the first two? Both download
+   models.
+5. **Hosted systems:** may a paid long-context model run on the public scenarios?
+6. **Dan's own data:** a phone dump, robot logs and a scripted day, with questions he writes, kept private and never
+   published.
+7. **Publishing:** will MMMB be public? That decides the dev/test policy for the real-data scenarios, and the project's own
+   licence.
