@@ -3,7 +3,7 @@
 How the build is checked, what it is held to, and what has not been run. The design is in [DESIGN.md](DESIGN.md). Dated
 notes are at the end, newest last; add to them whenever testing teaches something.
 
-The suite has 1,017 tests: 798 under `tests/`, 91 under `tests/oracles/` and 128 under `tests/mm/` (counted at the end of
+The suite has 1,054 tests: 833 under `tests/`, 91 under `tests/oracles/` and 130 under `tests/mm/` (counted after U14, on
 5 November 2026; five are slow). None starts a paid agent, uses the GPU, or needs the network.
 
 ## 1. Environment
@@ -59,7 +59,7 @@ These hold for every test and every check:
 | `gpu` | loads a model on the GPU | none |
 
 ```
-uv run pytest                          # the fast suite: about 8 minutes (7:33 for 1,011 tests at U13's end)
+uv run pytest                          # the fast suite: about 8 minutes (484 s for 1,048 tests at U14's end)
 uv run pytest tests/mm --require-mm    # the tests that need the mm extra; a skip is a failure
 uv run pytest -m slow <file>           # one slow test file (section 4)
 ```
@@ -98,10 +98,18 @@ neutrality check.
   and `exclusive` and `beyond_timeout` match, for all 48 pilot and 50 EgoLife `mm` results.
 - **Seam tests** (`tests/mm/test_seam.py`): a stand-in `claude` or `codex` that speaks JSON-RPC to the real mm server through
   the real agent path (`tests/stand_in_agent.py` is the stand-in, shared with the listing tests).
-- **The working-time clock** <!-- U14 clock: written from plan 6.5; to be corrected from U14's notes. --> (`tests/test_clock.py`):
-  with `now` and `queue_s` injected, a case at 950 s of wall time with 100 s queued is not over, one at 901 s of working time
-  is, and the wall cap fires whatever the queue. A system that gives no queue figure gives `clock: wall` and the message
-  `timeout: no answer in 900 s`, byte for byte as recorded. A real process is killed at a 0.2 s limit.
+- **The working-time clock** (`tests/test_clock.py`, 23 tests; `tests/test_clock_check.py`, 11; `tests/mm/test_clock_mm.py`, 2).
+  With `now` and `queue_s` injected, a case at 950 s of wall time with 100 s queued is not over, one at 901 s of working time
+  is, and the wall cap fires whatever the queue. A system that gives no queue figure gives `clock: wall` and the recorded
+  `timeout: no answer in 900 s`, byte for byte, in both agents. A queue read live moves the end of the limit. A real process is
+  killed at a 0.2 s limit by each agent and the result holds `clock`, `working_s` and `queue_s`, while `seconds` stays the wall
+  time. More than one exec at once on the working clock is refused for a session that cannot say its queue, by `run`, in a dry
+  run too, and for both of mm's sessions. `budget_s` is checked at 300, 900 and between. For `clock-check`, over the stand-in
+  system: each case is asked alone and then queued in two folders and the table is printed; the cases come from those that
+  do not hold the system alone; and it refuses, before any agent starts and writing nothing, a system with no queue figure
+  (naming D3), one that would run the cases one at a time, one that holds every case alone, one not ready, and a
+  configuration that is not one system. A second command asks nothing, and a cut-off half goes on. None of this ran on a
+  shared GPU: see section 8.
 - **Planted faults.** A suite counts only once it has been seen to fail on a planted fault: for the runner, two kinds swapped in
   `DONE_KINDS`; for `admits`, the heavy rule dropped; for deny, a word removed; for the report, a result flipped; for oracle 1,
   one colour constant changed. G1 planted 32 faults: 21 were caught and 11 escaped; the repair pass followed (section 9).
@@ -196,8 +204,9 @@ Nothing in P0 ran a real agent, the GPU, or the real model. So no test could sho
 - the CLI end to end with the real mm and the GPU;
 - the pilot-scale rename in the cache (antivirus could lock a folder during `os.replace`, and there is no retry), and the POSIX
   branch of the cache lock;
-- Ctrl+C during a side-by-side run; the wall-time saving of side-by-side (paper only, `simulate`); a POSIX daemon restart,
-  which would inherit Claude's `CUDA_VISIBLE_DEVICES=-1` (it does not apply on this machine);
+- the clock on a shared GPU, and the wall effect of its wait loop under load; Ctrl+C during `clock-check` or a side-by-side run;
+- the wall-time saving of side-by-side (paper only, `simulate`); a POSIX daemon restart, which would inherit Claude's
+  `CUDA_VISIBLE_DEVICES=-1` (it does not apply on this machine);
 - `run --dry-run --agents codex`, which fails here because this machine's Codex does not list the pinned model `gpt-6.1-terra`
   (the old code did the same).
 
@@ -248,7 +257,11 @@ and cost $19.00 at list for 50.3M tokens, about 173 minutes of wall time plus 11
   at `-n 2`; the slow neutrality test passed in a fresh environment); cached ingest; side-by-side scheduling (1,011 passed and 1
   skipped in 7:33). The dry run of the pilot repeat prints 110 execs, 13,044 session-seconds and 3,655 GPU-seconds, equal to the
   recorded ones.
-- **U14, the working-time clock, and U15, these documents,** came last. When this was written the suite collected 1,017 tests
+- **U14, the working-time clock.** `--clock` on `run` and `repeat`, `mmmb clock-check`, and one wait loop for both agents. 1,048
+  passed and 1 skipped in 484 s; the slow neutrality test passed in 55 s; 39 planted faults were all caught. No golden changed.
+  Two of U14's own test runs called the real `claude auth status` (read only, in the tests' throwaway home) before the fixture
+  patched `check_login`.
+- **U15, these documents,** were written beside U14 and corrected from its notes. The suite then collected 1,054 tests
   (`pytest --collect-only -q -n 0 -m ""`).
 
 Not run in P0: see section 8 and DESIGN.md section 12.

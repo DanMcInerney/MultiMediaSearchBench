@@ -30,9 +30,11 @@ Multimem not installed.
 - **Agents:** Claude Code and Codex, locked down.
 - **Built:** the question file, grounded answers, choosing cases, cached dumps and stores, side-by-side scheduling (off unless
   asked), `mmmb compare` and `mmmb repeat`.
-- **Working-time clock:** built (`--clock`); its check on 10 cases is not done, and needs a small change in Multimem first.
-- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner, and the first
-  `mm+files` run. No GPU and no paid agent ran in P0. The commands, their cost and what they decide are in
+- **Working-time clock:** built (`--clock working|wall`, default `working`). mm reports no queue, so it runs on the wall clock and
+  is refused more than one exec at once on the working clock. `mmmb clock-check` is built but not run, and for mm it needs a
+  small change in Multimem first.
+- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner (at `--jobs 1`), and the
+  first `mm+files` run. No GPU and no paid agent ran in P0. The commands, their cost and what they decide are in
   [DESIGN.md section 12](DESIGN.md#12-phases).
 - **Next (P1):** the `embed` and `transcript` systems and the priority-1 scenarios.
 
@@ -73,7 +75,8 @@ uv run mmmb report <run>
 - `report` pools the paired comparison into `report.md` and `report.json` in the run folder. `run` continues a run that
   stopped.
 - `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmmb ingest` command to
-  make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`.
+  make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`, with `--jobs 1` on `run`: mm gives
+  no queue figure, so on the working clock more than one mm exec at once is refused (and the laptop's GPU runs one at a time).
 
 Commands, each with `--help`:
 
@@ -86,7 +89,7 @@ Commands, each with `--help`:
 | `mmmb report RUN [RUN ...]` | figures and Markdown; several runs of one scenario are pooled |
 | `mmmb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
 | `mmmb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
-| `mmmb clock-check RUN` | the working clock tried on a few cases, each asked alone and then queued (not run yet) |
+| `mmmb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; refused for mm until Multimem reports its queue) |
 
 ## Systems and configurations
 
