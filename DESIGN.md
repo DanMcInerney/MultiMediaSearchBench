@@ -50,13 +50,14 @@ Six layers. Only the last knows any system.
 ```
 MultiMediaMemoryBench/
   VISION.md  DESIGN.md  TESTING.md  README.md  MEDIA.md  pyproject.toml  uv.lock  .python-version
-  mmmb/cli.py       build, ingest, run, retrieve, report, compare, repeat: argument parsing and the order of the steps
+  mmmb/cli.py       build, ingest, run, retrieve, report, compare, repeat, clock-check: the order of each command's steps
+  mmmb/arguments.py   the commands' names, options and defaults
   mmmb/core/        the neutral half; one module for each part of the runner
     contract.py config.py       the types a system and the runner exchange (3.1); a configuration's name (4)
     question.py grade.py        the question file (6.1) and the value rules
     answer.py grounded.py       the final answer and its grounded score (6.2, 6.3)
     scenario.py build.py cache.py runfolder.py     a scenario's types; making a run; the dump and store cache (8.4); a run's folder
-    runner.py schedule.py select.py costing.py dryrun.py clock.py     the exec loop; the pools (8.3); choosing cases (8.2); working time (8.4)
+    runner.py schedule.py select.py costing.py dryrun.py clock.py clockcheck.py     the exec loop; the pools (8.3); choosing cases (8.2); working time (8.4)
     record.py report.py render.py compare.py repeat.py retrieval.py stats.py     results, figures and Markdown; two runs side by side; a run
                                 again; the retrieval run (8.5); statistics
     fs.py paths.py gpu.py probe.py     files and permissions; where things live; the GPU check; the probe's outcome
@@ -398,7 +399,7 @@ works in file offsets are graded alike.
 
 **As built (`mmmb/core/grounded.py`).** `passed` is what it always was: the value rule, and no problem. The grounded status
 is told beside it, so that a re-run compares with the recorded verdicts on `passed` and reports grounded accuracy next to
-them. The statuses:
+them. The report's headline is still `passed`, because the recorded runs have no status. The statuses:
 
 | The answer | Status |
 | --- | --- |
@@ -553,8 +554,8 @@ Running faster means choosing fewer cases. Nothing else about a run changes.
   tells a paired comparison nothing. Two such cases stay in as canaries, one right and one wrong in turn. Only the agents
   named in `--agents` count.
 - **As built,** the flags are `--scenarios` (as the question names it, `V7`), `--kinds`, `--modalities`, `--splits`,
-  `--tag NAME=VALUE` (repeatable), `--rung X` (which is `--tag rung=X`; V7 and V8 have one rung each, and the ladder waits
-  for P2), `--only QID,..`, `--subset pilot`, `--limit` and `--discriminating`. A value no question has is an error. A
+  `--tag NAME=VALUE` (repeatable), `--rung X` (which is `--tag rung=X`; V7's rung is its scale and V8's is `3d`, and the
+  size ladder waits for P2), `--only QID,..`, `--subset pilot`, `--limit` and `--discriminating`. A value no question has is an error. A
   selection prints what each step left (`selection: the questions: 31, then --kinds last: 4`) and one that picks nothing is
   refused.
 - **Before it starts,** the runner prints what the selection will cost, and `--dry-run` stops there:
@@ -917,7 +918,7 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
 
 | # | Question | Default taken |
 | --- | --- | --- |
-| D1 | "The same verdicts" cannot mean identical per question: the agents are stochastic, and no repeat run exists to measure the noise. | Accept when each cell's correct count is within 2 of the recorded one (Claude `files` 23, Claude `mm` 22, Codex `files` 27, Codex `mm` 23); McNemar of the recorded run against the new one is not significant (p under 0.05) in any cell; the verdict lines read the same; no `setup` result; and a person has read every flip. Run once in `json`; run `line` too (another $19 and about 3 h) only if a cell falls outside the band. It is written once, in `mmmb/core/compare.py` (`BAND`, `ALPHA`). A pass means no large loss; it does not mean the runs agree (a band of 2 is about 7 points of 31 questions, and McNemar over a few discordant pairs has little power) |
+| D1 | "The same verdicts" cannot mean identical per question: the agents are stochastic, and no repeat run exists to measure the noise. | Accept when each cell's correct count is within 2 of the recorded one (Claude `files` 23, Claude `mm` 22, Codex `files` 27, Codex `mm` 23); McNemar of the recorded run against the new one is not significant (p under 0.05) in any cell; the verdict lines read the same; no `setup` result; and a person has read every flip. Run once in `json`; run `line` too (another $19 and about 3 h) only if a cell falls outside the band. It is written once, in `mmmb/core/compare.py` (`BAND`, `ALPHA`). A pass means no large loss; it does not mean the runs agree (a band of 2 is about 6 points of 31 questions, and McNemar over a few discordant pairs has little power) |
 | D2 | When may the re-run and the clock check spend? | Not until Stage 2 passed its review, and with the GPU free |
 | D3 | mm cannot report queue time. The working clock and the 10-case check need a small Multimem change: per-job queue seconds from `gpu.py` and `jobs.py`, and `ask`'s early return counted from GPU start. About 30-50 lines there | Make it in Multimem as its own task before the clock check. P0's code is ready for it; until then mm runs on `clock: wall` at `--jobs 1`, and the 10-case check stays open |
 | D4 | Multimem has no remote, so `mmmb[mm]` is a path source with this machine's path in `pyproject.toml` | Keep the absolute path. Publishing MMMB (13.8) needs Multimem published first, or `mm`'s plug-in moved |
@@ -934,8 +935,8 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
 
 ### 12.2 The commands that wait for Dan
 
-Each needs his go-ahead and a free GPU: `nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader` must print
-nothing, as `RESUME.md` requires.
+Each needs his go-ahead and a free GPU, because the laptop's rule is that a GPU job runs alone:
+`nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader` must print nothing.
 
 **1. The pilot through the new runner (10.2 step 4).** Run it in US Eastern time: the pilot's times are local, and a recipe from
 another zone is refused.
@@ -953,8 +954,8 @@ uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new 
 - The path is `.../converted` (the raw `pilot-s1/run.json` names no scenario). `repeat` reads the converted run: the recipe,
   the configurations (`files`, `mm/d1-3B`), the questions of each cell, and each agent's model and effort (Codex
   `gpt-6.1-terra` at `medium`; Claude records no effort, so only its model is checked). It builds or finds the cached dump and
-  store, runs `files` and `mm/d1-3B`, and prints the `compare` command. `--answer-format json` is the default. `--into
-  D:\mmmb-runs\<new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
+  store, runs `files` and `mm/d1-3B`, and prints the `compare` command. `--answer-format json` is the default.
+  `--into D:\mmmb-runs\<new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
 - `mmmb compare` prints, for each cell, the correct counts of the recorded run and the new one against the band, the
   questions that flipped (with both answers), McNemar's p, the problems of each run, and the verdict lines, and then the four
   numeric conditions of D1. A person reads every flip.

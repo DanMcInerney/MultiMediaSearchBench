@@ -29,10 +29,11 @@ Multimem not installed.
   and the leak filter) and `mm` (Multimem's local decision model).
 - **Agents:** Claude Code and Codex, locked down.
 - **Built:** the question file, grounded answers, choosing cases, cached dumps and stores, side-by-side scheduling (off unless
-  asked), the working-time clock, `mmmb compare` and `mmmb repeat`.
-- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner, the first
-  `mm+files` run, and the check of the clock on 10 cases. No GPU and no paid agent ran in P0. The commands, their cost and what
-  they decide are in [DESIGN.md section 12](DESIGN.md#12-phases).
+  asked), `mmmb compare` and `mmmb repeat`.
+- **Working-time clock:** built (`--clock`); its check on 10 cases is not done, and needs a small change in Multimem first.
+- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner, and the first
+  `mm+files` run. No GPU and no paid agent ran in P0. The commands, their cost and what they decide are in
+  [DESIGN.md section 12](DESIGN.md#12-phases).
 - **Next (P1):** the `embed` and `transcript` systems and the priority-1 scenarios.
 
 Tested on Windows 11 only.
@@ -49,7 +50,7 @@ uv sync --extra mm                   # also Multimem, for the mm system
 uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's real decision model
 ```
 
-- `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not change the environment.
+- `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
 - The `mm` extra is a path to Multimem's checkout (`C:/Users/danhm/tools/Multimem` in `pyproject.toml`), because Multimem
   has no git remote. Change it on another machine.
 - The libraries that write the V7 week are pinned, because its bytes depend on them. ffmpeg comes with `imageio-ffmpeg`.
@@ -57,20 +58,22 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
 ## Run it
 
 ```
-uv run mmmb build --scenario v7_screen --scale tiny
+uv run mmmb build --scenario v7_screen --scale tiny --configs files,listing
 uv run mmmb run <run> --agents claude --configs files,listing --dry-run
 uv run mmmb run <run> --agents claude --configs files,listing
 uv run mmmb report <run>
 ```
 
-- `build` writes the V7 week, its questions, and a stores for the systems among `--configs`, and runs the shortcut probe. It
-  prints the run folder, `D:\mmmb-runs\<date>-v7-tiny-s1`. The tiny week is 2 days and 19 questions, written in about 35
-  seconds. `--scale pilot` is the 3-day, 31-question week the pilot used; `standard` is 7 days.
+- `build` writes the V7 week and its questions, ingests the dump into the stores of the systems among `--configs` (default
+  `files`), and runs the shortcut probe. It prints the run folder, `D:\mmmb-runs\<date>-v7-tiny-s1`; `<run>` is that folder, or
+  its name. The tiny week is 2 days and 19 questions, written in about 35 seconds. `--scale pilot` is the 3-day, 31-question
+  week the pilot used; `standard` is 7 days.
 - `run --dry-run` says what the run will cost and starts no agent. Without `--dry-run` it spends your plans' quota. Add
   `--jobs 3` for three execs at once (at most 4), and `--limit 12` or `--kinds last,absent` to run fewer cases.
 - `report` pools the paired comparison into `report.md` and `report.json` in the run folder. `run` continues a run that
   stopped.
-- To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` (it ingests the dump into mm's store) and on `run`.
+- `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmmb ingest` command to
+  make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`.
 
 Commands, each with `--help`:
 
@@ -83,6 +86,7 @@ Commands, each with `--help`:
 | `mmmb report RUN [RUN ...]` | figures and Markdown; several runs of one scenario are pooled |
 | `mmmb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
 | `mmmb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
+| `mmmb clock-check RUN` | the working clock tried on a few cases, each asked alone and then queued (not run yet) |
 
 ## Systems and configurations
 
@@ -112,9 +116,9 @@ video, text and records; `mm+files` is asked them all.
 | `results/` | published reports: [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
 | `D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (change them with `--out`, `--temp`, `--cache`; keep them on one drive) |
 
-The published pilot compared mm with the files alone on 24 questions about 3 synthetic days: with mm, Codex was right on 23 of
-24 against 22, and Claude on 22 against 18, using fewer tokens, with a gain not yet significant. Read it in its own
-[README](results/2026-11-04-haystack-pilot/README.md); its commands and file names are those of the copied harness and no
+The published pilot asked 24 questions about 3 synthetic days of mm and of the files alone. With mm, Codex was right on 23 of 24
+against 22 without it, and Claude on 22 against 18, with fewer tokens; the gains are not yet significant. Read it in its own
+[README](results/2026-11-04-haystack-pilot/README.md). Its commands and file names are those of the copied harness and no
 longer apply.
 
 ## Tests
@@ -123,6 +127,6 @@ longer apply.
 uv run pytest
 ```
 
-runs the fast tests (1,012 of 1,017 tests; about 8 minutes at 4 workers) with no agent, no GPU and no network.
+runs the fast tests (about 1,000; about 8 minutes on this laptop, at 4 workers) with no agent, no GPU and no network.
 Without the `mm` extra the tests in `tests/mm` skip, and say so in the summary. [TESTING.md](TESTING.md) has the markers, the
 oracles, and the commands for the slow ones.
