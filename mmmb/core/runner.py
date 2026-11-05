@@ -19,6 +19,7 @@ from mmmb.core import fs, gpu, grounded
 from mmmb.core.agents import claude, codex
 from mmmb.core.agents.spec import SessionSpec
 from mmmb.core.answer import DEFAULT_FORMAT, AnswerFormat, parse_final
+from mmmb.core.atonce import GPU_JOBS, JOBS, asked, execs_at_once
 from mmmb.core.clock import DEFAULT_CLOCK, WORKING, check_queue, figures_of, unreported
 from mmmb.core.config import Config, describe_configs
 from mmmb.core.contract import Case, Description, Dump, Isolation, PlainSession, Session, SessionContext, System
@@ -31,7 +32,6 @@ from mmmb.core.schedule import Beside, SideBySide, Task, agent_off_gpu, keeps_ti
 from mmmb.core.select import asked_modalities, config_questions, selected
 
 
-JOBS = 3  # execs at once by default
 AGENTS = ("claude", "codex")
 TIMEOUT_S = 900.0  # the seconds an exec may take, unless the run says other (`RunFolder.timeout_s`)
 NO_SLOT = -1  # the slot of a case that has not started
@@ -72,11 +72,11 @@ def case_of(run: RunFolder, name: str, config: Config, q: Question, session: Ses
 
 def run_config(run: RunFolder, name: str, agent: Agent, config: Config, description: Description | None,
                questions: Sequence[Question], session: Session, dump: Dump, isolation: Isolation, jobs: int, halt: Halt,
-               answer_format: AnswerFormat, *, beside: Beside | None = None, clock: str = DEFAULT_CLOCK) -> None:
-    """The pending questions of one configuration of agent `name`, in ascending `until`, `jobs` at a time (fewer when the session
-    says so), each in a working slot. Each exec is given what `session.serve` serves for its case, the folder `scenario.view`
-    makes ready when the configuration has tools of its own, the prompt of `scenario.prompt`, and its result holds what
-    `scenario.after_exec` and `session.audit` add. The rules of the order:
+               answer_format: AnswerFormat, *, beside: Beside | None = None, clock: str = DEFAULT_CLOCK, gpu_jobs: int = GPU_JOBS) -> None:
+    """The pending questions of one configuration of agent `name`, in ascending `until`, `jobs` at a time (`gpu_jobs` when its system needs
+    the GPU, fewer when the session says so: `atonce.execs_at_once`), each in a working slot. Each exec is given what `session.serve` serves
+    for its case, the folder `scenario.view` makes ready when the configuration has tools of its own, the prompt of `scenario.prompt`, and
+    its result holds what `scenario.after_exec` and `session.audit` add. The rules of the order:
     - two cases of one group (two questions about one needle) never run at once, in any configuration;
     - the session may hold more back (`Session.admits`: file versions that must be read in time order, an exec that holds the
       GPU alone) and takes its state out when an exec ends (`Session.reset`, before the exec's working folder is emptied), so
@@ -104,10 +104,10 @@ def run_config(run: RunFolder, name: str, agent: Agent, config: Config, descript
         if beside.expected is None and not keeps_time_order(description):
             print(f"{name} {config.dir}: no earlier exec of this cell to order its cases longest first: they keep their order", flush=True)
         pending = start_order(pending, description, beside.expected)
-    if (at_once := session.max_jobs(cases, jobs)) < jobs:
-        print(f"{name} {config.dir}: {at_once} execs at once, not {jobs}", flush=True)
+    if (at_once := execs_at_once(description, session, cases, jobs, gpu_jobs)) < (want := asked(description, jobs, gpu_jobs)):
+        print(f"{name} {config.dir}: {at_once} execs at once, not {want}", flush=True)
     jobs = at_once
-    check_queue(f"{name} {config.name}", session, pending[0], jobs, clock)
+    check_queue(f"{name} {config.name}", description, session, pending[0], jobs, clock)
     data_halt = Halt()  # a configuration with tools of its own: it alone stops when the data changed
     free = list(range(jobs))  # the working slots not in use
     running: dict = {}  # future -> (case, slot)
@@ -219,21 +219,24 @@ def note_configs(run: RunFolder, descriptions: Mapping[Config, Description | Non
 def run_agents(run: RunFolder, agents: Mapping[str, Agent], configs: Sequence[Config], dump: Dump, store_of: Callable[[str], Path],
                jobs: int = JOBS, *, controls: str | None = None, subset: str = "all", only: Sequence[str] = (),
                load: Callable[[str], System] = systems.load, isolation: Isolation | None = None,
-               answer_format: AnswerFormat, side_by_side: SideBySide | None = None, clock: str = DEFAULT_CLOCK) -> None:
+               answer_format: AnswerFormat, side_by_side: SideBySide | None = None, clock: str = DEFAULT_CLOCK, gpu_jobs: int = GPU_JOBS) -> None:
     """The configurations with no variant (`blind`, `files`: nothing for the session to hold) of every agent over their questions
     (`config_questions`: all of them for a configuration with tools of its own or no system, else those of the modalities its
     system reads, the text and records only for the configuration `controls` names, or every one when it is None), then for each
     variant, for each agent, that variant's configurations, each with a session of its system opened and closed around it.
-    `jobs` at a time (`Session.max_jobs`). `store_of(system)` is where the system's ingested store is, `dump` what was ingested,
-    `load` gives a system by name and `isolation` is what the systems declare (by default all that `systems` has). The final answers
-    are asked in `answer_format`, and an exec is held to its time on `clock` (see `run_config`). A system whose extra is missing fails here, before anything runs. An agent that stops (its plan is out, or at STOP_AT) leaves its remaining
-    execs for the next command.
+    `jobs` at a time, `gpu_jobs` for a configuration whose system needs the GPU (`atonce.execs_at_once`; `Session.max_jobs` may allow
+    fewer). `store_of(system)` is where the system's ingested store is, `dump` what was ingested, `load` gives a system by name and
+    `isolation` is what the systems declare (by default all that `systems` has). The final answers are asked in `answer_format`, and an exec
+    is held to its time on `clock` (see `run_config`). A system whose extra is missing fails here, before anything runs, and so does a
+    `json` run with a question that no citation could ground (`grounded.check_groundable`). An agent that stops (its plan is out, or at
+    STOP_AT) leaves its remaining execs for the next command.
     Without `side_by_side` the cells run one after another (`cells_in_order`), and nothing else about a run changes. With it (core/schedule.py)
     they run beside each other: `jobs` still bounds the execs of one cell, and the pools bound all of them (one cell that needs the GPU at a
     time, at most `Pools.cpu` execs at once in all, at most `Pools.agents[a]` sessions of agent `a`). An agent that stops, or a lost GPU,
     stops every cell of that agent; an error in any cell stops all of them, each cell closes its session, and the first error is raised."""
-    if not 1 <= jobs <= JOBS_MAX:
-        raise ValueError(f"jobs is 1 to {JOBS_MAX}, not {jobs}: more crashed the laptop once")
+    for flag, n in (("jobs", jobs), ("gpu_jobs", gpu_jobs)):
+        if not 1 <= n <= JOBS_MAX:
+            raise ValueError(f"{flag} is 1 to {JOBS_MAX}, not {n}: more crashed the laptop once")
     if len({c.dir for c in configs}) != len(configs):
         raise ValueError("these configurations share a results folder (two variants that differ only in characters a folder name "
                          f"cannot hold): {', '.join(c.name for c in configs)}")
@@ -242,6 +245,8 @@ def run_agents(run: RunFolder, agents: Mapping[str, Agent], configs: Sequence[Co
     isolation = isolation or systems.isolation()
     loaded, descriptions = describe_configs(configs, load)  # a missing extra fails here
     questions = selected(run.questions(), subset, descriptions, only)
+    if answer_format == "json":
+        grounded.check_groundable(questions, dump)  # a question no citation can ground is refused here, not after the exec that answered it
     view = run.scenario.view(questions[0], 0, dump, run.temp, run.tag, False) if questions and any(c.own_tools for c in configs) else None
     run.check_paths(isolation, reads_of(view, dump))
     run.ensure_bin()
@@ -261,7 +266,7 @@ def run_agents(run: RunFolder, agents: Mapping[str, Agent], configs: Sequence[Co
                    else PlainSession())
         try:
             run_config(run, name, agents[name], config, description, mine, session, dump, isolation, jobs, halts[name], answer_format,
-                       beside=beside, clock=clock)
+                       beside=beside, clock=clock, gpu_jobs=gpu_jobs)
         except BaseException:
             close_after_error(name, config, session)
             raise

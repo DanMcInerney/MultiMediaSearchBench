@@ -102,6 +102,49 @@ MMMB_GUARD = """
 """
 
 
+PROGRAM_GUARD = """
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    FOLDER = Path(os.environ["STAND_INS"])
+    OWNER = Path(os.environ["OWNER_HOME"])
+    EXT = ".cmd" if os.name == "nt" else ""
+
+
+    def test_starting_a_program_named_claude_is_refused():
+        subprocess.run([str(FOLDER / ("claude" + EXT))])
+
+
+    def test_starting_a_program_named_codex_is_refused_by_a_command_string_too():
+        subprocess.run(f'"{FOLDER / ("codex" + EXT)}" exec', shell=True)
+
+
+    def test_os_system_is_watched_as_well():
+        os.system(f'"{FOLDER / ("claude" + EXT)}" auth status')
+
+
+    def test_a_refusal_the_code_swallows_still_fails_the_test():
+        try:
+            subprocess.run([str(FOLDER / ("claude" + EXT))])
+        except Exception:
+            pass
+
+
+    def test_a_program_inside_the_owners_folders_is_refused_whatever_it_is_called():
+        subprocess.run([str(OWNER / ".codex" / ("helper" + EXT))])
+
+
+    def test_python_is_allowed():
+        subprocess.run([sys.executable, "-c", "pass"], check=True)
+
+
+    def test_a_stand_in_of_another_name_is_allowed():
+        subprocess.run([str(FOLDER / ("stand_in" + EXT))], check=True)
+"""
+
+
 def project(root: Path, files: dict[str, str]) -> Path:
     root.mkdir()
     shutil.copy(CONFTEST, root / "conftest.py")
@@ -199,3 +242,43 @@ def test_a_test_may_read_the_folders_of_runs_dumps_and_cache_and_may_not_change_
     for folder in (paths.CACHE, paths.TEMP, paths.RUNS):  # (each was refused by the guard, not by a folder that was not there)
         assert re.search(rf"must not.*: (os\.mkdir|open) {re.escape(str(folder))}\\", done.stdout), (folder, done.stdout)
     assert [folder.exists() for folder in (paths.CACHE, paths.TEMP, paths.RUNS)] == before, "refused before anything was made"
+
+
+def program(path: Path) -> Path:
+    """A program at `path` (a script) that leaves `<path>.started` beside it when it runs, so that a refused one shows as never having run."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    marker = f"{path}.started"
+    if os.name == "nt":
+        path.write_text(f'@echo off\r\necho x> "{marker}"\r\n', encoding="utf-8")
+    else:
+        path.write_text(f'#!/bin/sh\ntouch "{marker}"\n', encoding="utf-8")
+        path.chmod(0o755)
+    return path
+
+
+def test_a_test_may_not_start_the_owners_agents_or_a_program_in_the_owners_folders_and_may_start_anything_else(tmp_path):
+    """Two test runs once reached the real `claude auth status` before a fixture patched `check_login`. Programs named as the agents are stand-ins
+    here that leave a marker when they run, so the test cannot start a real one even if the guard were gone."""
+    ext = ".cmd" if os.name == "nt" else ""
+    owner, stand_ins = tmp_path / "owner", tmp_path / "stand-ins"
+    for name in ("claude", "codex", "stand_in"):
+        program(stand_ins / f"{name}{ext}")
+    helper = program(owner / ".codex" / f"helper{ext}")
+    for folder in (".claude", ".multimem"):
+        (owner / folder).mkdir(parents=True)
+    done = pytest_in(project(tmp_path / "p", {"test_guard.py": PROGRAM_GUARD}), HOME=str(owner), USERPROFILE=str(owner), CODEX_HOME=str(owner / ".codex"),
+                     OWNER_HOME=str(owner), STAND_INS=str(stand_ins))
+    found = outcomes(done)
+    refused = {"test_starting_a_program_named_claude_is_refused", "test_starting_a_program_named_codex_is_refused_by_a_command_string_too",
+               "test_os_system_is_watched_as_well", "test_a_refusal_the_code_swallows_still_fails_the_test",
+               "test_a_program_inside_the_owners_folders_is_refused_whatever_it_is_called"}
+    allowed = {"test_python_is_allowed", "test_a_stand_in_of_another_name_is_allowed"}
+    assert set(found) == refused | allowed, done.stdout
+    assert all({"FAILED", "ERROR"} & found[t] for t in refused), done.stdout
+    assert all(found[t] == {"PASSED"} for t in allowed), done.stdout
+    assert "must not start the owner's agent (it spends the plan and reads the login)" in done.stdout
+    assert "must not start a program in the owner's agent setup" in done.stdout
+    # refused before the program ran; the allowed stand-in did run
+    for path in (stand_ins / f"claude{ext}", stand_ins / f"codex{ext}", helper):
+        assert not Path(f"{path}.started").exists(), path
+    assert Path(f"{stand_ins / f'stand_in{ext}'}.started").exists()

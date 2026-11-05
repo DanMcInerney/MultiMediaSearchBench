@@ -15,13 +15,14 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
-from mmmb.core import render
+from mmmb.core import grounded, render
 from mmmb.core.agents import claude, codex
 from mmmb.core.agents.spec import SessionSpec
 from mmmb.core.answer import AnswerFormat
+from mmmb.core.atonce import asked, execs_at_once, gpu_warning
 from mmmb.core.clock import check_queue, unreported
 from mmmb.core.config import Config
-from mmmb.core.contract import Description, Dump, Isolation, PlainSession, Session, SessionContext, System
+from mmmb.core.contract import BEYOND_TIMEOUT, GPU_ESTIMATE_S, Description, Dump, Isolation, PlainSession, Session, SessionContext, System
 from mmmb.core.probe import probe_line, probe_of
 from mmmb.core.question import Question
 from mmmb.core.retrieval import FOLDER
@@ -53,21 +54,25 @@ def warn_of_probe(run: RunFolder) -> None:
 
 
 def show_limits(run: RunFolder, names: Sequence[str], configs: Sequence[Config], descriptions: Mapping[Config, Description | None],
-                preview: Callable[[str, Config], Session], jobs: int, controls: str | None = None, subset: str = "all",
+                preview: Callable[[str, Config], Session], jobs: int, gpu_jobs: int, controls: str | None = None, subset: str = "all",
                 only: Sequence[str] = ()) -> None:
     """What a system says of the configurations it serves before a run, from its preview session: the execs at once when it lowers them
-    (`Session.max_jobs`: a slow model, a cut of the whole index to a horizon), and the questions whose work may need more GPU seconds
-    than an exec leaves it (`Served.record`'s `beyond_timeout`), where a timeout is the system's speed and not a miss."""
+    (`Session.max_jobs`: a slow model, a cut of the whole index to a horizon) and, when `--gpu-jobs` asked for several on a system that
+    needs the GPU, the warning that they run at once (`atonce.gpu_warning`); and the questions whose work may need more GPU seconds
+    than an exec leaves it (`contract.GPU_ESTIMATE_S` and `BEYOND_TIMEOUT` of `Served.record`), where a timeout is the system's speed
+    and not a miss."""
     questions = selected(run.questions(), subset, descriptions, only)
     for config in configs:
         if config.system is None:
             continue
         session = preview(names[0], config)
         cases = [case_of(run, names[0], config, q, session) for q in config_questions(questions, config, descriptions[config], controls)]
-        if (at_once := session.max_jobs(cases, jobs)) < jobs:
-            print(f"  {config.name}: {at_once} execs at once, not {jobs}")
+        if (at_once := execs_at_once(descriptions[config], session, cases, jobs, gpu_jobs)) < (want := asked(descriptions[config], jobs, gpu_jobs)):
+            print(f"  {config.name}: {at_once} execs at once, not {want}")
+        if warning := gpu_warning(config.name, descriptions[config], at_once):
+            print(f"  {warning}")
         records = [(c.qid, session.serve(dataclasses.replace(c, slot=0, work=run.slot(0))).record) for c in cases]
-        if past := [(qid, record["gpu_estimate_s"]) for qid, record in records if record.get("beyond_timeout")]:
+        if past := [(qid, record[GPU_ESTIMATE_S]) for qid, record in records if record.get(BEYOND_TIMEOUT)]:
             print(f"  {config.name}: its work over the whole range of {len(past)} questions may need more GPU seconds than the "
                   f"{render.ASK_SHARE * run.timeout_s:g} s an exec leaves it ({render.ASK_SHARE:.0%} of its {run.timeout_s:g} s: the "
                   "agent's own turns take the rest), so a timeout there is its speed, not a miss: "
@@ -75,7 +80,8 @@ def show_limits(run: RunFolder, names: Sequence[str], configs: Sequence[Config],
 
 
 def check_clocks(run: RunFolder, names: Sequence[str], configs: Sequence[Config], descriptions: Mapping[Config, Description | None],
-                 preview: Callable[[str, Config], Session], jobs: int, controls: str | None, subset: str, only: Sequence[str], clock: str) -> None:
+                 preview: Callable[[str, Config], Session], jobs: int, gpu_jobs: int, controls: str | None, subset: str, only: Sequence[str],
+                 clock: str) -> None:
     """Raises (`clock.check_queue`) for the first configuration whose system would run more than one exec at once on the working
     clock and cannot report its queue, from the preview sessions: a run is refused before it spends anything."""
     questions = selected(run.questions(), subset, descriptions, only)
@@ -85,7 +91,8 @@ def check_clocks(run: RunFolder, names: Sequence[str], configs: Sequence[Config]
         session = preview(names[0], config)
         cases = [case_of(run, names[0], config, q, session) for q in config_questions(questions, config, descriptions[config], controls)]
         if cases:
-            check_queue(config.name, session, cases[0], session.max_jobs(cases, jobs), clock)
+            check_queue(config.name, descriptions[config], session, cases[0], execs_at_once(descriptions[config], session, cases, jobs, gpu_jobs),
+                        clock)
 
 
 def minutes_text(minutes: float) -> str:
@@ -148,6 +155,8 @@ def dry_run(run: RunFolder, names: Sequence[str], configs: Sequence[Config], des
     of each agent (None: its own). Its prompt asks for the final answer in `answer_format`. With `side_by_side` an agent with its own tools is
     kept off the GPU, as in the run (`schedule.agent_off_gpu`). Codex's catalog comes from `codex debug models`, which only reads."""
     questions = selected(run.questions(), subset, descriptions, only)
+    if answer_format == "json":
+        grounded.check_groundable(questions, dump)  # (as the run refuses it)
     run.check_paths(isolation, reads_of(run.scenario.view(questions[0], 0, dump, run.temp, run.tag, False), dump) if questions else None)
     for name in names:
         found = shutil.which(name)

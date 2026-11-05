@@ -102,6 +102,13 @@ class McpServer:
     tools: tuple[str, ...]
 
 
+# The keys of `Served.record` that the core acts on, for any system. A system sets the ones that mean something for it; a case whose record
+# lacks a key is read as a case without it (not exclusive, no GPU estimate, not beyond its timeout).
+EXCLUSIVE = "exclusive"  # the system serves the case alone: `clock-check` does not draw it (it queues for nothing), and the report counts it
+GPU_ESTIMATE_S = "gpu_estimate_s"  # the seconds of its own the system thinks the case needs: the report's mean, and the dry run's list of those beyond the timeout
+BEYOND_TIMEOUT = "beyond_timeout"  # the case's work cannot finish inside the exec's time, so a timeout there is the system's speed, not a miss: the dry run and report say so
+
+
 @dataclass(frozen=True)
 class Served:
     server: McpServer | None
@@ -110,7 +117,7 @@ class Served:
     server_instructions: str | None  # Codex only, as recorded
     holder: str | None  # "mm": the word the prompt's sentences use
     clock_note: str | None  # the sentence about a clock later than `now`
-    record: Mapping[str, object]  # fields merged into the result, for example busy_at_start
+    record: Mapping[str, object]  # fields merged into the result; those the core acts on are EXCLUSIVE, GPU_ESTIMATE_S and BEYOND_TIMEOUT, the rest are the system's own
     opens: tuple[Path, ...] = ()  # folders the system hands the agent and its own tools may open though the run's folder is denied (mm's `looks`)
 
 

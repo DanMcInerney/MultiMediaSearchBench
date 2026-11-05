@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from collections.abc import Sequence
 from datetime import datetime, time, timedelta
 from typing import Literal
 
@@ -106,6 +107,18 @@ def moments_of(q: Question, dump: Dump) -> list[tuple[ManifestEntry, Placed]]:
     return out
 
 
+def check_groundable(questions: Sequence[Question], dump: Dump) -> None:
+    """Raises, naming the question, when a question that is not absent has no evidence to ground a citation in, or its evidence is in a file the
+    dump lacks. `ground` raises the same after an exec, which has spent the plan, so a run in the `json` format refuses it before any agent starts."""
+    for q in questions:
+        if q.kind != "absent" and not moments_of(q, dump):
+            raise ValueError(no_evidence(q))
+
+
+def no_evidence(q: Question) -> str:
+    return f"{q.qid} is not an absent question and has no evidence, so no citation can ground it"
+
+
 # -- scoring ---------------------------------------------------------------------------------------------------------------------
 
 def gap(a: Placed, b: Placed) -> float:
@@ -135,7 +148,7 @@ def ground(q: Question, final: FinalAnswer, value_passed: bool, dump: Dump) -> G
     elif q.kind == "absent":
         status = "grounded" if cited == 0 else "wrong"
     elif not truth:
-        raise ValueError(f"{q.qid} is not an absent question and has no evidence, so no citation can ground it")
+        raise ValueError(no_evidence(q))
     else:
         status = "grounded" if cited and matched == cited else "lucky"
     return Grounding(status, cited, matched, unresolved)

@@ -33,7 +33,7 @@ Multimem not installed.
 - **Working-time clock:** built (`--clock working|wall`, default `working`). mm reports no queue, so it runs on the wall clock and
   is refused more than one exec at once on the working clock. `mmmb clock-check` is built but not run, and for mm it needs a
   small change in Multimem first.
-- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner (at `--jobs 1`), and the
+- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner (`files` three execs at once, `mm` one, as the pilot ran), and the
   first `mm+files` run. No GPU and no paid agent ran in P0. The commands, their cost and what they decide are in
   [DESIGN.md section 12](DESIGN.md#12-phases).
 - **Next (P1):** the `embed` and `transcript` systems and the priority-1 scenarios.
@@ -70,13 +70,16 @@ uv run mmmb report <run>
   `files`), and runs the shortcut probe. It prints the run folder, `D:\mmmb-runs\<date>-v7-tiny-s1`; `<run>` is that folder, or
   its name. The tiny week is 2 days and 19 questions, written in about 35 seconds. `--scale pilot` is the 3-day, 31-question
   week the pilot used; `standard` is 7 days.
-- `run --dry-run` says what the run will cost and starts no agent. Without `--dry-run` it spends your plans' quota. Add
-  `--jobs 3` for three execs at once (at most 4), and `--limit 12` or `--kinds last,absent` to run fewer cases.
+- `run --dry-run` says what the run will cost and starts no agent. Without `--dry-run` it spends your plans' quota. `--jobs`
+  is how many execs of a configuration run at once (3 unless you say, at most 4). A configuration whose system needs the GPU
+  (`mm`) runs one at a time whatever `--jobs` says, and only `--gpu-jobs N` asks for more. `--limit 12` or `--kinds last,absent`
+  run fewer cases.
 - `report` pools the paired comparison into `report.md` and `report.json` in the run folder. `run` continues a run that
   stopped.
 - `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmmb ingest` command to
-  make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`, with `--jobs 1` on `run`: mm gives
-  no queue figure, so on the working clock more than one mm exec at once is refused (and the laptop's GPU runs one at a time).
+  make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`. mm runs one exec at a time, because
+  it needs the GPU and the laptop's driver crashed under three at once. `--gpu-jobs 2` asks for more, and until Multimem reports
+  its queue the working clock refuses it (`--clock wall` lets it through, with a warning).
 
 Commands, each with `--help`:
 
@@ -89,7 +92,7 @@ Commands, each with `--help`:
 | `mmmb report RUN [RUN ...]` | figures and Markdown; several runs of one scenario are pooled |
 | `mmmb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
 | `mmmb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
-| `mmmb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; refused for mm until Multimem reports its queue) |
+| `mmmb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until Multimem reports its queue) |
 
 ## Systems and configurations
 

@@ -16,7 +16,8 @@ from __future__ import annotations
 import time
 from collections.abc import Callable
 
-from mmmb.core.contract import Case, Session
+from mmmb.core.atonce import flag_of
+from mmmb.core.contract import Case, Description, Session
 
 WORKING, WALL = "working", "wall"
 CLOCKS = (WORKING, WALL)  # `--clock`: charge working time where the system reports its queue, or wall time throughout
@@ -78,16 +79,17 @@ class WorkingClock:
                 "queue_s": None if queue is None else round(queue, 1), "wall_s": round(wall, 1)}
 
 
-def check_queue(label: str, session: Session, case: Case, at_once: int, clock: str) -> None:
+def check_queue(label: str, description: Description | None, session: Session, case: Case, at_once: int, clock: str) -> None:
     """Raises when `at_once` execs of `session` would share it and `clock` is `working`, yet the session cannot say how long a case waits
     in its queue (`Session.queue_s` is None): a case's wait for the shared resource would be charged to it, and the result would not be
-    the working time it says. One exec at a time has no queue, so the wall is the working time there. `case` is any case of the cell."""
+    the working time it says. One exec at a time has no queue, so the wall is the working time there. `case` is any case of the cell, of
+    the configuration whose system has `description`. The remedy it names is one exec at a time (`atonce.flag_of`); it never offers the
+    wall clock, which would keep the several execs."""
     if clock not in CLOCKS:
         raise ValueError(f"the clock is one of {', '.join(CLOCKS)}, not {clock!r}")
     if clock == WORKING and at_once > 1 and session.queue_s(case) is None:
         raise ValueError(f"{label}: {at_once} execs at once on the working clock, but its system reports no queue time (Session.queue_s is "
-                         "None), so each exec would be charged its wait for the others. Run it at --jobs 1, or pass --clock wall "
-                         "(each result then says clock: wall)")
+                         f"None), so each exec would be charged its wait for the others. Run it one exec at a time ({flag_of(description)} 1)")
 
 
 def budget_s(media_hours: float) -> float:

@@ -72,7 +72,7 @@ def refuse_misdated(system: str, report: IngestReport) -> None:
         more = f"; and {len(report.misdated) - SHOWN} more" if len(report.misdated) > SHOWN else ""
         raise Misdated(f"{system} stored {len(report.misdated)} files at a time other than their own, so what it is asked of them would "
                        f"be answered from a wrong index and no number from this run could be trusted: {named}{more}. Remove its store "
-                       "and ingest again once it reads their time")
+                       "and ingest again once it stores them at their time")
 
 
 def store_hashes(descriptions: Mapping[Config, Description | None]) -> dict[str, str]:

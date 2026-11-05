@@ -5,6 +5,7 @@ is a `line` run. Expected values are the plan's rules and the prompts' words, ov
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import shutil
 from pathlib import Path
@@ -12,10 +13,11 @@ from pathlib import Path
 import pytest
 from cli_world import world  # noqa: F401
 from stub_system import FILES, Stub
-from test_cli import QUESTIONS, argv, built, w  # noqa: F401  (a copy of the toy run `mmmb build` makes, with no results)
+from test_cli import QUESTIONS, argv, built, result, w  # noqa: F401  (a copy of the toy run `mmmb build` makes, with no results)
 
 from mmmb import scenarios
 from mmmb.core import fs
+from mmmb.core.question import write_questions
 from mmmb.core.runfolder import RunFolder
 from mmmb.core.runner import Agent, answer_format_of
 
@@ -86,3 +88,37 @@ def test_the_recorded_runs_are_lines_whatever_they_are_asked_by_default():
         assert "answer_format" not in meta, "(the converted run.json is the recorded one: it has no format)"
         results = list((recorded / name / "converted" / "results").rglob("*.json"))
         assert results and not any("answer_format" in r.read_text(encoding="utf-8") for r in results[:50]), "and no result has a field of the format"
+
+
+def without_evidence(w):
+    """The toy run with one question that is not absent left with no evidence (its question file and the hash run.json keeps of it written again):
+    that question."""
+    bare_q = next(q for q in QUESTIONS if q.kind != "absent")
+    bare = dataclasses.replace(bare_q, truth=dataclasses.replace(bare_q.truth, evidence=()))
+    write_questions(w.run.folder / "questions.jsonl", [bare if q.qid == bare_q.qid else q for q in QUESTIONS])
+    fs.write_json(w.run.folder / "run.json", {**fs.read_json(w.run.folder / "run.json"), "question_hash": fs.sha256_of(w.run.folder / "questions.jsonl")})
+    return bare_q
+
+
+def test_a_json_run_with_a_question_no_citation_can_ground_is_refused_before_any_agent(w, capsys):
+    """`ground` raised for a question that is not absent and has no evidence after the exec that answered it, which had spent the plan. The run
+    refuses it at its start (`grounded.check_groundable`, in `run_agents` and in the dry run), naming the question."""
+    bare_q = without_evidence(w)
+    stub = Stub()
+    ask = argv(w, "--agents", "claude", "--configs", "files", "--only", bare_q.qid)
+    for flags in ((), ("--dry-run",), ("--answer-format", "json")):
+        assert w.main(*ask, *flags, agents=lambda: {"claude": Agent(stub)}) == 1, flags
+        assert f"error: {bare_q.qid} is not an absent question and has no evidence, so no citation can ground it" in capsys.readouterr().err
+    assert stub.execs == [] and not (w.run.folder / "results").exists(), "refused before any agent ran"
+    # only the questions the run asks count: another question of the run is not refused for this one
+    other = next(q.qid for q in QUESTIONS if q.kind != "absent" and q.qid != bare_q.qid)
+    assert w.main(*argv(w, "--agents", "claude", "--configs", "files", "--only", other), agents=lambda: {"claude": Agent(stub)}) == 0
+    assert len(stub.execs) == 1
+
+
+def test_a_line_run_grounds_nothing_so_a_question_without_evidence_is_asked_in_it(w):
+    bare_q = without_evidence(w)
+    stub = Stub()
+    assert w.main(*argv(w, "--agents", "claude", "--configs", "files", "--only", bare_q.qid, "--answer-format", "line"),
+                  agents=lambda: {"claude": Agent(stub)}) == 0
+    assert len(stub.execs) == 1 and result(w.run, "claude", "files", bare_q.qid)["answer_format"] == "line"

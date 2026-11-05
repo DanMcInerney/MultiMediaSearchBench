@@ -175,6 +175,12 @@ class StubSystem:
         return StubSession(self, context)
 
 
+def peak(spans) -> int:
+    """The most of `spans` (pairs of began, ended) that run at one moment: a span is running from its start up to, not including, its end, and
+    the most is always reached at some span's start."""
+    return max((sum(a <= t < b for a, b in spans) for t, _ in spans), default=0)
+
+
 class Stub:
     """An agent that answers right for text and records in both kinds of configuration and for every modality with a system's tools,
     `unknown` for pictures, video and sound with the agent's own tools only. `first` changes the fields of its first result,
@@ -220,6 +226,10 @@ class Stub:
 
     def qids(self, folder: str | None = None) -> list[str]:
         return [self.qid_of(s) for s in self.execs if folder is None or self.dir_of(s) == folder]
+
+    def at_once(self, folder: str) -> int:
+        """The most execs of the configuration with this results folder that ran at once (from `log`: what the execs did, not what was asked)."""
+        return peak([(began, ended) for f, _, _, began, ended in self.log if f == folder])
 
 
 def run_of(root: Path, configs=(FILES, STUB), scenario=None, questions=None, tag: str = "t1") -> tuple[RunFolder, Dump]:

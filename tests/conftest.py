@@ -8,6 +8,10 @@
   catches the change where it happens, and the test that caused it fails even when the code under test swallowed the error.
   A snapshot of those folders would not do: a live Claude Code or Codex session or the mm daemon changes them while the
   suite runs. A process a test starts is not watched: it gets the throwaway environment instead.
+- The same hook refuses to start a real `claude` or `codex` (any program of that name, or any program inside the owner's three
+  folders), which spends the plan or reads the owner's login. A test that needs an agent puts a stand-in in its place (a program of
+  another name, as tests/stand_in_agent.py does), and patches `claude.check_login`; two test runs once reached the real
+  `claude auth status` before a fixture had patched it.
 - Markers `slow`, `paid` and `gpu`, which pyproject's addopts leave out of a default run.
 - The mm tests (tests/mm) skip themselves when the mm extra is not installed. The summary says so in a banner, and
   `--require-mm` turns the skip into a failure.
@@ -17,6 +21,7 @@ from __future__ import annotations
 
 import ast
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -28,6 +33,9 @@ HOME_FOLDERS = (".claude", ".codex", ".multimem")
 HOME_VARS = {"CLAUDE_CONFIG_DIR": ".claude", "CODEX_HOME": ".codex", "MULTIMEM_HOME": ".multimem"}  # variable -> folder it overrides
 MM_MISSING = "could not import 'multimem'"  # the start of the reason `pytest.importorskip("multimem")` gives
 BANNER = "the mm extra is not installed; run uv sync --extra mm"
+AGENTS = frozenset({"claude", "codex"})  # programs a test must not start: the owner's agents
+SHELLS = frozenset({"cmd", "sh", "bash", "zsh", "powershell", "pwsh"})  # a program that runs the command it is given: the program is that command's
+SHELL_COMMAND = re.compile(r"(?:^|\s)(?:/c|-c|-command)\s+(.*)", re.I | re.S)
 WRITING = frozenset("wax+")
 WRITE_FLAGS = os.O_WRONLY | os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_TRUNC
 # audit event -> positions among its arguments of the paths it changes
@@ -49,11 +57,11 @@ def real_homes() -> tuple[str, ...]:
 
 REAL_HOMES = real_homes()
 MMMB_FOLDERS = tuple(normal(folder) for folder in (paths.RUNS, paths.TEMP, paths.CACHE))  # where a real run, dump and cache are kept
-WRITES: list[str] = []  # what the guard refused, in order, for the autouse fixture to tell
+REFUSED: list[str] = []  # what the guard refused, in order, for the autouse fixture to tell
 
 
-class RealHomeWrite(Exception):
-    """Not an OSError: code that skips what it cannot write must not skip this."""
+class Refused(Exception):
+    """Not an OSError: code that skips what it cannot write or start must not skip this."""
 
 
 def within(path, folders: tuple[str, ...]) -> bool:
@@ -70,7 +78,55 @@ def guarded(path) -> str | None:
     return None
 
 
+def first_word(text: str) -> str | None:
+    """The program of a command line: its first word, or the quoted path it starts with (which may hold spaces)."""
+    if not (text := text.strip()):
+        return None
+    if text[0] in "\"'":
+        end = text.find(text[0], 1)
+        return text[1:end] if end > 0 else text[1:]
+    return text.split(None, 1)[0]
+
+
+def text_of(value) -> str | None:
+    """A path or command as text: a string, bytes or a path."""
+    return os.fsdecode(value) if isinstance(value, (str, bytes, os.PathLike)) else None
+
+
+def program_of(event: str, args: tuple) -> str | None:
+    """The program a process-starting audit event runs, else None; that of the command a shell is given to run (`cmd /c`, `sh -c`).
+    `subprocess.Popen` gives (executable, args, cwd, env): the executable when it is named, else the first of `args`, or the first word of
+    it when it is one string; `os.system` a command line; `os.exec*`, `os.spawn*` and `os.posix_spawn` a path."""
+    line = None  # the command line, when there is one to look into
+    if event == "subprocess.Popen":
+        named, command = args[0], args[1]
+        line = " ".join(map(str, command)) if isinstance(command, (list, tuple)) else text_of(command)
+        program = text_of(named) if named is not None else (text_of(command[0]) if isinstance(command, (list, tuple)) and command else first_word(line or ""))
+    elif event == "os.system":
+        line = text_of(args[0])
+        program = first_word(line or "")
+    elif event in ("os.exec", "os.posix_spawn", "os.spawn"):
+        program = text_of(args[1] if event == "os.spawn" else args[0])
+    else:
+        return None
+    if program and Path(first_word(program) or "").stem.lower() in SHELLS and line and (inner := SHELL_COMMAND.search(line)):
+        return first_word(inner[1].strip().removeprefix('"') if inner[1].lstrip().startswith('""') else inner[1]) or program
+    return program or None
+
+
+def started(program: str) -> str | None:
+    """What a test must not start `program` of: the owner's agents, or anything in the owner's three folders; else None."""
+    if Path(program).stem.lower() in AGENTS:
+        return "the owner's agent (it spends the plan and reads the login): use a stand-in of another name"
+    if within(program, REAL_HOMES):
+        return "a program in the owner's agent setup"
+    return None
+
+
 def audit(event: str, args: tuple) -> None:
+    if (program := program_of(event, args)) is not None and (what := started(program)):
+        REFUSED.append(f"{event} {program}")
+        raise Refused(f"a test must not start {what}: {event} {program}")
     if event == "open":
         path, mode, flags = args
         changed = (path,) if (WRITING & set(mode) if isinstance(mode, str) else flags & WRITE_FLAGS) else ()
@@ -80,8 +136,8 @@ def audit(event: str, args: tuple) -> None:
         return
     for path in changed:
         if isinstance(path, (str, bytes, os.PathLike)) and (what := guarded(path)):
-            WRITES.append(f"{event} {os.fsdecode(path)}")
-            raise RealHomeWrite(f"a test must not change {what}: {event} {os.fsdecode(path)}")
+            REFUSED.append(f"{event} {os.fsdecode(path)}")
+            raise Refused(f"a test must not change {what}: {event} {os.fsdecode(path)}")
 
 
 sys.addaudithook(audit)
@@ -113,10 +169,11 @@ def throwaway_homes(tmp_path_factory: pytest.TempPathFactory):
 
 @pytest.fixture(autouse=True)
 def real_homes_untouched():
-    before = len(WRITES)
+    before = len(REFUSED)
     yield
-    if refused := WRITES[before:]:
-        pytest.fail("the test changed a folder it must not (refused, but the test must not try): " + "; ".join(refused))
+    if refused := REFUSED[before:]:
+        pytest.fail("the test did what it must not, a change to the owner's folders or the start of the owner's agents (refused, but the test must not "
+                    "try): " + "; ".join(refused))
 
 
 class MmSkips:

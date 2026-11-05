@@ -208,15 +208,19 @@ def test_more_than_one_exec_at_once_on_the_working_clock_is_refused_for_a_sessio
     case = Case("q", 0.0, None, (), 0.0, 1.0, "q", 0.0, -1, Path(), Path())
     says, silent = StubSession(StubSystem(), None), StubSession(StubSystem(reports_queue=False), None)
     says.at_once = silent.at_once = 4
+    plain, on_gpu = StubSystem().describe("all"), StubSystem(needs_gpu=True).describe("all")
     for session in (says, silent):
         for clock in CLOCKS:
-            check_queue("c", session, case, 1, clock)  # one at a time has no queue
-    check_queue("c", says, case, 4, WORKING)
-    check_queue("c", silent, case, 4, WALL)
-    with pytest.raises(ValueError, match=r"c: 2 execs at once on the working clock.*no queue time.*--jobs 1.*--clock wall"):
-        check_queue("c", silent, case, 2, WORKING)
+            check_queue("c", plain, session, case, 1, clock)  # one at a time has no queue
+    check_queue("c", plain, says, case, 4, WORKING)
+    check_queue("c", plain, silent, case, 4, WALL)
+    # the remedy is one exec at a time, by the option that sets it for this system; it is never the wall clock, which would keep the several
+    for description, option in ((plain, "--jobs"), (on_gpu, "--gpu-jobs")):
+        with pytest.raises(ValueError, match=rf"c: 2 execs at once on the working clock.*no queue time.*one exec at a time \({option} 1\)") as refused:
+            check_queue("c", description, silent, case, 2, WORKING)
+        assert "--clock" not in str(refused.value) and "wall" not in str(refused.value), str(refused.value)
     with pytest.raises(ValueError, match="one of working, wall"):
-        check_queue("c", says, case, 1, "monotonic")
+        check_queue("c", plain, says, case, 1, "monotonic")
     assert DEFAULT_CLOCK == WORKING
 
 

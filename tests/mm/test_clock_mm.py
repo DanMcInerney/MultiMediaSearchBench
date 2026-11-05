@@ -3,11 +3,15 @@ can say how long a case queued for the GPU, and the clock runs on the wall. That
 refuses several on the working clock (`mmmb run`, before any agent starts) and `mmmb clock-check` refuses mm altogether until Multimem reports the
 queue. Over the real system, the tiny week's real store and the fake decider; no agent, no model and no daemon of the owner's.
 
+mm needs the GPU, so it runs one exec at a time unless `--gpu-jobs` asks for more (core/atonce.py): the defaults are never refused, `--gpu-jobs 2`
+is refused on the working clock, and nothing a refusal says offers the wall clock as the way to keep the several.
+
 The expected values are the plan's words: a session that cannot say its queue says None, the preview as the opened one."""
 
 from __future__ import annotations
 
 import dataclasses
+import re
 import shutil
 from datetime import datetime
 
@@ -23,7 +27,7 @@ from mmmb.core import dryrun, fs  # noqa: E402
 from mmmb.core.agents import claude  # noqa: E402
 from mmmb.core.build import INGESTED, write_dump  # noqa: E402
 from mmmb.core.clock import WALL, WORKING, check_queue  # noqa: E402
-from mmmb.core.clockcheck import check_possible  # noqa: E402
+from mmmb.core.clockcheck import queued_at_once  # noqa: E402
 from mmmb.core.config import Config  # noqa: E402
 from mmmb.core.contract import Case  # noqa: E402
 from mmmb.core.question import write_questions  # noqa: E402
@@ -31,6 +35,7 @@ from mmmb.core.runfolder import RunFolder  # noqa: E402
 from mmmb.systems.mm import home as mm_home  # noqa: E402
 from mmmb.systems.mm import models  # noqa: E402
 from mmmb.systems.mm.daemon import Daemon  # noqa: E402
+from mmmb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 D1 = Config("mm/d1-3B", "mm", "d1-3B", False)
@@ -44,16 +49,23 @@ def test_neither_session_of_mm_can_say_its_queue_and_more_than_one_exec_at_once_
     _, dump, questions = week
     cases = [case_of(q, tmp_path / "work", tmp_path / "run" / q.qid) for q in questions]
     preview = MM.preview(store, dump, context(tmp_path / "homes"))
+    fake, d1 = MM.describe("fake"), Mm().describe("d1-3B")  # (the real d1-3B's facts: the tests' MM stands the fake decider in its place)
+    assert not fake.needs_gpu and d1.needs_gpu
     with Opened(store, dump, tmp_path / "homes") as opened:
         for session in (preview, opened):
             assert session.queue_s(cases[0]) is None, type(session).__name__
             assert session.max_jobs(cases, 3) == 3, "the fake decider is fast: three at once would run"
-            check_queue("mm/fake", session, cases[0], 1, WORKING)
-            check_queue("mm/fake", session, cases[0], 3, WALL)
-            with pytest.raises(ValueError, match=r"mm/fake: 3 execs at once on the working clock.*no queue time.*--clock wall"):
-                check_queue("mm/fake", session, cases[0], 3, WORKING)
+            check_queue("mm/fake", fake, session, cases[0], 1, WORKING)
+            check_queue("mm/fake", fake, session, cases[0], 3, WALL)
+            with pytest.raises(ValueError, match=r"mm/fake: 3 execs at once on the working clock.*no queue time.*one exec at a time \(--jobs 1\)") as refused:
+                check_queue("mm/fake", fake, session, cases[0], 3, WORKING)
+            with pytest.raises(ValueError, match=r"mm/d1-3B: 2 execs at once on the working clock.*one exec at a time \(--gpu-jobs 1\)") as gpu_refused:
+                check_queue("mm/d1-3B", d1, session, cases[0], 2, WORKING)
+            assert "--clock" not in str(refused.value) + str(gpu_refused.value), "no refusal offers the wall clock"
             with pytest.raises(ValueError, match="decision D3"):
-                check_possible(D1, session, cases, 3)
+                queued_at_once(D1, d1, session, cases, 3, 2)
+            with pytest.raises(ValueError, match=r"one at a time \(--gpu-jobs 1\).*--gpu-jobs 2 or more"):
+                queued_at_once(D1, d1, session, cases, 3, 1)
         assert opened.usage(cases[0], []).queue_s is None, "and it has none to report as the cost either"
 
 
@@ -71,7 +83,7 @@ def built(week, store, tmp_path) -> RunFolder:
                            cache=tmp_path / "cache")
 
 
-def test_the_commands_refuse_mm_at_several_execs_on_the_working_clock_before_anything_starts_and_clock_check_refuses_it_naming_d3(
+def test_mm_runs_one_exec_at_a_time_at_the_defaults_is_refused_at_several_on_the_working_clock_before_anything_starts_and_clock_check_needs_gpu_jobs(
         week, store, tmp_path, monkeypatch, capsys):
     run = built(week, store, tmp_path)
     monkeypatch.setattr(models.modelenv, "installed", lambda: {})  # no torch: a model that is not ready is not the refusal looked for
@@ -80,19 +92,27 @@ def test_the_commands_refuse_mm_at_several_execs_on_the_working_clock_before_any
     monkeypatch.setattr(mm_home, "copy_home", lambda *args: pytest.fail("a refusal copies no store"))
     monkeypatch.setattr(claude, "check_login", lambda: pytest.fail("a refusal logs nothing in"))
 
-    def command(*argv: str) -> tuple[int, str]:
+    def command(*argv: str) -> tuple[int, str, str]:
         status = cli.main([*argv, str(run.folder)] if argv[0] == "clock-check" else [argv[0], str(run.folder), *argv[1:]])
-        return status, capsys.readouterr().err
+        out, err = capsys.readouterr()
+        return status, out, err
 
-    for flags in ((), ("--dry-run",)):  # a dry run says so too
-        status, err = command("run", "--agents", "claude", "--configs", "mm/d1-3B", "--jobs", "3", *flags)
-        assert status == 1 and "mm/d1-3B: 3 execs at once on the working clock" in err and "--clock wall" in err
-    status, err = command("clock-check", "--config", "mm/d1-3B", "--agents", "claude", "--jobs", "3")
+    # several execs of mm are only what --gpu-jobs asks for, and the working clock refuses them: in a dry run too, and the remedy is one at a time
+    for flags in ((), ("--dry-run",)):
+        status, out, err = command("run", "--agents", "claude", "--configs", "mm/d1-3B", "--gpu-jobs", "2", *flags)
+        assert status == 1 and "mm/d1-3B: 2 execs at once on the working clock" in err and "one exec at a time (--gpu-jobs 1)" in err
+        assert "--clock" not in err and "warning" not in out, "no offer of the wall clock, and nothing to warn of: nothing runs"
+    status, out, err = command("clock-check", "--config", "mm/d1-3B", "--agents", "claude", "--gpu-jobs", "2")
     assert status == 1 and "mm/d1-3B's system reports no queue time" in err and "decision D3" in err
     assert not (run.folder / "clock-check").exists() and not (run.folder / "results").exists()
-    # at one exec at a time the wall is the working time, and on the wall clock the number does not matter: the dry runs go through
-    for flags in (("--jobs", "1"), ("--jobs", "3", "--clock", "wall")):
-        status, err = command("run", "--dry-run", "--agents", "claude", "--configs", "mm/d1-3B", *flags)
+    # at the defaults mm is one exec at a time whatever --jobs says: nothing to refuse, and the dry run says so
+    for flags in ((), ("--jobs", "3"), ("--jobs", "4", "--gpu-jobs", "1")):
+        status, out, err = command("run", "--dry-run", "--agents", "claude", "--configs", "mm/d1-3B", *flags)
         assert (status, err) == (0, ""), flags
-    status, err = command("clock-check", "--config", "mm/d1-3B", "--agents", "claude", "--jobs", "1")
-    assert status == 1 and "would run these cases 1 at a time, not 1, so nothing would queue" in err, "one at a time queues for nothing: no check"
+        assert re.search(r"claude\s+mm/d1-3B\s+\d+ to run of \d+ \(1 at once\)", out) and "warning" not in out, flags
+    # the owner may ask for the wall clock with several: it goes through, with a warning that several GPU execs run at once
+    status, out, err = command("run", "--dry-run", "--agents", "claude", "--configs", "mm/d1-3B", "--gpu-jobs", "2", "--clock", "wall")
+    assert (status, err) == (0, "") and "warning: mm/d1-3B: 2 execs at once on the GPU" in out and "(2 at once)" in out
+    # the check needs the explicit GPU option: at the defaults the cases would run one at a time and nothing would queue
+    status, out, err = command("clock-check", "--config", "mm/d1-3B", "--agents", "claude", "--jobs", "3")
+    assert status == 1 and "one at a time (--gpu-jobs 1)" in err and "--gpu-jobs 2 or more" in err and "--clock" not in err

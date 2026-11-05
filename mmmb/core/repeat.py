@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from mmmb.core import costing, fs, report
+from mmmb.core.atonce import asked, gpu_warning
 from mmmb.core.config import Config
 from mmmb.core.contract import Description
 from mmmb.core.runfolder import RunFolder
@@ -105,11 +106,11 @@ def options_of(scenario: Scenario, recipe: Mapping[str, object]) -> dict[str, ob
     return given
 
 
-def run_argv(folder: Path, repeat: Repeat, jobs: int) -> list[str]:
+def run_argv(folder: Path, repeat: Repeat, jobs: int, gpu_jobs: int) -> list[str]:
     """The `mmmb run` command line that does the repeat in `folder`: the recorded agents at their models and efforts, configurations,
-    questions and time limit."""
+    questions and time limit, and the execs at once the repeat was given (`--jobs`, and `--gpu-jobs` for the systems that need the GPU)."""
     argv = ["run", str(folder), "--agents", ",".join(repeat.agents), "--configs", ",".join(c.name for c in repeat.configs),
-            "--only", ",".join(repeat.qids), "--jobs", str(jobs), "--timeout", f"{repeat.recorded.timeout_s:g}"]
+            "--only", ",".join(repeat.qids), "--jobs", str(jobs), "--gpu-jobs", str(gpu_jobs), "--timeout", f"{repeat.recorded.timeout_s:g}"]
     for name, setting in repeat.agents.items():
         for what, value in setting.items():
             if value is not None:
@@ -121,12 +122,13 @@ def setting_text(setting: Mapping[str, str | None]) -> str:
     return f"{setting['model']}, " + (f"at {setting['effort']} effort" if setting["effort"] else "at the agent's own effort (its results hold none)")
 
 
-def show_repeat(repeat: Repeat, descriptions: Mapping[Config, Description | None], jobs: int, folders: Sequence[Path], temp: Path,
+def show_repeat(repeat: Repeat, descriptions: Mapping[Config, Description | None], jobs: int, gpu_jobs: int, folders: Sequence[Path], temp: Path,
                 cache: Path) -> None:
     """What the repeat will do, for `--dry-run` and before it starts: the agents, models and efforts, the cells and their execs, what each
     took in the earlier runs `folders` (the recorded run among them), and what has to be made first: the dump and the stores that the cache
-    in `cache` holds for the recipe (the dump in `temp`) are said to be cached, the rest to be made. A configuration whose system needs the
-    GPU is counted one exec at a time (DESIGN 8.1), as its store, which tells the system's own limit, does not exist yet."""
+    in `cache` holds for the recipe (the dump in `temp`) are said to be cached, the rest to be made. Each cell is counted at the execs at once
+    the run will ask of it (`atonce.asked`: `jobs`, or `gpu_jobs` for a system that needs the GPU), as `mmmb run` counts it, but not at the
+    fewer its system may allow (`Session.max_jobs`), which its store, not yet made, would tell."""
     run = repeat.recorded
     history = costing.history_of(folders)
     print(f"repeat of {run.name}: {run.scenario.name}, {run.scale}, seed {run.seed}, {len(run.days)} days; {len(repeat.qids)} questions, "
@@ -138,8 +140,10 @@ def show_repeat(repeat: Repeat, descriptions: Mapping[Config, Description | None
     for name in repeat.agents:
         for config in repeat.configs:
             if qids := repeat.cells.get((name, config.name)):
-                description = descriptions[config]
-                at_once = 1 if description is not None and description.needs_gpu else jobs
-                cells.append(costing.Cell(name, config, len(qids), len(qids), at_once, history.get((name, config.dir))))
-    costing.show_cells(cells, jobs, True)
+                cells.append(costing.Cell(name, config, len(qids), len(qids), asked(descriptions[config], jobs, gpu_jobs), history.get((name, config.dir)),
+                                          description=descriptions[config]))
+    for config in repeat.configs:
+        if warning := gpu_warning(config.name, descriptions[config], asked(descriptions[config], jobs, gpu_jobs)):
+            print(f"  {warning}")
+    costing.show_cells(cells, jobs, gpu_jobs, True)
     costing.show_new_builds(run, folders, {c.system: descriptions[c] for c in repeat.configs if c.system is not None}, temp, cache)

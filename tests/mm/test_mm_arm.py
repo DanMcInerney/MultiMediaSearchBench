@@ -52,7 +52,7 @@ from mmmb.systems.mm.daemon import Api, Daemon  # noqa: E402
 from mmmb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
 from mmmb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
 from mmmb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
-from mmmb.systems.mm.models import Model, needs_gpu, resolve_models  # noqa: E402
+from mmmb.systems.mm.models import Model, needs_gpu  # noqa: E402
 from mmmb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa: E402
 from mmmb.systems.mm.system import MmSession, serve_record  # noqa: E402
 
@@ -329,19 +329,21 @@ def test_models_are_resolved_and_the_ones_that_are_not_ready_say_why(tmp_path, m
     model_folder(folder, "h2o-lightning-4b")
     monkeypatch.setattr(models.modelenv, "problem", lambda backend, folder_, envs: None)
     monkeypatch.setattr(models, "serving", lambda url: False)
-    ready, skipped = resolve_models(["d1-3b", "D3-EDGE", "h2o-lightning-4b", "nonsense", "d1-3B"], folder)
-    assert [m.name for m in ready] == ["d1-3B"] and ready[0].spec == (folder / "d1-3B").resolve().as_posix()
-    assert ready[0].url is None and ready[0].slug == "d1-3B" and ready[0].about is decider.known("d1-3B")[1]
-    reasons = dict(line.split(": ", 1) for line in skipped)
-    assert "mm model use d3-edge" in reasons["d3-edge"] and "not serving" in reasons["h2o-lightning-4b"]
-    assert "not a model mm knows" in reasons["nonsense"] and len(skipped) == 3, "d1-3B named twice is one model"
+    mm = system.Mm(models_dir=folder)
+    ready = mm.ready_model("d1-3b")  # (a name is matched without regard to case)
+    assert ready.name == "d1-3B" and ready.spec == (folder / "d1-3B").resolve().as_posix()
+    assert ready.url is None and ready.slug == "d1-3B" and ready.about is decider.known("d1-3B")[1]
+    for name, why in (("D3-EDGE", "d3-edge: not downloaded: mm model use d3-edge"), ("h2o-lightning-4b", "not serving"), ("nonsense", "not a model mm knows")):
+        with pytest.raises(ValueError, match=why):
+            mm.ready_model(name)
     monkeypatch.setattr(models, "serving", lambda url: True)
-    served, _ = resolve_models(["h2o-lightning-4b"], folder)
-    assert served[0].url == "http://127.0.0.1:8741" and not needs_gpu(served[0])
+    served = mm.ready_model("h2o-lightning-4b")
+    assert served.url == "http://127.0.0.1:8741" and not needs_gpu(served)
     monkeypatch.setattr(models.modelenv, "problem", lambda backend, folder_, envs: "torch is missing")
-    assert "env is not ready: torch is missing" in resolve_models(["d1-3B"], folder)[1][0]
-    assert needs_gpu(ready[0]) and not needs_gpu(FAKE_MODEL)
-    assert Model("pplx-decider-flash-v1.2", "x", ready[0].about).slug == "pplx-decider-flash-v1-2"
+    with pytest.raises(ValueError, match="env is not ready: torch is missing"):
+        mm.ready_model("d1-3B")
+    assert needs_gpu(ready) and not needs_gpu(FAKE_MODEL)
+    assert Model("pplx-decider-flash-v1.2", "x", ready.about).slug == "pplx-decider-flash-v1-2"
     # the system: a variant it was given is that model, any other has its facts whether or not it can run (what `describe` and `preview` need),
     # and a session is opened only over one that is ready, the reason it is not being the error (G1's F9)
     monkeypatch.setattr(models.modelenv, "problem", lambda backend, folder_, envs: None)

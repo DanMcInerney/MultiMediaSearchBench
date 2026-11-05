@@ -9,14 +9,18 @@ from pathlib import Path
 from mmmb import scenarios
 from mmmb.core import paths
 from mmmb.core.answer import DEFAULT_FORMAT, FORMATS
+from mmmb.core.atonce import GPU_JOBS, JOBS
 from mmmb.core.clock import CLOCKS, DEFAULT_CLOCK
 from mmmb.core.clockcheck import CASES
 from mmmb.core.runfolder import JOBS_MAX
-from mmmb.core.runner import AGENTS, JOBS, TIMEOUT_S
+from mmmb.core.runner import AGENTS, TIMEOUT_S
 from mmmb.core.select import SUBSETS
 
 OPTIONS = ("scale", "seed", "days", "source", "per_age", "speech")  # what a scenario's recipe may be given; `build` passes those it takes
 DEFAULT_SEED = 1
+JOBS_HELP = f"execs at once of a configuration whose system needs no GPU, at most {JOBS_MAX} (default {JOBS}; a system may allow fewer)"
+GPU_JOBS_HELP = (f"execs at once of a configuration whose system needs the GPU, at most {JOBS_MAX} (default {GPU_JOBS}: several at once crashed "
+                 "the laptop's driver, so more only when asked; a system may allow fewer)")
 
 
 def csv(text: str) -> list[str]:
@@ -55,7 +59,8 @@ def parser_of() -> argparse.ArgumentParser:
     run.add_argument("run", help="a run folder, or its name under the runs folder")
     run.add_argument("--agents", default=",".join(AGENTS))
     run.add_argument("--configs", help="configurations, comma separated: blind, files, <system>[/<variant>][+files] (default the run's)")
-    run.add_argument("--jobs", type=int, default=JOBS, help=f"execs at once, at most {JOBS_MAX} (a system may allow fewer)")
+    run.add_argument("--jobs", type=int, default=JOBS, help=JOBS_HELP)
+    run.add_argument("--gpu-jobs", type=int, default=GPU_JOBS, help=GPU_JOBS_HELP)
     run.add_argument("--subset", choices=SUBSETS, default="all", help="pilot: the media questions and 3 controls (text and records)")
     run.add_argument("--controls", help="the one configuration also asked the text and records questions (default: every one that reads them)")
     run.add_argument("--only", default="", help="these qids of the subset only, comma separated (a smoke)")
@@ -106,11 +111,12 @@ def parser_of() -> argparse.ArgumentParser:
     repeats.add_argument("--cache", type=Path, default=paths.CACHE,
                          help=f"where the dump's record and the stores are kept (default {paths.CACHE}; as for build)")
     repeats.add_argument("--workers", type=int, default=3, help="files written or read at once while building (default 3)")
-    repeats.add_argument("--jobs", type=int, default=JOBS, help=f"execs at once, at most {JOBS_MAX} (a system may allow fewer)")
+    repeats.add_argument("--jobs", type=int, default=JOBS, help=JOBS_HELP)
+    repeats.add_argument("--gpu-jobs", type=int, default=GPU_JOBS, help=GPU_JOBS_HELP)
     repeats.add_argument("--answer-format", choices=FORMATS, help=f"as for run (default {DEFAULT_FORMAT}: D1 asks for json once, and for line only "
                          "when a cell falls outside the band)")
     repeats.add_argument("--clock", choices=CLOCKS, help=f"as for run (default {DEFAULT_CLOCK}); a system that cannot report its queue is refused "
-                         "more than one exec at once on the working clock, and the refusal comes after the build")
+                         "more than one exec at once on the working clock, and the refusal comes after the build, once the store is there to ask")
     repeats.add_argument("--dry-run", action="store_true", help="say what it would do and cost, build and start nothing")
     check = sub.add_parser("clock-check", help="the working clock tried on a few cases: each asked alone, then queued with the others, and the answers, "
                            "tokens and charged seconds side by side (DESIGN 8.4; it spends the plans' quota)")
@@ -119,5 +125,8 @@ def parser_of() -> argparse.ArgumentParser:
     check.add_argument("--config", required=True, help="the configuration to check: a system's, as mm/d1-3B")
     check.add_argument("--cases", type=int, default=CASES, help=f"how many cases (default {CASES}): a seeded sample that keeps the mix of kinds, "
                        "of the cases that do not hold the system alone")
-    check.add_argument("--jobs", type=int, default=JOBS, help=f"execs at once in the queued half, at most {JOBS_MAX} (default {JOBS})")
+    check.add_argument("--jobs", type=int, default=JOBS, help=f"execs at once in the queued half of a system that needs no GPU, at most {JOBS_MAX} "
+                       f"(default {JOBS})")
+    check.add_argument("--gpu-jobs", type=int, default=GPU_JOBS, help=f"execs at once in the queued half of a system that needs the GPU, at most "
+                       f"{JOBS_MAX} (default {GPU_JOBS}, which queues nothing: ask for 2 or more to check, and watch the GPU)")
     return parser

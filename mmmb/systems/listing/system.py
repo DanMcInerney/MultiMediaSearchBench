@@ -5,7 +5,8 @@ A question it answers right is answerable from metadata, or from what the model 
     store/listing.jsonl     one row per file of the dump (`ingest`), oldest first; `server.py` documents the row
     server.py               the MCP server `serve` hands the agent, started as a script over that file
 
-`ingest` reads each file as any tool on it could (`read.py`) and never copies the manifest's `t`, `kind` or `sha256`. `serve` gives the
+`ingest` reads each file as any tool on it could (`read.py`) and never copies the manifest's `t`, `kind` or `sha256`; it compares `t` with the
+file's mtime, and a dump whose files are not at their time (a download's mtimes) is reported `misdated`, which refuses the run. `serve` gives the
 server the case's horizon as `--until`, so a row whose mtime is past it is not there; a case with no horizon (V7's) is not cut. The server
 holds nothing that belongs to a case, so execs run at once."""
 
@@ -21,7 +22,7 @@ import av
 import PIL
 
 from mmmb.core import fs
-from mmmb.core.contract import Case, Description, Dump, IngestReport, McpServer, PlainSession, Served, SessionContext
+from mmmb.core.contract import Case, Description, Dump, IngestReport, McpServer, PlainSession, Refusal, Served, SessionContext
 from mmmb.systems import read as read_system_toml
 from mmmb.systems.listing import read as reading
 from mmmb.systems.listing import server
@@ -55,21 +56,24 @@ class Listing:
 
     def ingest(self, dump: Dump, store: Path) -> IngestReport:
         """`store/listing.jsonl`, a row per entry of the dump read from its file, oldest mtime first, and read back as the server reads it.
-        A picture, video or sound whose header will not read still has its row, with a refusal for what was not read."""
+        A picture, video or sound whose header will not read still has its row, with a refusal for what was not read. A file whose mtime is not
+        the time the dump says it holds is `misdated` (`reading.misdated_reason`): every command that would use the store refuses the run."""
         began = time.monotonic()
         file = Path(store) / LISTING
         if file.exists():
             raise ValueError(f"{file} exists: a listing store is made once")
-        rows, refused = [], []
+        rows, refused, misdated = [], [], []
         for entry in dump.entries:
             row, refusals = reading.row_of(dump.root, entry)
             rows.append(row)
             refused += refusals
+            if why := reading.misdated_reason(entry, row["mtime"]):
+                misdated.append(Refusal(entry.path, why))
         rows.sort(key=server.order)
         fs.write_text(file, "".join(json.dumps(row, allow_nan=False) + "\n" for row in rows))
         server.read_rows(file)
         return IngestReport(seconds=round(time.monotonic() - began, 1), gpu_seconds=0.0, bytes_written=file.stat().st_size,
-                            refused=tuple(refused), misdated=())
+                            refused=tuple(refused), misdated=tuple(misdated))
 
     def open(self, store: Path, dump: Dump, context: SessionContext) -> ListingSession:
         file = Path(store) / LISTING

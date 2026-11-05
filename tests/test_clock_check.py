@@ -12,10 +12,11 @@ from __future__ import annotations
 import pytest
 from agent_spec import clocked
 from cli_world import agents_of, built_run, world  # noqa: F401
-from stub_system import Stub, tiny_questions
+from stub_system import Stub, peak, tiny_questions
 
-from mmmb.core import fs
+from mmmb.core import fs, gpu
 from mmmb.core.agents import claude
+from mmmb.core.agents.common import reached
 from mmmb.core.runfolder import is_done, load_result
 
 QUESTIONS = tiny_questions()
@@ -116,15 +117,55 @@ def test_a_system_that_cannot_report_its_queue_is_refused_naming_decision_d3_bef
     assert world.system.kinds("open") == [], "no session was opened for it"
 
 
-def test_a_system_that_would_run_the_cases_one_at_a_time_has_no_queue_and_is_refused(world, run, capsys):
+def test_a_system_that_would_run_the_cases_one_at_a_time_has_no_queue_and_is_refused_and_the_message_names_what_to_change(world, run, capsys):
     stub = Takes()
-    world.system.job_limit = 1
+    world.system.job_limit = 1  # the system's own limit: no option raises it
     assert world.main(*CHECK, str(run.folder), "--jobs", "3", agents=agents_of(stub)) == 1
-    assert "would run these cases 1 at a time, not 3, so nothing would queue" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "would run these cases 1 at a time though 3 were asked for" in err and "so nothing would queue" in err
     world.system.job_limit = None
     assert world.main(*CHECK, str(run.folder), "--jobs", "1", agents=agents_of(stub)) == 1
-    assert "would run these cases 1 at a time, not 1, so nothing would queue" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "would run these cases one at a time (--jobs 1), so nothing would queue" in err and "Ask for several with --jobs 2 or more" in err
+    assert "1 at a time, not 1" not in err
     assert not stub.execs and not (run.folder / "clock-check").exists()
+
+
+def test_a_system_that_needs_the_gpu_is_checked_only_when_gpu_jobs_asks_for_several_and_the_queued_half_runs_that_many_with_a_warning(
+        world, run, capsys):
+    """The one command that puts several execs on the GPU on purpose, and only by the explicit option: `--jobs` does not raise it."""
+    world.system.needs_gpu = True
+    world.patch.setattr(gpu, "gpu_busy", lambda: None)  # (a GPU that is free and not lost: nvidia-smi is not asked)
+    world.patch.setattr(gpu, "gpu_lost", lambda: None)
+    world.system.waits = {q.qid: 0.5 for q in QUESTIONS}
+    stub = Takes(pause=0.05)
+    for flags in ((), ("--jobs", "3"), ("--gpu-jobs", "1")):
+        assert world.main(*CHECK, str(run.folder), *flags, agents=agents_of(stub)) == 1, flags
+        err = capsys.readouterr().err
+        assert "would run these cases one at a time (--gpu-jobs 1), so nothing would queue" in err and "Ask for several with --gpu-jobs 2 or more" in err
+    assert not stub.execs and not (run.folder / "clock-check").exists() and world.logins == [], "refused before any agent"
+    assert world.main(*CHECK, str(run.folder), "--agents", "claude", "--jobs", "1", "--gpu-jobs", "2", agents=agents_of(stub)) == 0
+    out = capsys.readouterr().out
+    assert "warning: stub/all: 2 execs at once on the GPU" in out
+    assert "clock-check, alone: 1 exec at once" in out and "clock-check, queued: 2 execs at once" in out
+    assert sorted({e[3] for e in world.system.kinds("max_jobs") if e[1] is None}) == [1, 2], "one half alone, one queued: --jobs did not count"
+    spans = [(began, ended) for _, _, _, began, ended in stub.log]  # (in the order the execs ended: the alone half's ten, then the queued half's)
+    assert len(spans) == 20 and (peak(spans[:10]), peak(spans[10:])) == (1, 2), "the alone half one at a time, the queued half two at once"
+
+
+def test_a_clock_check_half_denies_the_folder_of_the_run_it_branched_from_and_every_folder_in_it(world, run):
+    """The run's `questions.jsonl` holds the answers. A half's own folder is a folder of the run, so a rule that names only that folder leaves the run's
+    own files, and the other half's results, open to an agent with its own tools when the run is not in a folder that is denied for other reasons."""
+    stub = Takes()
+    assert world.main(*CHECK, str(run.folder), "--agents", "claude", agents=agents_of(stub)) == 0
+    planted = [run.folder / "questions.jsonl", run.folder / "run.json", run.folder / "data-manifest.json",
+               run.folder / "clock-check" / "alone" / "results" / "claude" / "stub-all" / f"{asked(run, 'alone', 'claude')[0]}.json"]
+    assert all(path.is_file() for path in planted) and len(stub.execs) == 20
+    for spec in stub.execs:
+        for path in planted:
+            assert reached(str(path), spec.deny) is not None, (spec.run_dir, path)
+            assert reached(f"cat {path}", spec.deny) is not None, "and in a command"
+        assert reached(str(run.temp / "elsewhere.txt"), spec.deny) is None, "the rule is the run's folders, not the whole machine"
 
 
 def test_a_system_that_is_not_ready_is_refused_before_any_agent_starts(world, run, capsys):

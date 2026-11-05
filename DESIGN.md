@@ -118,7 +118,7 @@ builds stores, and `open` returns a `Session` that lives across the cases of one
 | `Session` operation | Does | Rules |
 | --- | --- | --- |
 | `serve(case)` | the `Served`: the agent's tools (an MCP server's command, args, environment and tool names), the system's own instructions, and fields to add to the result | a `Case` never holds the question's text or truth. Only media before the case's horizon may be answered from. A system that cuts its own index to the horizon declares `horizon = "cut"`. One that cannot declares `"view"`, and the scenario hands the agent a folder cut to the horizon (V8 does this for `files`). Cutting a store's ingest per distinct `now` is not built |
-| `max_jobs(cases, requested)`, `admits(case, busy)` | how many cases run at once, and whether one may start beside those running | the system's own limits (mm: one at a time when any case has a horizon or the model is slow; no second version-sensitive case at once; a heavy case alone). The runner adds one rule for every system: two cases of one group never run at once |
+| `max_jobs(cases, requested)`, `admits(case, busy)` | how many cases run at once, and whether one may start beside those running | the system's own limits (mm: one at a time when any case has a horizon or the model is slow; no second version-sensitive case at once; a heavy case alone). The runner adds two rules for every system: two cases of one group never run at once, and `requested` is `--jobs`, or `--gpu-jobs` (1 unless asked) for a system with `needs_gpu` (8.4) |
 | `estimate(sources, ranges)` | a pure cost function: GPU seconds of a range | asked about the question's `cost_ranges`, never its truth |
 | `audit(case, calls)`, `reset(case, calls, others)` | fields for the result from the exec's calls; then the exec's state is taken out of the store | `audit` may raise to end the command (V8's horizon leak) |
 | `usage(case, calls)`, `queue_s(case)` | GPU seconds, queue seconds and API dollars of this case, not "since the last call": cases overlap; the seconds this case has waited so far | `queue_s` is read live by the working clock (8.4); `None` means the system cannot say. mm answers `None`: it keeps no per-job wait. The runner does not call `usage` yet |
@@ -169,8 +169,14 @@ P0 builds `files`, `listing` and `mm`. `embed`, `transcript` and the hosted syst
 - Its server is a stdio MCP server with two tools, `list_files(source, since, until, limit, after)` and `file_info(path)`.
   The agent has no other tool and no path to the dump.
 - Its only time is the file's `mtime`: `since`, `until`, the order and the horizon (`--until`) are all about it. That is
-  right for V7, whose files are set to the time they hold. V8's `mtime` is the download's, so the horizon would not cut V8's
-  cases: decide this before `listing` runs on V8. A cached listing store is valid only for a dump with the same `mtime`s.
+  right for V7, whose generator sets each file to the time it holds (`os.utime(path, (t, t))`; the recorded pilot's 1,572 files
+  are exactly at it). V8's `mtime` is the download's (3 November 2026, against recordings of 29 to 31 October), so the horizon
+  cut every clip from every question and the agent got an empty listing. So `ingest` compares each file's `mtime` with the
+  manifest's `t`, read for that check only and never listed or served, and reports a file more than one second off as
+  `misdated`; every command that would use the store then refuses the run, naming the files and both times. `listing` on V8
+  is refused at the build or at `mmmb ingest`, before any agent. One second is the tolerance because it is mm's own for the time
+  it stored a file at, and covers a volume that keeps whole seconds. A log is only required not to be before its first line,
+  because its `mtime` is its last line's. A cached listing store is valid only for a dump with the same `mtime`s.
 - It reads all five media, so every question is asked of it. It is a filter for leaks, not a reader (7.3).
 
 Each model inside a system is a variant (`mm/d1-3B`, `mm/d1-Omni-2B`, `embed/siglip2-base`), and every variant is
@@ -491,7 +497,12 @@ probe, and the report says so.
     counts. A question counts if any agent's filter passed it, and the count is of one run.
   - **Correction C9.** Absent questions are exempt. An agent with nothing to read answers "unknown", which is right for
     every absent question, so none of them would say anything about a leak.
-  - Its only time is `mtime` (3.2), which is why V8 needs a decision before it runs there.
+  - Its only time is `mtime` (3.2), which is why it is refused on a dump whose files are not at their time, V8 as downloaded.
+  - **Open (P1): chance passes.** A multiple-choice question has four options, so a filter configuration passes about a
+    quarter of them by chance (about 44% of them across two agents), and the filter would flag those and drop them from the
+    paired counts at random. The rule for a chance pass (rotated options below, or a floor above chance) is not built, so
+    `listing` is not to be run on a multiple-choice scenario until it is. V8's own report also counts every configuration
+    with a system other than `files` as tested and never reads `leak_filter`; that is for the same decision.
 - Multiple-choice questions (EgoLifeQA) are asked in 4 rotations of their options and count only if all 4 are right
   (VNBench). Not built (C14): the recorded V8 run has one rotation, re-running it is not P0, and its recorded report stands
   as it is. Do it when V8 is next asked.
@@ -532,7 +543,9 @@ The pilot ran one system (mm with d1-3B) against `files`, on 3 synthetic days, s
 | Claude `mm`, 24 cases, 1 at a time | ~49 min: 2,942 session-s, of which **2,499 GPU-s (85%)** | the GPU |
 
 The run took about 3 hours of work, and 4 with a driver crash and a reboot. The laptop's NVIDIA driver has crashed under
-one GPU job and under three, so **exactly one GPU job runs at a time**, whatever the system. A per-question GPU system
+one GPU job and under three, so **exactly one GPU job runs at a time**, whatever the system. In the code that is one rule
+(`mmmb/core/atonce.py`, 8.4): a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` says
+more, and `--jobs` and `--clock` do not. A per-question GPU system
 already keeps the GPU busy 76-85% of the time, so running more agents against it saves little. Time is saved by choosing
 cases, running GPU-free work beside GPU work, and ingesting once.
 
@@ -601,7 +614,7 @@ and the threads share the pools:
   when a slot is free.
 - **The execs.** At most 4 execs run at once in all, across both agents, not 4 for each: the working folders and the deny
   words are made for 4, and more crashed the laptop once. Each agent also has a gate of 4 sessions, and `--jobs` still
-  bounds one cell. A free slot goes to the cell that needs the GPU first, then to the earlier cell in the sequential order.
+  bounds one cell, `--gpu-jobs` (1 unless asked) the cell that needs the GPU: the rule of 8.4 holds inside it. A free slot goes to the cell that needs the GPU first, then to the earlier cell in the sequential order.
 - **Longest first.** In a cell that needs no GPU and whose system does not cut its index to each case's horizon, and in a
   cell with no system, pending cases start longest first, by the medians of earlier runs. A cell whose system cuts its index
   (`horizon = "cut"`, even `listing`, which needs no GPU) keeps the order of `until`, because the as-of order needs it. A
@@ -669,28 +682,43 @@ default selections.
 - **`--clock working|wall`,** on `run` and `repeat`, default `working`. `wall` charges wall time throughout.
 - **Result fields.** `clock`, `working_s` (what the limit was measured on) and `queue_s` (`null` when not reported). `seconds`
   stays the wall time, so the report is unchanged. A result made before the clock has none of them and is still done.
+- **How many at once (`mmmb/core/atonce.py`).** One rule, asked by the runner, every dry run and estimate, the refusal below and
+  `clock-check`. A cell runs `--jobs` execs at once (default 3), unless its system needs the GPU (`Description.needs_gpu`):
+  then it runs `--gpu-jobs` (default 1), because three decision-model execs at once crashed the NVIDIA driver on 2 November
+  2026. Neither is raised by the other, nor by `--clock`. The system's own limit (`Session.max_jobs`: mm is one at a time
+  for a case with a horizon, or for a slow model) comes on top and only lowers it. `repeat`, which has no store yet to ask
+  the system, counts the rule without that limit. Several execs on the GPU are only what the owner asks for with `--gpu-jobs`,
+  and a run, a dry run, a `repeat` and a `clock-check` print a `warning:` line when they will run several. `run` and `repeat`
+  print a line of the counts (`execs at once: 3 (--jobs); 1 for those that need the GPU, mm/d1-3B (--gpu-jobs)`), and a cell
+  whose count is not `--jobs` says so, so the dry run's wall estimate is the one the run is held to.
 - **The refusal.** More than one exec at once on the working clock, with a system that gives no queue figure, is refused: each
-  exec would be charged its wait for the others. "At once" is what the system allows (`max_jobs`), which can be fewer than
-  `--jobs`. It is checked from the preview sessions before anything is spent, so `run --dry-run` refuses too; a fresh
-  `repeat --dry-run` builds nothing and has no store to ask. In a real `repeat` the refusal comes after the build, which it
-  needs. The message names `--jobs 1` and `--clock wall`. On mm only `--jobs 1` is safe (below).
+  exec would be charged its wait for the others. "At once" is the rule above, which can be fewer than `--jobs`. It is checked
+  from the preview sessions before anything is spent, so `run --dry-run` refuses too; a fresh `repeat --dry-run` builds nothing
+  and has no store to ask. In a real `repeat` the refusal comes after the build, which it needs (at the defaults mm is one at a
+  time, so the pilot's `repeat` is not refused). The message names one exec at a time by the option of the system, `--gpu-jobs 1`
+  or, for a system that needs no GPU, `--jobs 1`. It never offers `--clock wall`, which would keep the several. `--clock wall`
+  with `--gpu-jobs` above 1 is allowed, because the owner asked for them, and prints the warning.
 - **`budget_s(media_hours)`** is linear from 300 s at 1 hour to 900 s at 24 hours (300 below and 900 above). It is unused until
   a scenario has an hour rung.
 - **mm reports no queue (C10, decision D3).** Multimem keeps no per-job wait, so `NoQueue`, the base of both of mm's sessions,
-  answers `None`: mm is `clock: wall` until D3. That is exact at one exec at a time, which is how the pilot ran its mm cells
-  and is the laptop's rule for the GPU: three mm execs at once crashed the NVIDIA driver on 2 November 2026. So do not
-  answer the refusal with `--clock wall` at several execs on mm. "Partial results count from GPU start" is in mm's adapter
+  answers `None`: mm is `clock: wall` until D3. That is exact at one exec at a time, which is mm's default (`--gpu-jobs 1`), as
+  the pilot ran its mm cells: three mm execs at once crashed the NVIDIA driver on 2 November 2026. So several are only for
+  `--gpu-jobs`, and until D3 the working clock refuses them. "Partial results count from GPU start" is in mm's adapter
   too (its `ask` waits up to 45 s from the call). Both are changes to Multimem, about 30-50 lines. Not made.
-- **`mmmb clock-check RUN --config CONFIG [--agents --cases N --jobs N]`** is the check before trusting it, **not yet run.**
-  It asks N cases (default 10, `--jobs` default 3) of each agent twice, alone and then all queued, and prints for each case its
+- **`mmmb clock-check RUN --config CONFIG [--agents --cases N --jobs N --gpu-jobs N]`** is the check before trusting it, **not yet
+  run.** It asks N cases (default 10) of each agent twice, alone and then all queued, the queued half at the execs at once of the
+  rule above: `--gpu-jobs` for a system that needs the GPU, so for mm it needs `--gpu-jobs 2` or more (the default 1 queues
+  nothing), else `--jobs` (default 3). It prints for each case its
   answer, tokens and charged (working) seconds in both halves and, queued, the seconds it waited and its wall seconds, then the
   totals. The halves are two folders, `<run>/clock-check/alone` and `<run>/clock-check/queued`, each with copies of the run's
   `run.json`, `questions.jsonl` and `data-manifest.json` and the run's own dump and stores; each resumes like a run. The cases
   are a seeded stratified sample of those the system does not mark `exclusive`; mm marks a case exclusive when it is heavy
-  (`estimate_s >= HEAVY_S`), since a case that holds the system alone queues for nothing. It refuses, before any agent starts,
-  when: the system gives no queue figure and `--jobs` is over 1 (D3, which is every case of mm today); the system would run
-  the cases fewer than two at a time, `--jobs 1` included, so nothing would queue; every case is exclusive; the system is not
-  ready; or the configuration has no system. It has no model or effort flags: `MMMB_*` apply. Cost and command: 12.2.
+  (`estimate_s >= HEAVY_S`), since a case that holds the system alone queues for nothing. A half denies the folder of the run it
+  branched from as well as its own, as the run's `questions.jsonl` holds the answers. It refuses, before any agent starts, when: the
+  system would run the cases fewer than two at a time (`--jobs 1`, or `--gpu-jobs 1`, the default, for a system that needs the GPU;
+  a limit of the system's own is told apart), so nothing would queue; the system gives no queue figure and the queued half is over
+  one exec at once (D3, which is every case of mm today); every case is exclusive; the system is not ready; or the configuration
+  has no system. It has no model or effort flags: `MMMB_*` apply. Cost and command: 12.2.
 
 **Ingest once (`mmmb/core/cache.py`, as built):**
 - Downloads are fetched once and content-hashed (EgoLife stays in `D:\bench-data`).
@@ -942,9 +970,13 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
 | D3 | mm cannot report queue time. The working clock and the 10-case check need a small Multimem change: per-job queue seconds from `gpu.py` and `jobs.py`, and `ask`'s early return counted from GPU start. About 30-50 lines there | Make it in Multimem as its own task before the clock check. P0's code is ready for it; until then mm is `clock: wall`, more than one mm exec at once on the working clock is refused, and the 10-case check stays open |
 | D4 | Multimem has no remote, so `mmmb[mm]` is a path source with this machine's path in `pyproject.toml` | Keep the absolute path. Publishing MMMB (13.8) needs Multimem published first, or `mm`'s plug-in moved |
 | D5 | 13.2, CPU work beside a GPU job | Stays off; `--side-by-side` exists and is tested |
+| D6 | What holds a GPU configuration to one exec at a time? (G2's blocker: only D3's refusal did, and the refusal offered `--clock wall`) | The owner's rule, built: a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` (default 1) asks for more; `--jobs` and `--clock` do not. One rule in `core/atonce.py` for the runner, every dry run and estimate, the refusal and `clock-check` (8.4) |
 
 **Open findings of the build.**
-- `listing`'s only time is `mtime`, which for V8 is the download's: decide before `listing` runs on V8 (3.2).
+- `listing` is refused on a dump whose files are not at their time (3.2), V8 as downloaded included. To run it there the clips
+  would need their recording times (copies, 41 GB, not links to the read-only download), the filter needs a rule for chance
+  passes on multiple-choice questions, and V8's own report, which takes every configuration with a system other than `files` as
+  tested and never reads `leak_filter`, would need to honour it (7.3). P1.
 - mm's instructions are over the 2,000-token rule of 3.1, and nothing enforces it.
 - Nothing guards two cells that share a home under `--side-by-side` (8.3).
 - Multimem's four limits (10.3).
@@ -962,16 +994,16 @@ another zone is refused.
 
 ```
 uv sync --extra mm --group mm-gpu
-uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted --jobs 1 --dry-run
-uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted --jobs 1
+uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted --dry-run
+uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted
 uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new run>
 ```
 
-- **`--jobs 1` is needed.** mm reports no queue (8.4), so on the working clock, which is the default, mm at several execs at
-  once is refused, and the default `--jobs 3` would be refused after the build. So the `files` cells also run one at a time.
-  That is slower than the pilot, whose `files` cells ran several at once and whose `mm` cells ran at `--jobs 1`. Do not
-  answer the refusal with `--clock wall` at more than one exec on mm: the laptop's rule is one GPU exec at a time, after three
-  mm execs at once crashed the NVIDIA driver on 2 November 2026. This may change after the final review.
+- **The defaults are the pilot's.** The `files` cells run `--jobs` (3) at once and `mm/d1-3B` runs one exec at a time
+  (`--gpu-jobs`, default 1), as the pilot ran them (8.4). mm reports no queue, but one exec at a time needs none, so the repeat
+  is not refused on the working clock. The dry run prints `(1 at once)` for the mm cells and says so. Do not pass `--gpu-jobs`
+  above 1: the laptop's rule is one GPU exec at a time, after three mm execs at once crashed the NVIDIA driver on 2 November
+  2026 (with it, the working clock refuses until D3, and `--clock wall` lets it through with a warning).
 - `--group mm-gpu` installs torch 2.11.0+cu128, torchvision 0.26.0+cu128 and transformers 5.21.0 into this environment,
   because mm runs d1 in the python that started its daemon. It is several GB, and uv copies it, because uv's cache is on C: and
   the environment on D:; set `UV_CACHE_DIR` on D: first. It was not installed in P0.
@@ -985,17 +1017,17 @@ uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new 
   numeric conditions of D1. A person reads every flip.
 - **Cost, from the pilot's measurements.** 110 execs, 13,044 session-seconds, 3,655 GPU-seconds (the dry run prints the same
   three). The tokens were 50.3M and the Claude cost $19.00 at list; the dry run prints 51.8M and $19.76, because three Claude
-  timeouts report no cost and are counted at their cell's mean. Codex's use is on its plan, not in dollars. Wall time: at one
-  exec at a time the 13,044 session-seconds run one after another, about 3.6 hours (217 minutes), with the build on top
-  (11 minutes in the pilot, not measured in the new code). The pilot took about 173 minutes with its `files` cells at several
-  execs at once (Codex `files` 14, Claude `files` 85, Codex `mm` 25, Claude `mm` 49). The dry run prints its own estimate at
-  `--jobs 1`.
+  timeouts report no cost and are counted at their cell's mean. Codex's use is on its plan, not in dollars. Wall time: the dry
+  run prints about 2.0 hours at the means (0.7 at the medians), with `files` at 3 and `mm` at 1, and the build on top (11 minutes
+  in the pilot, not measured in the new code). That estimate counts the `files` cells as perfectly parallel: it gives them
+  8,589 session-seconds over 3, 48 minutes, and the pilot's took 99 (Codex 14, Claude 85). The `mm` cells take what the estimate
+  says, 74 minutes (Codex 25, Claude 49). So the pilot took about 173 minutes, about 2.9 hours, and the re-run should take as long.
 - If a cell falls outside the band, run it again with `--answer-format line` (another $19, about 3.6 hours), as D1 says.
 
 **2. `mm+files` for the first time (10.2 step 4, last sentence).** After the re-run, in the same run folder:
 
 ```
-uv run mmmb run D:\mmmb-runs\<new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium --jobs 1
+uv run mmmb run D:\mmmb-runs\<new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium
 ```
 
 No cost was measured. A rough ceiling is the `files` cell plus the GPU: Claude about $16 and 2 hours, Codex about 45
@@ -1006,15 +1038,21 @@ from the agent's environment (8.3) does not break mm's server; and how much slow
 **3. The clock check on 10 cases (8.4).**
 
 ```
-uv run mmmb clock-check <new run> --agents codex,claude --config mm/d1-3B --cases 10 --jobs 3
+$env:MMMB_CODEX_EFFORT = "medium"
+uv run mmmb clock-check <new run> --agents codex,claude --config mm/d1-3B --cases 10 --gpu-jobs 2
 ```
 
+(The first line is PowerShell. `clock-check` has no effort flag: Codex runs at `MMMB_CODEX_EFFORT`, else high, and the cost
+below is the pilot's Codex at `medium`.)
+
 It asks 10 cases of each agent alone and then queued, in the two folders of 8.4, and prints the answers, tokens and charged
-seconds side by side. **It needs D3 first:** with mm reporting no queue it refuses at once, naming D3, and asks nothing. Its
-queued half is 3 mm execs at once, which is what crashed the driver on 2 November 2026, so it needs Dan's go-ahead for that as
-well. Cost, from the pilot's means: 20 execs for each agent; Codex about 21 minutes, 960 GPU-seconds and 2.3M tokens; Claude
-about 41 minutes, 2,080 GPU-seconds, about $2.25 and 3.3M tokens; together about 1 hour and 3,040 GPU-seconds. These are lower
-bounds: queued execs take longer.
+seconds side by side. **It needs D3 first, and Dan's go-ahead.** With mm reporting no queue it refuses at once, naming D3, and
+asks nothing; and without `--gpu-jobs 2` or more it refuses too, because mm runs one exec at a time and nothing would queue.
+The flag is the go-ahead: the queued half is 2 mm execs at once, the only time the benchmark asks for more than one on the GPU
+(three at once is what crashed the driver on 2 November 2026), and the command prints a warning when it starts. Watch the GPU
+while it runs. Cost, from the pilot's means: 20 execs for each agent; Codex about 21 minutes, 960 GPU-seconds and 2.3M tokens;
+Claude about 41 minutes, 2,080 GPU-seconds, about $2.25 and 3.3M tokens; together about 1 hour and 3,040 GPU-seconds. These are
+lower bounds: queued execs take longer.
 
 ## 13. Open questions for Dan
 

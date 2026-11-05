@@ -3,8 +3,8 @@
 How the build is checked, what it is held to, and what has not been run. The design is in [DESIGN.md](DESIGN.md). Dated
 notes are at the end, newest last; add to them whenever testing teaches something.
 
-The suite has 1,054 tests: 833 under `tests/`, 91 under `tests/oracles/` and 130 under `tests/mm/` (counted after U14, on
-5 November 2026; five are slow). None starts a paid agent, uses the GPU, or needs the network.
+The suite has 1,078 tests: 854 under `tests/`, 93 under `tests/oracles/` and 131 under `tests/mm/` (counted after the G2 repair,
+on 5 November 2026; five are slow). None starts a paid agent, uses the GPU, or needs the network.
 
 ## 1. Environment
 
@@ -44,7 +44,10 @@ These hold for every test and every check:
 - **Throwaway homes.** A session fixture points `HOME`, `USERPROFILE`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR` and `MULTIMEM_HOME` into
   a temporary folder. An audit hook fails a test that writes the real `~/.claude`, `~/.codex`, `~/.multimem`, or the folders
   MMMB keeps its runs in (`D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache`), even when the code under test swallows the error. A
-  test gives its commands an `--out`, `--temp` and `--cache` of its own.
+  test gives its commands an `--out`, `--temp` and `--cache` of its own. The same hook fails a test that starts a program named
+  `claude` or `codex`, or any program inside those three folders (`subprocess`, `os.system`, `os.exec*`, `os.spawn*`, and the
+  command a shell is given): a test that needs an agent puts a stand-in of another name in its place, and patches
+  `claude.check_login`.
 - **Read only:** the recorded runs in `D:\mm-bench` and `D:\mm-bench-temp`, Multimem, and `D:\bench-data`.
 - **mm tests** start Multimem's daemon only with throwaway homes and the `python:` fake decider, never with a real model.
 
@@ -59,7 +62,7 @@ These hold for every test and every check:
 | `gpu` | loads a model on the GPU | none |
 
 ```
-uv run pytest                          # the fast suite: about 8 minutes (484 s for 1,048 tests at U14's end)
+uv run pytest                          # the fast suite: about 8 to 10 minutes (484 s for 1,048 tests at U14's end; 489 s for 1,073 after the G2 repair)
 uv run pytest tests/mm --require-mm    # the tests that need the mm extra; a skip is a failure
 uv run pytest -m slow <file>           # one slow test file (section 4)
 ```
@@ -98,7 +101,17 @@ neutrality check.
   and `exclusive` and `beyond_timeout` match, for all 48 pilot and 50 EgoLife `mm` results.
 - **Seam tests** (`tests/mm/test_seam.py`): a stand-in `claude` or `codex` that speaks JSON-RPC to the real mm server through
   the real agent path (`tests/stand_in_agent.py` is the stand-in, shared with the listing tests).
-- **The working-time clock** (`tests/test_clock.py`, 23 tests; `tests/test_clock_check.py`, 11; `tests/mm/test_clock_mm.py`, 2).
+- **How many execs run at once** (`tests/test_gpu_jobs.py`, 9 tests, and the cases of `test_repeat.py`, `test_clock_check.py` and
+  `tests/mm/test_clock_mm.py`). The owner's rule is a table written out in the test, and the runs are read from the times the
+  stand-in agent was called at: a system that needs the GPU runs one exec at a time at the defaults, `files` runs `--jobs`,
+  `--gpu-jobs N` gives the GPU cell N and `--jobs` and `--clock wall` do not; the same in `--side-by-side`; the dry run prints
+  the count each cell will run at and its wall estimate is the one worked out by hand from the counts the run was seen to run
+  (for the recorded pilot, from its recorded seconds: `files` at 3 and `mm` at 1, and again at `--gpu-jobs 2`); a warning line is
+  printed for several GPU execs and for no other; no refusal names `--clock wall`, each names one exec at a time by the option of its
+  system; `clock-check` of a system that needs the GPU refuses at the defaults, naming `--gpu-jobs 2`, and its queued half runs at
+  `--gpu-jobs` and warns. A half of `clock-check` denies the run it branched from (the run's `questions.jsonl`, `run.json` and the
+  other half's results are reached by the deny list every exec of a half is given).
+- **The working-time clock** (`tests/test_clock.py`, 23 tests; `tests/test_clock_check.py`, 13; `tests/mm/test_clock_mm.py`, 2).
   With `now` and `queue_s` injected, a case at 950 s of wall time with 100 s queued is not over, one at 901 s of working time
   is, and the wall cap fires whatever the queue. A system that gives no queue figure gives `clock: wall` and the recorded
   `timeout: no answer in 900 s`, byte for byte, in both agents. A queue read live moves the end of the limit. A real process is
@@ -107,12 +120,20 @@ neutrality check.
   run too, and for both of mm's sessions. `budget_s` is checked at 300, 900 and between. For `clock-check`, over the stand-in
   system: each case is asked alone and then queued in two folders and the table is printed; the cases come from those that
   do not hold the system alone; and it refuses, before any agent starts and writing nothing, a system with no queue figure
-  (naming D3), one that would run the cases one at a time, one that holds every case alone, one not ready, and a
-  configuration that is not one system. A second command asks nothing, and a cut-off half goes on. None of this ran on a
+  (naming D3), one that would run the cases one at a time (the option that asks for more is named), one that holds every case
+  alone, one not ready, and a configuration that is not one system. A second command asks nothing, and a cut-off half goes on. None of this ran on a
   shared GPU: see section 8.
+- **The listing's rule for a file's time** (`tests/test_listing_times.py`, 5 tests; `tests/oracles/test_listing_pilot_times.py`, 2).
+  A file whose mtime is not within one second of the manifest's `t` (a log: not before its first line) is `misdated`, and the
+  run is refused by every command. Over the fake V8 download (made today, of recordings of 29 and 30 October): every clip is
+  refused and no transcript, at `build`, at `ingest` and at a later `run`, before any agent and naming both times. Over a planted
+  dump, a file moved three days either way, or two seconds, is refused for that file and half a second is not. Over the recorded
+  pilot's manifest, all 1,575 entries are at their time (1,572 files exactly, 3 logs 237,409 to 237,435 s after their first
+  line), and a shift of 1.1 s refuses all 1,572 files.
 - **Planted faults.** A suite counts only once it has been seen to fail on a planted fault: for the runner, two kinds swapped in
   `DONE_KINDS`; for `admits`, the heavy rule dropped; for deny, a word removed; for the report, a result flipped; for oracle 1,
-  one colour constant changed. G1 planted 32 faults: 21 were caught and 11 escaped; the repair pass followed (section 9).
+  one colour constant changed. G1 planted 32 faults: 21 were caught and 11 escaped; the repair pass followed (section 9). The G2
+  repair planted 24 more, one at a time and restored byte for byte, and all were caught (section 9).
 
 **What waits for Dan** (the pilot re-run, the first `mm+files` run, the clock check) is in DESIGN.md section 12.2, with its
 commands and costs.
@@ -199,8 +220,8 @@ Nothing in P0 ran a real agent, the GPU, or the real model. So no test could sho
   `--add-dir` for mm's `looks` folder with `--restricted` (if it refuses, a `Read` is denied by Claude and not counted as an
   escape); real Claude with `--model claude-sonnet-5-5`;
 - `mmmb repeat` end to end, and the times of the dump build and the ingest in the new code (none recorded);
-- a V8 build of the whole dump from `D:\bench-data\egolife` (its plan is checked; its dump is not), and `listing` on V8, whose
-  `mtime` is the download's;
+- a V8 build of the whole dump from `D:\bench-data\egolife` (its plan is checked; its dump is not), and the refusal of `listing`
+  there, which is seen only over the fake download (the real clips' mtimes are the download's, 3 November, against 29 to 31 October);
 - the CLI end to end with the real mm and the GPU;
 - the pilot-scale rename in the cache (antivirus could lock a folder during `os.replace`, and there is no retry), and the POSIX
   branch of the cache lock;
@@ -265,3 +286,36 @@ and cost $19.00 at list for 50.3M tokens, about 173 minutes of wall time plus 11
   (`pytest --collect-only -q -n 0 -m ""`).
 
 Not run in P0: see section 8 and DESIGN.md section 12.
+
+### 2026-11-05: the G2 repair
+
+G2's review passed every oracle and found one blocker. The repair, in one pass, with one coder:
+- **Finding 1, execs at once on the GPU.** `core/atonce.py` is the one rule (`--gpu-jobs`, default 1, for a system that needs the GPU;
+  `--jobs` for the others), asked by the runner, `show_agents`, `show_limits`, `check_clocks`, `show_repeat`, `check_queue` and
+  `clock-check`; `repeat` passes both options to its run. The refusals name `--gpu-jobs 1` or `--jobs 1`, never `--clock wall`.
+- **Finding 2**, the listing refuses a dump whose files are not at their time (tolerance one second); DESIGN 3.2 and 7.3 say so.
+  **Finding 3**, a clock-check half denies its parent run (`RunFolder.parent`). **Finding 4**, `EXCLUSIVE`, `GPU_ESTIMATE_S` and
+  `BEYOND_TIMEOUT` are in `core/contract.py`, and mm imports them. **Finding 5**, `grounded.check_groundable` refuses a `json` run
+  with a question that cannot be grounded, in `run_agents` and the dry run. **Finding 6**, the unused import and `resolve_models`
+  are gone. **Finding 7**, the README and DESIGN 3.2, 12.1 and 12.2 were corrected. **Finding 8**, three printed wordings.
+- **The guard.** The audit hook of `tests/conftest.py` now also refuses to start a real `claude` or `codex` or a program in the
+  owner's folders. Before it, nothing did: two test runs in U14 had reached the real `claude auth status`.
+- **Tests changed because the owner's rule did:** `test_clock_mm.py` (the refusal of mm at `--jobs 3` is now at `--gpu-jobs 2`; the
+  dry run at `--jobs 3 --clock wall` and the message that named `--clock wall` are gone; clock-check at `--jobs 1` said "1 at a
+  time, not 1"), `test_repeat_pilot.py` (`run_argv` takes `--gpu-jobs`; the dry run's counts are now checked against the
+  recorded seconds), `test_repeat.py` (`run_argv`; the refusal of a system with no queue figure now names `--jobs 1` and not
+  `--clock wall`, and two tests are new for a system that needs the GPU), `test_clock.py` (`check_queue` takes the description),
+  `test_clock_check.py` (the "one at a time" message), `test_runner.py` (`show_agents` takes `gpu_jobs`), `test_cli.py` (`JOBS`
+  moved to `atonce`), `listing_world.py` and `test_listing.py` (an entry's `t` is its file's mtime plus 0.4375 s, since the
+  listing now compares them; the leak check still finds a copy of `t`), `test_mm_arm.py` (`resolve_models` was removed; its test asks
+  `Mm.ready_model`), `test_conftest.py` and `conftest.py` (the guard).
+- **Result, run in US Eastern time with `--require-mm -n 4`:** 1,072 passed and 1 skipped in 489 s (8:09). The recorded-report, recorded-EgoLife, exec, goldens,
+  replay oracles and the slow neutrality and V7 sample tests passed, unchanged. No golden or recorded file changed.
+- **24 faults were planted**, one at a time in the worktree and restored byte for byte (a hash of `mmmb/` and `tests/` was the
+  same before and after), and all were caught: the rule ignoring `needs_gpu`; the runner, the dry runs, `show_repeat` and
+  clock-check each asking `--jobs` of a GPU system; `run_argv` and `run_command` dropping `--gpu-jobs`; the refusal offering the
+  wall clock or naming the wrong option; no warning; the listing reporting nothing misdated, a 3 s tolerance, a log held to a
+  point; the half not naming its parent; two result keys changed in `contract.py` (the recorded report oracle caught both);
+  `check_groundable` never raising or never called; three faults in the guard; the old wording of the questions. One planted fault
+  was left in `mmmb/cli.py` for a minute when the first run of the script was stopped by hand, and put back from its exact text.
+- Other projects' pytest runs (rtb-fleet) were running on the laptop beside these runs, so the times above are slower than U14's.

@@ -1,6 +1,7 @@
 """`mmmb repeat` of the recorded pilot, through the real registry and the real `Mm` (plan 8.1): the dry run that Dan reads before the 3-hour re-run
-prints the 110 execs with the recorded agents, models, efforts and configurations, and starts and makes nothing; and a repeat on a machine where
-mm cannot run (no torch) is refused before it builds, not after. The expected values are the recorded results' own, read here from their
+prints the 110 execs with the recorded agents, models, efforts and configurations, and starts and makes nothing; it counts the `files` cells at
+`--jobs` and the `mm` cells at `--gpu-jobs` (1 unless asked), which is how the pilot ran, and the wall time it prints is what those counts give; and
+a repeat on a machine where mm cannot run (no torch) is refused before it builds, not after. The expected values are the recorded results' own, read here from their
 files. Nothing is built, started or loaded.
 
 The recorded pilot is the converted run, recorded/pilot-s1/converted: the folder recorded/pilot-s1 holds the file as the old code wrote it,
@@ -71,6 +72,31 @@ def test_the_dry_run_of_the_recorded_pilot_prints_110_execs_with_the_recorded_ag
     # (the means count the three timeouts that report no tokens or dollars at their cell's mean, so these are a little over the plan's $19.00 and 50.3M)
     assert "$19.76 at list" in mean and "51.8M tokens" in mean
     assert any(line.startswith("at the medians") for line in lines) and "dump: written in the temp folder from the recipe (v7_screen, pilot" in out
+    # the pilot's concurrency: `files` three at once (`--jobs`), `mm` one (it needs the GPU), and the wall time at the means is those cells' seconds over those counts
+    assert "execs at once: 3 (--jobs); 1 for those that need the GPU, mm/d1-3B (--gpu-jobs); a system may allow fewer" in lines
+    assert "warning" not in out
+    assert f"about {wall_hours(files=3, mm=1):.1f} h, 13,044 session seconds" in mean
+
+
+def wall_hours(*, files: int, mm: int) -> float:
+    """The wall time of the recorded run's execs if its `files` cells ran `files` at once and its `mm` cells `mm` at once: the seconds each
+    cell took, added up from the recorded results, over its execs at once, worked out here from the files and not from the code."""
+    at_once = {"files": files, "mm/d1-3B": mm}
+    return sum(r["seconds"] / at_once[r["config"]] for r in RAW) / 3600
+
+
+def test_the_dry_run_at_gpu_jobs_2_counts_the_mm_cells_two_at_once_prints_the_warning_and_its_estimate_is_what_that_gives(pilot, tmp_path, capsys):
+    out_dir, temp_dir = tmp_path / "runs", tmp_path / "temp"
+    for gpu_jobs, jobs in ((2, 3), (1, 1)):
+        args = ["repeat", str(pilot), "--out", str(out_dir), "--temp", str(temp_dir), "--cache", str(tmp_path / "cache"), "--dry-run",
+                "--jobs", str(jobs), "--gpu-jobs", str(gpu_jobs)]
+        assert cli.main(args, agents=no_agents) == 0
+        lines = [" ".join(line.split()) for line in capsys.readouterr().out.splitlines()]
+        mm = [line for line in lines if " mm/d1-3B 24 to run of 24" in line]
+        assert len(mm) == 2 and all(f"({gpu_jobs} at once)" in line for line in mm) == (gpu_jobs != jobs)
+        assert (any(line.startswith("warning: mm/d1-3B: 2 execs at once on the GPU") for line in lines)) == (gpu_jobs == 2)
+        mean = next(line for line in lines if line.startswith("at the means"))
+        assert f"about {wall_hours(files=jobs, mm=gpu_jobs):.1f} h, 13,044 session seconds" in mean, (jobs, gpu_jobs)
 
 
 def test_the_folder_as_the_old_code_wrote_it_is_not_a_run_mmmb_reads_and_the_converted_one_beside_it_is(tmp_path, capsys):
@@ -86,8 +112,9 @@ def test_the_repeat_runs_the_recorded_agents_at_their_settings_over_the_recorded
     assert [c.name for c in repeat.configs] == ["files", "mm/d1-3B"]
     assert {key: len(qids) for key, qids in repeat.cells.items()} == {("claude", "files"): 31, ("claude", "mm/d1-3B"): 24, ("codex", "files"): 31,
                                                                        ("codex", "mm/d1-3B"): 24}
-    argv = run_argv(Path("new-run"), repeat, 3)
+    argv = run_argv(Path("new-run"), repeat, 3, 1)
     assert argv[:2] == ["run", "new-run"] and len(argv[argv.index("--only") + 1].split(",")) == 31
+    assert (argv[argv.index("--jobs") + 1], argv[argv.index("--gpu-jobs") + 1]) == ("3", "1"), "the pilot's: `files` three at once, `mm` one"
     assert argv[-6:] == ["--claude-model", "claude-sonnet-5-5", "--codex-model", "gpt-6.1-terra", "--codex-effort", "medium"]
 
 

@@ -20,7 +20,7 @@ from pathlib import Path
 
 import imageio_ffmpeg
 import pytest
-from listing_world import (ALLOWED_KEYS, BLOB, CONTAINER_KEYS, COMMENT, KIND, ROW_KEYS, SECRET, SHA, T, called, case, ingested, keys_of, pages,
+from listing_world import (ALLOWED_KEYS, BLOB, CONTAINER_KEYS, COMMENT, KIND, ROW_KEYS, SECRET, SHA, T, T_OFFSET, called, case, ingested, keys_of, pages,
                            planted_dump, server_of, talk)
 from PIL import ExifTags, Image
 from PIL.TiffImagePlugin import IFDRational
@@ -262,7 +262,8 @@ def test_a_dump_of_a_picture_a_sound_and_files_of_text_lists_what_they_say_of_th
     outputs = [*listed, *infos]
     everything = json.dumps(outputs) + listing.read_text(encoding="utf-8")
     assert SECRET not in everything and SECRET.lower() not in everything.lower(), "the word in a note, a config, a log, a picture's pixels and a sound's samples"
-    assert str(T) not in everything and "424242" not in everything and KIND not in everything and SHA not in everything, "the manifest's t, kind and sha256"
+    assert not [e.t for e in dump.entries if str(e.t) in everything] and ".4375" not in everything and KIND not in everything and SHA not in everything, \
+        "the manifest's t, kind and sha256"
     assert not BLOB.search(everything), "no run of base64: a file's bytes are not in any output"
     assert keys_of(outputs) <= ALLOWED_KEYS, keys_of(outputs) - ALLOWED_KEYS
     by_path = {i["path"]: i for i in infos}
@@ -340,7 +341,10 @@ def test_a_file_that_will_not_read_is_listed_with_what_the_file_system_gives_and
     for rel, data in (("phone/bad.jpg", b"not a jpeg"), ("mic/bad.wav", b"RIFF"), ("notes/ok.md", b"fine")):
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_bytes(data)
-    entry = lambda rel, media: ManifestEntry(rel, rel.split("/")[0], T, KIND, media, None, False, 1, 1, SHA)  # noqa: E731
+    def entry(rel, media):  # at the time the file system gives it (plus what no file holds); a file that is not there has none
+        t = (root / rel).stat().st_mtime + T_OFFSET if (root / rel).exists() else 0.0
+        return ManifestEntry(rel, rel.split("/")[0], t, KIND, media, None, False, 1, 1, SHA)
+
     dump = Dump("k", root, "x", (entry("phone/bad.jpg", "image"), entry("mic/bad.wav", "audio"), entry("notes/ok.md", "text")), ())
     report = Listing().ingest(dump, store)
     assert sorted((r.path, r.reason.split(":")[0]) for r in report.refused) == [

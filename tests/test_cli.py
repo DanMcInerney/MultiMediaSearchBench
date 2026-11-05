@@ -31,9 +31,10 @@ from stub_system import Stub, StubSystem, tiny_questions
 from mmmb import cli, scenarios
 from mmmb.core import dryrun, fs, paths, report
 from mmmb.core.agents import claude, codex
+from mmmb.core.atonce import JOBS
 from mmmb.core.costing import EXEC_MIN
 from mmmb.core.runfolder import JOBS_MAX, RunFolder
-from mmmb.core.runner import AGENTS, JOBS, TIMEOUT_S, Agent
+from mmmb.core.runner import AGENTS, TIMEOUT_S, Agent
 from mmmb.core.select import pilot_questions
 
 pytestmark = pytest.mark.xdist_group("cli")

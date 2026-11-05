@@ -24,6 +24,7 @@ from collections.abc import Mapping, Sequence
 
 from mmmb.core import fs
 from mmmb.core.config import Config
+from mmmb.core.contract import BEYOND_TIMEOUT, EXCLUSIVE, GPU_ESTIMATE_S
 from mmmb.core.grounded import NOT_RECORDED, status_of
 from mmmb.core.probe import probe_of
 from mmmb.core.record import kind_of
@@ -162,9 +163,9 @@ def worked(rs: list[dict]) -> dict:
     return {"n": len(rs), "ask_execs": sum(1 for t in tools if t.get("ask")),
             **{k: mean([t.get(name, 0) for t in tools]) for k, name in (("asks", "ask"), ("finds", "find"), ("looks", "look"))},
             "known": len(got), "windows": mean([w["windows"] for w in got]), "gpu_s": mean([w["seconds"] for w in got]),
-            "estimate_s": mean([r["gpu_estimate_s"] for r in rs if r.get("gpu_estimate_s") is not None]),
+            "estimate_s": mean([r[GPU_ESTIMATE_S] for r in rs if r.get(GPU_ESTIMATE_S) is not None]),
             "held_s": mean([r["held_s"] for r in rs if r.get("held_s") is not None]),
-            "alone": sum(1 for r in rs if r.get("exclusive")), "beyond": sum(1 for r in rs if r.get("beyond_timeout")),
+            "alone": sum(1 for r in rs if r.get(EXCLUSIVE)), "beyond": sum(1 for r in rs if r.get(BEYOND_TIMEOUT)),
             "max_s": sum(w["stopped"].get("max_s", 0) for w in got), "views": mean([w["views"] for w in got]),
             "shells": mean([w["shells"] for w in got])}
 
@@ -230,7 +231,7 @@ def cell_of(r: dict | None) -> dict | None:
     (None when the result does not say) and the asks it made."""
     if r is None:
         return None
-    return {"passed": bool(r["passed"]), "seconds": r["seconds"], "problem": kind_of(r["problem"]), "beyond": bool(r.get("beyond_timeout")),
+    return {"passed": bool(r["passed"]), "seconds": r["seconds"], "problem": kind_of(r["problem"]), "beyond": bool(r.get(BEYOND_TIMEOUT)),
             "views": (r.get("work") or {}).get("views"), "asks": (r.get("tools") or {}).get("ask", 0)}
 
 

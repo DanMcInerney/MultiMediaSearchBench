@@ -16,7 +16,7 @@ from echo_agent import agents_of, record_toy
 from stub_system import Stub, StubSystem, tiny_questions
 
 from mmmb import cli, scenarios
-from mmmb.core import fs, repeat
+from mmmb.core import fs, gpu, repeat
 from mmmb.core.agents import claude
 from mmmb.core.compare import compare_runs
 from mmmb.core.report import results_of
@@ -175,10 +175,10 @@ def test_a_recipe_the_scenario_cannot_make_again_is_refused(w):
 
 def test_the_run_command_line_a_repeat_makes_has_each_agents_recorded_model_and_effort_and_none_it_did_not_record(w):
     r = repeat.repeat_of(w.recorded)
-    argv = repeat.run_argv(Path("somewhere"), r, 2)
+    argv = repeat.run_argv(Path("somewhere"), r, 2, 1)
     assert argv[:2] == ["run", "somewhere"]
     assert argv[argv.index("--agents") + 1] == "claude,codex" and argv[argv.index("--configs") + 1] == "files,stub/all"
-    assert argv[argv.index("--jobs") + 1] == "2" and argv[argv.index("--timeout") + 1] == "900"
+    assert argv[argv.index("--jobs") + 1] == "2" and argv[argv.index("--gpu-jobs") + 1] == "1" and argv[argv.index("--timeout") + 1] == "900"
     assert argv[argv.index("--only") + 1] == ",".join(q.qid for q in tiny_questions())
     assert argv[-6:] == ["--claude-model", "claude-test-1", "--codex-model", "codex-default", "--codex-effort", "medium"], "(no --claude-effort: none recorded)"
     assert cli.parser_of().parse_args(argv).codex_effort == "medium"
@@ -189,10 +189,53 @@ def test_a_repeat_on_a_system_that_cannot_say_its_queue_is_refused_at_three_exec
     cli_world.use(w.patch, StubSystem(report=CLEAN, reports_queue=False))
     stub = Stub()
     assert w.main(*args_of(w, "--jobs", "3"), agents=agents_of(stub)) == 1
-    assert "stub/all: 3 execs at once on the working clock" in capsys.readouterr().err and stub.execs == []
+    err = capsys.readouterr().err
+    assert "stub/all: 3 execs at once on the working clock" in err and "one exec at a time (--jobs 1)" in err and "--clock" not in err
+    assert stub.execs == []
     new = repeated(w)
     assert w.main(*args_of(w, "--into", str(new.folder), "--jobs", "3", "--clock", "wall"), agents=agents_of(stub)) == 0
     assert len(stub.execs) == EXECS
     clocks = {config: {r["clock"] for cells in results_of(new).values() for r in cells[config].values()} for config in ("files", "stub-all")}
     assert clocks == {"files": {"wall"}, "stub-all": {"wall"}}, "asked for the wall clock: every result says so, a system with a queue figure or not"
     assert cli.parser_of().parse_args(["repeat", "recorded"]).clock is None and cli.parser_of().parse_args(["run", "x"]).clock == "working"
+
+
+def on_gpu(w, **kw) -> StubSystem:
+    """The world's `stub` as a system that needs the GPU, which is free and not lost (nvidia-smi is not asked)."""
+    w.patch.setattr(gpu, "gpu_busy", lambda: None)
+    w.patch.setattr(gpu, "gpu_lost", lambda: None)
+    return cli_world.use(w.patch, StubSystem(report=CLEAN, needs_gpu=True, **kw))
+
+
+def test_a_repeat_runs_the_files_cells_at_jobs_and_a_system_that_needs_the_gpu_one_at_a_time_and_says_so_in_its_dry_run_before_it_builds(w, capsys):
+    """The pilot's way (plan 8.1): `files` three at once and `mm` one. With a system that cannot report its queue the working clock refuses several
+    execs, so the repeat is not refused only because the GPU system is held to one: that is the rule, not the refusal, and it comes before the build."""
+    system = on_gpu(w, reports_queue=False)
+    stub = Stub(pause=0.05)
+    assert w.main(*args_of(w, "--dry-run"), agents=agents_of(stub)) == 0
+    lines = [" ".join(line.split()) for line in capsys.readouterr().out.splitlines()]
+    for agent in ("claude", "codex"):
+        assert any(line.startswith(f"{agent} stub/all {N} to run of {N} (1 at once) median ") for line in lines), agent
+        assert any(line.startswith(f"{agent} files {N} to run of {N} median ") for line in lines), "three at once is --jobs, and says nothing"
+    assert "execs at once: 3 (--jobs); 1 for those that need the GPU, stub/all (--gpu-jobs); a system may allow fewer" in lines
+    assert not any(line.startswith("warning") for line in lines)
+    assert w.main(*args_of(w), agents=agents_of(stub)) == 0, "not refused on the working clock: nothing runs beside another on the system that cannot say its queue"
+    capsys.readouterr()
+    assert (stub.at_once("stub-all"), stub.at_once("files")) == (1, 3), "what the run did: the GPU system one at a time, `files` three"
+    assert {e[3] for e in system.kinds("max_jobs") if e[1] is None} == {1}, "the system was asked for one at a time"
+
+
+def test_a_repeat_may_ask_for_more_gpu_execs_with_gpu_jobs_which_the_working_clock_refuses_after_the_build_without_offering_the_wall_clock(w, capsys):
+    system = on_gpu(w, reports_queue=False)
+    stub = Stub(pause=0.05)
+    assert w.main(*args_of(w, "--gpu-jobs", "2"), agents=agents_of(stub)) == 1
+    err = capsys.readouterr().err
+    assert "stub/all: 2 execs at once on the working clock" in err and "one exec at a time (--gpu-jobs 1)" in err and "--clock" not in err
+    assert stub.execs == []
+    new = repeated(w)
+    # the owner asks for the wall clock as well: it goes through, with the warning, at two at once
+    assert w.main(*args_of(w, "--into", str(new.folder), "--gpu-jobs", "2", "--clock", "wall"), agents=agents_of(stub)) == 0
+    out = capsys.readouterr().out
+    assert "warning: stub/all: 2 execs at once on the GPU" in out
+    assert (stub.at_once("stub-all"), stub.at_once("files")) == (2, 3)
+    assert {e[3] for e in system.kinds("max_jobs") if e[1] is None} >= {2}

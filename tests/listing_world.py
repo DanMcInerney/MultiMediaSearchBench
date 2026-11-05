@@ -4,7 +4,8 @@ through the server it is given. Nothing here starts a real agent or imports mult
 
 The planted dump holds, beside a note, a config and a log whose bodies say `SECRET`, a PNG whose pixels are the bytes of `SECRET` (stored, not
 compressed, so the word is in the file's bytes), a WAV whose samples are the same bytes, and a JPEG that says a comment in its EXIF. The
-manifest's entries carry values no file holds (`T`, `KIND`, `SHA`), so that a copy of one into the listing shows."""
+manifest's entries carry values no file holds (`KIND`, `SHA`, and a `t` that is the file's mtime plus `T_OFFSET`: within the listing's tolerance
+of a file's time, which ingest checks, yet a value no file holds), so that a copy of one into the listing shows."""
 
 from __future__ import annotations
 
@@ -29,7 +30,8 @@ from mmmb.core.contract import Case, Dump, ManifestEntry
 from mmmb.systems.listing.system import Listing, ListingSession
 
 SECRET = "ZEBRAQUARTZ"
-T, KIND, SHA = 424242.5, "KINDWORD", "ab" * 32  # what the manifest says and no file does
+T, KIND, SHA = 424242.5, "KINDWORD", "ab" * 32  # what the manifest says and no file does (T: a time that no row says, for a test that plants it)
+T_OFFSET = 0.4375  # the manifest's `t` of a file is its mtime plus this
 COMMENT = "planted exif comment"
 BLOB = re.compile(r"[A-Za-z0-9+/]{64,}={0,2}")  # a run of base64: a file's bytes carried in text
 ROW_KEYS = {"path", "source", "size", "mtime", "exif", "container"}  # the spec's rows
@@ -50,7 +52,7 @@ def png_of(pixels: bytes) -> bytes:
 
 
 def planted_dump(root: Path) -> Dump:
-    """The files above under `root`, with their entries, and mtimes of 2023 that are in no entry."""
+    """The files above under `root`, with their entries, and mtimes of 2023; an entry's `t` is its file's mtime plus `T_OFFSET`."""
     files = {
         "notes/n.md": f"the code word is {SECRET}\n".encode(),
         "config/app.toml": f'password = "{SECRET}"\n'.encode(),
@@ -76,8 +78,9 @@ def planted_dump(root: Path) -> Dump:
     media = {"png": "image", "jpg": "image", "wav": "audio", "md": "text", "toml": "text", "jsonl": "records"}
     entries = []
     for n, rel in enumerate(sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file())):
-        os.utime(root / rel, (1_700_000_000 + n * 60, 1_700_000_000 + n * 60))
-        entries.append(ManifestEntry(rel, rel.split("/")[0], T, KIND, media[rel.rsplit(".", 1)[1]], None, False, 1, 1, SHA))
+        mtime = 1_700_000_000 + n * 60
+        os.utime(root / rel, (mtime, mtime))
+        entries.append(ManifestEntry(rel, rel.split("/")[0], mtime + T_OFFSET, KIND, media[rel.rsplit(".", 1)[1]], None, False, 1, 1, SHA))
     return Dump("k" * 64, root, "planted", tuple(entries), ())
 
 

@@ -4,15 +4,15 @@ core/runner.py, core/retrieval.py, the scenario's `report`).
 
     mmmb build    --scenario NAME [--scale S --seed N --days D,D --source DIR ...] [--out DIR --temp DIR --cache DIR --configs A,B --no-probe]
     mmmb ingest   RUN [--configs A,B]                       the stores of the systems (build makes those of its --configs)
-    mmmb run      RUN [--agents claude,codex --configs A,B --jobs N --side-by-side --subset all|pilot --controls CONFIG --only QID,.. --timeout S
+    mmmb run      RUN [--agents claude,codex --configs A,B --jobs N --gpu-jobs N --side-by-side --subset all|pilot --controls CONFIG --only QID,.. --timeout S
                        --clock working|wall --anyway --dry-run --claude-effort L --codex-effort L --claude-model M --codex-model M --answer-format json|line
                        --scenarios S,.. --kinds K,.. --modalities M,.. --splits S,.. --tag NAME=VALUE --rung R --limit N --discriminating RUN,..]
     mmmb retrieve RUN [--configs A,B --dry-run]             each system asked for the needles, with no agent (the GPU, alone)
     mmmb report   RUN [RUN ...] [--control CONFIG]
     mmmb compare  RUN_A RUN_B [--across-settings]            two runs cell by cell: flips, counts, D1's band, McNemar, verdict lines
-    mmmb repeat   RECORDED [--into RUN --out DIR --temp DIR --cache DIR --jobs N --answer-format json|line --clock working|wall --dry-run]
+    mmmb repeat   RECORDED [--into RUN --out DIR --temp DIR --cache DIR --jobs N --gpu-jobs N --answer-format json|line --clock working|wall --dry-run]
                                                             a recorded run again at its agents' models and efforts
-    mmmb clock-check RUN --config CONFIG [--agents claude,codex --cases N --jobs N]
+    mmmb clock-check RUN --config CONFIG [--agents claude,codex --cases N --jobs N --gpu-jobs N]
                                                             the working clock tried: N cases asked alone and then queued, side by side
 
 (The options are in arguments.py, which holds `parser_of`.)
@@ -40,7 +40,7 @@ from mmmb.arguments import DEFAULT_SEED, OPTIONS, csv, parser_of
 from mmmb.core import fs, gpu, paths, render, report
 from mmmb.core.agents import claude
 from mmmb.core.build import build_run, check_stores, ensure_data, ingest_stores, read_dump, store_hashes, store_of
-from mmmb.core.clockcheck import check_possible, light_cases, pick, run_halves, show_sides
+from mmmb.core.clockcheck import light_cases, pick, queued_at_once, run_halves, show_sides
 from mmmb.core.compare import compare_runs, render_comparison
 from mmmb.core.config import Config, describe_configs, parse_config
 from mmmb.core.contract import Description, Isolation, Session, SessionContext, System
@@ -124,9 +124,10 @@ def agents_named(text: str, parser: argparse.ArgumentParser) -> list[str]:
     return names
 
 
-def check_jobs(jobs: int, parser: argparse.ArgumentParser) -> None:
-    if not 1 <= jobs <= JOBS_MAX:
-        parser.error(f"--jobs is 1 to {JOBS_MAX}: more crashed the laptop once")
+def check_jobs(jobs: int, gpu_jobs: int, parser: argparse.ArgumentParser) -> None:
+    for flag, n in (("--jobs", jobs), ("--gpu-jobs", gpu_jobs)):
+        if not 1 <= n <= JOBS_MAX:
+            parser.error(f"{flag} is 1 to {JOBS_MAX}: more crashed the laptop once")
 
 
 def selection_of(args: argparse.Namespace, parser: argparse.ArgumentParser, names: Sequence[str]) -> Selection:
@@ -209,20 +210,20 @@ def ingest_command(args: argparse.Namespace, parser: argparse.ArgumentParser, re
 
 
 def announce(run: RunFolder, names: Sequence[str], configs: Sequence[Config], descriptions: Mapping[Config, Description | None],
-             preview: Callable[[str, Config], Session], jobs: int, controls: str | None, subset: str, only: Sequence[str],
+             preview: Callable[[str, Config], Session], jobs: int, gpu_jobs: int, controls: str | None, subset: str, only: Sequence[str],
              side_by_side: bool) -> None:
     """What a run will do before it does it (and all a dry run prints of cost): what has to be built, the execs of each cell with the
     medians of earlier runs, the limits of the systems."""
     print("the data and the stores it needs:")
     show_builds(run, sorted({c.system for c in configs if c.system is not None}))
-    show_agents(run, names, configs, descriptions, preview, jobs, controls, subset, only, history_of(earlier(run)), side_by_side)
-    show_limits(run, names, configs, descriptions, preview, jobs, controls, subset, only)
+    show_agents(run, names, configs, descriptions, preview, jobs, gpu_jobs, controls, subset, only, history_of(earlier(run)), side_by_side)
+    show_limits(run, names, configs, descriptions, preview, jobs, gpu_jobs, controls, subset, only)
 
 
 def run_command(args: argparse.Namespace, parser: argparse.ArgumentParser, registry: Registry,
                 real: Callable[[], Mapping[str, Agent]]) -> int:
     names = agents_named(args.agents, parser)
-    check_jobs(args.jobs, parser)
+    check_jobs(args.jobs, args.gpu_jobs, parser)
     only = csv(args.only)
     run = resolve_run(args.run)
     configs = registry.configs(args.configs, run)
@@ -239,9 +240,9 @@ def run_command(args: argparse.Namespace, parser: argparse.ArgumentParser, regis
     dump = read_dump(run)
     only = picked(run, descriptions, args.subset, only, selection)
     preview = previewer(run, loaded, lambda system: store_of(run.folder, system), dump)
-    check_clocks(run, names, configs, descriptions, preview, args.jobs, args.controls, args.subset, only, args.clock)  # refused before it spends anything
+    check_clocks(run, names, configs, descriptions, preview, args.jobs, args.gpu_jobs, args.controls, args.subset, only, args.clock)  # refused before it spends
     if args.dry_run:
-        announce(run, names, configs, descriptions, preview, args.jobs, args.controls, args.subset, only, args.side_by_side)
+        announce(run, names, configs, descriptions, preview, args.jobs, args.gpu_jobs, args.controls, args.subset, only, args.side_by_side)
         dry_run(run, names, configs, descriptions, preview, dump, registry.isolation(), args.controls, args.subset, only, efforts, models,
                 answer_format=answer_format, side_by_side=args.side_by_side)
         return 0
@@ -251,7 +252,7 @@ def run_command(args: argparse.Namespace, parser: argparse.ArgumentParser, regis
         return 1
     registry.check_ready(configs, loaded)  # before any agent starts: not in a dry run, which starts nothing
     warn_of_probe(run)
-    announce(run, names, configs, descriptions, preview, args.jobs, args.controls, args.subset, only, args.side_by_side)
+    announce(run, names, configs, descriptions, preview, args.jobs, args.gpu_jobs, args.controls, args.subset, only, args.side_by_side)
     dump = ensure_data(run, dump)
     if "claude" in names:
         claude.check_login()
@@ -263,7 +264,7 @@ def run_command(args: argparse.Namespace, parser: argparse.ArgumentParser, regis
     beside = SideBySide(Pools.of(names), expected_of(history_of(earlier(run)))) if args.side_by_side else None
     run_agents(run, agents, configs, dump, lambda system: store_of(run.folder, system), args.jobs, controls=args.controls,
                subset=args.subset, only=only, load=registry.load, isolation=registry.isolation(), answer_format=answer_format, side_by_side=beside,
-               clock=args.clock)
+               clock=args.clock, gpu_jobs=args.gpu_jobs)
     note_agents(run)  # what the agents were (the results say), so that `mmmb repeat` can do this run again
     return 0
 
@@ -324,13 +325,13 @@ def repeat_command(args: argparse.Namespace, parser: argparse.ArgumentParser, re
                    real: Callable[[], Mapping[str, Agent]]) -> int:
     """A recorded run again (core/repeat.py): its recipe built into a new run, then `mmmb run` of that run with the recorded agents at their
     models and efforts, over the recorded configurations and questions. With `--into` the run is one an earlier repeat built: it goes on."""
-    check_jobs(args.jobs, parser)
+    check_jobs(args.jobs, args.gpu_jobs, parser)
     recorded = resolve_run(args.recorded)
     repeat = repeat_of(recorded)
     loaded, descriptions = registry.setup(repeat.configs)
     check_same_cases(repeat, descriptions)
     options = options_of(recorded.scenario, recorded.recipe)
-    show_repeat(repeat, descriptions, args.jobs, earlier(recorded), args.temp, args.cache)
+    show_repeat(repeat, descriptions, args.jobs, args.gpu_jobs, earlier(recorded), args.temp, args.cache)
     if args.into is not None:
         run = resolve_run(args.into)
         if dict(run.recipe) != dict(recorded.recipe):
@@ -343,7 +344,7 @@ def repeat_command(args: argparse.Namespace, parser: argparse.ArgumentParser, re
         run = build_run(recorded.scenario, options, args.out, args.temp, list(repeat.configs), timeout_s=recorded.timeout_s,
                         cache=args.cache, workers=args.workers, load=registry.load)
         print(run.folder)
-    argv = [*run_argv(run.folder, repeat, args.jobs), *(["--answer-format", args.answer_format] if args.answer_format else []),
+    argv = [*run_argv(run.folder, repeat, args.jobs, args.gpu_jobs), *(["--answer-format", args.answer_format] if args.answer_format else []),
             *(["--clock", args.clock] if args.clock else []), *(["--dry-run"] if args.dry_run else [])]
     status = run_command(parser.parse_args(argv), parser, registry, real)
     if status == 0 and not args.dry_run:
@@ -357,7 +358,7 @@ def clock_check_command(args: argparse.Namespace, parser: argparse.ArgumentParse
     report its queue or would not run the cases beside each other; else each of the cases asked alone and then queued, and the two printed
     side by side."""
     names = agents_named(args.agents, parser)
-    check_jobs(args.jobs, parser)
+    check_jobs(args.jobs, args.gpu_jobs, parser)
     if args.cases < 1:
         parser.error(f"--cases is 1 or more, not {args.cases}")
     run = resolve_run(args.run)
@@ -374,7 +375,7 @@ def clock_check_command(args: argparse.Namespace, parser: argparse.ArgumentParse
     cases = light_cases(run, names[0], config, descriptions[config], session)
     chosen = pick(run, config, cases, args.cases)
     qids = [q.qid for q in chosen]
-    check_possible(config, session, [c for c in cases if c.qid in qids], args.jobs)
+    at_once = queued_at_once(config, descriptions[config], session, [c for c in cases if c.qid in qids], args.jobs, args.gpu_jobs)
     registry.check_ready([config], loaded)  # before any agent starts
     answer_format = answer_format_of(run, None)
     dump = ensure_data(run, dump)
@@ -382,11 +383,11 @@ def clock_check_command(args: argparse.Namespace, parser: argparse.ArgumentParse
         claude.check_login()
     agents = {name: agent for name, agent in real().items() if name in names}
 
-    def ask(half: RunFolder, at_once: int) -> None:
-        run_agents(half, agents, [config], dump, lambda system: store_of(run.folder, system), at_once, only=qids, load=registry.load,
-                   isolation=registry.isolation(), answer_format=answer_format)
+    def ask(half: RunFolder, n: int) -> None:
+        run_agents(half, agents, [config], dump, lambda system: store_of(run.folder, system), n, only=qids, load=registry.load,
+                   isolation=registry.isolation(), answer_format=answer_format, gpu_jobs=n)
 
-    show_sides(run_halves(run, args.jobs, ask), names, config, qids)
+    show_sides(run_halves(run, config, descriptions[config], at_once, ask), names, config, qids)
     return 0
 
 

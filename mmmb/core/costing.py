@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from mmmb.core import fs
+from mmmb.core.atonce import GPU_JOBS_FLAG, JOBS_FLAG, execs_at_once, on_gpu
 from mmmb.core.build import store_of
 from mmmb.core.cache import CACHED, INGESTED, LOST, dump_state, store_state
 from mmmb.core.config import Config
@@ -185,7 +186,7 @@ def hours(seconds: float) -> str:
 
 
 def cell_line(c: Cell, jobs: int, history: bool) -> str:
-    line = f"  {c.agent:6} {c.config.name:24} {c.todo} to run of {c.of}" + (f" ({c.at_once} at once)" if c.at_once < jobs else "")
+    line = f"  {c.agent:6} {c.config.name:24} {c.todo} to run of {c.of}" + (f" ({c.at_once} at once)" if c.at_once != jobs else "")
     if not history:
         return line
     t = c.typical
@@ -201,12 +202,16 @@ def totals_text(t: Totals) -> str:
             f"${t.usd:.2f} at list")
 
 
-def show_cells(cells: Sequence[Cell], jobs: int, history: bool) -> None:
-    """A line for each cell and the estimate. Without `history` (the earlier runs were not looked at) every exec is at EXEC_MIN; with
-    it, the totals at the medians of earlier runs (DESIGN 8.2) and at their means, which are what those runs took in all (the medians
-    leave out the few long execs, a timeout is 900 s), and the cells that have no earlier exec."""
+def show_cells(cells: Sequence[Cell], jobs: int, gpu_jobs: int, history: bool) -> None:
+    """A line for each cell and the estimate. A cell whose execs at once are not `jobs` says so, and the line after the cells says which
+    configurations need the GPU and so run `gpu_jobs` (`atonce`). Without `history` (the earlier runs were not looked at) every exec is at
+    EXEC_MIN; with it, the totals at the medians of earlier runs (DESIGN 8.2) and at their means, which are what those runs took in all
+    (the medians leave out the few long execs, a timeout is 900 s), and the cells that have no earlier exec."""
     for c in cells:
         print(cell_line(c, jobs, history))
+    if gpu := sorted({c.config.name for c in cells if c.todo and on_gpu(c.description)}):
+        print(f"  execs at once: {jobs} ({JOBS_FLAG}); {gpu_jobs} for those that need the GPU, {', '.join(gpu)} ({GPU_JOBS_FLAG}); "
+              "a system may allow fewer")
     f = forecast(cells)
     old = estimate([(c.todo, c.at_once, *((BLIND_MIN,) if c.config.system is None else ())) for c in cells], jobs)
     if not history or len(f.guessed) == sum(1 for c in cells if c.todo):  # no cell with execs to run has an earlier exec to say
@@ -222,28 +227,28 @@ def show_cells(cells: Sequence[Cell], jobs: int, history: bool) -> None:
 
 
 def show_agents(run: RunFolder, names: Sequence[str], configs: Sequence[Config], descriptions: Mapping[Config, Description | None],
-                preview: Callable[[str, Config], Session], jobs: int, controls: str | None = None, subset: str = "all",
+                preview: Callable[[str, Config], Session], jobs: int, gpu_jobs: int, controls: str | None = None, subset: str = "all",
                 only: Sequence[str] = (), history: Mapping[tuple[str, str], Typical] | None = None, side_by_side: bool = False) -> None:
     """What `run_agents` will run, and how long that takes: it asks nothing. `descriptions` are those of `configs` (None for one
-    with no system). Each configuration is counted at `jobs` execs at once, or at the fewer its session allows (`Session.max_jobs`, from
-    the `preview` session of its system, as `run_config` will ask it), and said so. With a `history` (`history_of`, maybe empty) the
+    with no system). Each configuration is counted at the execs at once `run_config` will run (`atonce.execs_at_once`: `jobs`, or
+    `gpu_jobs` for a system that needs the GPU, or the fewer its session allows, from the `preview` session of its system), and said so. With a `history` (`history_of`, maybe empty) the
     estimate is from the medians of what each cell took there. With `side_by_side` it also says how long the same cases take run beside each
     other (`show_beside`)."""
     questions = selected(run.questions(), subset, descriptions, only)
     cells = []
     named = f", only {', '.join(only)}" if 0 < len(only) <= ONLY_NAMED else f", only {len(only)} chosen questions" if only else ""
-    print(f"run {run.name}: {run.scale}, seed {run.seed}, {len(run.days)} days, the {subset} questions{named}")
+    print(f"run {run.name}: {run.scale}, seed {run.seed}, {len(run.days)} days, {'all the' if subset == 'all' else f'the {subset}'} questions{named}")
     for name in names:
         for config in configs:
             mine = config_questions(questions, config, descriptions[config], controls)
             todo, of = pending_count(run, name, config, mine)
             session = preview(name, config)
             cases = [case_of(run, name, config, q, session) for q in mine]
-            at_once = session.max_jobs(cases, jobs)
+            at_once = execs_at_once(descriptions[config], session, cases, jobs, gpu_jobs)
             waiting = tuple(sorted((c for c in cases if not is_done(load_result(run.result_path(name, config, c.qid)))),
                                    key=lambda c: (c.until, c.qid)))
             cells.append(Cell(name, config, todo, of, at_once, (history or {}).get((name, config.dir)), waiting, descriptions[config]))
-    show_cells(cells, jobs, history is not None)
+    show_cells(cells, jobs, gpu_jobs, history is not None)
     if side_by_side:
         show_beside(cells, names, configs, history)
 

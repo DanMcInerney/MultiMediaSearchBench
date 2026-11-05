@@ -1,5 +1,5 @@
-"""The decision model behind a variant of mm (moved from `Model`, `serving`, `resolve_models`, `needs_gpu` and `MODELS_DIR` of bench.py of
-this repository at bb498a6): a variant is the name of a model Multimem knows (`mm model list`). A variant that is ready to run has its
+"""The decision model behind a variant of mm (moved from `Model`, `serving`, `needs_gpu` and `MODELS_DIR` of bench.py of
+this repository at bb498a6; `resolve_models`, which listed the ready ones among several names, was not moved: `Mm.ready_model` asks for one): a variant is the name of a model Multimem knows (`mm model list`). A variant that is ready to run has its
 folder of weights in MODELS_DIR, its env prepared and, for a served model, its server answering."""
 
 from __future__ import annotations
@@ -72,27 +72,6 @@ def not_ready(model: Model) -> str | None:
     if (why := fetch.unfinished(folder)) is not None:
         return f"{about.name}: its weights are not all there: {why}"
     return None
-
-
-def resolve_models(names: list[str], models_dir: Path) -> tuple[list[Model], list[str]]:
-    """The models of `names` that are ready to run, and a line for each that is not, saying why."""
-    ready: list[Model] = []
-    skipped: list[str] = []
-    seen: set[str] = set()
-    for name in names:
-        try:
-            model = known_model(name, models_dir)
-        except ValueError as error:
-            skipped.append(str(error))
-            continue
-        if model.name in seen:
-            continue
-        seen.add(model.name)
-        if why := not_ready(model):
-            skipped.append(why)
-        else:
-            ready.append(model)
-    return ready, skipped
 
 
 def needs_gpu(model: Model) -> bool:

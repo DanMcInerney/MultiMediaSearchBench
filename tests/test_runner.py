@@ -701,7 +701,7 @@ def test_a_run_prints_what_it_will_run_and_about_how_long_that_takes(world, caps
     descriptions = {FILES: systems.load("files").describe(None), STUB: world.system.describe("all"), BLIND: None}
     go(world, {"claude": Agent(Stub())}, [FILES], jobs=2)
     capsys.readouterr()
-    show_agents(world.run, ["claude", "codex"], [FILES, STUB, BLIND], descriptions, previewing(world), 3)
+    show_agents(world.run, ["claude", "codex"], [FILES, STUB, BLIND], descriptions, previewing(world), 3, 1)
     lines = [" ".join(line.split()) for line in capsys.readouterr().out.splitlines()]
     for expected in ("claude files 0 to run of 19", f"claude stub/all {N} to run of {N}", f"claude blind {N} to run of {N}",
                      f"codex files {N} to run of {N}", f"codex stub/all {N} to run of {N}", f"codex blind {N} to run of {N}"):
@@ -823,7 +823,7 @@ def test_the_estimate_counts_a_configuration_at_the_execs_its_system_allows_at_o
 
     limited = types.SimpleNamespace(**{**vars(world), "system": StubSystem(job_limit=1)})
     descriptions = {FILES: systems.load("files").describe(None), STUB: limited.system.describe("all")}
-    show_agents(limited.run, ["claude"], [FILES, STUB], descriptions, previewing(limited), 3)
+    show_agents(limited.run, ["claude"], [FILES, STUB], descriptions, previewing(limited), 3, 1)
     lines = [" ".join(line.split()) for line in capsys.readouterr().out.splitlines()]
     assert f"claude files {N} to run of {N}" in lines, "a configuration with no system has all its jobs"
     assert f"claude stub/all {N} to run of {N} (1 at once)" in lines

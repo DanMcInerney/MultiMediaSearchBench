@@ -34,8 +34,8 @@ from multimem.adapter import INSTRUCTIONS
 from multimem.project import MARKER
 
 from mmmb.core import fs
-from mmmb.core.contract import (Case, Description, Dump, IngestReport, McpServer, PlainSession, RetrievalQuery, RetrievalResult, Served,
-                                SessionContext, Usage)
+from mmmb.core.contract import (BEYOND_TIMEOUT, EXCLUSIVE, GPU_ESTIMATE_S, Case, Description, Dump, IngestReport, McpServer, PlainSession,
+                                RetrievalQuery, RetrievalResult, Served, SessionContext, Usage)
 from mmmb.core.runfolder import package_root
 from mmmb.systems import read as read_system_toml
 from mmmb.systems.mm.audit import HorizonLeak, ambient_labels, work_of
@@ -45,7 +45,7 @@ from mmmb.systems.mm.estimate import ASK_SHARE, HEAVY_S, arm_jobs, beyond_timeou
 from mmmb.systems.mm.home import PROJECT_PREFIX, SNAPSHOT_CONFIG, copy_home, exec_project, kept_items, scrub_home, set_horizon
 from mmmb.systems.mm.jobs import JOB_WAIT_S, quiesce, wait_idle
 from mmmb.systems.mm.load import check_snapshot, load
-from mmmb.systems.mm.models import MODELS_DIR, Model, known_model, needs_gpu, not_ready, resolve_models
+from mmmb.systems.mm.models import MODELS_DIR, Model, known_model, needs_gpu, not_ready
 from mmmb.systems.mm.oracle import retrieve, warm, warm_params
 
 HERE = Path(__file__).parent
@@ -99,7 +99,7 @@ def sha_of(*parts: object) -> str:
 def serve_record(estimate: float, timeout_s: float, busy_at_start: int | None) -> dict:
     """The fields `serve` adds to a result: the GPU seconds the case may need, whether it ran alone, whether the ask cannot finish inside the
     exec's time (the model's speed, not a miss), and the jobs the daemon still had when a case that holds the GPU started (0: idle)."""
-    return {"gpu_estimate_s": round(estimate, 1), "exclusive": heavy(estimate), "beyond_timeout": beyond_timeout(estimate, timeout_s),
+    return {GPU_ESTIMATE_S: round(estimate, 1), EXCLUSIVE: heavy(estimate), BEYOND_TIMEOUT: beyond_timeout(estimate, timeout_s),
             "busy_at_start": busy_at_start}
 
 
