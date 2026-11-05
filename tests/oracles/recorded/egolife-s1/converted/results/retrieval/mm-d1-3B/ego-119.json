@@ -1,0 +1,219 @@
+{
+ "qid": "ego-119",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a pair of glasses being picked up?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793293210.48,
+   1793293810.48
+  ],
+  [
+   1793319919.13,
+   1793320519.13
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.798,
+ "moments": 2,
+ "moments_found": [],
+ "away": 5,
+ "windows": 1202,
+ "seconds": 99.2,
+ "wall_s": 99.23,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 242, 241, 240, 239, 238 and 16 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 739, 738, 737, 736, 735 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:03:45.000-04:00",
+   "t1": "2026-10-29T13:03:45.000-04:00",
+   "p": 0.835,
+   "said": "Is a pair of glasses being picked up?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 229,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:03:30.000-04:00",
+   "t1": "2026-10-29T13:03:30.000-04:00",
+   "p": 0.818,
+   "said": "Is a pair of glasses being picked up?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 229,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T20:28:53.000-04:00",
+   "t1": "2026-10-29T20:28:55.000-04:00",
+   "p": 0.953,
+   "said": "Is a pair of glasses being picked up?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 726,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T20:27:26.000-04:00",
+   "t1": "2026-10-29T20:27:39.000-04:00",
+   "p": 0.977,
+   "said": "Is a pair of glasses being picked up?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 724,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T20:26:12.000-04:00",
+   "t1": "2026-10-29T20:27:13.000-04:00",
+   "p": 0.977,
+   "said": "Is a pair of glasses being picked up?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 722,
+    "at": 24.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:05:05.000-04:00",
+   "p": 0.798,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 232,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:02:53.000-04:00",
+   "p": 0.777,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 227,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:08:16.000-04:00",
+   "p": 0.706,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 238,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:07:06.000-04:00",
+   "p": 0.622,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 236,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:02:39.000-04:00",
+   "p": 0.622,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 227,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:32:04.000-04:00",
+   "p": 0.731,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 733,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:25:44.000-04:00",
+   "p": 0.706,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 720,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:29:06.000-04:00",
+   "p": 0.651,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 727,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:25:33.000-04:00",
+   "p": 0.593,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 720,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:29:55.000-04:00",
+   "p": 0.531,
+   "said": "Is a pair of glasses being picked up?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 728,
+    "at": 25.0
+   }
+  }
+ ]
+}

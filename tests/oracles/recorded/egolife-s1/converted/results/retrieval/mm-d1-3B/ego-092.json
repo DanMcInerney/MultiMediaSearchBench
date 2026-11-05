@@ -1,0 +1,78 @@
+{
+ "qid": "ego-092",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone using a computer?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793317706.15,
+   1793318507.03
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.986,
+ "moments": 2,
+ "moments_found": [
+  0,
+  1
+ ],
+ "away": 1,
+ "windows": 802,
+ "seconds": 66.4,
+ "wall_s": 66.38,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 28 video items was not heard, since d1-3B does not hear: glasses (items 683, 682, 681, 680, 679 and 23 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:55:52.000-04:00",
+   "t1": "2026-10-29T20:01:47.000-04:00",
+   "p": 0.986,
+   "said": "Is someone using a computer?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 680,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:55:23.000-04:00",
+   "t1": "2026-10-29T19:55:38.000-04:00",
+   "p": 0.98,
+   "said": "Is someone using a computer?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 671,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:48:26.150-04:00",
+   "t1": "2026-10-29T19:55:10.000-04:00",
+   "p": 0.986,
+   "said": "Is someone using a computer?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 665,
+    "at": 10.0
+   }
+  }
+ ],
+ "candidates": []
+}

@@ -1,0 +1,49 @@
+{
+ "qid": "video-screen-error-3",
+ "type": "video",
+ "template": "screen-error",
+ "level": "week",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": null,
+ "passed": false,
+ "abstained": false,
+ "problem": "capped: error_max_turns",
+ "seconds": 664.6,
+ "turns": 61,
+ "denials": 0,
+ "calls": 76,
+ "tools": {
+  "Glob": 18,
+  "Grep": 26,
+  "Read": 5,
+  "Bash": 27
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 4,
+  "shells": 27
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 120,
+  "output": 61572,
+  "cache_read": 4354500,
+  "cache_write": 139812
+ },
+ "cost_usd": 1.6106580000000001,
+ "used_percent": 76.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/video-screen-error-3",
+ "at": "2026-11-04T12:40:50",
+ "held_s": 806.9
+}

@@ -1,0 +1,19 @@
+{
+ "mcpServers": {
+  "mm": {
+   "command": "<PYTHON>",
+   "args": [
+    "-m",
+    "multimem.cli",
+    "--home",
+    "<HOME>",
+    "mcp",
+    "--tools",
+    "ask,find,look,label"
+   ],
+   "env": {
+    "CLAUDE_PROJECT_DIR": "<WORK>"
+   }
+  }
+ }
+}

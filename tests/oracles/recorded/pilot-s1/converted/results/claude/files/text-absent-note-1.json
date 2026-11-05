@@ -1,0 +1,49 @@
+{
+ "qid": "text-absent-note-1",
+ "type": "text",
+ "template": "absent-note",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 221.4,
+ "turns": 151,
+ "denials": 0,
+ "calls": 150,
+ "tools": {
+  "Glob": 5,
+  "Grep": 3,
+  "Read": 82,
+  "Bash": 60
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 79,
+  "shells": 60
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 46,
+  "output": 21312,
+  "cache_read": 1016593,
+  "cache_write": 135069
+ },
+ "cost_usd": 0.8551473000000002,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/text-absent-note-1",
+ "at": "2026-11-04T12:08:46",
+ "held_s": 0.0
+}

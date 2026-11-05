@@ -1,0 +1,62 @@
+{
+ "qid": "video-porch-parcel-1",
+ "type": "video",
+ "template": "porch-parcel",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "12:02 (about 12:02:53) on Sunday 1 November",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 33.4,
+ "turns": 10,
+ "denials": 0,
+ "calls": 9,
+ "tools": {
+  "find": 2,
+  "ask": 1,
+  "look": 6
+ },
+ "work": {
+  "jobs": 1,
+  "windows": 144,
+  "seconds": 9.9,
+  "stopped": {
+   "range_end": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 12,
+  "output": 1905,
+  "cache_read": 121600,
+  "cache_write": 23002
+ },
+ "cost_usd": 0.12324199999999999,
+ "used_percent": 81.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/video-porch-parcel-1",
+ "at": "2026-11-04T14:12:44",
+ "held_s": 0.0,
+ "gpu_estimate_s": 10.8,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 5,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

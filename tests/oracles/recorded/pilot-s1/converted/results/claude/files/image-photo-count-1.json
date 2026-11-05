@@ -1,0 +1,48 @@
+{
+ "qid": "image-photo-count-1",
+ "type": "image",
+ "template": "photo-count",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "4",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 43.0,
+ "turns": 15,
+ "denials": 0,
+ "calls": 14,
+ "tools": {
+  "Glob": 1,
+  "Bash": 5,
+  "Read": 8
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 8,
+  "shells": 5
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 12,
+  "output": 6534,
+  "cache_read": 90267,
+  "cache_write": 40353
+ },
+ "cost_usd": 0.2358027,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/image-photo-count-1",
+ "at": "2026-11-04T11:42:57",
+ "held_s": 0.0
+}

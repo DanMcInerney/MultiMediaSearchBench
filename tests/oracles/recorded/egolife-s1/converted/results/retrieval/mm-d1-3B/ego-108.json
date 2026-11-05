@@ -1,0 +1,148 @@
+{
+ "qid": "ego-108",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a delivery person handing over takeout?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793293475.07,
+   1793294075.07
+  ],
+  [
+   1793319348.12,
+   1793319948.12
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.349,
+ "moments": 2,
+ "moments_found": [],
+ "away": 0,
+ "windows": 907,
+ "seconds": 73.3,
+ "wall_s": 73.33,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 11 video items was not heard, since d1-3B does not hear: glasses (items 720, 719, 718, 717, 716 and 6 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 251, 250, 249, 248, 247 and 16 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:09:22.000-04:00",
+   "p": 0.349,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.35)",
+   "kind": "video",
+   "look": {
+    "item": 240,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:14:08.000-04:00",
+   "p": 0.202,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.20)",
+   "kind": "video",
+   "look": {
+    "item": 250,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:13:15.000-04:00",
+   "p": 0.202,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.20)",
+   "kind": "video",
+   "look": {
+    "item": 248,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:12:30.000-04:00",
+   "p": 0.165,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.16)",
+   "kind": "video",
+   "look": {
+    "item": 247,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:12:15.000-04:00",
+   "p": 0.165,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.16)",
+   "kind": "video",
+   "look": {
+    "item": 246,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:24:30.000-04:00",
+   "p": 0.622,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 718,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:24:13.000-04:00",
+   "p": 0.469,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.47)",
+   "kind": "video",
+   "look": {
+    "item": 717,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:21:23.000-04:00",
+   "p": 0.438,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.44)",
+   "kind": "video",
+   "look": {
+    "item": 711,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:22:19.000-04:00",
+   "p": 0.349,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.35)",
+   "kind": "video",
+   "look": {
+    "item": 713,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:21:02.000-04:00",
+   "p": 0.321,
+   "said": "Is a delivery person handing over takeout?: below 0.8 (p 0.32)",
+   "kind": "video",
+   "look": {
+    "item": 711,
+    "at": 2.0
+   }
+  }
+ ]
+}

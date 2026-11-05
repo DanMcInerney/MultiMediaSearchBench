@@ -1,0 +1,131 @@
+{
+ "qid": "ego-093",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a supermarket entrance in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793308267.18,
+   1793308867.18
+  ]
+ ],
+ "found": false,
+ "top5": false,
+ "p": null,
+ "moments": 1,
+ "moments_found": [],
+ "away": 3,
+ "windows": 603,
+ "seconds": 47.4,
+ "wall_s": 47.39,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 400, 399, 398, 397, 396 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:19:46.000-04:00",
+   "t1": "2026-10-29T17:19:51.000-04:00",
+   "p": 0.953,
+   "said": "Is a supermarket entrance in view?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 397,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:19:09.000-04:00",
+   "t1": "2026-10-29T17:19:23.000-04:00",
+   "p": 0.924,
+   "said": "Is a supermarket entrance in view?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 396,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:15:13.000-04:00",
+   "t1": "2026-10-29T17:15:13.000-04:00",
+   "p": 0.852,
+   "said": "Is a supermarket entrance in view?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 388,
+    "at": 13.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:14:13.000-04:00",
+   "p": 0.755,
+   "said": "Is a supermarket entrance in view?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 386,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:13:17.000-04:00",
+   "p": 0.731,
+   "said": "Is a supermarket entrance in view?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 384,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:13:43.000-04:00",
+   "p": 0.706,
+   "said": "Is a supermarket entrance in view?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 385,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:15:28.000-04:00",
+   "p": 0.679,
+   "said": "Is a supermarket entrance in view?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 388,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:14:45.000-04:00",
+   "p": 0.679,
+   "said": "Is a supermarket entrance in view?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 387,
+    "at": 15.0
+   }
+  }
+ ]
+}

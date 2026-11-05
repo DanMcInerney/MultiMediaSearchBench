@@ -1,0 +1,60 @@
+{
+ "qid": "video-screen-error-3",
+ "type": "video",
+ "template": "screen-error",
+ "level": "week",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": null,
+ "passed": false,
+ "abstained": false,
+ "problem": "timeout: no answer in 900 s",
+ "seconds": 900.3,
+ "turns": null,
+ "denials": 0,
+ "calls": 44,
+ "tools": {
+  "find": 6,
+  "ask": 27,
+  "look": 11
+ },
+ "work": {
+  "jobs": 8,
+  "windows": 12279,
+  "seconds": 979.6,
+  "stopped": {
+   "cancelled": 5,
+   "running": 3
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": null,
+ "cost_usd": null,
+ "used_percent": 84.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/video-screen-error-3",
+ "at": "2026-11-04T15:01:04",
+ "held_s": 0.0,
+ "gpu_estimate_s": 2679.1,
+ "exclusive": true,
+ "beyond_timeout": true,
+ "busy_at_start": 0,
+ "left": {
+  "labels": 8,
+  "unkept": 0
+ },
+ "cancelled": [
+  "j-4860407d"
+ ],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.1
+}

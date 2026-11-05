@@ -1,0 +1,46 @@
+{
+ "qid": "audio-mic-alarm-1",
+ "type": "audio",
+ "template": "mic-alarm",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "07:18:57 a.m.",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 42.7,
+ "turns": 1,
+ "denials": null,
+ "calls": 6,
+ "tools": {
+  "shell": 6
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 6
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 132782,
+  "output": 1332,
+  "cache_read": 108672,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/audio-mic-alarm-1",
+ "at": "2026-11-04T11:28:27",
+ "held_s": 0.0
+}

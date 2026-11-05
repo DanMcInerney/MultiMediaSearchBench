@@ -1,0 +1,84 @@
+{
+ "qid": "ego-221",
+ "type": "records",
+ "template": "HabitInsight",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about mineral water?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793461017.0,
+   1793461617.0
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.94,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 13,
+ "seconds": 2.0,
+ "wall_s": 2.0,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-31T11:44:10.400-04:00",
+   "t1": "2026-10-31T11:44:40.600-04:00",
+   "p": 0.977,
+   "said": "Does the text talk about mineral water?: yes (p 0.98)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-31T11:44:10.400-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-31T11:40:30.866-04:00",
+   "t1": "2026-10-31T11:42:39.266-04:00",
+   "p": 0.94,
+   "said": "Does the text talk about mineral water?: yes (p 0.94)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-31T11:41:58.866-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-31T11:39:05.700-04:00",
+   "p": 0.777,
+   "said": "Does the text talk about mineral water?: below 0.8 (p 0.78)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-31T11:39:05.700-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-31T11:45:57.500-04:00",
+   "p": 0.593,
+   "said": "Does the text talk about mineral water?: below 0.8 (p 0.59)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-31T11:45:57.500-04:00"
+   }
+  }
+ ]
+}

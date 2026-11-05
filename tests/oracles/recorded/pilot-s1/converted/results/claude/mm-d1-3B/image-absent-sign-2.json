@@ -1,0 +1,62 @@
+{
+ "qid": "image-absent-sign-2",
+ "type": "image",
+ "template": "absent-sign",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 45.0,
+ "turns": 9,
+ "denials": 0,
+ "calls": 8,
+ "tools": {
+  "find": 2,
+  "ask": 3,
+  "look": 3
+ },
+ "work": {
+  "jobs": 3,
+  "windows": 189,
+  "seconds": 13.3,
+  "stopped": {
+   "range_end": 3
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 16,
+  "output": 2517,
+  "cache_read": 231481,
+  "cache_write": 44224
+ },
+ "cost_usd": 0.2252461,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/image-absent-sign-2",
+ "at": "2026-11-04T14:26:49",
+ "held_s": 0.0,
+ "gpu_estimate_s": 4.2,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 10,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

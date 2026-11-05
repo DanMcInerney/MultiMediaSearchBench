@@ -1,0 +1,245 @@
+{
+ "qid": "ego-195",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a shopping cart being pushed?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793308450.01,
+   1793309050.01
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.971,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 10,
+ "windows": 603,
+ "seconds": 51.0,
+ "wall_s": 51.05,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 406, 405, 404, 403, 402 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:23:49.000-04:00",
+   "t1": "2026-10-29T17:24:09.000-04:00",
+   "p": 0.98,
+   "said": "Is a shopping cart being pushed?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 406,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:23:33.000-04:00",
+   "t1": "2026-10-29T17:23:33.000-04:00",
+   "p": 0.818,
+   "said": "Is a shopping cart being pushed?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 405,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:22:50.000-04:00",
+   "t1": "2026-10-29T17:23:00.000-04:00",
+   "p": 0.963,
+   "said": "Is a shopping cart being pushed?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 403,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:22:21.000-04:00",
+   "t1": "2026-10-29T17:22:30.000-04:00",
+   "p": 0.94,
+   "said": "Is a shopping cart being pushed?: yes (p 0.94)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 403,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:21:54.000-04:00",
+   "t1": "2026-10-29T17:22:06.000-04:00",
+   "p": 0.947,
+   "said": "Is a shopping cart being pushed?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 402,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:21:29.000-04:00",
+   "t1": "2026-10-29T17:21:29.000-04:00",
+   "p": 0.924,
+   "said": "Is a shopping cart being pushed?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 400,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:20:57.000-04:00",
+   "t1": "2026-10-29T17:20:57.000-04:00",
+   "p": 0.905,
+   "said": "Is a shopping cart being pushed?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 399,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:20:40.000-04:00",
+   "t1": "2026-10-29T17:20:42.000-04:00",
+   "p": 0.867,
+   "said": "Is a shopping cart being pushed?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 399,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:20:28.000-04:00",
+   "t1": "2026-10-29T17:20:28.000-04:00",
+   "p": 0.867,
+   "said": "Is a shopping cart being pushed?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 398,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:19:44.000-04:00",
+   "t1": "2026-10-29T17:20:08.000-04:00",
+   "p": 0.98,
+   "said": "Is a shopping cart being pushed?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 397,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:19:01.000-04:00",
+   "t1": "2026-10-29T17:19:25.000-04:00",
+   "p": 0.971,
+   "said": "Is a shopping cart being pushed?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 396,
+    "at": 19.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:21:13.000-04:00",
+   "p": 0.651,
+   "said": "Is a shopping cart being pushed?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 400,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:17:07.000-04:00",
+   "p": 0.651,
+   "said": "Is a shopping cart being pushed?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 392,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:21:40.000-04:00",
+   "p": 0.622,
+   "said": "Is a shopping cart being pushed?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 401,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:17:18.000-04:00",
+   "p": 0.622,
+   "said": "Is a shopping cart being pushed?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 392,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:23:14.000-04:00",
+   "p": 0.407,
+   "said": "Is a shopping cart being pushed?: below 0.8 (p 0.41)",
+   "kind": "video",
+   "look": {
+    "item": 404,
+    "at": 14.0
+   }
+  }
+ ]
+}

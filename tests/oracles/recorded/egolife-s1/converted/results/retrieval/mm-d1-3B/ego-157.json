@@ -1,0 +1,362 @@
+{
+ "qid": "ego-157",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a person's hairstyle clearly in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793286860.16,
+   1793287460.16
+  ],
+  [
+   1793308111.11,
+   1793308711.11
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.953,
+ "moments": 2,
+ "moments_found": [
+  0,
+  1
+ ],
+ "away": 13,
+ "windows": 1052,
+ "seconds": 90.2,
+ "wall_s": 90.28,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 16 video items was not heard, since d1-3B does not hear: glasses (items 395, 394, 393, 392, 391 and 11 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 30, 29, 28, 27, 26 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:23:45.000-04:00",
+   "t1": "2026-10-29T11:23:46.000-04:00",
+   "p": 0.893,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 29,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:20:56.000-04:00",
+   "t1": "2026-10-29T11:22:13.000-04:00",
+   "p": 0.932,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 24,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:20:29.000-04:00",
+   "t1": "2026-10-29T11:20:42.000-04:00",
+   "p": 0.924,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 23,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:19:29.000-04:00",
+   "t1": "2026-10-29T11:19:29.000-04:00",
+   "p": 0.835,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 20,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:18:20.000-04:00",
+   "t1": "2026-10-29T11:18:32.000-04:00",
+   "p": 0.852,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 18,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:17:24.000-04:00",
+   "t1": "2026-10-29T11:17:37.000-04:00",
+   "p": 0.932,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 16,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:16:01.000-04:00",
+   "t1": "2026-10-29T11:16:38.000-04:00",
+   "p": 0.905,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 14,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:15:33.000-04:00",
+   "t1": "2026-10-29T11:15:41.000-04:00",
+   "p": 0.932,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 13,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:15:15.000-04:00",
+   "t1": "2026-10-29T11:15:15.000-04:00",
+   "p": 0.835,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 12,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:14:48.000-04:00",
+   "t1": "2026-10-29T11:14:57.000-04:00",
+   "p": 0.893,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 11,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:18:01.000-04:00",
+   "t1": "2026-10-29T17:18:31.000-04:00",
+   "p": 0.963,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 394,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:16:10.000-04:00",
+   "t1": "2026-10-29T17:17:47.000-04:00",
+   "p": 0.967,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 390,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:15:31.000-04:00",
+   "t1": "2026-10-29T17:15:55.000-04:00",
+   "p": 0.974,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 389,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:14:05.000-04:00",
+   "t1": "2026-10-29T17:14:57.000-04:00",
+   "p": 0.967,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 386,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:12:56.000-04:00",
+   "t1": "2026-10-29T17:13:46.000-04:00",
+   "p": 0.953,
+   "said": "Is a person's hairstyle clearly in view?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 385,
+    "at": 1.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:24:17.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 30,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:18:43.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 19,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:17:07.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 16,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:14:31.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 11,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:23:13.000-04:00",
+   "p": 0.777,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 28,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:12:08.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 382,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:11:42.000-04:00",
+   "p": 0.798,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 381,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:12:36.000-04:00",
+   "p": 0.755,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 383,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:12:25.000-04:00",
+   "p": 0.755,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 382,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:11:29.010-04:00",
+   "p": 0.651,
+   "said": "Is a person's hairstyle clearly in view?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 380,
+    "at": 27.85
+   }
+  }
+ ]
+}

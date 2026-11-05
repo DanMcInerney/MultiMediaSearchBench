@@ -1,0 +1,49 @@
+{
+ "qid": "audio-mic-alarm-2",
+ "type": "audio",
+ "template": "mic-alarm",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "07:18:57 (about 07:19)",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 158.0,
+ "turns": 70,
+ "denials": 0,
+ "calls": 69,
+ "tools": {
+  "Glob": 2,
+  "Grep": 1,
+  "Read": 34,
+  "Bash": 32
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 33,
+  "shells": 32
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 36,
+  "output": 10750,
+  "cache_read": 441150,
+  "cache_write": 41800
+ },
+ "cost_usd": 0.3188870000000001,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/audio-mic-alarm-2",
+ "at": "2026-11-04T11:44:28",
+ "held_s": 0.0
+}

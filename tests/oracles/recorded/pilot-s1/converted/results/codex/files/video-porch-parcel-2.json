@@ -1,0 +1,47 @@
+{
+ "qid": "video-porch-parcel-2",
+ "type": "video",
+ "template": "porch-parcel",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "12:02:53 p.m. on Sunday 1 November 2026.",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 44.8,
+ "turns": 1,
+ "denials": null,
+ "calls": 9,
+ "tools": {
+  "shell": 6,
+  "view_image": 3
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 3,
+  "shells": 6
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 214452,
+  "output": 1010,
+  "cache_read": 186752,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/video-porch-parcel-2",
+ "at": "2026-11-04T11:31:01",
+ "held_s": 0.0
+}

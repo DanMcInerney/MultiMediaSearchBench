@@ -1,0 +1,376 @@
+{
+ "qid": "ego-074",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Are slippers on someone's feet?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793297081.02,
+   1793297681.02
+  ],
+  [
+   1793308072.09,
+   1793308672.09
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.924,
+ "moments": 2,
+ "moments_found": [
+  0,
+  1
+ ],
+ "away": 13,
+ "windows": 1013,
+ "seconds": 79.9,
+ "wall_s": 79.97,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 14 video items was not heard, since d1-3B does not hear: glasses (items 393, 392, 391, 390, 389 and 9 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 371, 370, 369, 368, 367 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:14:21.000-04:00",
+   "t1": "2026-10-29T14:14:26.000-04:00",
+   "p": 0.94,
+   "said": "Are slippers on someone's feet?: yes (p 0.94)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 370,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:13:58.000-04:00",
+   "t1": "2026-10-29T14:13:58.000-04:00",
+   "p": 0.867,
+   "said": "Are slippers on someone's feet?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 369,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:13:07.000-04:00",
+   "t1": "2026-10-29T14:13:08.000-04:00",
+   "p": 0.881,
+   "said": "Are slippers on someone's feet?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 368,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:11:27.000-04:00",
+   "t1": "2026-10-29T14:11:27.000-04:00",
+   "p": 0.835,
+   "said": "Are slippers on someone's feet?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 364,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:11:01.000-04:00",
+   "t1": "2026-10-29T14:11:01.000-04:00",
+   "p": 0.867,
+   "said": "Are slippers on someone's feet?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 364,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:10:11.000-04:00",
+   "t1": "2026-10-29T14:10:28.000-04:00",
+   "p": 0.924,
+   "said": "Are slippers on someone's feet?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 362,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:09:58.000-04:00",
+   "t1": "2026-10-29T14:09:58.000-04:00",
+   "p": 0.867,
+   "said": "Are slippers on someone's feet?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 361,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:08:35.000-04:00",
+   "t1": "2026-10-29T14:08:52.000-04:00",
+   "p": 0.958,
+   "said": "Are slippers on someone's feet?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 359,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:07:39.000-04:00",
+   "t1": "2026-10-29T14:07:39.000-04:00",
+   "p": 0.818,
+   "said": "Are slippers on someone's feet?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 357,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:06:58.000-04:00",
+   "t1": "2026-10-29T14:07:26.000-04:00",
+   "p": 0.932,
+   "said": "Are slippers on someone's feet?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 356,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:06:04.000-04:00",
+   "t1": "2026-10-29T14:06:04.000-04:00",
+   "p": 0.947,
+   "said": "Are slippers on someone's feet?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 354,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:15:19.000-04:00",
+   "t1": "2026-10-29T17:15:19.000-04:00",
+   "p": 0.881,
+   "said": "Are slippers on someone's feet?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 388,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:13:23.000-04:00",
+   "t1": "2026-10-29T17:13:23.000-04:00",
+   "p": 0.893,
+   "said": "Are slippers on someone's feet?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 384,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:12:51.000-04:00",
+   "t1": "2026-10-29T17:13:00.000-04:00",
+   "p": 0.905,
+   "said": "Are slippers on someone's feet?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 383,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:11:35.000-04:00",
+   "t1": "2026-10-29T17:11:35.000-04:00",
+   "p": 0.893,
+   "said": "Are slippers on someone's feet?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 381,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:11:01.160-04:00",
+   "t1": "2026-10-29T17:11:01.160-04:00",
+   "p": 0.867,
+   "said": "Are slippers on someone's feet?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 380,
+    "at": 0.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:09:18.000-04:00",
+   "p": 0.777,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 360,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:09:07.000-04:00",
+   "p": 0.777,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 360,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:10:39.000-04:00",
+   "p": 0.755,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 363,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:13:39.000-04:00",
+   "p": 0.706,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 369,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:09:35.000-04:00",
+   "p": 0.679,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 361,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:12:38.000-04:00",
+   "p": 0.798,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 383,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:15:32.000-04:00",
+   "p": 0.755,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 389,
+    "at": 2.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:14:58.000-04:00",
+   "p": 0.706,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 387,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:16:57.000-04:00",
+   "p": 0.679,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 391,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:12:02.000-04:00",
+   "p": 0.679,
+   "said": "Are slippers on someone's feet?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 382,
+    "at": 2.0
+   }
+  }
+ ]
+}

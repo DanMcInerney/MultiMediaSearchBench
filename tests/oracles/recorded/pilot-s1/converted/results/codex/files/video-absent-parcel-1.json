@@ -1,0 +1,47 @@
+{
+ "qid": "video-absent-parcel-1",
+ "type": "video",
+ "template": "absent-parcel",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 50.2,
+ "turns": 1,
+ "denials": null,
+ "calls": 12,
+ "tools": {
+  "shell": 7,
+  "view_image": 5
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 5,
+  "shells": 7
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 301755,
+  "output": 1382,
+  "cache_read": 270080,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/video-absent-parcel-1",
+ "at": "2026-11-04T11:36:08",
+ "held_s": 0.0
+}

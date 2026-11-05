@@ -1,0 +1,49 @@
+{
+ "qid": "image-absent-sign-2",
+ "type": "image",
+ "template": "absent-sign",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 66.0,
+ "turns": 22,
+ "denials": 0,
+ "calls": 20,
+ "tools": {
+  "Glob": 2,
+  "Bash": 10,
+  "Grep": 2,
+  "Read": 6
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 6,
+  "shells": 10
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 26,
+  "output": 10317,
+  "cache_read": 260075,
+  "cache_write": 37127
+ },
+ "cost_usd": 0.2777375,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/image-absent-sign-2",
+ "at": "2026-11-04T12:03:34",
+ "held_s": 0.0
+}

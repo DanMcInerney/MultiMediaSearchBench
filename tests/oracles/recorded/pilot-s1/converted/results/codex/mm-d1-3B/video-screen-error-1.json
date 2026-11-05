@@ -1,0 +1,63 @@
+{
+ "qid": "video-screen-error-1",
+ "type": "video",
+ "template": "screen-error",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "E-8755, 14:01:22 on 1 November 2026.",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 124.9,
+ "turns": 1,
+ "denials": null,
+ "calls": 9,
+ "tools": {
+  "find": 1,
+  "ask": 4,
+  "look": 4
+ },
+ "work": {
+  "jobs": 2,
+  "windows": 1669,
+  "seconds": 104.9,
+  "stopped": {
+   "limit": 1,
+   "cancelled": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 1,
+ "tokens": {
+  "input": 220582,
+  "output": 524,
+  "cache_read": 199808,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/video-screen-error-1",
+ "at": "2026-11-04T13:48:41",
+ "held_s": 0.0,
+ "gpu_estimate_s": 373.6,
+ "exclusive": true,
+ "beyond_timeout": false,
+ "busy_at_start": 0,
+ "left": {
+  "labels": 1,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

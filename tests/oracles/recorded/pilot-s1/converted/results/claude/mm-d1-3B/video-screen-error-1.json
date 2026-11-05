@@ -1,0 +1,62 @@
+{
+ "qid": "video-screen-error-1",
+ "type": "video",
+ "template": "screen-error",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "E-8755, first appearing at about 14:01:22 (2:01 pm) on Sunday 1 November",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 45.5,
+ "turns": 6,
+ "denials": 0,
+ "calls": 5,
+ "tools": {
+  "find": 1,
+  "ask": 1,
+  "look": 3
+ },
+ "work": {
+  "jobs": 1,
+  "windows": 427,
+  "seconds": 27.3,
+  "stopped": {
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 10,
+  "output": 1319,
+  "cache_read": 127192,
+  "cache_write": 28430
+ },
+ "cost_usd": 0.1396492,
+ "used_percent": 81.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/video-screen-error-1",
+ "at": "2026-11-04T14:13:30",
+ "held_s": 0.0,
+ "gpu_estimate_s": 373.6,
+ "exclusive": true,
+ "beyond_timeout": false,
+ "busy_at_start": 0,
+ "left": {
+  "labels": 3,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

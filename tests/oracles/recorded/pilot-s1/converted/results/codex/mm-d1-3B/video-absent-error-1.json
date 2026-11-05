@@ -1,0 +1,63 @@
+{
+ "qid": "video-absent-error-1",
+ "type": "video",
+ "template": "absent-error",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 157.9,
+ "turns": 1,
+ "denials": null,
+ "calls": 8,
+ "tools": {
+  "find": 1,
+  "ask": 4,
+  "look": 3
+ },
+ "work": {
+  "jobs": 2,
+  "windows": 2002,
+  "seconds": 135.4,
+  "stopped": {
+   "limit": 1,
+   "range_end": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 162357,
+  "output": 493,
+  "cache_read": 142848,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/video-absent-error-1",
+ "at": "2026-11-04T13:57:22",
+ "held_s": 0.0,
+ "gpu_estimate_s": 399.9,
+ "exclusive": true,
+ "beyond_timeout": false,
+ "busy_at_start": 0,
+ "left": {
+  "labels": 5,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

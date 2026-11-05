@@ -1,0 +1,59 @@
+{
+ "qid": "text-note-code-2",
+ "type": "text",
+ "template": "note-code",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "7113",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 17.8,
+ "turns": 7,
+ "denials": 0,
+ "calls": 6,
+ "tools": {
+  "find": 4,
+  "look": 2
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 8,
+  "output": 855,
+  "cache_read": 66131,
+  "cache_write": 9221
+ },
+ "cost_usd": 0.0520631,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/text-note-code-2",
+ "at": "2026-11-04T14:14:40",
+ "held_s": 0.0,
+ "gpu_estimate_s": 2.2,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

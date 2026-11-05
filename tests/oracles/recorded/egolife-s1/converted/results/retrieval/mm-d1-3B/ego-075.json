@@ -1,0 +1,91 @@
+{
+ "qid": "ego-075",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Are dishes being washed?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793296605.08,
+   1793297205.08
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.974,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 3,
+ "windows": 601,
+ "seconds": 46.6,
+ "wall_s": 46.58,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 355, 354, 353, 352, 351 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:02:19.000-04:00",
+   "t1": "2026-10-29T14:06:43.000-04:00",
+   "p": 0.967,
+   "said": "Are dishes being washed?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 350,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:58:51.000-04:00",
+   "t1": "2026-10-29T14:01:59.000-04:00",
+   "p": 0.974,
+   "said": "Are dishes being washed?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 344,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:58:12.000-04:00",
+   "t1": "2026-10-29T13:58:30.000-04:00",
+   "p": 0.953,
+   "said": "Are dishes being washed?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 338,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:56:45.100-04:00",
+   "t1": "2026-10-29T13:57:53.000-04:00",
+   "p": 0.971,
+   "said": "Are dishes being washed?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 337,
+    "at": 6.0
+   }
+  }
+ ],
+ "candidates": []
+}

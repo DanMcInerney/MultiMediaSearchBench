@@ -1,0 +1,19 @@
+{
+ "mm/d1-3B": {
+  "system": "mm",
+  "variant": "d1-3B",
+  "dir": "mm-d1-3B",
+  "readable": [
+   "image",
+   "records",
+   "text",
+   "video"
+  ],
+  "asked": [
+   "image",
+   "records",
+   "text",
+   "video"
+  ]
+ }
+}

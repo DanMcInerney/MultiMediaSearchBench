@@ -1,0 +1,49 @@
+{
+ "qid": "video-absent-parcel-1",
+ "type": "video",
+ "template": "absent-parcel",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "19:38",
+ "passed": false,
+ "abstained": false,
+ "problem": null,
+ "seconds": 284.5,
+ "turns": 149,
+ "denials": 0,
+ "calls": 148,
+ "tools": {
+  "Glob": 8,
+  "Grep": 2,
+  "Bash": 70,
+  "Read": 68
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 68,
+  "shells": 70
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 82,
+  "output": 28670,
+  "cache_read": 2286058,
+  "cache_write": 106580
+ },
+ "cost_usd": 0.9417898,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/video-absent-parcel-1",
+ "at": "2026-11-04T12:09:54",
+ "held_s": 0.0
+}

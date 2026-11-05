@@ -1,0 +1,131 @@
+{
+ "qid": "ego-107",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a food delivery app open on a phone?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793316845.18,
+   1793317445.18
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.798,
+ "moments": 1,
+ "moments_found": [],
+ "away": 3,
+ "windows": 601,
+ "seconds": 52.1,
+ "wall_s": 52.09,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 648, 647, 646, 645, 644 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:38:35.000-04:00",
+   "t1": "2026-10-29T19:38:35.000-04:00",
+   "p": 0.905,
+   "said": "Is a food delivery app open on a phone?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 637,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:36:57.000-04:00",
+   "t1": "2026-10-29T19:37:35.000-04:00",
+   "p": 0.963,
+   "said": "Is a food delivery app open on a phone?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 634,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T19:36:03.000-04:00",
+   "t1": "2026-10-29T19:36:14.000-04:00",
+   "p": 0.835,
+   "said": "Is a food delivery app open on a phone?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 632,
+    "at": 3.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:39:19.000-04:00",
+   "p": 0.798,
+   "said": "Is a food delivery app open on a phone?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 638,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:38:24.000-04:00",
+   "p": 0.755,
+   "said": "Is a food delivery app open on a phone?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 636,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:37:55.000-04:00",
+   "p": 0.755,
+   "said": "Is a food delivery app open on a phone?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 635,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:36:40.000-04:00",
+   "p": 0.731,
+   "said": "Is a food delivery app open on a phone?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 633,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:39:00.000-04:00",
+   "p": 0.706,
+   "said": "Is a food delivery app open on a phone?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 638,
+    "at": 0.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,133 @@
+{
+ "qid": "ego-193",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone riding a moving walkway?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793313034.16,
+   1793313634.16
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.977,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 2,
+ "windows": 601,
+ "seconds": 54.4,
+ "wall_s": 54.36,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 559, 558, 557, 556, 555 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T18:38:09.000-04:00",
+   "t1": "2026-10-29T18:38:09.000-04:00",
+   "p": 0.835,
+   "said": "Is someone riding a moving walkway?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 554,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T18:36:21.000-04:00",
+   "t1": "2026-10-29T18:36:22.000-04:00",
+   "p": 0.881,
+   "said": "Is someone riding a moving walkway?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 550,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T18:35:44.000-04:00",
+   "t1": "2026-10-29T18:36:09.000-04:00",
+   "p": 0.977,
+   "said": "Is someone riding a moving walkway?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 549,
+    "at": 27.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T18:33:40.000-04:00",
+   "p": 0.706,
+   "said": "Is someone riding a moving walkway?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 545,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T18:35:33.000-04:00",
+   "p": 0.622,
+   "said": "Is someone riding a moving walkway?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 549,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T18:33:23.000-04:00",
+   "p": 0.622,
+   "said": "Is someone riding a moving walkway?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 544,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T18:33:59.000-04:00",
+   "p": 0.593,
+   "said": "Is someone riding a moving walkway?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 545,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T18:38:21.000-04:00",
+   "p": 0.531,
+   "said": "Is someone riding a moving walkway?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 554,
+    "at": 21.0
+   }
+  }
+ ]
+}

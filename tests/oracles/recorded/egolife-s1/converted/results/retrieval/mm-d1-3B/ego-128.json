@@ -1,0 +1,119 @@
+{
+ "qid": "ego-128",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone walking into the room?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793395475.0,
+   1793396070.02322
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.835,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 596,
+ "seconds": 48.4,
+ "wall_s": 48.44,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1362, 1361, 1360, 1359, 1358 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:29:30.000-04:00",
+   "t1": "2026-10-30T17:29:30.000-04:00",
+   "p": 0.835,
+   "said": "Is someone walking into the room?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1352,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:26:23.000-04:00",
+   "t1": "2026-10-30T17:26:23.000-04:00",
+   "p": 0.818,
+   "said": "Is someone walking into the room?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1345,
+    "at": 23.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:26:09.000-04:00",
+   "p": 0.651,
+   "said": "Is someone walking into the room?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 1345,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:29:03.000-04:00",
+   "p": 0.622,
+   "said": "Is someone walking into the room?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 1351,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:29:42.000-04:00",
+   "p": 0.593,
+   "said": "Is someone walking into the room?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1352,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:29:19.000-04:00",
+   "p": 0.593,
+   "said": "Is someone walking into the room?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1351,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:25:32.000-04:00",
+   "p": 0.593,
+   "said": "Is someone walking into the room?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1344,
+    "at": 2.0
+   }
+  }
+ ]
+}

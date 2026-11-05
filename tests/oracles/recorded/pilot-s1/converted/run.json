@@ -1,0 +1,64 @@
+{
+ "scenario": "v7_screen",
+ "generator": 6,
+ "recipe": {
+  "scale": "pilot",
+  "seed": 1,
+  "days": [
+   "2026-11-01",
+   "2026-11-02",
+   "2026-11-03"
+  ],
+  "utc_offsets": [
+   "-0400",
+   "-0500",
+   "-0500",
+   "-0500"
+  ]
+ },
+ "dump_key": "85d6e398296ea8d65b3e3addc5b00e2c0c6724f3ed3d101fabf99ae342cc76d0",
+ "seed": 1,
+ "scale": "pilot",
+ "days": [
+  "2026-11-01",
+  "2026-11-02",
+  "2026-11-03"
+ ],
+ "data": "D:\\mm-bench-temp\\mmb-de178c4d7f-data",
+ "temp": "D:\\mm-bench-temp",
+ "tag": "de178c4d7f",
+ "timeout_s": 900.0,
+ "plan": "cfdb321d22e4ed4aaab2f9ad9bc10379cf88d039cd07a79ea3c7143df93cf66a",
+ "files": "b1406b48882140aea017d57bf0b4783b4f47dd55f7e1939cc6737c07a5be21a7",
+ "question_hash": "adadc6f780b2be7e718c29c81e69563f7e1e04e3f5df2d1b89ea0be7c0f5521f",
+ "configs": [
+  {
+   "name": "files",
+   "system": "files",
+   "variant": null,
+   "own_tools": true
+  },
+  {
+   "name": "mm/d1-3B",
+   "system": "mm",
+   "variant": "d1-3B",
+   "own_tools": false
+  }
+ ],
+ "agents": {
+  "claude": {
+   "model": "claude-sonnet-5-5",
+   "effort": null
+  },
+  "codex": {
+   "model": "gpt-6.1-terra",
+   "effort": "medium"
+  }
+ },
+ "probe": {
+  "status": "passed",
+  "failures": []
+ },
+ "created": "2026-11-04T03:26:16",
+ "mmmb_commit": "7895548+dirty"
+}

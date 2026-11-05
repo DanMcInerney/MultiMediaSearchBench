@@ -1,0 +1,49 @@
+{
+ "qid": "audio-absent-doorbell-1",
+ "type": "audio",
+ "template": "absent-doorbell",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 376.4,
+ "turns": 41,
+ "denials": 0,
+ "calls": 37,
+ "tools": {
+  "Glob": 5,
+  "Grep": 3,
+  "Bash": 13,
+  "Read": 16
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 16,
+  "shells": 13
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 64,
+  "output": 17294,
+  "cache_read": 1224906,
+  "cache_write": 66713
+ },
+ "cost_usd": 0.5624106,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/audio-absent-doorbell-1",
+ "at": "2026-11-04T11:56:52",
+ "held_s": 0.0
+}

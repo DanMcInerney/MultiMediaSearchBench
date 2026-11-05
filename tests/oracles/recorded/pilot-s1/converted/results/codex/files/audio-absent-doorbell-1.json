@@ -1,0 +1,47 @@
+{
+ "qid": "audio-absent-doorbell-1",
+ "type": "audio",
+ "template": "absent-doorbell",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 107.1,
+ "turns": 1,
+ "denials": null,
+ "calls": 23,
+ "tools": {
+  "shell": 11,
+  "view_image": 12
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 12,
+  "shells": 11
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 609944,
+  "output": 2710,
+  "cache_read": 573440,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/audio-absent-doorbell-1",
+ "at": "2026-11-04T11:33:51",
+ "held_s": 0.0
+}

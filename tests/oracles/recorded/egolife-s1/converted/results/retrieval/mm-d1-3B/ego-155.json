@@ -1,0 +1,133 @@
+{
+ "qid": "ego-155",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone playing a guitar?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793398314.14,
+   1793398914.14
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.988,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 2,
+ "windows": 601,
+ "seconds": 49.4,
+ "wall_s": 49.39,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1456, 1455, 1454, 1453, 1452 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:21:52.000-04:00",
+   "t1": "2026-10-30T18:21:54.000-04:00",
+   "p": 0.982,
+   "said": "Is someone playing a guitar?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1456,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:20:03.000-04:00",
+   "t1": "2026-10-30T18:21:38.000-04:00",
+   "p": 0.986,
+   "said": "Is someone playing a guitar?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1454,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:14:42.000-04:00",
+   "t1": "2026-10-30T18:19:50.000-04:00",
+   "p": 0.988,
+   "said": "Is someone playing a guitar?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1451,
+    "at": 24.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:12:10.000-04:00",
+   "p": 0.777,
+   "said": "Is someone playing a guitar?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 1437,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:12:25.000-04:00",
+   "p": 0.593,
+   "said": "Is someone playing a guitar?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1437,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:12:52.000-04:00",
+   "p": 0.531,
+   "said": "Is someone playing a guitar?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 1438,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:12:36.000-04:00",
+   "p": 0.321,
+   "said": "Is someone playing a guitar?: below 0.8 (p 0.32)",
+   "kind": "video",
+   "look": {
+    "item": 1438,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:14:17.000-04:00",
+   "p": 0.182,
+   "said": "Is someone playing a guitar?: below 0.8 (p 0.18)",
+   "kind": "video",
+   "look": {
+    "item": 1441,
+    "at": 17.0
+   }
+  }
+ ]
+}

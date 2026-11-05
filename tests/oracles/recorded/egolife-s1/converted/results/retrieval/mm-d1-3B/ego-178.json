@@ -1,0 +1,86 @@
+{
+ "qid": "ego-178",
+ "type": "records",
+ "template": "EventRecall",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about AI?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793408767.0,
+   1793409367.0
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.679,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 11,
+ "seconds": 1.8,
+ "wall_s": 1.77,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-30T21:10:45.900-04:00",
+   "p": 0.679,
+   "said": "Does the text talk about AI?: below 0.8 (p 0.68)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T21:10:45.900-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-30T21:08:36.000-04:00",
+   "p": 0.182,
+   "said": "Does the text talk about AI?: below 0.8 (p 0.18)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T21:08:36.000-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-30T21:14:50.300-04:00",
+   "p": 0.085,
+   "said": "Does the text talk about AI?: below 0.8 (p 0.09)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T21:14:50.300-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-30T21:12:59.400-04:00",
+   "p": 0.06,
+   "said": "Does the text talk about AI?: below 0.8 (p 0.06)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T21:12:59.400-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-30T21:06:56.000-04:00",
+   "p": 0.06,
+   "said": "Does the text talk about AI?: below 0.8 (p 0.06)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T21:06:56.000-04:00"
+   }
+  }
+ ]
+}

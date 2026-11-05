@@ -1,0 +1,119 @@
+{
+ "qid": "ego-168",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is takeout being put in a microwave?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793319994.11,
+   1793320594.11
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.881,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 601,
+ "seconds": 51.7,
+ "wall_s": 51.7,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 742, 741, 740, 739, 738 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T20:36:22.000-04:00",
+   "t1": "2026-10-29T20:36:22.000-04:00",
+   "p": 0.818,
+   "said": "Is takeout being put in a microwave?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 741,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T20:31:35.000-04:00",
+   "t1": "2026-10-29T20:31:35.000-04:00",
+   "p": 0.881,
+   "said": "Is takeout being put in a microwave?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 732,
+    "at": 5.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:34:10.000-04:00",
+   "p": 0.731,
+   "said": "Is takeout being put in a microwave?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 737,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:31:54.000-04:00",
+   "p": 0.731,
+   "said": "Is takeout being put in a microwave?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 732,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:30:29.000-04:00",
+   "p": 0.622,
+   "said": "Is takeout being put in a microwave?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 729,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:28:53.000-04:00",
+   "p": 0.593,
+   "said": "Is takeout being put in a microwave?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 726,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T20:32:18.000-04:00",
+   "p": 0.562,
+   "said": "Is takeout being put in a microwave?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 733,
+    "at": 18.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "qid": "video-absent-error-2",
+ "type": "video",
+ "template": "absent-error",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": null,
+ "passed": false,
+ "abstained": false,
+ "problem": "capped: error_max_turns",
+ "seconds": 806.7,
+ "turns": 61,
+ "denials": 0,
+ "calls": 68,
+ "tools": {
+  "Glob": 14,
+  "Grep": 5,
+  "Read": 15,
+  "Bash": 34
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 14,
+  "shells": 34
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 120,
+  "output": 97535,
+  "cache_read": 5538579,
+  "cache_write": 185937
+ },
+ "cost_usd": 2.2731958999999997,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/video-absent-error-2",
+ "at": "2026-11-04T12:29:46",
+ "held_s": 453.3
+}

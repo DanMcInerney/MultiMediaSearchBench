@@ -1,0 +1,47 @@
+{
+ "qid": "image-photo-sign-2",
+ "type": "image",
+ "template": "photo-sign",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "989",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 25.2,
+ "turns": 1,
+ "denials": null,
+ "calls": 5,
+ "tools": {
+  "shell": 3,
+  "view_image": 2
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 2,
+  "shells": 3
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 48286,
+  "output": 651,
+  "cache_read": 36864,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/image-photo-sign-2",
+ "at": "2026-11-04T11:30:10",
+ "held_s": 0.0
+}

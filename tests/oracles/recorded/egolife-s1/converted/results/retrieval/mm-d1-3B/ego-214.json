@@ -1,0 +1,315 @@
+{
+ "qid": "ego-214",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Are people working together in a room?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793398201.0,
+   1793398801.0
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.947,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 14,
+ "windows": 600,
+ "seconds": 50.6,
+ "wall_s": 50.59,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1453, 1452, 1451, 1450, 1449 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:19:29.000-04:00",
+   "t1": "2026-10-30T18:19:35.000-04:00",
+   "p": 0.932,
+   "said": "Are people working together in a room?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1452,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:19:10.000-04:00",
+   "t1": "2026-10-30T18:19:11.000-04:00",
+   "p": 0.835,
+   "said": "Are people working together in a room?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1451,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:18:26.000-04:00",
+   "t1": "2026-10-30T18:18:30.000-04:00",
+   "p": 0.852,
+   "said": "Are people working together in a room?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1450,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:17:28.000-04:00",
+   "t1": "2026-10-30T18:18:07.000-04:00",
+   "p": 0.94,
+   "said": "Are people working together in a room?: yes (p 0.94)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1448,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:16:48.000-04:00",
+   "t1": "2026-10-30T18:17:13.000-04:00",
+   "p": 0.905,
+   "said": "Are people working together in a room?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1447,
+    "at": 2.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:16:23.000-04:00",
+   "t1": "2026-10-30T18:16:34.000-04:00",
+   "p": 0.905,
+   "said": "Are people working together in a room?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1446,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:15:59.000-04:00",
+   "t1": "2026-10-30T18:16:08.000-04:00",
+   "p": 0.867,
+   "said": "Are people working together in a room?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1445,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:15:26.000-04:00",
+   "t1": "2026-10-30T18:15:27.000-04:00",
+   "p": 0.881,
+   "said": "Are people working together in a room?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1443,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:14:42.000-04:00",
+   "t1": "2026-10-30T18:14:46.000-04:00",
+   "p": 0.947,
+   "said": "Are people working together in a room?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1442,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:14:11.000-04:00",
+   "t1": "2026-10-30T18:14:13.000-04:00",
+   "p": 0.94,
+   "said": "Are people working together in a room?: yes (p 0.94)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1441,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:13:06.000-04:00",
+   "t1": "2026-10-30T18:13:39.000-04:00",
+   "p": 0.881,
+   "said": "Are people working together in a room?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1440,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:12:53.000-04:00",
+   "t1": "2026-10-30T18:12:53.000-04:00",
+   "p": 0.835,
+   "said": "Are people working together in a room?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1438,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:12:26.000-04:00",
+   "t1": "2026-10-30T18:12:34.000-04:00",
+   "p": 0.893,
+   "said": "Are people working together in a room?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1438,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:12:03.000-04:00",
+   "t1": "2026-10-30T18:12:14.000-04:00",
+   "p": 0.924,
+   "said": "Are people working together in a room?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1437,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:10:56.000-04:00",
+   "t1": "2026-10-30T18:11:44.000-04:00",
+   "p": 0.953,
+   "said": "Are people working together in a room?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1436,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T18:10:02.000-04:00",
+   "t1": "2026-10-30T18:10:07.000-04:00",
+   "p": 0.932,
+   "said": "Are people working together in a room?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1433,
+    "at": 7.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:15:39.000-04:00",
+   "p": 0.777,
+   "said": "Are people working together in a room?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 1444,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:19:51.000-04:00",
+   "p": 0.755,
+   "said": "Are people working together in a room?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 1452,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:10:35.000-04:00",
+   "p": 0.755,
+   "said": "Are people working together in a room?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 1434,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:13:51.000-04:00",
+   "p": 0.706,
+   "said": "Are people working together in a room?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 1440,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T18:15:15.000-04:00",
+   "p": 0.562,
+   "said": "Are people working together in a room?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 1443,
+    "at": 15.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "qid": "ego-039",
+ "type": "records",
+ "template": "EntityLog",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about century eggs?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793296527.08,
+   1793297127.08
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.924,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 0,
+ "windows": 15,
+ "seconds": 2.5,
+ "wall_s": 2.47,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T14:00:15.633-04:00",
+   "t1": "2026-10-29T14:00:41.933-04:00",
+   "p": 0.924,
+   "said": "Does the text talk about century eggs?: yes (p 0.92)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T14:00:15.633-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T13:56:53.100-04:00",
+   "p": 0.245,
+   "said": "Does the text talk about century eggs?: below 0.8 (p 0.25)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T13:56:53.100-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T14:01:15.966-04:00",
+   "p": 0.202,
+   "said": "Does the text talk about century eggs?: below 0.8 (p 0.20)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T14:01:15.966-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T13:58:43.500-04:00",
+   "p": 0.085,
+   "said": "Does the text talk about century eggs?: below 0.8 (p 0.09)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T13:58:43.500-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T14:03:51.166-04:00",
+   "p": 0.033,
+   "said": "Does the text talk about century eggs?: below 0.8 (p 0.03)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T14:03:51.166-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T14:02:17.800-04:00",
+   "p": 0.033,
+   "said": "Does the text talk about century eggs?: below 0.8 (p 0.03)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T14:02:17.800-04:00"
+   }
+  }
+ ]
+}

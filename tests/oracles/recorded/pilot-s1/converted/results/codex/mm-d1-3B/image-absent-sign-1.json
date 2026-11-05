@@ -1,0 +1,62 @@
+{
+ "qid": "image-absent-sign-1",
+ "type": "image",
+ "template": "absent-sign",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 15.3,
+ "turns": 1,
+ "denials": null,
+ "calls": 3,
+ "tools": {
+  "find": 1,
+  "ask": 1,
+  "look": 1
+ },
+ "work": {
+  "jobs": 1,
+  "windows": 25,
+  "seconds": 1.8,
+  "stopped": {
+   "range_end": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 57291,
+  "output": 197,
+  "cache_read": 45312,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/image-absent-sign-1",
+ "at": "2026-11-04T13:58:05",
+ "held_s": 0.0,
+ "gpu_estimate_s": 1.9,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

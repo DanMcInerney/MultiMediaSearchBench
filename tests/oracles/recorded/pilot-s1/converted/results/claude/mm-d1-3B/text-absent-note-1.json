@@ -1,0 +1,59 @@
+{
+ "qid": "text-absent-note-1",
+ "type": "text",
+ "template": "absent-note",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 23.0,
+ "turns": 8,
+ "denials": 0,
+ "calls": 7,
+ "tools": {
+  "find": 6,
+  "look": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 10,
+  "output": 1067,
+  "cache_read": 87376,
+  "cache_write": 8668
+ },
+ "cost_usd": 0.0540996,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/text-absent-note-1",
+ "at": "2026-11-04T14:28:51",
+ "held_s": 0.0,
+ "gpu_estimate_s": 6.8,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

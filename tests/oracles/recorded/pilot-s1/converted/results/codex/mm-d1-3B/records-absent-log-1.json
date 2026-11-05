@@ -1,0 +1,58 @@
+{
+ "qid": "records-absent-log-1",
+ "type": "records",
+ "template": "absent-log",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "0",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 12.0,
+ "turns": 1,
+ "denials": null,
+ "calls": 2,
+ "tools": {
+  "find": 2
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 37324,
+  "output": 137,
+  "cache_read": 29440,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/records-absent-log-1",
+ "at": "2026-11-04T13:57:34",
+ "held_s": 0.0,
+ "gpu_estimate_s": 7.1,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

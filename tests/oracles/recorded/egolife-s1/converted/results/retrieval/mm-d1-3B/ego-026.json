@@ -1,0 +1,201 @@
+{
+ "qid": "ego-026",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a shelf being assembled?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793293176.09,
+   1793293776.09
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.679,
+ "moments": 1,
+ "moments_found": [],
+ "away": 8,
+ "windows": 601,
+ "seconds": 48.5,
+ "wall_s": 48.5,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 241, 240, 239, 238, 237 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:09:00.000-04:00",
+   "t1": "2026-10-29T13:09:34.000-04:00",
+   "p": 0.905,
+   "said": "Is a shelf being assembled?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 240,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:08:21.000-04:00",
+   "t1": "2026-10-29T13:08:48.000-04:00",
+   "p": 0.924,
+   "said": "Is a shelf being assembled?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 239,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:07:43.000-04:00",
+   "t1": "2026-10-29T13:08:08.000-04:00",
+   "p": 0.915,
+   "said": "Is a shelf being assembled?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 237,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:07:09.000-04:00",
+   "t1": "2026-10-29T13:07:30.000-04:00",
+   "p": 0.915,
+   "said": "Is a shelf being assembled?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 236,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:05:38.000-04:00",
+   "t1": "2026-10-29T13:05:38.000-04:00",
+   "p": 0.867,
+   "said": "Is a shelf being assembled?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 233,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:01:05.000-04:00",
+   "t1": "2026-10-29T13:02:46.000-04:00",
+   "p": 0.932,
+   "said": "Is a shelf being assembled?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 227,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:00:17.000-04:00",
+   "t1": "2026-10-29T13:00:37.000-04:00",
+   "p": 0.881,
+   "said": "Is a shelf being assembled?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 222,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T12:59:39.000-04:00",
+   "t1": "2026-10-29T12:59:58.000-04:00",
+   "p": 0.867,
+   "said": "Is a shelf being assembled?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 221,
+    "at": 27.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:05:51.000-04:00",
+   "p": 0.755,
+   "said": "Is a shelf being assembled?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 233,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:03:23.000-04:00",
+   "p": 0.755,
+   "said": "Is a shelf being assembled?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 228,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:04:43.000-04:00",
+   "p": 0.679,
+   "said": "Is a shelf being assembled?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 231,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:06:16.000-04:00",
+   "p": 0.622,
+   "said": "Is a shelf being assembled?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 234,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:03:00.000-04:00",
+   "p": 0.622,
+   "said": "Is a shelf being assembled?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 228,
+    "at": 0.0
+   }
+  }
+ ]
+}

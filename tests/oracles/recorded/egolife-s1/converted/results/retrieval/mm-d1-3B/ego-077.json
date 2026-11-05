@@ -1,0 +1,101 @@
+{
+ "qid": "ego-077",
+ "type": "records",
+ "template": "RelationMap",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about looking after a ring?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793316856.12,
+   1793317456.12
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.679,
+ "moments": 1,
+ "moments_found": [],
+ "away": 1,
+ "windows": 14,
+ "seconds": 2.3,
+ "wall_s": 2.3,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T19:36:31.066-04:00",
+   "t1": "2026-10-29T19:36:58.266-04:00",
+   "p": 0.867,
+   "said": "Does the text talk about looking after a ring?: yes (p 0.87)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:36:31.066-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T19:39:04.500-04:00",
+   "p": 0.679,
+   "said": "Does the text talk about looking after a ring?: below 0.8 (p 0.68)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:39:04.500-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T19:35:44.933-04:00",
+   "p": 0.133,
+   "said": "Does the text talk about looking after a ring?: below 0.8 (p 0.13)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:35:44.933-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T19:37:20.566-04:00",
+   "p": 0.095,
+   "said": "Does the text talk about looking after a ring?: below 0.8 (p 0.10)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:37:20.566-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T19:43:14.333-04:00",
+   "p": 0.068,
+   "said": "Does the text talk about looking after a ring?: below 0.8 (p 0.07)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:43:14.333-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T19:44:09.666-04:00",
+   "p": 0.033,
+   "said": "Does the text talk about looking after a ring?: below 0.8 (p 0.03)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T19:44:09.666-04:00"
+   }
+  }
+ ]
+}

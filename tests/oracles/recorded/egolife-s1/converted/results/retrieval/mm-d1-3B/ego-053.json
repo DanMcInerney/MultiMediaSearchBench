@@ -1,0 +1,117 @@
+{
+ "qid": "ego-053",
+ "type": "records",
+ "template": "EntityLog",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about buying a hot pot base?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793309509.16,
+   1793310109.16
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.947,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 15,
+ "seconds": 2.4,
+ "wall_s": 2.44,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T17:39:51.666-04:00",
+   "t1": "2026-10-29T17:40:19.866-04:00",
+   "p": 0.947,
+   "said": "Does the text talk about buying a hot pot base?: yes (p 0.95)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:39:51.666-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T17:36:39.033-04:00",
+   "t1": "2026-10-29T17:37:06.466-04:00",
+   "p": 0.947,
+   "said": "Does the text talk about buying a hot pot base?: yes (p 0.95)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:36:39.033-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:35:19.766-04:00",
+   "p": 0.593,
+   "said": "Does the text talk about buying a hot pot base?: below 0.8 (p 0.59)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:35:19.766-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:38:24.033-04:00",
+   "p": 0.349,
+   "said": "Does the text talk about buying a hot pot base?: below 0.8 (p 0.35)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:38:24.033-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:41:01.333-04:00",
+   "p": 0.321,
+   "said": "Does the text talk about buying a hot pot base?: below 0.8 (p 0.32)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:41:01.333-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:31:50.966-04:00",
+   "p": 0.182,
+   "said": "Does the text talk about buying a hot pot base?: below 0.8 (p 0.18)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:31:50.966-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:33:54.100-04:00",
+   "p": 0.068,
+   "said": "Does the text talk about buying a hot pot base?: below 0.8 (p 0.07)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:33:54.100-04:00"
+   }
+  }
+ ]
+}

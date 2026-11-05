@@ -1,0 +1,47 @@
+{
+ "qid": "audio-mic-doorbell-1",
+ "type": "audio",
+ "template": "mic-doorbell",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "approximately 19:25:28 (7:25 p.m.)",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 69.4,
+ "turns": 1,
+ "denials": null,
+ "calls": 15,
+ "tools": {
+  "shell": 8,
+  "view_image": 7
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 7,
+  "shells": 8
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 359303,
+  "output": 1952,
+  "cache_read": 330240,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 16.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/audio-mic-doorbell-1",
+ "at": "2026-11-04T11:29:35",
+ "held_s": 0.0
+}

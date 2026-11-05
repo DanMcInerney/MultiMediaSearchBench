@@ -1,0 +1,189 @@
+{
+ "qid": "ego-004",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Are flowers being put on a table?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793287789.0,
+   1793288389.0
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.852,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 5,
+ "windows": 600,
+ "seconds": 47.6,
+ "wall_s": 47.64,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 61, 60, 59, 58, 57 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:37:17.000-04:00",
+   "t1": "2026-10-29T11:39:48.000-04:00",
+   "p": 0.958,
+   "said": "Are flowers being put on a table?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 56,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:36:31.000-04:00",
+   "t1": "2026-10-29T11:36:59.000-04:00",
+   "p": 0.971,
+   "said": "Are flowers being put on a table?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 55,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:35:39.000-04:00",
+   "t1": "2026-10-29T11:35:55.000-04:00",
+   "p": 0.958,
+   "said": "Are flowers being put on a table?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 53,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:35:06.000-04:00",
+   "t1": "2026-10-29T11:35:06.000-04:00",
+   "p": 0.852,
+   "said": "Are flowers being put on a table?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 52,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:34:41.000-04:00",
+   "t1": "2026-10-29T11:34:41.000-04:00",
+   "p": 0.818,
+   "said": "Are flowers being put on a table?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 51,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:33:03.000-04:00",
+   "t1": "2026-10-29T11:33:13.000-04:00",
+   "p": 0.867,
+   "said": "Are flowers being put on a table?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 48,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T11:32:23.000-04:00",
+   "t1": "2026-10-29T11:32:23.000-04:00",
+   "p": 0.852,
+   "said": "Are flowers being put on a table?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 46,
+    "at": 23.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:35:25.000-04:00",
+   "p": 0.798,
+   "said": "Are flowers being put on a table?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 52,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:30:57.000-04:00",
+   "p": 0.777,
+   "said": "Are flowers being put on a table?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 43,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:32:47.000-04:00",
+   "p": 0.755,
+   "said": "Are flowers being put on a table?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 47,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:31:55.000-04:00",
+   "p": 0.755,
+   "said": "Are flowers being put on a table?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 45,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T11:29:59.000-04:00",
+   "p": 0.706,
+   "said": "Are flowers being put on a table?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 41,
+    "at": 29.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "qid": "ego-159",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "2-6h",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "C",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 185.5,
+ "turns": 1,
+ "denials": null,
+ "calls": 18,
+ "tools": {
+  "shell": 11,
+  "view_image": 7
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 7,
+  "shells": 11
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 412596,
+  "output": 2858,
+  "cache_read": 372224,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 15.0,
+ "agent_model": "gpt-6.1-terra",
+ "exec": "execs/codex/files/ego-159",
+ "at": "2026-11-03T10:32:51",
+ "timeout_s": 900.0,
+ "seen_past_horizon": [],
+ "held_s": 0.0
+}

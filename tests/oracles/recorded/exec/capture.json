@@ -1,0 +1,70 @@
+{
+ "repo_commit": "bb498a6fd0dfc5d5d839357a8cb57c0358f1aea6",
+ "multimem_commit": "fe0ece549d73a4a96f496064c75df1d7a54953ab",
+ "python": "3.12.4",
+ "model": "d1-3B",
+ "notes": "d1_3b.md",
+ "claude": {
+  "name": "sonnet",
+  "level": "high"
+ },
+ "codex": {
+  "name": "gpt-6.1-terra",
+  "level": "medium"
+ },
+ "old_modules": {
+  "bench.py": "ef0d16f7a76d9f1e1c65e1fb94a2609f5c6091368ef4f4d36058b305abc8d263",
+  "claude_run.py": "94da17b7715f18bc14ff89b6aa16c8a7a4f97774db3bde82a6351bfbdf66091f",
+  "codex_run.py": "b79b9e2cb9655a0ea0f48ed0914b3bc1061e55895a3da9f60d4507822cb03d55",
+  "egolife.py": "533ed5fd4dd17bf23864dd2cf08aecd9ed5ff34569b4680fb6867ea7f862c5d9",
+  "haystack.py": "6ca96272588276364c521ce5d249108ec6b092eec956cc8988ab7bd570541c1b",
+  "grade.py": "60e9469deb6673aac3b440cdb4938bbd37ebd0c249e00d9e50170ea91bf12a44"
+ },
+ "read": {
+  "SKILL.md": "c9ebcf387cc38f76e97621fb405fed6c7da30e14b764c408ef2d12369428b4f4",
+  "d1_3b.md": "9b9ee991951566229e01f0b0c098d0ed71928337f48c9ccb017bedb4817fd30b",
+  "adapter.INSTRUCTIONS": "6701724557524959463b20771a4fb45cffbe9ce64c9541c4ed1d9dc01d2fbf8f",
+  "codex-models.json": "932c8fe56714a95d0663386471bc2b6767073cce8e7bca1eb46ce487583cf75d"
+ },
+ "planted_environment": {
+  "PATH": "<GIT>\\cmd;C:\\owner\\bin;C:\\owner\\venv\\Scripts",
+  "SYSTEMROOT": "C:\\Windows",
+  "USERPROFILE": "C:\\owner",
+  "KEEP_ME": "kept",
+  "ANTHROPIC_API_KEY": "sk-planted",
+  "ANTHROPIC_AUTH_TOKEN": "planted-token",
+  "MULTIMEM_HOME": "C:\\owner\\mm-home",
+  "MULTIMEM_MODELS": "D:\\models",
+  "MULTIMEM_DEBUG": "1",
+  "VIRTUAL_ENV": "C:\\owner\\venv"
+ },
+ "files": {
+  "claude-blind/argv.json": "72261276c7dcf2bee10745fc260a0ec91aa31dc068b83f6a13095a2ad277f072",
+  "claude-blind/env.json": "34b6857f8c9f45c43dc1542767c4d1d043e8b2ae1b283a33352711183824eded",
+  "claude-blind/instructions.md": "807c238ba6c3a305392076c554a16355985674dbe19467b7dad4ce6b06544d34",
+  "claude-blind/settings.json": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+  "claude-files/argv.json": "838f6ba63ba889f458aa5810683a3643e8ea477920a5824ce973222c074e108b",
+  "claude-files/env.json": "3ddaa04fd116085a9b29c42eaf307d01c4e1c29c8027a1b6f38dbe172e77fe1d",
+  "claude-files/instructions.md": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+  "claude-files/settings.json": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+  "claude-mm/argv.json": "6fa917fc430aaa09f733dbf49a18767e3557bf1fa5211a7fe8be63dd866c610a",
+  "claude-mm/env.json": "34b6857f8c9f45c43dc1542767c4d1d043e8b2ae1b283a33352711183824eded",
+  "claude-mm/instructions.md": "ac8cfb38829ab621a1f00f063a2efc8a15a4c413b5e55d339cd5e72c65642bf6",
+  "claude-mm/mcp.json": "0ea1c05a3ef968b8a6b343e62ae597ab486705e065caee01a5dc5fb202d4e086",
+  "claude-mm/settings.json": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+  "codex-blind/argv.json": "34f7063e04c21121a546862cfeb8bda7b635c95f948de86da94603c7f450aa55",
+  "codex-blind/catalog.json": "8be4a3b9cb5c9d2661d21628e626cd7e062046408913cd9841018fc80d177108",
+  "codex-blind/env.json": "97837450d61dbf8bc02042edf8f90639d65d2bdeda7ede9ca88720dcbc93aac5",
+  "codex-blind/instructions.md": "807c238ba6c3a305392076c554a16355985674dbe19467b7dad4ce6b06544d34",
+  "codex-files/argv.json": "010d0e0865491aeba580f6b70f43ac5815c49585d88ec6dd664b0db9106e477e",
+  "codex-files/catalog.json": "8be4a3b9cb5c9d2661d21628e626cd7e062046408913cd9841018fc80d177108",
+  "codex-files/env.json": "97837450d61dbf8bc02042edf8f90639d65d2bdeda7ede9ca88720dcbc93aac5",
+  "codex-files/instructions.md": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+  "codex-mm/argv.json": "fa4af47df4901970750d29a518cf8dba82da5a8da3d66d5f9ee3bb124b113d5e",
+  "codex-mm/catalog.json": "8be4a3b9cb5c9d2661d21628e626cd7e062046408913cd9841018fc80d177108",
+  "codex-mm/env.json": "97837450d61dbf8bc02042edf8f90639d65d2bdeda7ede9ca88720dcbc93aac5",
+  "codex-mm/instructions.md": "373a4021efa45193d5baa1ec52cfed093cff48d4ab85d32cd880602db89c7ea4",
+  "deny-v7.json": "5c76dc52caafdea3d5ccc9b99d21064aba2f793989da7da977c0e8f64e15ef7a",
+  "deny-v8.json": "cde110dee1b38f6ab5041992432bcb61738921330569dde1d03f0ba5e3e2047f"
+ }
+}

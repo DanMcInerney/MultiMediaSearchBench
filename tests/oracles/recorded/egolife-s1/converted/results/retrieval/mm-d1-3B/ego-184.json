@@ -1,0 +1,133 @@
+{
+ "qid": "ego-184",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone holding a doll?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793476320.1,
+   1793476920.1
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.932,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 2,
+ "windows": 601,
+ "seconds": 50.2,
+ "wall_s": 50.22,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1994, 1993, 1992, 1991, 1990 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T16:00:12.000-04:00",
+   "t1": "2026-10-31T16:00:12.000-04:00",
+   "p": 0.818,
+   "said": "Is someone holding a doll?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1990,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T15:57:04.000-04:00",
+   "t1": "2026-10-31T15:57:06.000-04:00",
+   "p": 0.932,
+   "said": "Is someone holding a doll?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1984,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T15:56:01.000-04:00",
+   "t1": "2026-10-31T15:56:01.000-04:00",
+   "p": 0.818,
+   "said": "Is someone holding a doll?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1982,
+    "at": 1.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-31T16:00:55.000-04:00",
+   "p": 0.755,
+   "said": "Is someone holding a doll?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 1991,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:52:45.000-04:00",
+   "p": 0.755,
+   "said": "Is someone holding a doll?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 1975,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T16:00:35.000-04:00",
+   "p": 0.731,
+   "said": "Is someone holding a doll?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 1991,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:55:03.000-04:00",
+   "p": 0.731,
+   "said": "Is someone holding a doll?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 1980,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:53:29.000-04:00",
+   "p": 0.706,
+   "said": "Is someone holding a doll?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 1976,
+    "at": 29.0
+   }
+  }
+ ]
+}

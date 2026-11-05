@@ -1,0 +1,203 @@
+{
+ "qid": "ego-233",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a piping bag being used?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793324165.16,
+   1793324765.16
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.986,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 6,
+ "windows": 601,
+ "seconds": 51.5,
+ "wall_s": 51.52,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 789, 788, 787, 786, 785 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:45:06.000-04:00",
+   "t1": "2026-10-29T21:45:06.000-04:00",
+   "p": 0.818,
+   "said": "Is a piping bag being used?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 787,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:44:24.000-04:00",
+   "t1": "2026-10-29T21:44:24.000-04:00",
+   "p": 0.905,
+   "said": "Is a piping bag being used?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 785,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:43:43.000-04:00",
+   "t1": "2026-10-29T21:43:43.000-04:00",
+   "p": 0.915,
+   "said": "Is a piping bag being used?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 784,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:42:42.000-04:00",
+   "t1": "2026-10-29T21:42:42.000-04:00",
+   "p": 0.867,
+   "said": "Is a piping bag being used?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 782,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:41:37.000-04:00",
+   "t1": "2026-10-29T21:41:54.000-04:00",
+   "p": 0.988,
+   "said": "Is a piping bag being used?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 780,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:41:05.000-04:00",
+   "t1": "2026-10-29T21:41:21.000-04:00",
+   "p": 0.986,
+   "said": "Is a piping bag being used?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 779,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:40:37.000-04:00",
+   "t1": "2026-10-29T21:40:37.000-04:00",
+   "p": 0.905,
+   "said": "Is a piping bag being used?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 778,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:39:33.000-04:00",
+   "t1": "2026-10-29T21:39:33.000-04:00",
+   "p": 0.953,
+   "said": "Is a piping bag being used?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 776,
+    "at": 3.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:46:05.000-04:00",
+   "p": 0.798,
+   "said": "Is a piping bag being used?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 789,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:36:14.000-04:00",
+   "p": 0.755,
+   "said": "Is a piping bag being used?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 769,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:40:48.000-04:00",
+   "p": 0.706,
+   "said": "Is a piping bag being used?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 778,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:39:14.000-04:00",
+   "p": 0.679,
+   "said": "Is a piping bag being used?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 775,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:36:57.000-04:00",
+   "p": 0.651,
+   "said": "Is a piping bag being used?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 770,
+    "at": 27.0
+   }
+  }
+ ]
+}

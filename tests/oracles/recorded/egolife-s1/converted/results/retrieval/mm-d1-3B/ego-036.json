@@ -1,0 +1,88 @@
+{
+ "qid": "ego-036",
+ "type": "video",
+ "template": "TaskMaster",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a whiteboard listing drinks in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793296916.08,
+   1793297516.08
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.531,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 601,
+ "seconds": 46.7,
+ "wall_s": 46.75,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 365, 364, 363, 362, 361 and 16 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:07:00.000-04:00",
+   "p": 0.531,
+   "said": "Is a whiteboard listing drinks in view?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 356,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:07:12.000-04:00",
+   "p": 0.349,
+   "said": "Is a whiteboard listing drinks in view?: below 0.8 (p 0.35)",
+   "kind": "video",
+   "look": {
+    "item": 356,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:08:55.000-04:00",
+   "p": 0.321,
+   "said": "Is a whiteboard listing drinks in view?: below 0.8 (p 0.32)",
+   "kind": "video",
+   "look": {
+    "item": 359,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:07:48.000-04:00",
+   "p": 0.269,
+   "said": "Is a whiteboard listing drinks in view?: below 0.8 (p 0.27)",
+   "kind": "video",
+   "look": {
+    "item": 357,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:03:25.000-04:00",
+   "p": 0.223,
+   "said": "Is a whiteboard listing drinks in view?: below 0.8 (p 0.22)",
+   "kind": "video",
+   "look": {
+    "item": 348,
+    "at": 25.0
+   }
+  }
+ ]
+}

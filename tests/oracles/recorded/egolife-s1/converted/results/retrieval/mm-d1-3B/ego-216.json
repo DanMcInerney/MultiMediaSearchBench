@@ -1,0 +1,217 @@
+{
+ "qid": "ego-216",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is the view from someone seated on a sofa?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793490046.02,
+   1793490646.02
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.915,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 7,
+ "windows": 601,
+ "seconds": 48.7,
+ "wall_s": 48.67,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 2251, 2250, 2249, 2248, 2247 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:49:55.000-04:00",
+   "t1": "2026-10-31T19:49:55.000-04:00",
+   "p": 0.867,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2249,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:48:14.000-04:00",
+   "t1": "2026-10-31T19:48:15.000-04:00",
+   "p": 0.881,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.88)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2246,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:46:51.000-04:00",
+   "t1": "2026-10-31T19:46:51.000-04:00",
+   "p": 0.835,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2243,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:46:08.000-04:00",
+   "t1": "2026-10-31T19:46:37.000-04:00",
+   "p": 0.915,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2243,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:45:50.000-04:00",
+   "t1": "2026-10-31T19:45:50.000-04:00",
+   "p": 0.818,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2241,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:44:07.000-04:00",
+   "t1": "2026-10-31T19:44:08.000-04:00",
+   "p": 0.905,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2238,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:42:50.000-04:00",
+   "t1": "2026-10-31T19:43:16.000-04:00",
+   "p": 0.958,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2236,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:42:30.000-04:00",
+   "t1": "2026-10-31T19:42:30.000-04:00",
+   "p": 0.818,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2235,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T19:42:02.000-04:00",
+   "t1": "2026-10-31T19:42:02.000-04:00",
+   "p": 0.893,
+   "said": "Is the view from someone seated on a sofa?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 2234,
+    "at": 2.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-31T19:43:47.000-04:00",
+   "p": 0.777,
+   "said": "Is the view from someone seated on a sofa?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 2237,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T19:42:17.000-04:00",
+   "p": 0.731,
+   "said": "Is the view from someone seated on a sofa?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 2234,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T19:41:41.000-04:00",
+   "p": 0.731,
+   "said": "Is the view from someone seated on a sofa?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 2233,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T19:40:46.050-04:00",
+   "p": 0.706,
+   "said": "Is the view from someone seated on a sofa?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 2231,
+    "at": 16.05
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T19:48:01.000-04:00",
+   "p": 0.679,
+   "said": "Is the view from someone seated on a sofa?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 2246,
+    "at": 1.0
+   }
+  }
+ ]
+}

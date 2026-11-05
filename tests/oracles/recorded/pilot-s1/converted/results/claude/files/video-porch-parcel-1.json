@@ -1,0 +1,48 @@
+{
+ "qid": "video-porch-parcel-1",
+ "type": "video",
+ "template": "porch-parcel",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "12:02",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 28.2,
+ "turns": 29,
+ "denials": 0,
+ "calls": 28,
+ "tools": {
+  "Glob": 4,
+  "Grep": 1,
+  "Bash": 12,
+  "Read": 11
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 11,
+  "shells": 12
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 16,
+  "output": 3991,
+  "cache_read": 98381,
+  "cache_write": 25182
+ },
+ "cost_usd": 0.15050809999999998,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "exec": "execs/claude/files/video-porch-parcel-1",
+ "at": "2026-11-04T11:14:36",
+ "held_s": 0.0
+}

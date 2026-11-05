@@ -1,0 +1,119 @@
+{
+ "qid": "ego-109",
+ "type": "video",
+ "template": "TaskMaster",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a purchase list on a whiteboard in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793296915.08,
+   1793297515.08
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.818,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 601,
+ "seconds": 48.3,
+ "wall_s": 48.31,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 365, 364, 363, 362, 361 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:08:55.000-04:00",
+   "t1": "2026-10-29T14:08:56.000-04:00",
+   "p": 0.852,
+   "said": "Is a purchase list on a whiteboard in view?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 359,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T14:06:56.000-04:00",
+   "t1": "2026-10-29T14:06:56.000-04:00",
+   "p": 0.818,
+   "said": "Is a purchase list on a whiteboard in view?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 355,
+    "at": 26.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:07:12.000-04:00",
+   "p": 0.755,
+   "said": "Is a purchase list on a whiteboard in view?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 356,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:07:48.000-04:00",
+   "p": 0.407,
+   "said": "Is a purchase list on a whiteboard in view?: below 0.8 (p 0.41)",
+   "kind": "video",
+   "look": {
+    "item": 357,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:02:08.000-04:00",
+   "p": 0.407,
+   "said": "Is a purchase list on a whiteboard in view?: below 0.8 (p 0.41)",
+   "kind": "video",
+   "look": {
+    "item": 346,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:04:37.000-04:00",
+   "p": 0.378,
+   "said": "Is a purchase list on a whiteboard in view?: below 0.8 (p 0.38)",
+   "kind": "video",
+   "look": {
+    "item": 351,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T14:03:27.000-04:00",
+   "p": 0.378,
+   "said": "Is a purchase list on a whiteboard in view?: below 0.8 (p 0.38)",
+   "kind": "video",
+   "look": {
+    "item": 348,
+    "at": 27.0
+   }
+  }
+ ]
+}
