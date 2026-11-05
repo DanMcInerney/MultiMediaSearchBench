@@ -1,0 +1,59 @@
+{
+ "qid": "text-absent-note-1",
+ "type": "text",
+ "template": "absent-note",
+ "level": "part",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 12.2,
+ "turns": 1,
+ "denials": null,
+ "calls": 3,
+ "tools": {
+  "find": 2,
+  "look": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 41508,
+  "output": 158,
+  "cache_read": 39936,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/text-absent-note-1",
+ "at": "2026-11-04T13:59:29",
+ "held_s": 0.0,
+ "gpu_estimate_s": 6.8,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

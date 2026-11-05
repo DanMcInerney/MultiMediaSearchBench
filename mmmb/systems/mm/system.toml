@@ -1,0 +1,15 @@
+[system]
+name = "mm"
+class = "mmmb.systems.mm.system:Mm"
+extra = "mm"
+license = "see Multimem"
+default_variant = "d1-3B"
+horizon = "cut"
+
+[isolation]
+env_drop_prefixes = ["MULTIMEM_"]
+deny_words = [".multimem"]
+deny_package_roots = ["multimem"]
+
+[isolation.env_nowhere]
+MULTIMEM_HOME = "no-mm-home"

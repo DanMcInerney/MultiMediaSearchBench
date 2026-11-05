@@ -1,0 +1,21 @@
+{
+ "seed": 1,
+ "scale": "pilot",
+ "days": [
+  "2026-11-01",
+  "2026-11-02",
+  "2026-11-03"
+ ],
+ "data": "D:\\mm-bench-temp\\mmb-de178c4d7f-data",
+ "temp": "D:\\mm-bench-temp",
+ "generator": 6,
+ "plan": "cfdb321d22e4ed4aaab2f9ad9bc10379cf88d039cd07a79ea3c7143df93cf66a",
+ "files": "b1406b48882140aea017d57bf0b4783b4f47dd55f7e1939cc6737c07a5be21a7",
+ "created": "2026-11-04T03:26:16",
+ "mm_commit": "7895548+dirty",
+ "probe": {
+  "status": "passed",
+  "failures": []
+ },
+ "tag": "de178c4d7f"
+}

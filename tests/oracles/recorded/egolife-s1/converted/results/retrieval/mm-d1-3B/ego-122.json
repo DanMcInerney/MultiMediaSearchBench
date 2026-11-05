@@ -1,0 +1,329 @@
+{
+ "qid": "ego-122",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is an item being handed over?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793380048.18,
+   1793380648.18
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.977,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 15,
+ "windows": 601,
+ "seconds": 49.0,
+ "wall_s": 49.06,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1069, 1068, 1067, 1066, 1065 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:17:26.000-04:00",
+   "t1": "2026-10-30T13:17:28.000-04:00",
+   "p": 0.905,
+   "said": "Is an item being handed over?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1069,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:16:37.000-04:00",
+   "t1": "2026-10-30T13:16:47.000-04:00",
+   "p": 0.915,
+   "said": "Is an item being handed over?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1068,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:15:35.000-04:00",
+   "t1": "2026-10-30T13:15:35.000-04:00",
+   "p": 0.835,
+   "said": "Is an item being handed over?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1066,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:15:05.000-04:00",
+   "t1": "2026-10-30T13:15:16.000-04:00",
+   "p": 0.893,
+   "said": "Is an item being handed over?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1065,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:14:37.000-04:00",
+   "t1": "2026-10-30T13:14:40.000-04:00",
+   "p": 0.924,
+   "said": "Is an item being handed over?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1064,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:13:59.000-04:00",
+   "t1": "2026-10-30T13:14:20.000-04:00",
+   "p": 0.924,
+   "said": "Is an item being handed over?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1063,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:13:37.000-04:00",
+   "t1": "2026-10-30T13:13:45.000-04:00",
+   "p": 0.958,
+   "said": "Is an item being handed over?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1062,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:13:10.000-04:00",
+   "t1": "2026-10-30T13:13:24.000-04:00",
+   "p": 0.924,
+   "said": "Is an item being handed over?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1061,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:12:26.000-04:00",
+   "t1": "2026-10-30T13:12:26.000-04:00",
+   "p": 0.852,
+   "said": "Is an item being handed over?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1059,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:12:09.000-04:00",
+   "t1": "2026-10-30T13:12:13.000-04:00",
+   "p": 0.977,
+   "said": "Is an item being handed over?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1059,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:11:41.000-04:00",
+   "t1": "2026-10-30T13:11:50.000-04:00",
+   "p": 0.94,
+   "said": "Is an item being handed over?: yes (p 0.94)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1058,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:10:43.000-04:00",
+   "t1": "2026-10-30T13:10:43.000-04:00",
+   "p": 0.905,
+   "said": "Is an item being handed over?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1056,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:09:54.000-04:00",
+   "t1": "2026-10-30T13:10:00.000-04:00",
+   "p": 0.905,
+   "said": "Is an item being handed over?: yes (p 0.90)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1054,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:09:00.000-04:00",
+   "t1": "2026-10-30T13:09:21.000-04:00",
+   "p": 0.958,
+   "said": "Is an item being handed over?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1053,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:08:41.000-04:00",
+   "t1": "2026-10-30T13:08:43.000-04:00",
+   "p": 0.867,
+   "said": "Is an item being handed over?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1052,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:08:06.000-04:00",
+   "t1": "2026-10-30T13:08:24.000-04:00",
+   "p": 0.974,
+   "said": "Is an item being handed over?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1051,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T13:07:52.000-04:00",
+   "t1": "2026-10-30T13:07:55.000-04:00",
+   "p": 0.932,
+   "said": "Is an item being handed over?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1050,
+    "at": 22.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T13:10:55.000-04:00",
+   "p": 0.798,
+   "said": "Is an item being handed over?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 1056,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T13:09:37.000-04:00",
+   "p": 0.798,
+   "said": "Is an item being handed over?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 1054,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T13:15:59.000-04:00",
+   "p": 0.731,
+   "said": "Is an item being handed over?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 1066,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T13:16:22.000-04:00",
+   "p": 0.706,
+   "said": "Is an item being handed over?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 1067,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T13:17:09.000-04:00",
+   "p": 0.651,
+   "said": "Is an item being handed over?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 1069,
+    "at": 9.0
+   }
+  }
+ ]
+}

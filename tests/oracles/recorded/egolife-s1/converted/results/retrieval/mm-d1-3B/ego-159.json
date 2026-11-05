@@ -1,0 +1,119 @@
+{
+ "qid": "ego-159",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone placing a calibration board?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793396042.1,
+   1793396642.1
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.835,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 1,
+ "windows": 601,
+ "seconds": 49.0,
+ "wall_s": 49.03,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1381, 1380, 1379, 1378, 1377 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:43:55.000-04:00",
+   "t1": "2026-10-30T17:43:57.000-04:00",
+   "p": 0.867,
+   "said": "Is someone placing a calibration board?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1380,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:39:02.000-04:00",
+   "t1": "2026-10-30T17:39:06.000-04:00",
+   "p": 0.835,
+   "said": "Is someone placing a calibration board?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1371,
+    "at": 6.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:42:34.000-04:00",
+   "p": 0.798,
+   "said": "Is someone placing a calibration board?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 1378,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:39:50.000-04:00",
+   "p": 0.798,
+   "said": "Is someone placing a calibration board?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 1372,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:43:06.000-04:00",
+   "p": 0.731,
+   "said": "Is someone placing a calibration board?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 1379,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:42:23.000-04:00",
+   "p": 0.679,
+   "said": "Is someone placing a calibration board?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 1377,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:40:03.000-04:00",
+   "p": 0.593,
+   "said": "Is someone placing a calibration board?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1373,
+    "at": 3.0
+   }
+  }
+ ]
+}

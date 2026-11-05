@@ -1,0 +1,64 @@
+{
+ "qid": "image-photo-sign-3",
+ "type": "image",
+ "template": "photo-sign",
+ "level": "week",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "585",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 50.2,
+ "turns": 9,
+ "denials": 0,
+ "calls": 8,
+ "tools": {
+  "find": 2,
+  "ask": 4,
+  "look": 2
+ },
+ "work": {
+  "jobs": 4,
+  "windows": 292,
+  "seconds": 19.1,
+  "stopped": {
+   "range_end": 1,
+   "running": 2,
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 16,
+  "output": 2181,
+  "cache_read": 235308,
+  "cache_write": 36691
+ },
+ "cost_usd": 0.1921368,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/image-photo-sign-3",
+ "at": "2026-11-04T14:28:17",
+ "held_s": 0.0,
+ "gpu_estimate_s": 12.6,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 12,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

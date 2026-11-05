@@ -1,0 +1,61 @@
+{
+ "qid": "video-absent-error-2",
+ "type": "video",
+ "template": "absent-error",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": null,
+ "passed": false,
+ "abstained": false,
+ "problem": "timeout: no answer in 900 s",
+ "seconds": 900.3,
+ "turns": null,
+ "denials": 0,
+ "calls": 29,
+ "tools": {
+  "find": 2,
+  "ask": 21,
+  "look": 6
+ },
+ "work": {
+  "jobs": 3,
+  "windows": 7179,
+  "seconds": 846.5,
+  "stopped": {
+   "limit": 1,
+   "cancelled": 1,
+   "running": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": null,
+ "cost_usd": null,
+ "used_percent": 83.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/video-absent-error-2",
+ "at": "2026-11-04T14:43:52",
+ "held_s": 0.0,
+ "gpu_estimate_s": 945.3,
+ "exclusive": true,
+ "beyond_timeout": true,
+ "busy_at_start": 0,
+ "left": {
+  "labels": 5,
+  "unkept": 0
+ },
+ "cancelled": [
+  "j-16a0e9e4"
+ ],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

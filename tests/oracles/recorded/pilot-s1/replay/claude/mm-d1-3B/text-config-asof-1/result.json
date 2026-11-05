@@ -1,0 +1,58 @@
+{
+ "qid": "text-config-asof-1",
+ "type": "text",
+ "template": "config-asof",
+ "level": "time",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "arm": "mm",
+ "model": "d1-3B",
+ "answer": "28",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 12.3,
+ "turns": 3,
+ "denials": 0,
+ "calls": 2,
+ "tools": {
+  "find": 1,
+  "look": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 6,
+  "output": 390,
+  "cache_read": 45106,
+  "cache_write": 2613
+ },
+ "cost_usd": 0.018874600000000002,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/text-config-asof-1",
+ "at": "2026-11-04T14:18:17",
+ "held_s": 0.0,
+ "gpu_estimate_s": 0.1,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

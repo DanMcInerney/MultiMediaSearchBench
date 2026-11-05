@@ -1,0 +1,203 @@
+{
+ "qid": "ego-203",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a fruit stall in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793308632.15,
+   1793309232.15
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.893,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 6,
+ "windows": 603,
+ "seconds": 52.5,
+ "wall_s": 52.48,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 412, 411, 410, 409, 408 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:25:03.000-04:00",
+   "t1": "2026-10-29T17:27:07.000-04:00",
+   "p": 0.967,
+   "said": "Is a fruit stall in view?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 410,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:23:42.000-04:00",
+   "t1": "2026-10-29T17:24:43.000-04:00",
+   "p": 0.953,
+   "said": "Is a fruit stall in view?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 407,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:23:21.000-04:00",
+   "t1": "2026-10-29T17:23:21.000-04:00",
+   "p": 0.835,
+   "said": "Is a fruit stall in view?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 404,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:22:51.000-04:00",
+   "t1": "2026-10-29T17:23:07.000-04:00",
+   "p": 0.893,
+   "said": "Is a fruit stall in view?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 403,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:22:03.000-04:00",
+   "t1": "2026-10-29T17:22:18.000-04:00",
+   "p": 0.893,
+   "said": "Is a fruit stall in view?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 402,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:21:45.000-04:00",
+   "t1": "2026-10-29T17:21:45.000-04:00",
+   "p": 0.818,
+   "said": "Is a fruit stall in view?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 401,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:20:17.000-04:00",
+   "t1": "2026-10-29T17:21:33.000-04:00",
+   "p": 0.932,
+   "said": "Is a fruit stall in view?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 401,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:19:45.000-04:00",
+   "t1": "2026-10-29T17:20:05.000-04:00",
+   "p": 0.915,
+   "said": "Is a fruit stall in view?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 398,
+    "at": 1.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:19:13.000-04:00",
+   "p": 0.755,
+   "said": "Is a fruit stall in view?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 396,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:22:33.000-04:00",
+   "p": 0.651,
+   "said": "Is a fruit stall in view?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 403,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:18:50.000-04:00",
+   "p": 0.407,
+   "said": "Is a fruit stall in view?: below 0.8 (p 0.41)",
+   "kind": "video",
+   "look": {
+    "item": 395,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:17:23.000-04:00",
+   "p": 0.119,
+   "said": "Is a fruit stall in view?: below 0.8 (p 0.12)",
+   "kind": "video",
+   "look": {
+    "item": 392,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T17:18:37.000-04:00",
+   "p": 0.085,
+   "said": "Is a fruit stall in view?: below 0.8 (p 0.09)",
+   "kind": "video",
+   "look": {
+    "item": 395,
+    "at": 7.0
+   }
+  }
+ ]
+}

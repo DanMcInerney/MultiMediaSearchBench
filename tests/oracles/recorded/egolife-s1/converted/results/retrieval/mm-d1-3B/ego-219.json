@@ -1,0 +1,273 @@
+{
+ "qid": "ego-219",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Are desserts being made?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793324337.09,
+   1793324937.09
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.953,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 12,
+ "windows": 601,
+ "seconds": 51.8,
+ "wall_s": 51.89,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 794, 793, 792, 791, 790 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:48:46.000-04:00",
+   "t1": "2026-10-29T21:48:55.000-04:00",
+   "p": 0.967,
+   "said": "Are desserts being made?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 794,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:47:57.000-04:00",
+   "t1": "2026-10-29T21:48:16.000-04:00",
+   "p": 0.867,
+   "said": "Are desserts being made?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 793,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:47:16.000-04:00",
+   "t1": "2026-10-29T21:47:16.000-04:00",
+   "p": 0.953,
+   "said": "Are desserts being made?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 791,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:46:55.000-04:00",
+   "t1": "2026-10-29T21:46:55.000-04:00",
+   "p": 0.852,
+   "said": "Are desserts being made?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 790,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:46:36.000-04:00",
+   "t1": "2026-10-29T21:46:44.000-04:00",
+   "p": 0.915,
+   "said": "Are desserts being made?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 790,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:46:21.000-04:00",
+   "t1": "2026-10-29T21:46:21.000-04:00",
+   "p": 0.835,
+   "said": "Are desserts being made?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 789,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:46:01.000-04:00",
+   "t1": "2026-10-29T21:46:04.000-04:00",
+   "p": 0.835,
+   "said": "Are desserts being made?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 789,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:45:50.000-04:00",
+   "t1": "2026-10-29T21:45:50.000-04:00",
+   "p": 0.835,
+   "said": "Are desserts being made?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 788,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:45:29.000-04:00",
+   "t1": "2026-10-29T21:45:34.000-04:00",
+   "p": 0.852,
+   "said": "Are desserts being made?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 787,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:43:44.000-04:00",
+   "t1": "2026-10-29T21:45:11.000-04:00",
+   "p": 0.953,
+   "said": "Are desserts being made?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 785,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:41:05.000-04:00",
+   "t1": "2026-10-29T21:43:16.000-04:00",
+   "p": 0.977,
+   "said": "Are desserts being made?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 780,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:39:43.000-04:00",
+   "t1": "2026-10-29T21:39:46.000-04:00",
+   "p": 0.932,
+   "said": "Are desserts being made?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 776,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T21:39:14.000-04:00",
+   "t1": "2026-10-29T21:39:16.000-04:00",
+   "p": 0.953,
+   "said": "Are desserts being made?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 775,
+    "at": 16.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:47:44.000-04:00",
+   "p": 0.798,
+   "said": "Are desserts being made?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 792,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:40:26.000-04:00",
+   "p": 0.777,
+   "said": "Are desserts being made?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 777,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:47:33.000-04:00",
+   "p": 0.755,
+   "said": "Are desserts being made?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 792,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:43:31.000-04:00",
+   "p": 0.731,
+   "said": "Are desserts being made?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 784,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:48:33.000-04:00",
+   "p": 0.593,
+   "said": "Are desserts being made?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 794,
+    "at": 3.0
+   }
+  }
+ ]
+}

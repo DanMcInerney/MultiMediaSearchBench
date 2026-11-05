@@ -1,0 +1,65 @@
+{
+ "qid": "ego-106",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone shopping in a supermarket?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793308981.12,
+   1793310047.12
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.991,
+ "moments": 3,
+ "moments_found": [
+  0,
+  1,
+  2
+ ],
+ "away": 0,
+ "windows": 1067,
+ "seconds": 94.7,
+ "wall_s": 94.67,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 36 video items was not heard, since d1-3B does not hear: glasses (items 439, 438, 437, 436, 435 and 31 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:31:38.000-04:00",
+   "t1": "2026-10-29T17:40:47.000-04:00",
+   "p": 0.991,
+   "said": "Is someone shopping in a supermarket?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 438,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T17:23:01.150-04:00",
+   "t1": "2026-10-29T17:31:21.000-04:00",
+   "p": 0.99,
+   "said": "Is someone shopping in a supermarket?: yes (p 0.99)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 416,
+    "at": 15.0
+   }
+  }
+ ],
+ "candidates": []
+}

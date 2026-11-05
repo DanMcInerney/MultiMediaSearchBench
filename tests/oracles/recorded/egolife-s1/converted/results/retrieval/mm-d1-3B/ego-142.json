@@ -1,0 +1,175 @@
+{
+ "qid": "ego-142",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone putting on makeup?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793378460.04,
+   1793379060.04
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.924,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 4,
+ "windows": 487,
+ "seconds": 38.8,
+ "wall_s": 38.8,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 18 video items was not heard, since d1-3B does not hear: glasses (items 1017, 1016, 1015, 1014, 1013 and 13 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:49:44.000-04:00",
+   "t1": "2026-10-30T12:49:44.000-04:00",
+   "p": 0.835,
+   "said": "Is someone putting on makeup?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1014,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:48:40.000-04:00",
+   "t1": "2026-10-30T12:49:24.000-04:00",
+   "p": 0.915,
+   "said": "Is someone putting on makeup?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1012,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:46:26.000-04:00",
+   "t1": "2026-10-30T12:46:27.000-04:00",
+   "p": 0.915,
+   "said": "Is someone putting on makeup?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1007,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:45:50.000-04:00",
+   "t1": "2026-10-30T12:45:54.000-04:00",
+   "p": 0.924,
+   "said": "Is someone putting on makeup?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1006,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:43:14.000-04:00",
+   "t1": "2026-10-30T12:43:14.000-04:00",
+   "p": 0.915,
+   "said": "Is someone putting on makeup?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1001,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T12:43:02.000-04:00",
+   "t1": "2026-10-30T12:43:03.000-04:00",
+   "p": 0.915,
+   "said": "Is someone putting on makeup?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1001,
+    "at": 3.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T12:48:25.000-04:00",
+   "p": 0.777,
+   "said": "Is someone putting on makeup?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 1011,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T12:45:19.000-04:00",
+   "p": 0.777,
+   "said": "Is someone putting on makeup?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 1005,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T12:50:06.000-04:00",
+   "p": 0.679,
+   "said": "Is someone putting on makeup?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 1015,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T12:47:38.000-04:00",
+   "p": 0.5,
+   "said": "Is someone putting on makeup?: below 0.8 (p 0.50)",
+   "kind": "video",
+   "look": {
+    "item": 1010,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T12:44:59.000-04:00",
+   "p": 0.5,
+   "said": "Is someone putting on makeup?: below 0.8 (p 0.50)",
+   "kind": "video",
+   "look": {
+    "item": 1004,
+    "at": 29.0
+   }
+  }
+ ]
+}

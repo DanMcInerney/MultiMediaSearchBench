@@ -1,0 +1,65 @@
+{
+ "qid": "ego-106",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "6-24h",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "D",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 23.8,
+ "turns": 1,
+ "denials": null,
+ "calls": 4,
+ "tools": {
+  "find": 2,
+  "ask": 1,
+  "look": 1
+ },
+ "work": {
+  "jobs": 1,
+  "windows": 31,
+  "seconds": 6.8,
+  "stopped": {
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 71266,
+  "output": 304,
+  "cache_read": 50560,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 15.0,
+ "agent_model": "gpt-6.1-terra",
+ "exec": "execs/codex/mm-d1-3B/ego-106",
+ "at": "2026-11-03T12:06:07",
+ "timeout_s": 900.0,
+ "after_horizon": 0,
+ "asks": 1,
+ "asks_past_horizon": 0,
+ "held_s": 0.0,
+ "gpu_estimate_s": 82.6,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 5,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

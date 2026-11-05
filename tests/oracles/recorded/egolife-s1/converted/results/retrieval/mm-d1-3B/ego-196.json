@@ -1,0 +1,88 @@
+{
+ "qid": "ego-196",
+ "type": "video",
+ "template": "TaskMaster",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a shopping list in view?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793459682.02,
+   1793460282.02
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.378,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 436,
+ "seconds": 34.3,
+ "wall_s": 34.34,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 16 video items was not heard, since d1-3B does not hear: glasses (items 1698, 1697, 1696, 1695, 1694 and 11 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-31T11:18:36.000-04:00",
+   "p": 0.5,
+   "said": "Is a shopping list in view?: below 0.8 (p 0.50)",
+   "kind": "video",
+   "look": {
+    "item": 1686,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T11:18:00.000-04:00",
+   "p": 0.469,
+   "said": "Is a shopping list in view?: below 0.8 (p 0.47)",
+   "kind": "video",
+   "look": {
+    "item": 1685,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T11:19:43.000-04:00",
+   "p": 0.378,
+   "said": "Is a shopping list in view?: below 0.8 (p 0.38)",
+   "kind": "video",
+   "look": {
+    "item": 1688,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T11:17:34.000-04:00",
+   "p": 0.378,
+   "said": "Is a shopping list in view?: below 0.8 (p 0.38)",
+   "kind": "video",
+   "look": {
+    "item": 1684,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T11:21:13.000-04:00",
+   "p": 0.349,
+   "said": "Is a shopping list in view?: below 0.8 (p 0.35)",
+   "kind": "video",
+   "look": {
+    "item": 1691,
+    "at": 13.0
+   }
+  }
+ ]
+}

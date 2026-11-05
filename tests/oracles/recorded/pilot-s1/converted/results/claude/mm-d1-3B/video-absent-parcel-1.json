@@ -1,0 +1,63 @@
+{
+ "qid": "video-absent-parcel-1",
+ "type": "video",
+ "template": "absent-parcel",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "unknown",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 57.4,
+ "turns": 13,
+ "denials": 0,
+ "calls": 12,
+ "tools": {
+  "find": 4,
+  "ask": 2,
+  "look": 6
+ },
+ "work": {
+  "jobs": 2,
+  "windows": 427,
+  "seconds": 29.6,
+  "stopped": {
+   "range_end": 1,
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 16,
+  "output": 2388,
+  "cache_read": 198157,
+  "cache_write": 25350
+ },
+ "cost_usd": 0.1451277,
+ "used_percent": 83.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/video-absent-parcel-1",
+ "at": "2026-11-04T14:44:49",
+ "held_s": 0.0,
+ "gpu_estimate_s": 30.6,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 13,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

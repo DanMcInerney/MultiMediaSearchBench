@@ -1,0 +1,58 @@
+{
+ "qid": "records-log-count-2",
+ "type": "records",
+ "template": "log-count",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "6",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 10.8,
+ "turns": 1,
+ "denials": null,
+ "calls": 1,
+ "tools": {
+  "find": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 20926,
+  "output": 84,
+  "cache_read": 19456,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/records-log-count-2",
+ "at": "2026-11-04T13:49:31",
+ "held_s": 0.0,
+ "gpu_estimate_s": 7.1,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

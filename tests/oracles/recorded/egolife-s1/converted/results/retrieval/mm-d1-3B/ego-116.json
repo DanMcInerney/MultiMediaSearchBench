@@ -1,0 +1,189 @@
+{
+ "qid": "ego-116",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is an item being taken from someone's hand?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793293712.07,
+   1793294312.07
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.852,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 6,
+ "windows": 601,
+ "seconds": 48.6,
+ "wall_s": 48.66,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 259, 258, 257, 256, 255 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:14:21.000-04:00",
+   "t1": "2026-10-29T13:14:27.000-04:00",
+   "p": 0.852,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 250,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:13:30.000-04:00",
+   "t1": "2026-10-29T13:13:30.000-04:00",
+   "p": 0.852,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 249,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:12:54.000-04:00",
+   "t1": "2026-10-29T13:12:54.000-04:00",
+   "p": 0.818,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 247,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:10:53.000-04:00",
+   "t1": "2026-10-29T13:10:53.000-04:00",
+   "p": 0.835,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 243,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:09:56.000-04:00",
+   "t1": "2026-10-29T13:09:56.000-04:00",
+   "p": 0.852,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 241,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:09:43.000-04:00",
+   "t1": "2026-10-29T13:09:43.000-04:00",
+   "p": 0.852,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 241,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:08:56.000-04:00",
+   "t1": "2026-10-29T13:08:56.000-04:00",
+   "p": 0.835,
+   "said": "Is an item being taken from someone's hand?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 239,
+    "at": 26.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:17:47.000-04:00",
+   "p": 0.798,
+   "said": "Is an item being taken from someone's hand?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 257,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:16:43.000-04:00",
+   "p": 0.777,
+   "said": "Is an item being taken from someone's hand?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 255,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:14:06.000-04:00",
+   "p": 0.777,
+   "said": "Is an item being taken from someone's hand?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 250,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:10:28.000-04:00",
+   "p": 0.755,
+   "said": "Is an item being taken from someone's hand?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 242,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:17:05.000-04:00",
+   "p": 0.731,
+   "said": "Is an item being taken from someone's hand?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 256,
+    "at": 5.0
+   }
+  }
+ ]
+}

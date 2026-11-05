@@ -1,0 +1,47 @@
+{
+ "qid": "image-photo-sign-1",
+ "type": "image",
+ "template": "photo-sign",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "989",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 22.3,
+ "turns": 23,
+ "denials": 0,
+ "calls": 22,
+ "tools": {
+  "Glob": 1,
+  "Read": 20,
+  "Bash": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 20,
+  "shells": 1
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 12,
+  "output": 2407,
+  "cache_read": 110213,
+  "cache_write": 40568
+ },
+ "cost_usd": 0.1973873,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "exec": "execs/claude/files/image-photo-sign-1",
+ "at": "2026-11-04T11:14:31",
+ "held_s": 0.0
+}

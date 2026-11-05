@@ -1,0 +1,48 @@
+{
+ "qid": "ego-116",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "6-24h",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "C",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 51.9,
+ "turns": 1,
+ "denials": null,
+ "calls": 14,
+ "tools": {
+  "shell": 11,
+  "view_image": 3
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 3,
+  "shells": 11
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 208390,
+  "output": 1683,
+  "cache_read": 165376,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 15.0,
+ "agent_model": "gpt-6.1-terra",
+ "exec": "execs/codex/files/ego-116",
+ "at": "2026-11-03T11:27:52",
+ "timeout_s": 900.0,
+ "seen_past_horizon": [],
+ "held_s": 0.0
+}

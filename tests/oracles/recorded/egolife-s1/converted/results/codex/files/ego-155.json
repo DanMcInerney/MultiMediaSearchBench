@@ -1,0 +1,48 @@
+{
+ "qid": "ego-155",
+ "type": "video",
+ "template": "RelationMap",
+ "level": "2-6h",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "B",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 91.0,
+ "turns": 1,
+ "denials": null,
+ "calls": 18,
+ "tools": {
+  "shell": 12,
+  "view_image": 6
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 6,
+  "shells": 12
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 249482,
+  "output": 2434,
+  "cache_read": 196480,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 15.0,
+ "agent_model": "gpt-6.1-terra",
+ "exec": "execs/codex/files/ego-155",
+ "at": "2026-11-03T11:29:40",
+ "timeout_s": 900.0,
+ "seen_past_horizon": [],
+ "held_s": 0.0
+}

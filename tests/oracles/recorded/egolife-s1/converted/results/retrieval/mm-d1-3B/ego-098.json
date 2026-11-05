@@ -1,0 +1,148 @@
+{
+ "qid": "ego-098",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a shopping list being written on a whiteboard?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793295655.0,
+   1793296255.0
+  ],
+  [
+   1793315808.07,
+   1793316408.07
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.731,
+ "moments": 2,
+ "moments_found": [],
+ "away": 0,
+ "windows": 1202,
+ "seconds": 95.4,
+ "wall_s": 95.44,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 323, 322, 321, 320, 319 and 16 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 613, 612, 611, 610, 609 and 16 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:46:37.000-04:00",
+   "p": 0.798,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 315,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:47:57.000-04:00",
+   "p": 0.777,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 317,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:46:54.000-04:00",
+   "p": 0.777,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 315,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:50:05.000-04:00",
+   "p": 0.731,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 322,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:48:56.000-04:00",
+   "p": 0.706,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 319,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:18:09.000-04:00",
+   "p": 0.798,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 596,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:18:37.000-04:00",
+   "p": 0.755,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 597,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:21:44.000-04:00",
+   "p": 0.731,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 603,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:21:26.000-04:00",
+   "p": 0.731,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 602,
+    "at": 26.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T19:22:13.000-04:00",
+   "p": 0.706,
+   "said": "Is a shopping list being written on a whiteboard?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 604,
+    "at": 13.0
+   }
+  }
+ ]
+}

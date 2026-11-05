@@ -1,0 +1,86 @@
+{
+ "qid": "ego-201",
+ "type": "records",
+ "template": "RelationMap",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about a seafood section?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793310434.16,
+   1793311034.16
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.798,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 17,
+ "seconds": 2.8,
+ "wall_s": 2.83,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:51:44.700-04:00",
+   "p": 0.798,
+   "said": "Does the text talk about a seafood section?: below 0.8 (p 0.80)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:51:44.700-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:50:33.833-04:00",
+   "p": 0.321,
+   "said": "Does the text talk about a seafood section?: below 0.8 (p 0.32)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:50:33.833-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:49:40.366-04:00",
+   "p": 0.165,
+   "said": "Does the text talk about a seafood section?: below 0.8 (p 0.16)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:49:40.366-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:48:52.366-04:00",
+   "p": 0.068,
+   "said": "Does the text talk about a seafood section?: below 0.8 (p 0.07)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:48:52.366-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:53:44.033-04:00",
+   "p": 0.053,
+   "said": "Does the text talk about a seafood section?: below 0.8 (p 0.05)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:53:44.033-04:00"
+   }
+  }
+ ]
+}

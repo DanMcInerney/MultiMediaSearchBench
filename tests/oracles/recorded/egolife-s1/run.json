@@ -1,0 +1,35 @@
+{
+ "dataset": "egolife",
+ "generator": 1,
+ "source": "D:\\bench-data\\egolife",
+ "seed": 1,
+ "scale": "egolife",
+ "days": [
+  "2026-10-29",
+  "2026-10-30",
+  "2026-10-31"
+ ],
+ "data": "D:\\mm-bench\\20261103-0257-egolife-s1\\data",
+ "temp": "D:\\mmb-temp",
+ "tag": "57b7c2ece5",
+ "plan": "9c3f87e89c086635276866f2a6be386ca599cdfb977a1e9876546609b2d2541b",
+ "files": "312a417518fa3fc16431adcda77a4c7d4ced3fde91170a56dc2d8081f563c727",
+ "decode_s": 0.024,
+ "timeout_s": 900.0,
+ "per_age": 10,
+ "speech": 10,
+ "pools": {
+  "video": 143,
+  "speech": 95,
+  "dropped": {
+   "its time is a range or a list in one string": 7,
+   "a target is outside the clips (a gap) or after the horizon": 1,
+   "its query is after the last day": 254
+  }
+ },
+ "created": "2026-11-03T03:01:43",
+ "mm_commit": "c7f62e9+dirty",
+ "probe": {
+  "status": "none"
+ }
+}

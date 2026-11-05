@@ -1,0 +1,57 @@
+{
+ "qid": "records-log-count-1",
+ "type": "records",
+ "template": "log-count",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "arm": "mm",
+ "model": "d1-3B",
+ "answer": "2",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 10.6,
+ "turns": 3,
+ "denials": 0,
+ "calls": 2,
+ "tools": {
+  "find": 2
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 6,
+  "output": 548,
+  "cache_read": 44869,
+  "cache_write": 3250
+ },
+ "cost_usd": 0.0229789,
+ "used_percent": 82.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/mm-d1-3B/records-log-count-1",
+ "at": "2026-11-04T14:28:28",
+ "held_s": 0.0,
+ "gpu_estimate_s": 2.3,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 0,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

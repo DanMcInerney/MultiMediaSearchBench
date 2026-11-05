@@ -1,0 +1,129 @@
+{
+ "qid": "ego-204",
+ "type": "records",
+ "template": "EventRecall",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about checking out at a supermarket?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793311905.16,
+   1793312505.16
+  ]
+ ],
+ "found": false,
+ "top5": false,
+ "p": null,
+ "moments": 1,
+ "moments_found": [],
+ "away": 3,
+ "windows": 16,
+ "seconds": 2.6,
+ "wall_s": 2.62,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T18:21:08.266-04:00",
+   "t1": "2026-10-29T18:21:29.333-04:00",
+   "p": 0.835,
+   "said": "Does the text talk about checking out at a supermarket?: yes (p 0.84)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:21:08.266-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T18:17:34.133-04:00",
+   "t1": "2026-10-29T18:18:04.366-04:00",
+   "p": 0.835,
+   "said": "Does the text talk about checking out at a supermarket?: yes (p 0.84)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:17:34.133-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T18:12:58.800-04:00",
+   "t1": "2026-10-29T18:13:31.966-04:00",
+   "p": 0.915,
+   "said": "Does the text talk about checking out at a supermarket?: yes (p 0.91)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:12:58.800-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T18:11:46.033-04:00",
+   "p": 0.777,
+   "said": "Does the text talk about checking out at a supermarket?: below 0.8 (p 0.78)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:11:46.033-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T18:19:50.200-04:00",
+   "p": 0.731,
+   "said": "Does the text talk about checking out at a supermarket?: below 0.8 (p 0.73)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:19:50.200-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T18:15:51.000-04:00",
+   "p": 0.378,
+   "said": "Does the text talk about checking out at a supermarket?: below 0.8 (p 0.38)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:15:51.000-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T18:14:11.066-04:00",
+   "p": 0.107,
+   "said": "Does the text talk about checking out at a supermarket?: below 0.8 (p 0.11)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:14:11.066-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T18:18:42.833-04:00",
+   "p": 0.029,
+   "said": "Does the text talk about checking out at a supermarket?: below 0.8 (p 0.03)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T18:18:42.833-04:00"
+   }
+  }
+ ]
+}

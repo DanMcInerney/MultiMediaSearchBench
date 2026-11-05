@@ -1,0 +1,109 @@
+{
+ "qid": "ego-084",
+ "type": "records",
+ "template": "RelationMap",
+ "level": "2-6h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about sterile eggs?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793309361.0,
+   1793309961.0
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.958,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 2,
+ "windows": 13,
+ "seconds": 2.1,
+ "wall_s": 2.16,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T17:35:49.233-04:00",
+   "t1": "2026-10-29T17:36:54.566-04:00",
+   "p": 0.947,
+   "said": "Does the text talk about sterile eggs?: yes (p 0.95)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:35:49.233-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T17:33:42.233-04:00",
+   "t1": "2026-10-29T17:34:58.633-04:00",
+   "p": 0.958,
+   "said": "Does the text talk about sterile eggs?: yes (p 0.96)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:33:42.233-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-29T17:32:11.500-04:00",
+   "t1": "2026-10-29T17:32:59.733-04:00",
+   "p": 0.947,
+   "said": "Does the text talk about sterile eggs?: yes (p 0.95)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:32:11.500-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:38:35.733-04:00",
+   "p": 0.095,
+   "said": "Does the text talk about sterile eggs?: below 0.8 (p 0.10)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:38:35.733-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:37:20.700-04:00",
+   "p": 0.037,
+   "said": "Does the text talk about sterile eggs?: below 0.8 (p 0.04)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:37:20.700-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:29:21.500-04:00",
+   "p": 0.029,
+   "said": "Does the text talk about sterile eggs?: below 0.8 (p 0.03)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:29:21.500-04:00"
+   }
+  }
+ ]
+}

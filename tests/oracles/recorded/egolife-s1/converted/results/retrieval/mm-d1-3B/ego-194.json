@@ -1,0 +1,88 @@
+{
+ "qid": "ego-194",
+ "type": "video",
+ "template": "TaskMaster",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a shopping plan written on a whiteboard?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793324057.16,
+   1793324657.16
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.622,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 499,
+ "seconds": 43.0,
+ "wall_s": 43.05,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 18 video items was not heard, since d1-3B does not hear: glasses (items 785, 784, 783, 782, 781 and 13 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:39:25.000-04:00",
+   "p": 0.622,
+   "said": "Is a shopping plan written on a whiteboard?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 775,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:40:27.000-04:00",
+   "p": 0.531,
+   "said": "Is a shopping plan written on a whiteboard?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 777,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:37:06.000-04:00",
+   "p": 0.531,
+   "said": "Is a shopping plan written on a whiteboard?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 771,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:37:36.000-04:00",
+   "p": 0.469,
+   "said": "Is a shopping plan written on a whiteboard?: below 0.8 (p 0.47)",
+   "kind": "video",
+   "look": {
+    "item": 772,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T21:39:39.000-04:00",
+   "p": 0.438,
+   "said": "Is a shopping plan written on a whiteboard?: below 0.8 (p 0.44)",
+   "kind": "video",
+   "look": {
+    "item": 776,
+    "at": 9.0
+   }
+  }
+ ]
+}

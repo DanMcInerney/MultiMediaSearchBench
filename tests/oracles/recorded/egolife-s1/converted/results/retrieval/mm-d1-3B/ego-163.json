@@ -1,0 +1,103 @@
+{
+ "qid": "ego-163",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is a microwave being used?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793413998.16,
+   1793414598.16
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.755,
+ "moments": 1,
+ "moments_found": [],
+ "away": 1,
+ "windows": 352,
+ "seconds": 28.8,
+ "wall_s": 28.78,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 13 video items was not heard, since d1-3B does not hear: glasses (items 1652, 1651, 1650, 1649, 1648 and 8 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T22:39:10.000-04:00",
+   "t1": "2026-10-30T22:39:10.000-04:00",
+   "p": 0.818,
+   "said": "Is a microwave being used?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1644,
+    "at": 10.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T22:38:23.000-04:00",
+   "p": 0.755,
+   "said": "Is a microwave being used?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 1642,
+    "at": 23.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T22:42:59.000-04:00",
+   "p": 0.593,
+   "said": "Is a microwave being used?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 1651,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T22:37:29.010-04:00",
+   "p": 0.438,
+   "said": "Is a microwave being used?: below 0.8 (p 0.44)",
+   "kind": "video",
+   "look": {
+    "item": 1640,
+    "at": 1.85
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T22:41:17.000-04:00",
+   "p": 0.407,
+   "said": "Is a microwave being used?: below 0.8 (p 0.41)",
+   "kind": "video",
+   "look": {
+    "item": 1648,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T22:39:48.000-04:00",
+   "p": 0.321,
+   "said": "Is a microwave being used?: below 0.8 (p 0.32)",
+   "kind": "video",
+   "look": {
+    "item": 1645,
+    "at": 18.0
+   }
+  }
+ ]
+}

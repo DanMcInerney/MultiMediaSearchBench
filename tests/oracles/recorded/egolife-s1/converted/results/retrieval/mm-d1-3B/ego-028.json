@@ -1,0 +1,460 @@
+{
+ "qid": "ego-028",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone working in a kitchen?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793295289.08,
+   1793295889.08
+  ],
+  [
+   1793295987.18,
+   1793296587.18
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.967,
+ "moments": 2,
+ "moments_found": [
+  0,
+  1
+ ],
+ "away": 19,
+ "windows": 1202,
+ "seconds": 97.7,
+ "wall_s": 97.67,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 311, 310, 309, 308, 307 and 16 more); find lists them",
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 334, 333, 332, 331, 330 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:44:12.000-04:00",
+   "t1": "2026-10-29T13:44:25.000-04:00",
+   "p": 0.947,
+   "said": "Is someone working in a kitchen?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 310,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:44:00.000-04:00",
+   "t1": "2026-10-29T13:44:01.000-04:00",
+   "p": 0.915,
+   "said": "Is someone working in a kitchen?: yes (p 0.91)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 310,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:43:32.000-04:00",
+   "t1": "2026-10-29T13:43:42.000-04:00",
+   "p": 0.974,
+   "said": "Is someone working in a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 309,
+    "at": 3.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:43:12.000-04:00",
+   "t1": "2026-10-29T13:43:15.000-04:00",
+   "p": 0.932,
+   "said": "Is someone working in a kitchen?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 308,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:42:18.000-04:00",
+   "t1": "2026-10-29T13:42:22.000-04:00",
+   "p": 0.893,
+   "said": "Is someone working in a kitchen?: yes (p 0.89)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 306,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:42:01.000-04:00",
+   "t1": "2026-10-29T13:42:01.000-04:00",
+   "p": 0.963,
+   "said": "Is someone working in a kitchen?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 306,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:41:45.000-04:00",
+   "t1": "2026-10-29T13:41:45.000-04:00",
+   "p": 0.835,
+   "said": "Is someone working in a kitchen?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 305,
+    "at": 15.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:41:24.000-04:00",
+   "t1": "2026-10-29T13:41:24.000-04:00",
+   "p": 0.932,
+   "said": "Is someone working in a kitchen?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 304,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:41:01.000-04:00",
+   "t1": "2026-10-29T13:41:06.000-04:00",
+   "p": 0.963,
+   "said": "Is someone working in a kitchen?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 304,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:40:43.000-04:00",
+   "t1": "2026-10-29T13:40:50.000-04:00",
+   "p": 0.967,
+   "said": "Is someone working in a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 303,
+    "at": 20.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:40:30.000-04:00",
+   "t1": "2026-10-29T13:40:32.000-04:00",
+   "p": 0.924,
+   "said": "Is someone working in a kitchen?: yes (p 0.92)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 303,
+    "at": 1.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:40:14.000-04:00",
+   "t1": "2026-10-29T13:40:14.000-04:00",
+   "p": 0.835,
+   "said": "Is someone working in a kitchen?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 302,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:38:21.000-04:00",
+   "t1": "2026-10-29T13:39:57.000-04:00",
+   "p": 0.967,
+   "said": "Is someone working in a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 300,
+    "at": 22.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:37:24.000-04:00",
+   "t1": "2026-10-29T13:37:24.000-04:00",
+   "p": 0.867,
+   "said": "Is someone working in a kitchen?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 296,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:36:14.000-04:00",
+   "t1": "2026-10-29T13:36:30.000-04:00",
+   "p": 0.947,
+   "said": "Is someone working in a kitchen?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 294,
+    "at": 17.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:35:55.000-04:00",
+   "t1": "2026-10-29T13:35:55.000-04:00",
+   "p": 0.852,
+   "said": "Is someone working in a kitchen?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 293,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:53:57.000-04:00",
+   "t1": "2026-10-29T13:55:48.000-04:00",
+   "p": 0.971,
+   "said": "Is someone working in a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 333,
+    "at": 2.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:52:33.000-04:00",
+   "t1": "2026-10-29T13:52:52.000-04:00",
+   "p": 0.958,
+   "said": "Is someone working in a kitchen?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 327,
+    "at": 9.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:52:11.000-04:00",
+   "t1": "2026-10-29T13:52:11.000-04:00",
+   "p": 0.953,
+   "said": "Is someone working in a kitchen?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 326,
+    "at": 11.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:50:31.000-04:00",
+   "t1": "2026-10-29T13:51:33.000-04:00",
+   "p": 0.963,
+   "said": "Is someone working in a kitchen?: yes (p 0.96)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 324,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:48:43.000-04:00",
+   "t1": "2026-10-29T13:48:48.000-04:00",
+   "p": 0.852,
+   "said": "Is someone working in a kitchen?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 319,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-29T13:46:29.000-04:00",
+   "t1": "2026-10-29T13:46:29.000-04:00",
+   "p": 0.947,
+   "said": "Is someone working in a kitchen?: yes (p 0.95)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 314,
+    "at": 29.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:44:49.000-04:00",
+   "p": 0.755,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 311,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:35:44.000-04:00",
+   "p": 0.731,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 293,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:37:58.000-04:00",
+   "p": 0.706,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 297,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:37:12.000-04:00",
+   "p": 0.706,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.71)",
+   "kind": "video",
+   "look": {
+    "item": 296,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:36:48.000-04:00",
+   "p": 0.651,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 295,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:47:10.000-04:00",
+   "p": 0.777,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 316,
+    "at": 10.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:52:00.000-04:00",
+   "p": 0.755,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 326,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:47:38.000-04:00",
+   "p": 0.755,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.75)",
+   "kind": "video",
+   "look": {
+    "item": 317,
+    "at": 8.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:49:25.000-04:00",
+   "p": 0.731,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.73)",
+   "kind": "video",
+   "look": {
+    "item": 320,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-29T13:46:57.000-04:00",
+   "p": 0.651,
+   "said": "Is someone working in a kitchen?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 315,
+    "at": 27.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "qid": "video-screen-error-3",
+ "type": "video",
+ "template": "screen-error",
+ "level": "week",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "unknown",
+ "passed": false,
+ "abstained": true,
+ "problem": null,
+ "seconds": 193.5,
+ "turns": 1,
+ "denials": null,
+ "calls": 13,
+ "tools": {
+  "shell": 10,
+  "view_image": 3
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 3,
+  "shells": 10
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 702076,
+  "output": 2943,
+  "cache_read": 669568,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/files/video-screen-error-3",
+ "at": "2026-11-04T11:41:50",
+ "held_s": 147.8
+}

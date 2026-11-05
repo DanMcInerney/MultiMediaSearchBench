@@ -1,0 +1,48 @@
+{
+ "qid": "records-log-count-1",
+ "type": "records",
+ "template": "log-count",
+ "level": "part",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "2",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 5.9,
+ "turns": 4,
+ "denials": 0,
+ "calls": 3,
+ "tools": {
+  "Glob": 1,
+  "Grep": 1,
+  "Read": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 6,
+  "output": 595,
+  "cache_read": 16516,
+  "cache_write": 2132
+ },
+ "cost_usd": 0.0161416,
+ "used_percent": 75.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/records-log-count-1",
+ "at": "2026-11-04T12:05:09",
+ "held_s": 0.0
+}

@@ -1,0 +1,49 @@
+{
+ "qid": "audio-mic-doorbell-2",
+ "type": "audio",
+ "template": "mic-doorbell",
+ "level": "day",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "19:42",
+ "passed": false,
+ "abstained": false,
+ "problem": null,
+ "seconds": 155.7,
+ "turns": 30,
+ "denials": 0,
+ "calls": 28,
+ "tools": {
+  "Glob": 4,
+  "Grep": 3,
+  "Bash": 12,
+  "Read": 9
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 9,
+  "shells": 12
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 46,
+  "output": 12216,
+  "cache_read": 653661,
+  "cache_write": 46945
+ },
+ "cost_usd": 0.3753980999999999,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/audio-mic-doorbell-2",
+ "at": "2026-11-04T11:50:35",
+ "held_s": 0.0
+}

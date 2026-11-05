@@ -1,0 +1,62 @@
+{
+ "qid": "image-photo-sign-3",
+ "type": "image",
+ "template": "photo-sign",
+ "level": "week",
+ "last": true,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "585",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 19.2,
+ "turns": 1,
+ "denials": null,
+ "calls": 3,
+ "tools": {
+  "find": 1,
+  "ask": 1,
+  "look": 1
+ },
+ "work": {
+  "jobs": 1,
+  "windows": 113,
+  "seconds": 7.1,
+  "stopped": {
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 52902,
+  "output": 174,
+  "cache_read": 44032,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 17.0,
+ "agent_model": "gpt-6.1-terra",
+ "agent_effort": "medium",
+ "exec": "execs/codex/mm-d1-3B/image-photo-sign-3",
+ "at": "2026-11-04T13:59:09",
+ "held_s": 0.0,
+ "gpu_estimate_s": 12.6,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 1,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

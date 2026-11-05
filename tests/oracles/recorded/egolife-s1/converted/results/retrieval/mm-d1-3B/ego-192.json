@@ -1,0 +1,134 @@
+{
+ "qid": "ego-192",
+ "type": "video",
+ "template": "HabitInsight",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone paying at a counter?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793475317.12,
+   1793475917.12
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.932,
+ "moments": 2,
+ "moments_found": [
+  0,
+  1
+ ],
+ "away": 2,
+ "windows": 601,
+ "seconds": 48.9,
+ "wall_s": 48.97,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1960, 1959, 1958, 1957, 1956 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T15:42:44.000-04:00",
+   "t1": "2026-10-31T15:42:44.000-04:00",
+   "p": 0.835,
+   "said": "Is someone paying at a counter?: yes (p 0.84)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1955,
+    "at": 14.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T15:39:56.000-04:00",
+   "t1": "2026-10-31T15:40:28.000-04:00",
+   "p": 0.932,
+   "said": "Is someone paying at a counter?: yes (p 0.93)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1950,
+    "at": 27.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-31T15:39:39.000-04:00",
+   "t1": "2026-10-31T15:39:42.000-04:00",
+   "p": 0.867,
+   "said": "Is someone paying at a counter?: yes (p 0.87)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1949,
+    "at": 12.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:42:00.000-04:00",
+   "p": 0.798,
+   "said": "Is someone paying at a counter?: below 0.8 (p 0.80)",
+   "kind": "video",
+   "look": {
+    "item": 1954,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:39:07.000-04:00",
+   "p": 0.679,
+   "said": "Is someone paying at a counter?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 1948,
+    "at": 7.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:38:55.000-04:00",
+   "p": 0.651,
+   "said": "Is someone paying at a counter?: below 0.8 (p 0.65)",
+   "kind": "video",
+   "look": {
+    "item": 1947,
+    "at": 25.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:43:29.000-04:00",
+   "p": 0.562,
+   "said": "Is someone paying at a counter?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 1956,
+    "at": 29.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T15:38:38.000-04:00",
+   "p": 0.562,
+   "said": "Is someone paying at a counter?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 1947,
+    "at": 8.0
+   }
+  }
+ ]
+}

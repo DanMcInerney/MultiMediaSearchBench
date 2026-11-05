@@ -1,0 +1,88 @@
+{
+ "qid": "ego-223",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is someone placing baking utensils on a table?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793492398.02,
+   1793492998.02
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.679,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 601,
+ "seconds": 49.9,
+ "wall_s": 49.89,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 2329, 2328, 2327, 2326, 2325 and 16 more); find lists them"
+ ],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-31T20:25:02.000-04:00",
+   "p": 0.679,
+   "said": "Is someone placing baking utensils on a table?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 2320,
+    "at": 2.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T20:29:02.000-04:00",
+   "p": 0.622,
+   "said": "Is someone placing baking utensils on a table?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 2328,
+    "at": 2.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T20:27:36.000-04:00",
+   "p": 0.593,
+   "said": "Is someone placing baking utensils on a table?: below 0.8 (p 0.59)",
+   "kind": "video",
+   "look": {
+    "item": 2325,
+    "at": 6.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T20:29:13.000-04:00",
+   "p": 0.562,
+   "said": "Is someone placing baking utensils on a table?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 2328,
+    "at": 13.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-31T20:28:42.000-04:00",
+   "p": 0.562,
+   "said": "Is someone placing baking utensils on a table?: below 0.8 (p 0.56)",
+   "kind": "video",
+   "look": {
+    "item": 2327,
+    "at": 12.0
+   }
+  }
+ ]
+}

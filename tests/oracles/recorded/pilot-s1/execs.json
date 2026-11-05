@@ -1,0 +1,3685 @@
+{
+ "source": "D:\\mm-bench\\20261104-0314-pilot-s1",
+ "execs": [
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-absent-doorbell-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:50. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Tuesday 3 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-absent-doorbell-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:56. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-mic-alarm-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:14. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the smoke alarm beep on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-mic-alarm-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:41. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the smoke alarm beep on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-mic-alarm-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:48. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time did the smoke alarm last beep? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-mic-doorbell-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:45. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Sunday 1 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "audio-mic-doorbell-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:48. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-absent-sign-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:47. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November, in the afternoon (12:00 to 18:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-absent-sign-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:02. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-photo-count-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:42. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-photo-count-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:03. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-photo-sign-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:14. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-photo-sign-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:42. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "image-photo-sign-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:03. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the last green sign that I took a photo of? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "records-absent-log-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:47. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-996 on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "records-log-count-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:05. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-985 on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "records-log-count-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:43. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-842 on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "records-log-last-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:46. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the last deploy of the web service finish on Monday 2 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "text-absent-note-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:05. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the Wi-Fi password that I noted on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "text-config-asof-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:44. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was retention_days set to in app.toml at 08:44 on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "text-note-code-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": "two dry runs (11:13 and 12:41) overwrote prompt.txt, instructions.md and settings.json or catalog.json (NOTES.txt)",
+   "prompt": null,
+   "settings_sha256": null,
+   "instructions_sha256": null,
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "text-note-code-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:44. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the combination of my bike lock that I noted on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-absent-error-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:06. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Monday 2 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-absent-error-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:16. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Tuesday 3 November, and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-absent-parcel-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:05. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-porch-parcel-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:14. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November, in the afternoon (12:00 to 18:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-porch-parcel-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:45. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-porch-parcel-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:09. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time was a parcel last left at the front door? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-screen-error-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:45. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-screen-error-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:52. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "files",
+   "qid": "video-screen-error-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 12:29. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen the last time one appeared, and on what day and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "a89297cc14762f12ad1eee64a4267263ff4792b2f8c91782d58ae71748448f8f",
+   "mcp": null,
+   "init": {
+    "tools": [
+     "Bash",
+     "Glob",
+     "Grep",
+     "Read"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-absent-sign-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:25. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November, in the afternoon (12:00 to 18:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-absent-sign-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:26. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-count-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:13. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-count-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:26. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:11. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:13. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:27. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the last green sign that I took a photo of? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "records-absent-log-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:24. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-996 on Monday 2 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-count-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:28. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-985 on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-count-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:14. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-842 on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-last-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:18. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the last deploy of the web service finish on Monday 2 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "text-absent-note-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:28. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the Wi-Fi password that I noted on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "text-config-asof-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:18. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was retention_days set to in app.toml at 08:44 on Monday 2 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "text-note-code-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:25. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the code of my gym locker that I noted on Tuesday 3 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "text-note-code-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:14. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the combination of my bike lock that I noted on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-error-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:18. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Monday 2 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-error-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:28. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Tuesday 3 November, and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-parcel-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:43. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Tuesday 3 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:12. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November, in the afternoon (12:00 to 18:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:14. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:44. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time was a parcel last left at the front door? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-1",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:12. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-2",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:15. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "claude",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-3",
+   "files": [
+    "events.jsonl",
+    "final.txt",
+    "init.json",
+    "instructions.md",
+    "mcp.json",
+    "prompt.txt",
+    "settings.json",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:46. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen the last time one appeared, and on what day and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": "1688cfccae57d3a3439c4dd31676af9d744b6b7cf109d727e706401d9382e963",
+   "instructions_sha256": "88d94d46706f1faec82c4a750f4a60aae0c2fbee6d747402fe321744d18cc11a",
+   "mcp": {
+    "mcpServers": {
+     "mm": {
+      "command": "<PYTHON>",
+      "args": [
+       "-m",
+       "multimem.cli",
+       "--home",
+       "<HOME>",
+       "mcp",
+       "--tools",
+       "ask,find,look,label"
+      ],
+      "env": {
+       "CLAUDE_PROJECT_DIR": "<WORK>"
+      }
+     }
+    }
+   },
+   "init": {
+    "tools": [
+     "mcp__mm__ask",
+     "mcp__mm__find",
+     "mcp__mm__label",
+     "mcp__mm__look"
+    ],
+    "mcp_servers": [
+     {
+      "name": "mm",
+      "status": "connected",
+      "source": "dynamic"
+     }
+    ],
+    "plugins": [],
+    "apiKeySource": "none",
+    "permissionMode": "dontAsk",
+    "slash_commands": [],
+    "skills": []
+   },
+   "catalog_sha256": null
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-absent-doorbell-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:32. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Tuesday 3 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-absent-doorbell-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:33. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-mic-alarm-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:27. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the smoke alarm beep on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-mic-alarm-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:28. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the smoke alarm beep on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-mic-alarm-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:31. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time did the smoke alarm last beep? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-mic-doorbell-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:28. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Sunday 1 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "audio-mic-doorbell-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the doorbell ring on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-absent-sign-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:31. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November, in the afternoon (12:00 to 18:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-absent-sign-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:33. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-photo-count-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:29. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-photo-count-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:34. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-photo-sign-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:27. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-photo-sign-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:29. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "image-photo-sign-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:34. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the last green sign that I took a photo of? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "records-absent-log-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:31. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-996 on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "records-log-count-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:34. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-985 on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "records-log-count-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-842 on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "records-log-last-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the last deploy of the web service finish on Monday 2 November, in the morning (06:00 to 12:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "text-absent-note-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:34. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the Wi-Fi password that I noted on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "text-config-asof-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was retention_days set to in app.toml at 08:44 on Monday 2 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "text-note-code-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": "two dry runs (11:13 and 12:41) overwrote prompt.txt, instructions.md and settings.json or catalog.json (NOTES.txt)",
+   "prompt": null,
+   "settings_sha256": null,
+   "instructions_sha256": null,
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": null
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "text-note-code-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the combination of my bike lock that I noted on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-absent-error-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:32. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Monday 2 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-absent-error-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:35. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Tuesday 3 November, and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-absent-parcel-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:35. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Tuesday 3 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-porch-parcel-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:27. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November, in the afternoon (12:00 to 18:00)? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-porch-parcel-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-porch-parcel-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:36. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time was a parcel last left at the front door? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-screen-error-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:28. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-screen-error-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:30. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "files",
+   "qid": "video-screen-error-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 11:38. The files of these sources, from Sunday 1 November to Tuesday 3 November, are in D:\\mm-bench-temp\\mmb-de178c4d7f-data, one folder per source; each file is named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen the last time one appeared, and on what day and at what time did it first appear? Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "3951a33ea98b04384cf356b9189a21f62cc0a45f1c8701d83d07eca6b468c028",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "ac5d226090a8ac4d0f33a99ef7812c9373ef9ec91234be814f069b8ec0c45102"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-absent-sign-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:57. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November, in the afternoon (12:00 to 18:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-absent-sign-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:58. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Tuesday 3 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-count-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:48. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-count-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:58. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many photos of a red car did I take? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:45. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:49. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the green sign that I took a photo of on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "image-photo-sign-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:58. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What number was on the last green sign that I took a photo of? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "records-absent-log-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:57. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-996 on Monday 2 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-count-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:59. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-985 on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-count-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:49. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). How many times did the payments service log ERR-842 on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "records-log-last-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:54. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time did the last deploy of the web service finish on Monday 2 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "text-absent-note-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:59. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the Wi-Fi password that I noted on Tuesday 3 November, in the evening (18:00 to 24:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "text-config-asof-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:54. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was retention_days set to in app.toml at 08:44 on Monday 2 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "text-note-code-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:57. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the code of my gym locker that I noted on Tuesday 3 November, in the morning (06:00 to 12:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "text-note-code-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:49. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What is the combination of my bike lock that I noted on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-error-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:54. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Monday 2 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-error-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:59. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Tuesday 3 November, and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-absent-parcel-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:04. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Tuesday 3 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:46. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November, in the afternoon (12:00 to 18:00)? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:49. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). At what time was a parcel left at the front door on Sunday 1 November? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-porch-parcel-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:04. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). On what day and at what time was a parcel last left at the front door? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-1",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:46. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, in the afternoon (12:00 to 18:00), and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-2",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 13:50. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen on Sunday 1 November, and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  },
+  {
+   "agent": "codex",
+   "dir": "mm-d1-3B",
+   "qid": "video-screen-error-3",
+   "files": [
+    "catalog.json",
+    "events.jsonl",
+    "final.txt",
+    "instructions.md",
+    "prompt.txt",
+    "stderr.txt",
+    "tools.json"
+   ],
+   "excluded": null,
+   "prompt": "It is now Wednesday 04 November 2026, 14:05. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. The sources are: screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs). What was the error code on the red error screen the last time one appeared, and on what day and at what time did it first appear? Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.",
+   "settings_sha256": null,
+   "instructions_sha256": "0eaf4d4f20f7e667f9de223e5fc362d0cf673500c701b35ce74d12b900a9a0a7",
+   "mcp": null,
+   "init": null,
+   "catalog_sha256": "e67870b79279b3b729965fa978e8aab541ce8e318a4827790496f3307b77ba02"
+  }
+ ]
+}

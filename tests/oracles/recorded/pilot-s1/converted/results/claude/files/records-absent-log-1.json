@@ -1,0 +1,48 @@
+{
+ "qid": "records-absent-log-1",
+ "type": "records",
+ "template": "absent-log",
+ "level": "day",
+ "last": false,
+ "absent": true,
+ "seed": 1,
+ "agent": "claude",
+ "config": "files",
+ "system": "files",
+ "variant": null,
+ "answer": "0",
+ "passed": true,
+ "abstained": true,
+ "problem": null,
+ "seconds": 26.3,
+ "turns": 7,
+ "denials": 0,
+ "calls": 6,
+ "tools": {
+  "Glob": 1,
+  "Grep": 4,
+  "Read": 1
+ },
+ "work": {
+  "jobs": 0,
+  "windows": 0,
+  "seconds": 0,
+  "stopped": {},
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 10,
+  "output": 1214,
+  "cache_read": 30870,
+  "cache_write": 4782
+ },
+ "cost_usd": 0.034375,
+ "used_percent": 74.0,
+ "agent_model": "claude-sonnet-5-5",
+ "agent_effort": null,
+ "exec": "execs/claude/files/records-absent-log-1",
+ "at": "2026-11-04T11:47:28",
+ "held_s": 0.0
+}

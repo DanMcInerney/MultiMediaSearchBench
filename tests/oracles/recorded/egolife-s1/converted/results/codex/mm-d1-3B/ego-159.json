@@ -1,0 +1,66 @@
+{
+ "qid": "ego-159",
+ "type": "video",
+ "template": "EntityLog",
+ "level": "2-6h",
+ "last": false,
+ "absent": false,
+ "seed": 1,
+ "agent": "codex",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "answer": "C",
+ "passed": true,
+ "abstained": false,
+ "problem": null,
+ "seconds": 135.0,
+ "turns": 1,
+ "denials": null,
+ "calls": 8,
+ "tools": {
+  "find": 2,
+  "look": 2,
+  "ask": 4
+ },
+ "work": {
+  "jobs": 2,
+  "windows": 902,
+  "seconds": 112.6,
+  "stopped": {
+   "cancelled": 1,
+   "limit": 1
+  },
+  "views": 0,
+  "shells": 0
+ },
+ "scope_all": 0,
+ "tokens": {
+  "input": 161991,
+  "output": 590,
+  "cache_read": 110848,
+  "cache_write": 0
+ },
+ "cost_usd": null,
+ "used_percent": 15.0,
+ "agent_model": "gpt-6.1-terra",
+ "exec": "execs/codex/mm-d1-3B/ego-159",
+ "at": "2026-11-03T11:15:56",
+ "timeout_s": 900.0,
+ "after_horizon": 0,
+ "asks": 2,
+ "asks_past_horizon": 0,
+ "held_s": 0.0,
+ "gpu_estimate_s": 46.5,
+ "exclusive": false,
+ "beyond_timeout": false,
+ "busy_at_start": null,
+ "left": {
+  "labels": 3,
+  "unkept": 0
+ },
+ "cancelled": [],
+ "unended": [],
+ "orphans": 0,
+ "settle_s": 0.0
+}

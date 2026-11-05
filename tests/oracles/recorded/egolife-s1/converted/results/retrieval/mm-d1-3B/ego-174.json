@@ -1,0 +1,98 @@
+{
+ "qid": "ego-174",
+ "type": "records",
+ "template": "EntityLog",
+ "level": "6-24h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about decoration styles?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793414946.16,
+   1793415546.16
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.94,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 2,
+ "windows": 14,
+ "seconds": 2.2,
+ "wall_s": 2.24,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [
+  {
+   "source": "transcript",
+   "t0": "2026-10-30T22:53:24.100-04:00",
+   "t1": "2026-10-30T22:54:52.200-04:00",
+   "p": 0.94,
+   "said": "Does the text talk about decoration styles?: yes (p 0.94)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T22:53:24.100-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-30T22:51:25.166-04:00",
+   "t1": "2026-10-30T22:52:43.900-04:00",
+   "p": 0.932,
+   "said": "Does the text talk about decoration styles?: yes (p 0.93)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T22:52:08.200-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t0": "2026-10-30T22:49:07.433-04:00",
+   "t1": "2026-10-30T22:50:00.566-04:00",
+   "p": 0.852,
+   "said": "Does the text talk about decoration styles?: yes (p 0.85)",
+   "kind": "records",
+   "capped": false,
+   "project": null,
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T22:49:07.433-04:00"
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-30T22:57:31.600-04:00",
+   "p": 0.438,
+   "said": "Does the text talk about decoration styles?: below 0.8 (p 0.44)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T22:57:31.600-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-30T22:55:53.133-04:00",
+   "p": 0.107,
+   "said": "Does the text talk about decoration styles?: below 0.8 (p 0.11)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-30T22:55:53.133-04:00"
+   }
+  }
+ ]
+}

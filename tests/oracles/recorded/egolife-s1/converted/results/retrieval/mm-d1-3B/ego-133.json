@@ -1,0 +1,86 @@
+{
+ "qid": "ego-133",
+ "type": "records",
+ "template": "EntityLog",
+ "level": "24h+",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Does the text talk about buying baby cabbage?",
+ "source": "transcript",
+ "ranges": [
+  [
+   1793309384.16,
+   1793309984.16
+  ]
+ ],
+ "found": false,
+ "top5": true,
+ "p": 0.706,
+ "moments": 1,
+ "moments_found": [],
+ "away": 0,
+ "windows": 13,
+ "seconds": 2.1,
+ "wall_s": 2.12,
+ "stopped": "range_end",
+ "warnings": [],
+ "sightings": [],
+ "candidates": [
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:32:27.266-04:00",
+   "p": 0.798,
+   "said": "Does the text talk about buying baby cabbage?: below 0.8 (p 0.80)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:32:27.266-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:34:21.600-04:00",
+   "p": 0.706,
+   "said": "Does the text talk about buying baby cabbage?: below 0.8 (p 0.71)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:34:21.600-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:36:11.933-04:00",
+   "p": 0.469,
+   "said": "Does the text talk about buying baby cabbage?: below 0.8 (p 0.47)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:36:11.933-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:37:58.166-04:00",
+   "p": 0.294,
+   "said": "Does the text talk about buying baby cabbage?: below 0.8 (p 0.29)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:37:58.166-04:00"
+   }
+  },
+  {
+   "source": "transcript",
+   "t": "2026-10-29T17:39:19.833-04:00",
+   "p": 0.269,
+   "said": "Does the text talk about buying baby cabbage?: below 0.8 (p 0.27)",
+   "kind": "records",
+   "look": {
+    "source": "transcript",
+    "t": "2026-10-29T17:39:19.833-04:00"
+   }
+  }
+ ]
+}

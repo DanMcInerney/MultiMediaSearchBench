@@ -1,0 +1,189 @@
+{
+ "qid": "ego-129",
+ "type": "video",
+ "template": "EventRecall",
+ "level": "0-2h",
+ "config": "mm/d1-3B",
+ "system": "mm",
+ "variant": "d1-3B",
+ "question": "Is the view inside a kitchen?",
+ "source": "glasses",
+ "ranges": [
+  [
+   1793394697.12,
+   1793395297.12
+  ]
+ ],
+ "found": true,
+ "top5": true,
+ "p": 0.984,
+ "moments": 1,
+ "moments_found": [
+  0
+ ],
+ "away": 6,
+ "windows": 601,
+ "seconds": 47.7,
+ "wall_s": 47.73,
+ "stopped": "range_end",
+ "warnings": [
+  "the sound of 21 video items was not heard, since d1-3B does not hear: glasses (items 1336, 1335, 1334, 1333, 1332 and 16 more); find lists them"
+ ],
+ "sightings": [
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:20:00.000-04:00",
+   "t1": "2026-10-30T17:20:05.000-04:00",
+   "p": 0.974,
+   "said": "Is the view inside a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1333,
+    "at": 4.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:19:00.000-04:00",
+   "t1": "2026-10-30T17:19:00.000-04:00",
+   "p": 0.852,
+   "said": "Is the view inside a kitchen?: yes (p 0.85)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1331,
+    "at": 0.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:18:12.000-04:00",
+   "t1": "2026-10-30T17:18:23.000-04:00",
+   "p": 0.98,
+   "said": "Is the view inside a kitchen?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1329,
+    "at": 12.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:17:48.000-04:00",
+   "t1": "2026-10-30T17:17:48.000-04:00",
+   "p": 0.818,
+   "said": "Is the view inside a kitchen?: yes (p 0.82)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1328,
+    "at": 18.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:17:35.000-04:00",
+   "t1": "2026-10-30T17:17:35.000-04:00",
+   "p": 0.977,
+   "said": "Is the view inside a kitchen?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1328,
+    "at": 5.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:16:28.000-04:00",
+   "t1": "2026-10-30T17:17:22.000-04:00",
+   "p": 0.984,
+   "said": "Is the view inside a kitchen?: yes (p 0.98)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1326,
+    "at": 28.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t0": "2026-10-30T17:15:07.000-04:00",
+   "t1": "2026-10-30T17:15:11.000-04:00",
+   "p": 0.974,
+   "said": "Is the view inside a kitchen?: yes (p 0.97)",
+   "kind": "video",
+   "capped": false,
+   "project": null,
+   "look": {
+    "item": 1323,
+    "at": 8.0
+   }
+  }
+ ],
+ "candidates": [
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:13:49.000-04:00",
+   "p": 0.777,
+   "said": "Is the view inside a kitchen?: below 0.8 (p 0.78)",
+   "kind": "video",
+   "look": {
+    "item": 1320,
+    "at": 19.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:19:46.000-04:00",
+   "p": 0.679,
+   "said": "Is the view inside a kitchen?: below 0.8 (p 0.68)",
+   "kind": "video",
+   "look": {
+    "item": 1332,
+    "at": 16.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:19:21.000-04:00",
+   "p": 0.622,
+   "said": "Is the view inside a kitchen?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 1331,
+    "at": 21.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:14:54.000-04:00",
+   "p": 0.622,
+   "said": "Is the view inside a kitchen?: below 0.8 (p 0.62)",
+   "kind": "video",
+   "look": {
+    "item": 1322,
+    "at": 24.0
+   }
+  },
+  {
+   "source": "glasses",
+   "t": "2026-10-30T17:18:45.000-04:00",
+   "p": 0.531,
+   "said": "Is the view inside a kitchen?: below 0.8 (p 0.53)",
+   "kind": "video",
+   "look": {
+    "item": 1330,
+    "at": 15.0
+   }
+  }
+ ]
+}
