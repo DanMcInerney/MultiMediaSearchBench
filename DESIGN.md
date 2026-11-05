@@ -133,7 +133,8 @@ so it is a diagnostic only.
 Each scenario is one dump and 15-40 questions about it. All its cases share the dump, so it is built, probed and ingested
 once per system. The questions mix the kinds in section 5.6. The tables give one example question each.
 
-"Source to find" means no suitable data with a licence that fits has been found yet. Dan reads every licence (section 11.3).
+[MEDIA.md](MEDIA.md) says where each scenario's media comes from, what is already downloaded, and what is still missing
+(4 November 2026). Licences are recorded there but are not a filter (section 11.3).
 Agents cannot hear, so the truth of every sound question comes from a mixing list, a script or a dataset's labels, never
 from an agent listening. Speech-heavy scenarios (A3, M1-M3) are reported apart as well as in the totals, since some
 systems do not handle speech at all.
@@ -143,11 +144,11 @@ systems do not handle speech at all.
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
 | V1 | Doorbell or security export | "My parcel vanished Tuesday. When was it taken, and what was the person wearing?" | 3 cameras × 48 h, 1-hour or 24-hour MP4s, 4-8 GB each | night and infrared, many passers-by, the same event on two cameras | MEVA | 1 |
-| V2 | Dashcam road trip | "Where did the cyclist cut in front of me?" "What exit did we take for fuel?" | 8 h in 4 GB GoPro-style chapters, the camera clock set wrong | everything moves; a sign is readable for a second; "what time" means the true time | comma2k19 (GPS and CAN, no event labels) | 3 |
-| V3 | Kid's recital or match | "Find my daughter's solo." "Every time number 7 touched the ball." | one 3-hour 4K phone video, over 10 GB | one huge file; small faces | source to find (CC-licensed full-length recordings) | 3 |
+| V2 | Dashcam road trip | "Where did the cyclist cut in front of me?" "What exit did we take for fuel?" | 8 h in 4 GB GoPro-style chapters, the camera clock set wrong | everything moves; a sign is readable for a second; "what time" means the true time | a real daily dashcam archive with a per-second GPS track (Bristol VA); comma2k19 (GPS and CAN); no event labels | 3 |
+| V3 | Kid's recital or match | "Find my daughter's solo." "Every time number 7 touched the ball." | one 3-hour 4K phone video, over 10 GB | one huge file; small faces | full-length recordings from the stands (YouTube); SoccerTrack v2 (gated on Hugging Face; a public Drive folder is untested) | 3 |
 | V4 | Lecture, meeting or conference recording | "When did the speaker show the attention diagram?" "Who drew on the whiteboard?" | a 6-hour livestream; or 20-40 h of meetings | slides look alike; needs reading | AMI Meeting Corpus; CC-licensed lectures | 2 |
 | V5 | Lab or robot camera | "Find the run where the arm dropped the cup." | 300 episodes of 2-3 cameras, or one 8-hour lab camera | near-identical runs; only the outcome differs | DROID | 1 |
-| V6 | Bird-feeder or wildlife camera | "When did the woodpecker visit?" | 12 h from a fixed camera | long still stretches, a tiny subject | source to find | 3 |
+| V6 | Bird-feeder or wildlife camera | "When did the woodpecker visit?" | 12 h from a fixed camera | long still stretches, a tiny subject | a feeder cam's daily 12-hour archive with the project's species logs (Birds Untold) | 3 |
 | V7 | Developer screen | "When did the borrow-checker error first appear?" | days of screen recording in 1-minute files | text-sized changes among look-alike decoys | the copied synthetic week; AgentNet's screen recordings | kept |
 | V8 | Egocentric days | EgoLifeQA's questions, as open answers where its labels allow | 3 days of smart-glasses video | many hours; much of it speech | EgoLife | kept |
 
@@ -155,12 +156,12 @@ systems do not handle speech at all.
 
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
-| I1 | Phone camera roll | "Find the parking-level sign at the airport." "The receipt for the TV." | 10-30k photos over years: HEIC, bursts, WhatsApp copies without dates | small text, near-duplicates, wrong dates | YFCC100M photostreams; DISBench (57 users, 122 verified queries); Dan's phone (private) | 1 |
-| I2 | Screenshots folder | "Find the screenshot with the wifi password." | 5k screenshots | they all look alike; needs reading | source to find; Dan's own (private) | 2 |
+| I1 | Phone camera roll | "Find the parking-level sign at the airport." "The receipt for the TV." | 10-30k photos over years: HEIC, bursts, WhatsApp copies without dates | small text, near-duplicates, wrong dates | ATM-Bench (one person's 3,759 photos, 1,013 questions in their voice by annotators); YFCC100M photostreams; DISBench (57 users, 122 verified queries); Dan's phone (private) | 1 |
+| I2 | Screenshots folder | "Find the screenshot with the wifi password." | 5k screenshots | they all look alike; needs reading | Android in the Wild and Rico screenshots; Dan's own (private) | 2 |
 | I3 | Trail camera SD card | "Which nights did deer come? Was there ever a bear?" | 20k triggers, 90% empty from wind | empty frames; night infrared; animals at the edge | Caltech Camera Traps (LILA BC) | 1 |
-| I4 | Home inspection or insurance | "Show me every photo of water damage in the basement." | 2k photos | subtle; must find all of them | source to find | 3 |
-| I5 | Family archive scans | "Find grandma at the beach" (one reference photo attached) | 8k scanned prints, no dates | search by example; people age | source to find | 3 |
-| I6 | Construction time-lapse | "When was the crane taken down?" | 50k photos, one every 5 minutes | slow change | source to find | 3 |
+| I4 | Home inspection or insurance | "Show me every photo of water damage in the basement." | 2k photos | subtle; must find all of them | one damaged home's phone photos, building-defect close-ups, listing photos | 3 |
+| I5 | Family archive scans | "Find grandma at the beach" (one reference photo attached) | 8k scanned prints, no dates | search by example; people age | one family's 1,376 scans (Internet Archive) with FG-NET's 82 people across ages | 3 |
+| I6 | Construction time-lapse | "When was the crane taken down?" | 50k photos, one every 5 minutes | slow change | an hourly 4K building-site webcam, 2018-2021 (ANU) | 3 |
 
 ### 5.3 Long audio, one file
 
@@ -169,8 +170,8 @@ systems do not handle speech at all.
 | A1 | Home while away | "Did the smoke alarm go off? When did the dog start barking?" | 24 h from a room microphone in one file (about 2.7 GB of mono 16 kHz WAV) | the TV plays alarms too; the dog barks at everything | a real home's ambience (SINS) with real events (FSD50K) mixed in at a set SNR | 1 |
 | A2 | Overnight recording | "Did I talk in my sleep? When did the baby cry?" | 8 h from a bedroom | mostly silence; faint events | a quiet-room recording with FSD50K events mixed in; or Dan's own | 2 |
 | A3 | Meeting or interview | "When did Bob agree to the price?" | a 3-hour meeting; 6 h of interview tapes | it is speech | AMI Meeting Corpus | 1 |
-| A4 | Field recorder | "When did the owl call? Find every frog chorus." | 3 nights outdoors | wind, rain, distant calls | the 33 annotated one-hour bird soundscapes | 2 |
-| A5 | Car or machine | "When does the rattle start?" | a 2-hour drive; 24 h of a factory floor | a small change in constant noise | MIMII machine sounds (licence to check) | 3 |
+| A4 | Field recorder | "When did the owl call? Find every frog chorus." | 3 nights outdoors | wind, rain, distant calls | three real nights of one BirdVox recorder, with owls and frogs mixed in from the annotated soundscapes and AnuraSet | 2 |
+| A5 | Car or machine | "When does the rattle start?" | a 2-hour drive; 24 h of a factory floor | a small change in constant noise | MIMII machine sounds (clips only: no long base found) | 3 |
 
 ### 5.4 Many short audio files, hours in total
 
@@ -178,9 +179,9 @@ systems do not handle speech at all.
 | --- | --- | --- | --- | --- | --- | --- |
 | M1 | Voice memos | "Find the memo where I said the gate code." "Where I hummed that melody." | 400 memos over 2 years, 10 s to 10 min, M4A | speech; dates only from the files | Dan's own (private); or a scripted set Dan records | 2 |
 | M2 | Messaging voice notes | "Find Mum's note with the lasagne recipe." | 1,000 Opus notes from a chat export | speech; meaningless names | a scripted set recorded by Dan or volunteers | 3 |
-| M3 | Voicemails | "The voicemail from the dentist about rescheduling." | 300 calls | phone-quality sound | source to find | 3 |
+| M3 | Voicemails | "The voicemail from the dentist about rescheduling." | 300 calls | phone-quality sound | real business voicemails from litigation archives; FTC robocalls; answering-machine tapes | 3 |
 | M4 | Sample library | "Find a door creak." "Every snare with reverb." | 10k WAVs | find-all by sound, no speech | FSD50K clips | 1 |
-| M5 | Bat or bird recorder on a schedule | "Which recordings have owls in them?" | 3,000 one-minute files | many files, few hits | the bird soundscapes, cut on an AudioMoth-style schedule | 2 |
+| M5 | Bat or bird recorder on a schedule | "Which recordings have owls in them?" | 3,000 one-minute files | many files, few hits | AnuraSet's real one-minute schedule files; or the bird soundscapes, cut on an AudioMoth-style schedule | 2 |
 | M6 | Motion clips with sound | "Which clips have glass breaking?" | 2,000 thirty-second camera clips | the sound is inside video files | camera clips with FSD50K events mixed into their sound | 2 |
 
 ### 5.5 Mixed dumps, and the large-file track
@@ -565,18 +566,19 @@ screen-video memory was found.
 | [MEVA](https://registry.opendata.aws/mevadata/) | CC BY 4.0; open on AWS, no account | ~328 h multi-camera video; 37 activity types with spans for ~184 h | V1, M6, V7's camera |
 | [AMI Meeting Corpus](https://groups.inf.ed.ac.uk/ami/corpus/) | CC BY 4.0 for signals, transcripts and some annotations | 100 h; room video, close and far microphones, slides; transcripts | V4, A3 |
 | [FSD50K](https://zenodo.org/records/4060432) | CC BY 4.0; per clip CC0, BY or BY-NC; no account | 51K clips, 200 classes (doorbell and alarm classes: check `vocabulary.csv`) | A1, A2, M4, M6 |
-| [SINS](https://zenodo.org/records/2555143) | licence in a PDF, unread | a continuous week in a real home, 13 nodes × 4 microphones, activity labels | A1 |
+| [SINS](https://zenodo.org/records/2555143) | CC BY 4.0 on Zenodo, but its licence PDF says academic use only | a continuous week in a real home, 13 nodes × 4 microphones, activity labels | A1 |
 | [DROID](https://arxiv.org/abs/2403.12945) | CC BY 4.0 | 76K episodes, 350 h, 3 cameras, an instruction each | V5 |
 | YFCC100M, or [DISBench](https://arxiv.org/abs/2602.10809) on it | per-photo CC; original metadata under Yahoo's Webscope agreement (reports conflict) | real users' photos with EXIF; DISBench: 57 users, 109K photos, 122 verified queries | I1 |
 | [Bird soundscapes](https://zenodo.org/records/7050014) | CC BY 4.0; no account | 33 one-hour recordings, 20,147 timed calls | A4, M5 |
-| [Caltech Camera Traps](https://lila.science/) | CDLA-Permissive | 243K images, 140 places (time fields unverified) | I3 |
+| [Caltech Camera Traps](https://lila.science/) | CDLA-Permissive | 243K images, 140 places, `date_captured` to the second (checked) | I3 |
 | [comma2k19](https://github.com/commaai/comma2k19) | MIT | 33 h of driving, ~100 GB, GPS and CAN, no event labels | V2 |
 | [AgentNet / OpenCUA](https://huggingface.co/datasets/xlangai/AgentNet) | MIT per its card; gating unverified | 22.6K human screen-video tasks with input events | V7 |
-| MIMII | licence to check | machine sounds (valves, pumps, fans, slide rails) | A5 |
+| MIMII | CC BY-SA 4.0 (as found) | machine sounds (valves, pumps, fans, slide rails) | A5 |
 | EPIC-KITCHENS-100 + EPIC-SOUNDS | CC BY-NC 4.0 | 100 h egocentric with sound; 78K timed sound events | a kitchen scenario, if non-commercial suits |
 | Gated: VIRAT, Ego4D, LSC/NTCIR, BirdCLEF, V3C | an agreement, an application or an account | | not without Dan |
 
-Dan reads each licence before anything is downloaded. No agent accepts a licence or makes an account.
+On 4 November 2026 Dan decided that licences are not a filter for use on this machine; [MEDIA.md](MEDIA.md) records the
+licence each source states. No agent accepts an agreement or makes an account, so gated sources wait for Dan.
 
 ## 12. Phases
 
@@ -589,7 +591,8 @@ Dan reads each licence before anything is downloaded. No agent accepts a licence
 
 ## 13. Open questions for Dan
 
-1. **Licences:** each dataset in section 11.3, read and accepted by Dan.
+1. **Licences:** decided on 4 November 2026: not a filter for use on this machine. Gated sources still need Dan
+   ([MEDIA.md](MEDIA.md), "Decisions for Dan").
 2. **CPU work beside a GPU job:** may GPU-free configurations and builds run while a system holds the GPU?
 3. **Where mm's plug-in lives:** in MMMB as `systems/mm` with Multimem as an optional dependency (proposed), or in
    Multimem?
@@ -601,6 +604,8 @@ Dan reads each licence before anything is downloaded. No agent accepts a licence
    - a scripted set of voice notes (M2).
 
    All with questions he writes, kept private and never published.
-7. **Sources to find:** V3, V6, I4, I5, I6 and M3 have no fitting data yet. Candidates are welcome, or they wait.
+7. **Sources:** on 4 November 2026 every public scenario got a starter source. Some fall short: V1 cannot reach 48 h
+   per camera, A5 has no long base, and M5 has frogs, not owls. The gaps and the decisions they need are in
+   [MEDIA.md](MEDIA.md).
 8. **Publishing:** will MMMB be public? That decides the dev/test policy for the real-data scenarios, and the project's
    own licence.
