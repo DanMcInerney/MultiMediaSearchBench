@@ -109,6 +109,8 @@ def parser_of() -> argparse.ArgumentParser:
     repeats.add_argument("--jobs", type=int, default=JOBS, help=f"execs at once, at most {JOBS_MAX} (a system may allow fewer)")
     repeats.add_argument("--answer-format", choices=FORMATS, help=f"as for run (default {DEFAULT_FORMAT}: D1 asks for json once, and for line only "
                          "when a cell falls outside the band)")
+    repeats.add_argument("--clock", choices=CLOCKS, help=f"as for run (default {DEFAULT_CLOCK}); a system that cannot report its queue is refused "
+                         "more than one exec at once on the working clock, and the refusal comes after the build")
     repeats.add_argument("--dry-run", action="store_true", help="say what it would do and cost, build and start nothing")
     check = sub.add_parser("clock-check", help="the working clock tried on a few cases: each asked alone, then queued with the others, and the answers, "
                            "tokens and charged seconds side by side (DESIGN 8.4; it spends the plans' quota)")

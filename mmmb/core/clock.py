@@ -55,19 +55,19 @@ class WorkingClock:
         return wall, queue, wall if queue is None else max(0.0, wall - queue)
 
     def left(self) -> float:
-        """The most seconds that can pass before the clock is over, if the queue stays as it is."""
+        """The most seconds that can pass before the clock is over if no more of the exec's time is queued from now on."""
         wall, _, working = self.look()
         return max(0.0, min(self.limit_s - working, self.wall_cap_s - wall))
 
     def expired(self) -> str | None:
-        """The `problem` of an exec that is out of time, else None. Over the wall cap is told apart from over the limit; the limit's
-        text is the recorded `timeout: no answer in 900 s` unless the exec waited in a queue, which it then says."""
+        """The `problem` of an exec that is out of time, else None. The limit's text is the recorded `timeout: no answer in 900 s` unless
+        the exec waited in a queue, which it then says; the wall cap, which only a long queue reaches first, is told apart from it."""
         wall, queue, working = self.look()
         waited = f"{queue:g} s" if queue else None
-        if wall >= self.wall_cap_s:
-            return f"timeout: no answer in {self.wall_cap_s:g} s on the wall clock" + (f" ({waited} of it queued)" if waited else "")
         if working >= self.limit_s:
             return f"timeout: no answer in {self.limit_s:g} s" + (f" of working time ({wall:.0f} s on the wall clock, {waited} queued)" if waited else "")
+        if wall >= self.wall_cap_s:
+            return f"timeout: no answer in {self.wall_cap_s:g} s on the wall clock" + (f" ({waited} of it queued)" if waited else "")
         return None
 
     def figures(self) -> dict:

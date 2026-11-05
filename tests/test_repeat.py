@@ -182,3 +182,17 @@ def test_the_run_command_line_a_repeat_makes_has_each_agents_recorded_model_and_
     assert argv[argv.index("--only") + 1] == ",".join(q.qid for q in tiny_questions())
     assert argv[-6:] == ["--claude-model", "claude-test-1", "--codex-model", "codex-default", "--codex-effort", "medium"], "(no --claude-effort: none recorded)"
     assert cli.parser_of().parse_args(argv).codex_effort == "medium"
+
+
+def test_a_repeat_on_a_system_that_cannot_say_its_queue_is_refused_at_three_execs_once_the_run_is_built_and_goes_on_with_the_wall_clock(w, capsys):
+    """The refusal of the working clock (core/clock.py) needs the system's store, so it comes after the build, which stays; `--clock wall` is passed on to the run."""
+    cli_world.use(w.patch, StubSystem(report=CLEAN, reports_queue=False))
+    stub = Stub()
+    assert w.main(*args_of(w, "--jobs", "3"), agents=agents_of(stub)) == 1
+    assert "stub/all: 3 execs at once on the working clock" in capsys.readouterr().err and stub.execs == []
+    new = repeated(w)
+    assert w.main(*args_of(w, "--into", str(new.folder), "--jobs", "3", "--clock", "wall"), agents=agents_of(stub)) == 0
+    assert len(stub.execs) == EXECS
+    clocks = {config: {r["clock"] for cells in results_of(new).values() for r in cells[config].values()} for config in ("files", "stub-all")}
+    assert clocks == {"files": {"wall"}, "stub-all": {"wall"}}, "asked for the wall clock: every result says so, a system with a queue figure or not"
+    assert cli.parser_of().parse_args(["repeat", "recorded"]).clock is None and cli.parser_of().parse_args(["run", "x"]).clock == "working"

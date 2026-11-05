@@ -42,6 +42,7 @@ from multimem import config, decider  # noqa: E402
 from mmmb import systems  # noqa: E402
 from mmmb.core import fs, render, report, retrieval  # noqa: E402
 from mmmb.core.agents.common import scrubbed  # noqa: E402
+from mmmb.core.clock import WALL  # noqa: E402
 from mmmb.core.contract import Case, RetrievalQuery  # noqa: E402
 from mmmb.core.record import Halt  # noqa: E402
 from mmmb.core.runner import Agent, run_agents, run_config  # noqa: E402
@@ -77,9 +78,10 @@ def scan(api, **params) -> dict:
 
 
 def go(run, dump, store, agent, configs=None, jobs: int = 2, **kw) -> None:
-    """`run_agents` over `run` with the mm system (the fake decider is its variant `fake`) and the registry for the rest."""
+    """`run_agents` over `run` with the mm system (the fake decider is its variant `fake`) and the registry for the rest. mm cannot say its queue
+    (decision D3), so more than one exec at once is on the wall clock: these tests are of other things than the clock."""
     run_agents(run, {"claude": Agent(agent)}, list(configs or run.configs), dump, lambda name: store, jobs,
-               load=lambda name: MM if name == "mm" else systems.load(name), isolation=systems.isolation(), answer_format="line", **kw)
+               load=lambda name: MM if name == "mm" else systems.load(name), isolation=systems.isolation(), answer_format="line", clock=WALL, **kw)
 
 
 def result(run, folder: str, qid: str, agent: str = "claude") -> dict:
@@ -548,7 +550,7 @@ def test_no_exec_sees_a_label_an_earlier_exec_left_and_a_long_exec_holds_the_gpu
         baseline = kept_items(home)
 
         def arm(agent, questions_, jobs):
-            run_config(run, "claude", Agent(agent), S, description, questions_, session, dump, isolation, jobs, Halt(), "line")
+            run_config(run, "claude", Agent(agent), S, description, questions_, session, dump, isolation, jobs, Halt(), "line", clock=WALL)
 
         # without the scrub, the later of two execs finds the earlier one's label (so the test below can fail)
         leaky = Probing(first, tiny)
@@ -738,7 +740,7 @@ def test_the_next_exec_of_a_template_starts_after_the_late_label_of_the_last_one
                 "tokens": None, "cost_usd": None, "used_percent": 1.0, "model": "stub", "denials": 0}
 
     description, isolation = MM.describe("fake"), systems.isolation()
-    run_config(run, "claude", Agent(agent), S, description, [b, a, other], session, week[1], isolation, 3, Halt(), "line")
+    run_config(run, "claude", Agent(agent), S, description, [b, a, other], session, week[1], isolation, 3, Halt(), "line", clock=WALL)
     at = {event: i for i, event in enumerate(events)}
     mine = ("scrub", (exec_project(a.qid),))
     assert at[("end", a.qid)] < at[("label lands", "j-late")] < at[mine] < at[("start", b.qid)], events

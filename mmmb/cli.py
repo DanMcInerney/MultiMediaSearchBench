@@ -5,12 +5,12 @@ core/runner.py, core/retrieval.py, the scenario's `report`).
     mmmb build    --scenario NAME [--scale S --seed N --days D,D --source DIR ...] [--out DIR --temp DIR --cache DIR --configs A,B --no-probe]
     mmmb ingest   RUN [--configs A,B]                       the stores of the systems (build makes those of its --configs)
     mmmb run      RUN [--agents claude,codex --configs A,B --jobs N --side-by-side --subset all|pilot --controls CONFIG --only QID,.. --timeout S
-                       --anyway --dry-run --claude-effort L --codex-effort L --claude-model M --codex-model M --answer-format json|line
+                       --clock working|wall --anyway --dry-run --claude-effort L --codex-effort L --claude-model M --codex-model M --answer-format json|line
                        --scenarios S,.. --kinds K,.. --modalities M,.. --splits S,.. --tag NAME=VALUE --rung R --limit N --discriminating RUN,..]
     mmmb retrieve RUN [--configs A,B --dry-run]             each system asked for the needles, with no agent (the GPU, alone)
     mmmb report   RUN [RUN ...] [--control CONFIG]
     mmmb compare  RUN_A RUN_B [--across-settings]            two runs cell by cell: flips, counts, D1's band, McNemar, verdict lines
-    mmmb repeat   RECORDED [--into RUN --out DIR --temp DIR --cache DIR --jobs N --answer-format json|line --dry-run]
+    mmmb repeat   RECORDED [--into RUN --out DIR --temp DIR --cache DIR --jobs N --answer-format json|line --clock working|wall --dry-run]
                                                             a recorded run again at its agents' models and efforts
     mmmb clock-check RUN --config CONFIG [--agents claude,codex --cases N --jobs N]
                                                             the working clock tried: N cases asked alone and then queued, side by side
@@ -344,7 +344,7 @@ def repeat_command(args: argparse.Namespace, parser: argparse.ArgumentParser, re
                         cache=args.cache, workers=args.workers, load=registry.load)
         print(run.folder)
     argv = [*run_argv(run.folder, repeat, args.jobs), *(["--answer-format", args.answer_format] if args.answer_format else []),
-            *(["--dry-run"] if args.dry_run else [])]
+            *(["--clock", args.clock] if args.clock else []), *(["--dry-run"] if args.dry_run else [])]
     status = run_command(parser.parse_args(argv), parser, registry, real)
     if status == 0 and not args.dry_run:
         print(f"repeated {recorded.name} as {run.name}; compare them, and read every flip:\n  mmmb compare {recorded.folder} {run.folder}")
@@ -361,7 +361,9 @@ def clock_check_command(args: argparse.Namespace, parser: argparse.ArgumentParse
     if args.cases < 1:
         parser.error(f"--cases is 1 or more, not {args.cases}")
     run = resolve_run(args.run)
-    (config,) = registry.parse(args.config)
+    if len(configs := registry.parse(args.config)) != 1:
+        parser.error(f"--config is one configuration, not {args.config!r}")
+    config = configs[0]
     if config.system is None:
         raise ValueError(f"{config.name} has no system, so there is no queue to check")
     loaded, descriptions = registry.setup([config])

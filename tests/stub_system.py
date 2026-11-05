@@ -62,10 +62,19 @@ class StubSession(PlainSession):
 
     def __init__(self, system: StubSystem, context: SessionContext) -> None:
         self.system, self.context = system, context
+        self.at_once = 1  # the execs at once `max_jobs` allowed: with one there is no queue
 
     def max_jobs(self, cases, requested):
         self.system.note("max_jobs", None, len(cases), requested)
-        return min(requested, self.system.job_limit or requested)
+        self.at_once = min(requested, self.system.job_limit or requested)
+        return self.at_once
+
+    def queue_s(self, case: Case) -> float | None:
+        """What a system with a queue reports (`waits`: the seconds each case waits when execs share it), 0.0 as `PlainSession` does when
+        nothing is planted, or None for a system that cannot say (`reports_queue`)."""
+        if not self.system.reports_queue:
+            return None
+        return self.system.waits.get(case.qid, 0.0) if self.at_once > 1 else 0.0
 
     def estimate(self, sources, ranges):
         return self.system.rate * sum(b - a for a, b in ranges)
@@ -123,11 +132,14 @@ class StubSystem:
     shared: list | None = None  # a log that other stand-ins write to as well, to tell the order of the calls among them
     report: IngestReport | None = None  # what `ingest` reports (the runner never ingests; the CLI's build does); None: ingest is an error
     unready: str | None = None  # why `check_ready` raises (a model not downloaded, an environment not installed); None: it is ready
+    reports_queue: bool = True  # False: its sessions cannot say how long a case waits (`Session.queue_s` is None), as mm's cannot (decision D3)
+    waits: dict = None  # qid -> the seconds that case waits in the queue when more than one exec runs at once; the others wait none
 
     def __post_init__(self) -> None:
         self.events: list[tuple] = []
         self.lock = threading.Lock()
         self.closing = self.closing or {}
+        self.waits = self.waits or {}
 
     def note(self, kind: str, qid: str | None, *rest) -> None:
         with self.lock:

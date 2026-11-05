@@ -154,7 +154,7 @@ def test_a_dry_run_of_the_command_prints_the_exec_of_a_model_this_environment_ca
     monkeypatch.setattr(Daemon, "start", lambda self, ready=True: pytest.fail("a dry run starts no daemon"))
     monkeypatch.setattr(mm_home, "copy_home", lambda *args: pytest.fail("a dry run copies no store"))
     monkeypatch.setattr(claude, "check_login", lambda: pytest.fail("a dry run logs nothing in"))
-    assert cli.main(["run", str(folder), "--dry-run", "--agents", "claude", "--configs", "mm/d1-3B"]) == 0
+    assert cli.main(["run", str(folder), "--dry-run", "--agents", "claude", "--configs", "mm/d1-3B", "--clock", "wall"]) == 0
     out = capsys.readouterr().out
     assert "== claude mm-d1-3B" in out and "--mcp-config" in out and out.rstrip().endswith("nothing was run")
     assert not (folder / "homes").exists() and not (folder / "results").exists()
