@@ -1,8 +1,8 @@
 # MMMB: the plan to production readiness
 
 Agreed with Dan on 5 November 2026, then re-planned the same day: MMMB is a standalone benchmark of realistic media, not
-Multimem's benchmark separated out. Unit 1 is built and reviewed; the changes from this plan made while building are marked
-"As built".
+Multimem's benchmark separated out. Built on 6 November 2026, through both review gates and the real-agent test; the changes
+from this plan made while building are marked "As built". DESIGN.md section 5.7 says what each scenario is now.
 
 ## The goal
 
@@ -44,10 +44,18 @@ Each scenario:
 - has a `tiny` size of a few files for the tests, built in seconds from the same source;
 - marks about 30% of its questions `dev` and 70% `test`, by a seeded draw.
 
+*As built:* V1 is one MP4 per camera for each unbroken stretch it recorded (the recorder stopped five minutes at 10:35), and
+leaves out MEVA's infrared cameras and night clip, which have no official labels: 6 files, 5.9 GB. M4 is not the whole
+split: it keeps a few clips of each sound it asks about and none of a sound easily taken for one (about 6,100 clips, 5.2 GB).
+At full size: V1 22 questions, I3 23, A1 20, M4 21, with 24% to 27% absent.
+
 Defaults taken, each easy to change later:
-- A1 asks about labelled activities only. Mixing alarms, a doorbell or a dog into the room is later work.
+- A1 asks about labelled activities only. Mixing alarms, a doorbell or a dog into the room is later work. *As built:* the
+  vacuum cleaner, the TV, visits and the resident's absences; cooking, eating, dishwashing and working run into one another
+  with no edge in the sound, and are not asked.
 - I3 keeps the camera's own clock, which writes midnight as 12:xx (real mess), and asks no question that rests on those
-  frames.
+  frames. *As built:* the camera's clock was right and printed AM or PM on each photo; the dataset dropped it. I3 reads it from
+  the photo and writes the night ones at 00:xx, and still asks nothing that rests on an hour-12 photo.
 - SINS keeps one channel as recorded, its DC offset included.
 
 ## What gets built
@@ -77,7 +85,9 @@ Defaults taken, each easy to change later:
   the tolerance, "unknown" on a needle.
 - Each full dump is built once and probed (CPU and disk only, minutes each).
 - One small real-agent test: `i3_trailcam` tiny, `files` and `listing`, Claude and Codex, 2 questions: 8 execs, about 10
-  minutes, likely under $1 of Claude and a little Codex quota.
+  minutes, likely under $1 of Claude and a little Codex quota. *As built:* 6 of the 8 ran (Claude's `listing` cells were stopped by
+  the run itself, the plan being at 98% of its use); Claude's $0.88. It found one fault, a file cited with an ISO time read
+  as unparsed, now fixed (TESTING.md section 9).
 - The fast suite once at the end (about 8 minutes, 4 CPU workers, no GPU). Targeted tests only before that.
 
 ## Order of work

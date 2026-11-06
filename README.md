@@ -20,23 +20,27 @@ media for the scenarios comes from.
 
 ## Status
 
-P0 is built (5 November 2026). The benchmark that was copied from Multimem is now the `mmmb` package, and its core runs with
-Multimem not installed.
+Built (6 November 2026): a standalone benchmark of four real piles of media, one for each shape, with every answer taken from
+the source's own labels.
 
-- **Scenarios:** V7, a synthetic week of an owner's screen, phone, front door camera, microphone, notes and logs, with
-  needles hidden among decoys; and V8, EgoLifeQA over the public EgoLife smart-glasses video.
-- **Systems:** `files` (the agent's own tools, the baseline), `listing` (file names, sizes, times and metadata only: the floor
-  and the leak filter) and `mm` (Multimem's local decision model).
+| Scenario | The pile | Questions (full size) |
+| --- | --- | --- |
+| `v1_security` | three outdoor security cameras, 75 minutes each, one MP4 for each unbroken stretch a camera recorded (MEVA) | 22: when an activity was first or last seen, how many times, and things that never happened |
+| `i3_trailcam` | a trail camera's memory card: 4,256 photos over six months, most of them empty (Caltech Camera Traps) | 23: which days an animal came, how many, first and last visits, animals that never came |
+| `a1_home_audio` | a voice recorder left running in a living room for 24 hours, one WAV (SINS) | 20: when the vacuum, the TV or a visitor started and stopped, how many times, things that did not happen |
+| `m4_samples` | a folder of about 6,100 short sound clips under names that say nothing (FSD50K) | 21: find every clip of a sound, how many there are, sounds that are not there |
+
+About a quarter of each scenario's questions are about things that never happened, and about 30% are `dev`.
+
+- **Systems:** `files` (the agent alone with the files and its own tools: the baseline), `listing` (file names, sizes, times
+  and metadata only: the floor and the leak check), and any plug-in search system. `mm` (Multimem's local model) is one,
+  optional.
 - **Agents:** Claude Code and Codex, locked down.
-- **Built:** the question file, grounded answers, choosing cases, cached dumps and stores, side-by-side scheduling (off unless
-  asked), `mmmb compare` and `mmmb repeat`.
-- **Working-time clock:** built (`--clock working|wall`, default `working`). mm reports no queue, so it runs on the wall clock and
-  is refused more than one exec at once on the working clock. `mmmb clock-check` is built but not run, and for mm it needs a
-  small change in Multimem first.
-- **Not done, because it needs the GPU, a paid agent or Dan's go-ahead:** the pilot re-run through the new runner (`files` three execs at once, `mm` one, as the pilot ran), and the
-  first `mm+files` run. No GPU and no paid agent ran in P0. The commands, their cost and what they decide are in
-  [DESIGN.md section 12](DESIGN.md#12-phases).
-- **Next (P1):** the `embed` and `transcript` systems and the priority-1 scenarios.
+- **Checked with real agents:** a tiny run of `i3_trailcam` with Claude and Codex in `files` and `listing` (TESTING.md).
+- **Extras:** V7, the synthetic week of a screen, phone, door camera, microphone and logs that mm was tuned on, and V8,
+  EgoLifeQA over the EgoLife smart-glasses video. Both came from Multimem's work and stay as they were.
+- **Not done:** full runs of the four scenarios with real agents (paid), and everything that needs the GPU (DESIGN.md
+  section 12).
 
 Tested on Windows 11 only.
 
@@ -47,11 +51,13 @@ runs use your plans' quota), Git for Windows (Claude's shell tool needs it), and
 Multimem's model installed.
 
 ```
-uv sync                              # the core, V7 and V8, the files and listing systems, and pytest
+uv sync                              # the core, the scenarios, the files and listing systems, and pytest
 uv sync --extra mm                   # also Multimem, for the mm system
 uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's real decision model
 ```
 
+- The four scenarios read their sources from `D:\bench-data\sources\` (`meva`, `caltech-camera-traps`, `sins`, `fsd50k`;
+  [MEDIA.md](MEDIA.md) says where each comes from) and never write there. A build copies what it needs.
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
 - The `mm` extra is a path to Multimem's checkout (`C:/Users/danhm/tools/Multimem` in `pyproject.toml`), because Multimem
   has no git remote. Change it on another machine.
@@ -60,21 +66,26 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
 ## Run it
 
 ```
-uv run mmmb build --scenario v7_screen --scale tiny --configs files,listing
-uv run mmmb run <run> --agents claude --configs files,listing --dry-run
-uv run mmmb run <run> --agents claude --configs files,listing
+uv run mmmb build --scenario i3_trailcam --scale standard --configs files,listing
+uv run mmmb run <run> --agents claude,codex --configs files,listing --dry-run
+uv run mmmb run <run> --agents claude,codex --configs files,listing
 uv run mmmb report <run>
 ```
 
-- `build` writes the V7 week and its questions, ingests the dump into the stores of the systems among `--configs` (default
-  `files`), and runs the shortcut probe. It prints the run folder, `D:\mmmb-runs\<date>-v7-tiny-s1`; `<run>` is that folder, or
-  its name. The tiny week is 2 days and 19 questions, written in about 35 seconds. `--scale pilot` is the 3-day, 31-question
-  week the pilot used; `standard` is 7 days.
-- `run --dry-run` says what the run will cost and starts no agent. Without `--dry-run` it spends your plans' quota. `--jobs`
-  is how many execs of a configuration run at once (3 unless you say, at most 4). A configuration whose system needs the GPU
-  (`mm`) runs one at a time whatever `--jobs` says, and only `--gpu-jobs N` asks for more. `--limit 12` or `--kinds last,absent`
-  run fewer cases.
-- `report` pools the paired comparison into `report.md` and `report.json` in the run folder. `run` continues a run that
+- `build` copies the scenario's files into a dump with their recording times, writes its questions, ingests the dump into the
+  stores of the systems among `--configs` (default `files`), and runs the leak probe. It prints the run folder,
+  `D:\mmmb-runs\<date>-i3-standard-s1`; `<run>` is that folder, or its name. `--scenario` is `v1_security`, `i3_trailcam`,
+  `a1_home_audio` or `m4_samples` (or the extras `v7_screen`, `v8_egolife`); `--seed N` draws other questions from the same
+  pile. A full-size dump is built in minutes and is found again by the next build of the same recipe.
+- `--scale tiny` is a few files of the same pile and 6-8 questions, built in seconds: a smoke run, as in TESTING.md.
+- `run --dry-run` says what the run will cost and starts no agent. Without `--dry-run` it spends your plans' quota, and stops
+  when a plan is at 95% of its use. `--jobs` is how many execs of a configuration run at once (3 unless you say, at most 4). A
+  configuration whose system needs the GPU (`mm`) runs one at a time whatever `--jobs` says, and only `--gpu-jobs N` asks for
+  more. `--limit 12` or `--kinds count,absent` run fewer cases.
+- `report` writes `report.md` and `report.json` in the run folder: per agent and configuration, what it got right with its
+  interval, grounded and lucky answers, absent questions answered, seconds, tokens and dollars per right answer, the questions
+  `listing` answered (leaks, left out of every other figure), and each other configuration beside `files`. Several runs of one
+  real scenario (other seeds) are pooled; runs of several scenarios get a table over all of them. `run` continues a run that
   stopped.
 - `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmmb ingest` command to
   make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`. mm runs one exec at a time, because
@@ -89,7 +100,7 @@ Commands, each with `--help`:
 | `mmmb ingest RUN` | ingests the dump into the stores of more systems |
 | `mmmb run RUN` | the execs of Claude and Codex over the questions; resumes; `--dry-run` prices it |
 | `mmmb retrieve RUN` | each system asked for the needles with no agent (the GPU, alone) |
-| `mmmb report RUN [RUN ...]` | figures and Markdown; several runs of one scenario are pooled |
+| `mmmb report RUN [RUN ...]` | figures and Markdown; runs of one real scenario (or of V7) are pooled, V8's are reported one at a time, and runs of several scenarios get a table over all |
 | `mmmb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
 | `mmmb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
 | `mmmb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until Multimem reports its queue) |
@@ -115,9 +126,9 @@ video, text and records; `mm+files` is asked them all.
 
 | Path | What |
 | --- | --- |
-| `mmmb/core/` | the runner, the agents (`agents/`), grading, the report; knows no system |
+| `mmmb/core/` | the runner, the agents (`agents/`), grading, the reports (`summary.py` for the real scenarios); knows no system |
 | `mmmb/systems/` | `files/`, `listing/`, `mm/`, each with a `system.toml` |
-| `mmmb/scenarios/` | `v7_screen/`, `v8_egolife/` |
+| `mmmb/scenarios/` | `realdump/` (the builder the real scenarios share), `v1_security/`, `i3_trailcam/`, `a1_home_audio/`, `m4_samples/`; the extras `v7_screen/`, `v8_egolife/` |
 | `tests/` | the tests; `tests/oracles/recorded/` holds the recorded pilot and EgoLife runs they are held to |
 | `results/` | published reports: [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
 | `D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (change them with `--out`, `--temp`, `--cache`; keep them on one drive) |

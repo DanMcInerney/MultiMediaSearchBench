@@ -1,10 +1,12 @@
 # MultiMediaMemoryBench (MMMB): design
 
-Status: P0 is built (5 November 2026). [VISION.md](VISION.md) says what MMMB is for; this file says how. The benchmark
-copied from Multimem is now `mmmb`: the core, the V7 and V8 scenarios and the `files`, `listing` and `mm` systems run from
-this repository, and the core runs with Multimem not installed. Not done in P0: the pilot re-run through the new runner,
-the first `mm+files` run, and the check of the working-time clock on 10 cases (section 12). A section says where it
-describes what P1 and later will build, and every estimate is marked as one. Section 8.1 is measured.
+Status: built (6 November 2026). [VISION.md](VISION.md) says what MMMB is for; this file says how. MMMB is a standalone
+benchmark of real piles of media: four scenarios, one for each media shape, built from real recordings with every answer
+taken from the source's own labels (5.7), on a shared builder (7.2), graded by fixed rules (6.1) and reported by a neutral
+report (6.3). The benchmark first copied from Multimem (P0, 5 November) is `mmmb` too: the V7 and V8 scenarios and the `mm`
+system stay as extras, and the core runs with Multimem not installed. Not done: full runs of the four scenarios with real
+agents, the pilot re-run, the first `mm+files` run, and the check of the working-time clock (section 12). A section says
+where it describes what later work will build, and every estimate is marked as one. Section 8.1 is measured.
 [TESTING.md](TESTING.md) says how the build was checked.
 
 ## 1. Overview
@@ -60,10 +62,12 @@ MultiMediaMemoryBench/
     runner.py schedule.py select.py costing.py dryrun.py clock.py clockcheck.py     the exec loop; the pools (8.3); choosing cases (8.2); working time (8.4)
     record.py report.py render.py compare.py repeat.py retrieval.py stats.py     results, figures and Markdown; two runs side by side; a run
                                 again; the retrieval run (8.5); statistics
+    summary.py                  the neutral report of the real scenarios (6.3)
     fs.py paths.py gpu.py probe.py     files and permissions; where things live; the GPU check; the probe's outcome
     agents/     spec.py (one exec as the agents get it), common.py, claude.py, codex.py
   mmmb/systems/     a registry that reads every system.toml; files/  listing/  mm/       # one folder per plug-in
-  mmmb/scenarios/   a registry; v7_screen/  v8_egolife/                                 # recipe, builder, questions, prompts
+  mmmb/scenarios/   a registry; realdump/ (the real scenarios' shared builder); v1_security/  i3_trailcam/  a1_home_audio/
+                    m4_samples/; the extras v7_screen/  v8_egolife/                     # recipe, builder, questions, prompts
   tests/            unit tests; oracles/ (the recorded goldens and the code that made them); mm/ (needs the mm extra)
   results/          <date>-<selection>/                                                 # published reports
   media/            sources.jsonl (MEDIA.md)
@@ -228,8 +232,8 @@ once per system. The questions mix the kinds in section 5.6. The tables give one
 [MEDIA.md](MEDIA.md) says where each scenario's media comes from, what is already downloaded, and what is still missing
 (4 November 2026). Licences are recorded there but are not a filter (section 11.3).
 
-P0 builds V7 and V8 only. A scenario is a module under `mmmb/scenarios/` named so that it can be imported (C6): `v7_screen`
-and `v8_egolife`, not `V1-security`. Its questions keep the ID of the tables below (`Question.scenario` is `V7`, `V8`).
+P0 built V7 and V8 only; V1, I3, A1 and M4 followed on 6 November (5.7). A scenario is a module under `mmmb/scenarios/` named
+so that it can be imported (C6): `v1_security` and `v7_screen`, not `V1-security`. Its questions keep the ID of the tables below (`Question.scenario` is `V7`, `V8`).
 A scenario is the functions of the `Scenario` protocol (`mmmb/core/scenario.py`): `recipe`, `hashes`, `build`, `probe`,
 `prompt`, `view`, `deny_words`, `after_exec`, `release`, `report`, and a line in the registry. It never knows a system.
 Agents cannot hear, so the truth of every sound question comes from a mixing list, a script or a dataset's labels, never
@@ -307,6 +311,48 @@ systems do not handle speech at all.
 
 About a quarter of all questions are absent ones. Agents and systems both force matches.
 
+### 5.7 The real scenarios, as built (6 November 2026)
+
+One scenario for each media shape, each a module of the `Scenario` protocol over the shared builder (7.2): a reader of the
+source and its labels, and question templates. Each has a `tiny` scale (a few files of the same pile, built in seconds, for the
+tests and a smoke run) and a `standard` one. Every answer comes from the source's own labels; about a quarter of the questions
+are absent, built to read exactly like a real question of their template; about 30% are `dev` by a seeded draw (6.4); `--seed`
+draws other questions from the same pile. The question is asked at a fixed `now` after the pile's last recording.
+
+| ID | Module | The dump (standard) | Questions (standard, seed 1) | Rules |
+| --- | --- | --- | --- | --- |
+| V1 | `v1_security` | MEVA, 12 March 2018, 10:00 to 11:15, the three visible cameras of one site: one MP4 per camera for each unbroken stretch it recorded (the recorder stopped 10:35 to 10:40), `cam1_20180312_100000-103500.mp4`, 6 files, 5.9 GB; tiny, the first ten minutes (3 files, 0.8 GB) | 22, 6 absent: when a car first turned left, or someone last closed a car door, on a camera; how many times someone closed a car door on cam1 between 10:15 and 10:30; the same of activities no camera shows, or in a window with none | `time` with the date, 30 s; `count`; `absent` |
+| I3 | `i3_trailcam` | Caltech Camera Traps, location 23: the memory card, `DCIM/100RECNX/IMG_0001.JPG` on, each photo with RECONYX EXIF, 10 September 2013 to 28 February 2014, 4,256 photos, 1.9 GB; tiny, one week of December 2013 (199 photos) | 23, 6 absent: on which days in December 2013 a skunk came past (a set of dates); on how many days a pig came; when the camera first or last photographed a deer; the same of animals that never came, or in a month with none | `set` of dates; `count`; `time` with the date, 60 s; `absent` |
+| A1 | `a1_home_audio` | SINS node 7, the living room of a person living alone: one WAV of 2 February 2017, midnight to midnight, one channel as recorded (its DC offset kept), `RECORD/REC_20170202_000000.wav`, 2.8 GB; tiny, 21:30 to 22:30 (115 MB) | 20, 5 absent: at what time, between two times, the vacuum cleaner was switched on or off, the TV watched, a visitor came or left, the resident left or got back; how many times; the same over a window with none | `time`, 60 s (the TV, 120 s), asked as HH:MM:SS; `count`; `absent` |
+| M4 | `m4_samples` | FSD50K's evaluation split, but most clips of the sounds asked about and every clip of the sounds easily taken for them: `folder_01/rec_00001.wav` on, in 10 numbered folders, the clips as they are with no metadata, their times a seeded spread over April to September 2026 (the source has none), about 6,100 clips, 5.2 GB; tiny, 240 clips in 3 folders | 21, 5 absent: find every clip of a cat meowing (a set of file names); how many clips of someone chewing there are; the same of sounds the folder does not hold (a gong) | `set` of file names; `count`; `absent` |
+
+**What a question avoids** (several found by the independent reviews of the build, and each checked in the scenario's tests by a
+plain reader of the labels of its own):
+- a label a careful annotator may have missed, or that the source marks unsure (MEVA's `unaudited` and `not_good`; a label
+  within a second of a clip's edge);
+- a class easily taken for one in the dump (V1's vehicle manoeuvres, reversing, U-turns and turns, are asked only where no other
+  manoeuvre is within 30 s of the moment or in the window; A1's cooking, eating, dishwashing and working run into one another
+  with no edge in the sound, and are not asked; I3 asks of no fox, which a night coyote in infrared could be taken for; M4
+  leaves out of the folder every clip of a sound easily taken for one it asks about, such as bells and chimes beside a gong:
+  `NEAR` in its questions.py, from FSD50K's rater FAQ, the review's lists and judgement);
+- an animal too small to be sure of: I3 asks nothing of birds, which a labeller may miss among thousands of empty frames;
+- a window whose edge cuts an event, or that spans a stop of the recorder;
+- a moment the labels place loosely: A1's TV labels mark the watching, and the set's sound starts and stops up to a minute either
+  side, so the TV's tolerance is 120 s;
+- an answer the file list gives away: I3 asks for no first or last visit that is the card's first or last photo taken on
+  motion (its other photos are time-lapse shots on the hour). The `listing` leak check runs at every run as well.
+
+**The trail camera's midnight.** The dataset gives each photo's time with no AM or PM, so the hour after midnight reads as noon,
+while the camera printed the right one on the photo. I3 reads the "A" or "P" from a fixed box of each hour-12 photo's strip
+(checked on 1,213 photos, with no box between the two values; one that is neither is refused) and writes the 375 night photos
+of the card at 00:xx, in EXIF, the modified time and the order of the names. It still asks no first or last question that
+rests on an hour-12 photo.
+
+**Departures from the plan.** V1 is one MP4 per unbroken stretch, not one per hour, and leaves out MEVA's infrared cameras and
+its night clip, which have no official labels. A1 asks about labelled activities only (no sounds mixed in, 7.1). M4's dump is
+not the whole split: see its row. Each file's modified time is its start (a real recorder leaves the time it closed the file);
+the manifest's `t`, from which a citation's seconds are counted, is the start too.
+
 **Tags on every question.** Cases can be selected by any tag, and the report cuts every measure by each:
 - scenario, media shape, kind and modality;
 - haystack size (hours, files) and its rung on the size ladder (section 7.5);
@@ -347,8 +393,14 @@ it holds dataclasses. A line also has the keys the separation turned out to need
 - `retrieval`: what the retrieval run asks (the query, sources, ranges, `k`, tolerance, and the moments and other moments
   to score against), else null.
 
-`grade.rule` is one of `number`, `count`, `time`, `code_time`, `absent`, `choice`, with `truth`, `time`, `tol_s`, `wrong`,
-`ignore` and `date`. The kinds written are `find`, `last`, `when`, `count` and `absent` (V7) and `choice` (V8). `now` is ISO
+`grade.rule` is one of `number`, `count`, `time`, `code_time`, `absent`, `choice`, `set`, with `truth`, `time`, `tol_s`,
+`wrong`, `ignore`, `date` and `items`. `set` is for "find every one": right only with the exact set of `items`, which are ISO
+dates or file names (a file by its base name, in any case, wherever the agent saw it), and the F1 of the items found is kept
+beside the verdict as `items_f1`; a line written before `items` existed reads as none. The loader refuses a `set` with no
+items, items on another rule, a repeated item, dates mixed with file names, an item that is no date, and two files of one
+base name. `ignore` holds the question's own numbers and clock times, which an answer may repeat (`grade.asked`); the digits
+of a name (`cam3`, `IMG_0003.JPG`, a path) and a month of a year are no numbers, and a count the question also holds is still
+the answer. The kinds written are `find`, `last`, `when`, `count` and `absent` (V7) and `choice` (V8). `now` is ISO
 with an offset. V7's is noon on the day after its last day (C12): the pilot's prompts used the real clock, 4 November
 11:27 to 15:01, and a fixed `now` makes a re-run ask the same question. mm's clock then reads later than `now`, so mm's
 `clock_note` ("give since and until as dates and times, not as ages or now") is added when the wall clock is more than an
@@ -383,6 +435,9 @@ works in file offsets are graded alike.
   "t0", "t1"}`, with full ISO times that carry an offset. A `file` is its manifest path, or a longer path ending in `/` and
   the manifest path (the agent may have read it in a folder). A clock time is the first moment at or after the file's start
   that the local clock reads it, so it cannot name the day within a file of several days: use `source` and ISO times.
+  *As built since the smoke run (6 November 2026):* a `file` may also carry ISO times, as a photo's time is written: with an
+  offset, the instant; with none, the dump's wall clock, as a clock time is. Real Claude cited a trail-camera photo so, and its
+  right answer had been recorded as unparsed.
 - **The prompt.** It ends with a sentence asking for the format (`answer_request`). V7 names what the agent holds there:
   `mm`, `the files`, or `mm and these files`. V8 has no "unknown" clause, because its questions are multiple choice. The
   `S+files` sentence ("unknown when mm and these files do not hold it") was never recorded. The real agents have not seen
@@ -432,6 +487,18 @@ them. The report's headline is still `passed`, because the recorded runs have no
   1, 10 and 100 questions, and the count of searches an absent question drew. The report has seconds, tokens and GPU seconds
   per correct answer.
 
+**The neutral report (`mmmb/core/summary.py`, 6 November 2026).** The core's first report (`report.py`, `render.py`) is V7's
+mm report and stays where it is, because `compare`, `repeat`, the dry run and the recorded pilot's oracle read it there. The
+real scenarios report with `summary`, which names no system. Per scenario, agent and configuration: right out of n with its
+Wilson interval, grounded, lucky and unparsed answers, absent questions answered, `unknown` on a real one, seconds, thousands
+of tokens and dollars per right answer, the mean `items_f1` of the `set` questions, timeouts, and right by kind. A question
+that a leak filter (`listing`) answered right, and that has something to find, is listed as a leak and left out of every other
+configuration's figures; a result that is not done (a limit, a setup fault) is counted under "to run again" and left out. Each
+other configuration, filters aside, is set beside the control (`files`, `--control`) on the questions both answered, with
+McNemar's counts. `mmmb report` gives a scenario's own report for its runs (the summary for the four real scenarios, which
+pool runs of other seeds and refuse the same questions twice; V8 one run at a time), and the summary with a table over all
+for runs of several scenarios.
+
 ### 6.4 Dev and test
 
 Every scenario has a public **dev** split (about 30% of its questions) and a **test** split (about 70%).
@@ -473,6 +540,20 @@ Dumps keep what real ones have:
 - EXIF present, stripped or wrong, time zones and daylight saving;
 - duplicates, nested folders, and names like `IMG_4821.HEIC` and `VID_20250612_181502.mp4`.
 
+**As built (`mmmb/scenarios/realdump`, 6 November 2026),** what the four real scenarios share:
+- **Writing.** Each file is copied (never linked: the source stays read-only) into the dump under the name a device or folder would
+  give it, in parallel, and its modified time is set to its recording time; the manifest entry measures it. A wall time with no
+  zone is this machine's local time, so the recipe records the UTC offsets of its days and a dump built in another zone is
+  refused (`check_offsets`).
+- **Questions.** `question` makes one with its grade, tags, scope and evidence spans (`Span(file, t0, t1)`, seconds into the
+  file), and puts the question's own numbers and times into the grade's `ignore`; `split` marks about 30% `dev` by the seed.
+- **The prompt** says the time it is ("It is now Monday 23 December 2013, 09:00"), what the pile is and where it is (or which
+  system holds it), how its files are named and timed, and the answer request (6.2).
+- **The deny words:** the scenario's and the builder's code (`from mmmb`, `import mmmb`), the source's names in commands (as
+  paths where a name is inside ordinary code: `/sins` and not `sins`, which is in `isinstance`), and `bench-data`, where the
+  sources are, in a command and in what it prints.
+- **The probe** (7.3).
+
 ### 7.3 The shortcut probe and leaks
 
 **The shortcut probe** (from the copied `shortcuts.py`) checks every dump before any run. No file name, file size, EXIF or
@@ -485,6 +566,14 @@ with no probe, such as V8, a public dataset) and says what to say of a run whose
 outcome is in `run.json`, the probe's files are `shortcuts.json` and `shortcuts.md` in the run folder, and the outcome is
 cached with the dump. `mmmb run` refuses a run whose probe failed unless `--anyway`; `mmmb build --no-probe` skips the
 probe, and the report says so.
+
+**The real scenarios' probe (`realdump.probe`).** No file's path, and no text of its metadata, names a label: each label as a
+phrase and by its words of three letters or more (but the commonest, such as "person"), with the plain words a scenario adds
+("vacuum" for `vacuumcleaner`). Metadata is read by suffix: JPEG segments before the image, WAV chunks but the samples, and
+V1's MP4 boxes; a file of a suffix with no reader fails, and only runs of four printable characters or more are text. File
+sizes are not checked: they are the recordings' own (on the trail camera an animal's photo tends to be smaller than an empty
+one, as on any card), and nothing can be done about them without changing the media. The `listing` leak check at run time
+catches what the probe cannot, such as a photo whose time alone gives the answer.
 
 **Leaks:**
 - No network for agents or local systems, so no one looks up a public dataset's answers.
@@ -945,7 +1034,16 @@ licence each source states. No agent accepts an agreement or makes an account, s
 | P2 | The priority-2 scenarios (V4, I2, A2, A4, M1, M5, M6, X1, X2); the size ladder; session mode | a full run has 70+ discriminating questions per agent |
 | P3 | The priority-3 scenarios, once sources are found; hosted systems if wanted | as P1 |
 
-### 12.1 P0's state (5 November 2026)
+### 12.1 P0's state (5 November 2026), and the real scenarios (6 November)
+
+**6 November 2026: the real scenarios.** MMMB was re-planned as a standalone benchmark of real piles of media (`PLAN.md`). Built
+and checked offline: V1, I3, A1 and M4 (5.7) on the shared builder (7.2), the `set` rule (6.1), the neutral report (6.3), and
+the real scenarios' probe (7.3). Each full-size dump was built once and probed (TESTING.md section 9). Two independent reviews
+gated the work: one of the builder, the rule, the report and I3 before the other three copied them, and one of the whole. Real
+Claude and Codex answered two I3 questions in `files` and through `listing` (TESTING.md 4.2): the run found one fault, a file
+cited with an ISO time read as unparsed (6.2), which is fixed. Not done: a full run of any of the four with real agents (paid),
+and the priority-1 scenarios not yet built (V5, I1, A3, the track L). P1's search systems (`embed`, `transcript`) are not built; `mm` is optional. The smoke run's
+Claude (Sonnet) execs on the tiny card cost $0.37 and $0.51 each; a full-size exec is not measured.
 
 **Built, and checked offline** (how: [TESTING.md](TESTING.md)). The core runs without Multimem: the neutrality tests import
 it with Multimem refused, and in an environment made without the `mm` extra they build V7 tiny, probe it and run a `files` cell.

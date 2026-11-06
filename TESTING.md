@@ -28,7 +28,11 @@ uv sync --frozen --no-default-groups # what the neutrality test makes: no extra,
   test cannot change zone itself.
 - **Everything on D:.** Set `TEMP` and `TMP` to `D:/mmmb-temp/tmp`, give pytest `--basetemp=D:/mmmb-temp/pytest-<name>`, and
   `UV_CACHE_DIR=D:/mmmb-temp/uv-cache` for any uv call that could write its cache. C: swung between 1.8 GB and 23 GB free
-  during the build because of other work on the machine. uv's cache is on C: and the environment on D:, so uv copies.
+  during the build because of other work on the machine. uv's cache is on C: and the environment on D:, so uv copies. A
+  `TEMP` under `C:\Users\...\AppData` also fails V8's run tests, because "data", one of V8's deny words, is in "AppData".
+  In Git Bash: `export TEMP=D:/mmmb-temp/tmp TMP=D:/mmmb-temp/tmp TZ=America/New_York`.
+- **The sources of the real scenarios.** `tests/test_v1.py`, `test_i3.py`, `test_a1.py` and `test_m4.py` read
+  `D:\bench-data\sources\{meva,caltech-camera-traps,sins,fsd50k}` and skip loudly when it is missing.
 - **Test names.** None of `tests/`, `tests/oracles/` and `tests/mm/` has an `__init__.py`, and the test files import their helpers as
   siblings, so a test file's name must be unique across the three. That is why oracle 1a is `test_v7_hashes.py` and oracle 2 is
   `test_recorded_report.py`: `tests/test_v7_plan.py` and `tests/test_report.py` have the other names.
@@ -135,6 +139,33 @@ neutrality check.
   one colour constant changed. G1 planted 32 faults: 21 were caught and 11 escaped; the repair pass followed (section 9). The G2
   repair planted 24 more, one at a time and restored byte for byte, and all were caught (section 9).
 
+### 4.1 The real scenarios
+
+| Tests | Check | Time |
+| --- | --- | --- |
+| `tests/test_v1.py`, `test_i3.py`, `test_a1.py`, `test_m4.py` | each builds its `tiny` dump from the real source: names, recording times (mtime and EXIF), the joined media's lengths, the metadata; derives every question's truth again with a plain reader of the label files of its own, at `tiny` and at `standard` (labels only, no build) and over several seeds; the grader takes each truth and refuses planted near misses (a day too many or too few, a time out of tolerance, `unknown` on a needle, a made-up answer to an absent question); the probe passes on the tiny dump; one `mmmb build`, `run` and `report` through the CLI with a stand-in agent | 8 to 20 s each on one worker |
+| `tests/test_realdump.py` | the shared builder: files written with their times, the probe (a label's phrase and its words, in a name or a metadata text), the seeded split, the prompt in each way of reaching the files, the deny words (and that none of the four scenarios' words is in ordinary code), the recipe's time zone | about 1 s |
+| `tests/test_set_rule.py` | the `set` rule (an exact set of dates or of file names, its F1 beside it) and the question file's `grade.items` | about 1 s |
+| `tests/test_summary.py` | the neutral report over runs written by hand: leaks out of every figure but the filter's, results to run again left out, each configuration beside the control, several scenarios pooled | about 1 s |
+
+Each full-size dump was built once and probed by hand (section 9 has the times and sizes); no test builds one.
+
+### 4.2 The real-agent smoke run (paid, by hand)
+
+Run it after each update of the Claude or Codex CLI, and before a paid full run. It spends about $1 of Claude and a little of
+Codex's quota, and takes about 5 minutes.
+
+```
+uv run mmmb build --scenario i3_trailcam --scale tiny --configs files,listing --out D:/mmmb-temp/real/runs --temp D:/mmmb-temp/real/data --cache D:/mmmb-temp/real/cache
+uv run mmmb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2 --dry-run
+uv run mmmb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2
+uv run mmmb report <run>
+```
+
+Read each result's `answer`, `answer_error` and `grounded`, and the exec's `final.txt` for any that is not right: an
+`answer_error` on a right answer is a fault of the reader, not of the agent. The `listing` cells should be right only on the
+absent question. Section 9 has what the first one showed.
+
 **What waits for Dan** (the pilot re-run, the first `mm+files` run, the clock check) is in DESIGN.md section 12.2, with its
 commands and costs.
 
@@ -215,10 +246,11 @@ and `test_a_changed_distractor_with_no_version_bump_is_caught_by_the_files_hash`
 
 ## 8. Not verified
 
-Nothing in P0 ran a real agent, the GPU, or the real model. So no test could show:
-- real Claude and Codex answering the `json` request, the `mm+files` prompt, or the listing server; real Claude accepting a second
-  `--add-dir` for mm's `looks` folder with `--restricted` (if it refuses, a `Read` is denied by Claude and not counted as an
-  escape); real Claude with `--model claude-sonnet-5-5`;
+Nothing in P0 ran a real agent, the GPU, or the real model. The smoke run of 6 November 2026 (4.2, 9) has since shown real
+Claude (Sonnet) and Codex answering the `json` request in `files` and through the listing server, and real Claude reading from
+two `--add-dir` folders under `--restricted` and refused a file outside them. No test could show, and nothing has yet:
+- real Claude and Codex with the `mm+files` prompt; real Claude with mm's `looks` folder itself as the second `--add-dir`;
+- a full run of any of the four real scenarios with real agents, and the time and cost of one;
 - `mmmb repeat` end to end, and the times of the dump build and the ingest in the new code (none recorded);
 - a V8 build of the whole dump from `D:\bench-data\egolife` (its plan is checked; its dump is not), and the refusal of `listing`
   there, which is seen only over the fake download (the real clips' mtimes are the download's, 3 November, against 29 to 31 October);
@@ -228,8 +260,11 @@ Nothing in P0 ran a real agent, the GPU, or the real model. So no test could sho
 - the clock on a shared GPU, and the wall effect of its wait loop under load; Ctrl+C during `clock-check` or a side-by-side run;
 - the wall-time saving of side-by-side (paper only, `simulate`); a POSIX daemon restart, which would inherit Claude's
   `CUDA_VISIBLE_DEVICES=-1` (it does not apply on this machine);
-- `run --dry-run --agents codex`, which fails here because this machine's Codex does not list the pinned model `gpt-6.1-terra`
-  (the old code did the same).
+- whether the labels of the real scenarios miss what a careful person would see or hear: the questions avoid the labels the
+  review judged unsure (DESIGN 5.7), but nobody has watched the MEVA video or listened to the FSD50K clips to check.
+
+(`run --dry-run --agents codex` failed in P0 because Codex did not list the pinned model; on 6 November 2026, with codex-cli
+0.159.3, it passes and the real run went through.)
 
 ## 9. Log
 
@@ -319,3 +354,37 @@ G2's review passed every oracle and found one blocker. The repair, in one pass, 
   `check_groundable` never raising or never called; three faults in the guard; the old wording of the questions. One planted fault
   was left in `mmmb/cli.py` for a minute when the first run of the script was stopped by hand, and put back from its exact text.
 - Other projects' pytest runs (rtb-fleet) were running on the laptop beside these runs, so the times above are slower than U14's.
+
+### 2026-11-06: the real scenarios
+
+Built to PLAN.md: the shared builder, the `set` rule, the neutral report and four scenarios, in two units, each gated by one
+independent review and at most one repair pass.
+- **Gate 1** (the builder, the rule, the report and I3, before three makers copied them) found ten faults, repaired in one
+  pass: among them, an answer could not repeat the question's own numbers, the probe passed a file it could not read, and a
+  burst of photos was cited by one frame.
+- **Unit 2** (V1, A1, M4, by three makers at once, one worker each) brought one fault of the shared grader: the "3" of "cam3"
+  was read as a number, so a count answer that named its camera was wrong.
+- **Gate 2** (the whole change) re-derived every truth it drew (I3, V1 and M4 over several seeds, all of A1's) with readers of
+  its own and found them right. Its findings, all repaired in one pass:
+  - a right "nothing there" that names a camera, a folder or a file was wrong (a regression of Unit 2's fix);
+  - "sins" and "meva", deny words, are in `isinstance` and `timevalue`, so an agent's own script would end its exec as an escape;
+  - the probe looked only for a label's whole phrase;
+  - a photo cited by its EXIF time (`2013-09-17T01:09:35`) made the answer unparsed;
+  - the hour after midnight of the trail camera was written as noon (375 photos); birds, which a labeller may miss, and a fox
+    beside night coyotes were asked; one last visit was the card's last motion photo, which the file list gives away;
+  - M4 kept the sounds easily taken for the ones it asks (bells beside a gong, typing beside a printer);
+  - A1's TV labels sit up to a minute from the set's sound, too near the 60 s tolerance for an answer in HH:MM;
+  - V1 asked about manoeuvres with another one seconds away, and windows across the recorder's stop;
+  - the pooled report did not mark the leak check.
+  Left as they are, with the reason: each scenario repeats about 50 lines of the protocol's plumbing (moving it into
+  `realdump` is a refactor with no caller asking); a file's modified time is its start, not the time it was closed (DESIGN 5.7);
+  a later U-turn on V1's far camera could still be taken for a reverse by someone who looks only at the end.
+- **The real-agent smoke run** (4.2), on the I3 tiny card, two questions, before the Gate 2 repairs to I3: Codex `files` 2 of 2,
+  both grounded (48 s an exec); Codex `listing` right only on the absent one; Claude `files` right on the absent one, and on the
+  bird question its answer, 2013-12-22 citing `IMG_0190.JPG` with `"t0": "2013-12-22T16:05:20-08:00"`, was recorded unparsed.
+  That was the reader's fault (a file took no ISO time) and is fixed; read again, the answer passes. Claude cost $0.37 and
+  $0.51 an exec. The run stopped Claude's `listing` cells itself: the plan was at 98% of its use. One `claude -p` with
+  `--restricted` and two `--add-dir` folders read a file in each and was refused one outside them ($0.02).
+- **The full-size dumps,** each built once and probed with the new probe, then deleted: V1 5.5 GiB in 8 s (stream copy);
+  A1 2.6 GiB in 67 s; I3 1.8 GiB in 24 s (375 photos at 00:xx, 204 at noon, the names in time order); M4 5.0 GiB in
+  45 s. Every probe passed.
