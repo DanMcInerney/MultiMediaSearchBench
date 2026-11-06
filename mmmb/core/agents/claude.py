@@ -494,7 +494,8 @@ def ask_claude(spec: SessionSpec) -> dict:
     out = {"final": done["final"], "tools": tools_of(events),
            "events": [scrubbed(e) for e in events], "seconds": seconds, **figures, "turns": done["turns"],
            "tokens": done["tokens"], "cost_usd": done["cost_usd"], "used_percent": done["used_percent"],
-           "model": done["model"], "denials": done["denials"], "problem": problem, "argv": argv, "stderr": stderr}
+           "model": done["model"], "effort": spec.effort or effort(), "denials": done["denials"], "problem": problem, "argv": argv,
+           "stderr": stderr}
     if init := next((e for e in events if is_init(e)), None):
         (run_dir / "init.json").write_text(json.dumps(scrubbed(init), indent=1), encoding="utf-8")
     (run_dir / "events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in out["events"]), encoding="utf-8")

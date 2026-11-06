@@ -515,6 +515,7 @@ def test_claudes_stream_is_read_from_a_process_and_a_setup_problem_an_escape_or_
     assert out["problem"] is None and answer_of(out["final"]) == "47" and out["turns"] == 2 and out["cost_usd"] == 0.0421
     assert [t["tool"] for t in out["tools"]] == ["find"] and out["tokens"]["cache_write"] == 800
     assert out["model"] == "claude-sonnet-x" and out["used_percent"] is None and out["argv"][0] == sys.executable
+    assert out["effort"] == out["argv"][out["argv"].index("--effort") + 1] == claude.effort(), "the result says the effort it ran at"
     assert (run / "prompt.txt").read_text() == "What was the sign?" and (run / "init.json").is_file()
     assert json.loads((run / "tools.json").read_text())[0]["tool"] == "find"
     assert (run / "final.txt").read_text().endswith("ANSWER: 47")
