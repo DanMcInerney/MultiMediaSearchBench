@@ -121,3 +121,29 @@ def test_a_file_whose_metadata_the_probe_cannot_read_fails_it(tmp_path):
 
 def test_with_no_way_to_the_files_the_prompt_still_offers_unknown():
     assert prompt_of(False, False).endswith('Answer "unknown" with "evidence": [] when what you know does not hold it.')
+
+
+def test_the_probe_finds_a_word_of_a_label_and_reads_only_the_text_of_metadata(tmp_path):
+    """Gate 2: a label is caught by its words too ("microwave" for `Microwave_oven`, "coin" for `Coin_(dropping)`), in a name or in a
+    WAV's title; in metadata only runs of four printable characters or more are text."""
+    title = b"INFO" + b"INAM" + struct.pack("<I", 20) + b"coin drop on table\0\0"
+    dump = written(tmp_path / "a", {"folder_01/microwave_beep.wav": wav(), "folder_01/0002.wav": wav(b"LIST" + struct.pack("<I", len(title)) + title),
+                                    "folder_01/0003.wav": wav(b"junk" + struct.pack("<I", 6) + b"\x01ov\x02en")})
+    outcome = realdump.probe(dump, tmp_path / "a", ["Microwave_oven", "Coin_(dropping)", "Other_vehicle"])
+    assert outcome.failures == ("folder_01/microwave_beep.wav: its name says 'microwave'", "folder_01/0002.wav: its metadata says 'coin'")
+    assert realdump.label_words(["Coin_(dropping)", "person_opens_trunk"])[:2] == ["person opens trunk", "coin (dropping)"]
+    assert "person" not in realdump.label_words(["person_opens_trunk"]), "the commonest words are no label"
+
+
+SOME_CODE = ('python -c "import wave, numpy as np; x = np.frombuffer(w.readframes(n), dtype=np.int16); print(isinstance(x, np.ndarray)); '
+             'timevalue = somevar = namevalue = 0; mixedcase = 1"')
+
+
+@pytest.mark.parametrize("name", ["v1_security", "i3_trailcam", "a1_home_audio", "m4_samples"])
+def test_no_deny_word_of_a_real_scenario_is_in_ordinary_code(name, tmp_path):
+    """Gate 2: "sins" is in `isinstance`, "meva" in `timevalue`; an agent's own script must not end its exec as an escape."""
+    from mmmb.core.agents.common import reached
+    import importlib
+    words = tuple(w.lower() for w in importlib.import_module(f"mmmb.scenarios.{name}").deny_words((), tmp_path, "k"))
+    assert reached({"command": SOME_CODE}, words) is None
+    assert reached({"command": r"dir D:\bench-data\sources"}, words) == "bench-data"

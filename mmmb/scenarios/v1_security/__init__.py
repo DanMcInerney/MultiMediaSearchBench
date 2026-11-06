@@ -45,8 +45,10 @@ WHAT = "the recordings of my three outdoor security cameras"
 LAYOUT = ("cam1, cam2 and cam3 are three fixed cameras over roads and car parks, each with a folder of its own; a recording's name gives when "
           "it started and ended (YYYYMMDD_HHMMSS-HHMMSS) and the file's modified time is its start. A camera has more than one recording "
           "when it stopped for a while.")
-COMMAND_WORDS = ("meva", "kitware", "g336", "g341", "g436")  # the source's names
-SOURCE_WORDS = (*COMMAND_WORDS, "school", "hospital")  # and the words no file of the dump may hold
+SOURCE_NAMES = ("meva", "kitware", "g336", "g341", "g436")  # the source's names
+# which no command may hold: "meva" as a path, since it is in `timevalue` and `somevar`
+COMMAND_WORDS = ("/meva", "meva/", "kitware", "g336", "g341", "g436")
+SOURCE_WORDS = (*SOURCE_NAMES, "school", "hospital")  # and the words no file of the dump may hold
 
 
 def recipe(*, scale: str = "tiny", seed: int, source: Path | str = SOURCE) -> dict:

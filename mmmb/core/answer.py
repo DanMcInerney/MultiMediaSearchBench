@@ -8,7 +8,7 @@
 
 A citation names the moment that shows the answer in one of two ways, because an agent that has only a system's tools never sees a file
 path (DESIGN 6.2 corrected): `{"file": <path in the dump>, "t0", "t1"}` with seconds into the file, a clock time (`H:MM[:SS[.f]]`) or
-an ISO time that carries an offset (the instant: a photo's time is written so) for the two times, or `{"source": <name>, "t0", "t1"}` with
+an ISO time (the instant; with no offset, the dump's wall clock: a photo's time is written so) for the two times, or `{"source": <name>, "t0", "t1"}` with
 ISO times that carry an offset. `parse_final` is the one place a final message is
 read; `core/grounded.py` places a citation in time and scores it."""
 
@@ -112,9 +112,9 @@ def citation(item: object, n: int) -> Citation:
         if isinstance(t0, str) and isinstance(t1, str):
             if (iso := is_iso(t0)) != is_iso(t1):
                 raise ValueError(f'{where}: "t0" and "t1" of a file must both be clock times or both ISO times, not {shown(t0)} and {shown(t1)}')
-            if iso:  # an instant, as a source's (a photo has no seconds into it, and its time is a date and a time)
-                start = iso_epoch(t0, f'{where}: "t0"')
-                if iso_epoch(t1, f'{where}: "t1"') < start:
+            if iso:  # an instant, as a source's, or with no offset the dump's wall clock (a photo's time is a date and a time)
+                start = iso_epoch(t0, f'{where}: "t0"', local=True)
+                if iso_epoch(t1, f'{where}: "t1"', local=True) < start:
                     raise ValueError(f'{where}: "t1" ({t1}) is before "t0" ({t0})')
             else:
                 clock_seconds(t0, f'{where}: "t0"'), clock_seconds(t1, f'{where}: "t1"')
@@ -153,11 +153,12 @@ def clock_seconds(text: str, where: str = "a clock time") -> float:
     return hours * 3600 + minutes * 60 + seconds
 
 
-def iso_epoch(text: str, where: str = "an ISO time") -> float:
-    """Epoch seconds of the ISO time `text`, which must carry an offset; a ValueError saying `where` when it does not."""
+def iso_epoch(text: str, where: str = "an ISO time", local: bool = False) -> float:
+    """Epoch seconds of the ISO time `text`, which must carry an offset unless `local` (a file's time, which with no offset is the dump's
+    wall clock, as a clock time is); a ValueError saying `where` when it is no such time."""
     try:
         moment = datetime.fromisoformat(text.strip())
-        if moment.utcoffset() is None:
+        if moment.utcoffset() is None and not local:
             raise ValueError
         return moment.timestamp()
     except (ValueError, OverflowError):

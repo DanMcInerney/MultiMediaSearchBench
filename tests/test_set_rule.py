@@ -102,7 +102,7 @@ def test_an_answer_may_repeat_the_questions_own_numbers():
                                  evidence=[] if g.rule == "absent" else [Span("a.jpg", 0, 0)], sources=("camera",), since=0, until=1,
                                  value=None)
     absent = asked("On which days in September 2013 did a bobcat come past my trail camera?", realdump.grade("absent"))
-    assert "2013" in absent.grade.ignore and grade.grade(absent.grade, "No, none came in September 2013.")
+    assert grade.grade(absent.grade, "No, none came in September 2013.")  # (a month of a year is a date, no number)
     assert not grade.grade(absent.grade, "Not sure; maybe 3 times in September 2013.")
     found = asked("On which days in September 2013 did a rabbit come past my trail camera?", of(["2013-09-24", "2013-09-28"]))
     assert grade.grade(found.grade, "In September 2013: 2013-09-24 and 2013-09-28")

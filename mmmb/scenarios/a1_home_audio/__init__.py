@@ -35,7 +35,9 @@ FOLDER = "RECORD"
 WHAT = "the voice recorder I left running in my living room"
 LAYOUT = (f"{FOLDER} holds its recording, REC_<date>_<time>.wav, named for the moment it began (which is also the file's modified time); "
           "it plays on from there without a break.")
-COMMAND_WORDS = ("sins", "node07", "node7_", "kuleuven", "dcase")  # the source's names
+SOURCE_NAMES = ("sins", "node07", "node7_", "kuleuven", "dcase")  # the source's names, which no file of the dump may hold
+# and which no command may: as paths, since "sins" is in `isinstance` and "dcase" in "mixedcase"
+COMMAND_WORDS = ("/sins", "sins/", "node07", "node7_", "kuleuven", "dcase20")
 
 
 def recipe(*, scale: str = "tiny", seed: int, source: Path | str = SOURCE) -> dict:
@@ -87,7 +89,7 @@ def build(recipe: Mapping[str, object], out: Path, workers: int = 3) -> tuple[Du
 def probe(recipe: Mapping[str, object], dump: Dump, out: Path, ffmpeg: Path, seed: int) -> ProbeOutcome:
     """The leak probe: no file's name or metadata names a class of the labels, or the database."""
     living, home = read_runs(str(recipe["source"]))
-    return realdump.probe(dump, out, [*{r.cls for r in (*living, *home)}, *COMMAND_WORDS])
+    return realdump.probe(dump, out, [*{r.cls for r in (*living, *home)}, *SOURCE_NAMES])
 
 
 def prompt(question: Question, access: Access) -> str:

@@ -112,6 +112,7 @@ def test_runs_of_several_scenarios_are_pooled_and_the_same_questions_twice_are_r
     assert [s["scenario"] for s in figures["scenarios"]] == ["camera_scenario", "sound_scenario"]
     assert figures["overall"]["claude"]["files"] == [2 + 6, 4 + 6]
     assert "## Over all the scenarios" in summary.markdown(figures)
+    assert "| claude | listing (leak check) | 3/6 (50%) |" in summary.markdown(figures).split("## Over all the scenarios")[1]
     with pytest.raises(ValueError, match="count each question twice"):
         summary.numbers([run, run_of(tmp_path / "c", CAMERA)])
     assert len(summary.numbers([run, run_of(tmp_path / "d", CAMERA, seed=2)])["scenarios"]) == 1, "another seed is pooled"

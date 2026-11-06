@@ -217,12 +217,33 @@ def riff_header(path: Path) -> bytes:
 METADATA = {".jpg": jpeg_header, ".jpeg": jpeg_header, ".wav": riff_header}  # by suffix: what of a file the probe reads
 
 
+STOP_WORDS = {"and", "the", "of", "in", "on", "at", "with", "by", "for", "other", "person", "vehicle", "object", "human", "sound"}
+
+
+def label_words(labels: Sequence[str]) -> list[str]:
+    """What the probe looks for: each label as a phrase (`_` read as a space) and each of its words of three letters or more but the
+    commonest (`STOP_WORDS`), so that "microwave beep" is caught for the label `Microwave_oven`. A label written as one word
+    (`vacuumcleaner`) is one word: a scenario passes the words it is said in as labels too."""
+    out = set()
+    for label in labels:
+        if phrase := label.casefold().replace("_", " ").strip():
+            out.add(phrase)
+            out |= {w for w in re.split(r"[^a-z]+", phrase) if len(w) >= 3 and w not in STOP_WORDS}
+    return sorted(out, key=lambda w: (-len(w), w))  # the longest first: a phrase is told before a word of it
+
+
+def text_of(header: bytes) -> str:
+    """The text of a file's metadata: its runs of four printable characters or more (the binary tables between them hold no words)."""
+    return " ".join(m.decode("ascii") for m in re.findall(rb"[\x20-\x7e]{4,}", header))
+
+
 def probe(dump: Dump, out: Path, labels: Sequence[str], metadata: Mapping[str, Callable[[Path], bytes]] = METADATA) -> ProbeOutcome:
-    """The leak probe of a real dump: no file's path, nor its metadata (read by its suffix with `metadata`: a file of a suffix with no
-    reader fails, so a scenario of other files passes its own readers), names one of `labels` (the source's label words, as whole
-    words, in any case, `_` read as a space). Writes `shortcuts.md` into `out`. The files' sizes are not checked: they are the
-    recordings' own (in I3 an animal's photo tends to be smaller than an empty one, as on any camera's card)."""
-    words = sorted({w.casefold().replace("_", " ") for w in labels if w})
+    """The leak probe of a real dump: no file's path, nor the text of its metadata (read by its suffix with `metadata`: a file of a
+    suffix with no reader fails, so a scenario of other files passes its own readers), names one of `labels` (the source's labels, each
+    as a phrase and by its words, `label_words`; whole words, in any case, `_` read as a space). Writes `shortcuts.md` into `out`. The
+    files' sizes are not checked: they are the recordings' own (in I3 an animal's photo tends to be smaller than an empty one, as on any
+    camera's card)."""
+    words = label_words([w for w in labels if w])
     pattern = re.compile(r"(?<![a-z])(" + "|".join(re.escape(w) for w in words) + r")(?![a-z])")
     failures = []
     for e in dump.entries:
@@ -232,7 +253,7 @@ def probe(dump: Dump, out: Path, labels: Sequence[str], metadata: Mapping[str, C
         read = metadata.get(Path(e.path).suffix.casefold())
         if read is None:
             failures.append(f"{e.path}: its metadata is not read (no reader for {Path(e.path).suffix or 'a file with no suffix'})")
-        elif found := pattern.search(read(dump.root / e.path).decode("latin-1").casefold().replace("_", " ")):
+        elif found := pattern.search(text_of(read(dump.root / e.path)).casefold().replace("_", " ")):
             failures.append(f"{e.path}: its metadata says {found[1]!r}")
     lines = ["# Leak probe", "", f"{len(dump.entries)} files; label words: {', '.join(words)}.", ""]
     lines += [f"- {f}" for f in failures] or ["No file's name or metadata names a label."]

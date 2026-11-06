@@ -15,7 +15,9 @@ UNITS = "zero one two three four five six seven eight nine ten eleven twelve thi
         "eighteen nineteen".split()
 TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
 ONCE = {"once": "1", "twice": "2", "thrice": "3"}
-NAMED = re.compile(r"\b[^\W\d]+\d[\w.]*", re.IGNORECASE)  # a name led by letters with digits in it (cam3, IMG_0003.JPG): no number
+# a name with digits in it, which is no number: one led by letters (cam3, IMG_0003.JPG, cam3_20180312_100000-103500.mp4), or a
+# path that has a letter in it (DCIM/100RECNX)
+NAMED = re.compile(r"\b[^\W\d]+\d[\w.-]*|(?<!\S)(?=\S*[^\W\d_])\S*[\\/]\S*", re.IGNORECASE)
 WORD = re.compile(r"\b(?:(" + "|".join(TENS) + r")(?:[ -](one|two|three|four|five|six|seven|eight|nine))?|("
                   + "|".join(UNITS) + r"))\b")
 TIME = re.compile(r"\b(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([ap])\.?m\b\.?)?")
@@ -26,7 +28,8 @@ ISO = re.compile(r"\b\d{4}-\d{2}-\d{2}[t ](\d{1,2}:\d{2}(?::\d{2})?)(?:\.\d+)?(?
 DATES = (re.compile(rf"\b(?:{DAY}\s+(?:of\s+)?{MONTH}|{MONTH}\s+{DAY})(?:,?\s+\d{{4}})?(?!\d)"),
          re.compile(rf"\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)"
                     rf"\.?,?\s+{DAY}(?!\d)"),
-         re.compile(r"\b\d{4}-\d{2}-\d{2}\b"))
+         re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
+         re.compile(rf"\b{MONTH}\s+(?:of\s+)?\d{{4}}(?!\d)"))  # a month of a year, "October 2013"
 WEEKDAYS = "mon tue wed thu fri sat sun".split()
 MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
 # a date an answer may name, as `date_mentions` reads it; a clock time ("21:04") is never the day of a month or a year
@@ -199,14 +202,14 @@ def searched(plain: str) -> str:
 def abstained(text: str | None, ignore=()) -> bool:
     """Whether an answer says the thing is not there: it holds a word of abstaining or negation (`unknown`, `none`, `never`,
     `nothing`, `nobody`, `no`, `not` (so `did not`, `could not`), `cannot`, `unable`, `n/a`, `zero`, `didn't` and the like), and
-    every number in digits and every time in it is in `ignore` (the question's own: "Not sure, maybe 47" is a guess; a number
+    every number in digits (but a name's, as `cam3`'s) and every time in it is in `ignore` (the question's own: "Not sure, maybe 47" is a guess; a number
     word such as "one" is not a number here: "No, not a single one" abstains), or is the bound of a range it says it searched
     in an answer that is negative throughout (`searched`)."""
     if text is None:
         return False
     plain = searched(text.casefold().replace("’", "'"))
     digits, times = split(ignore)
-    return (NEGATION.search(plain) is not None and all(n == "0" or n in digits for n in digits_in(plain))
+    return (NEGATION.search(plain) is not None and all(n == "0" or n in digits for n in digits_in(NAMED.sub(" ", plain)))
             and timed(plain, times))
 
 

@@ -93,7 +93,7 @@ def resolve(c: Citation, dump: Dump) -> Placed | None:
     if isinstance(c.t0, float):
         return Placed(entry.source, entry.t + c.t0, entry.t + c.t1, entry.path)
     if is_iso(c.t0):
-        return Placed(entry.source, iso_epoch(c.t0), iso_epoch(c.t1), entry.path)
+        return Placed(entry.source, iso_epoch(c.t0, local=True), iso_epoch(c.t1, local=True), entry.path)
     start = at_clock(c.t0, entry.t)
     return Placed(entry.source, start, max(start, at_clock(c.t1, start)), entry.path)
 

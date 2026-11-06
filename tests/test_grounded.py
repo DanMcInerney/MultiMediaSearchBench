@@ -227,6 +227,8 @@ def test_a_photo_cited_by_its_file_with_an_iso_time_is_grounded_whatever_offset_
     picture = question("find", Span("phone/p1.jpg", 0.0, 0.0))
     assert status(picture, said(cf("phone/p1.jpg", "2026-11-03T14:00:00-08:00", "2026-11-03T14:00:00-08:00"))) == "grounded"
     assert status(VIDEO, said(cf("cam/long.mp4", at(T0 + 2000.0), at(T0 + 2010.0)))) == "lucky", "a video's instant must still be near"
+    naive = datetime.fromtimestamp(T0 + 1500.0).isoformat()  # with no offset: the dump's wall clock, as a clock time is
+    assert resolve(cf("cam/long.mp4", naive, naive), DUMP) == Placed("cam", T0 + 1500.0, T0 + 1500.0, "cam/long.mp4")
 
 
 def test_a_clock_time_across_midnight_is_on_the_next_day_and_one_before_the_file_starts_is_too():

@@ -231,11 +231,11 @@ def markdown(figures: dict) -> str:
         out += section_lines(s, figures["control"])
     if "overall" in figures:
         out += ["", "## Over all the scenarios", ""]
-        rows = []
+        rows, filters = [], {f for s in figures["scenarios"] for f in s["filters"]}
         for agent, by in figures["overall"].items():
             for name, (k, n) in by.items():
                 low, high = wilson(k, n)
-                rows.append([agent, name, pct(k, n), f"{100 * low:.0f}-{100 * high:.0f}%"])
+                rows.append([agent, name + (" (leak check)" if name in filters else ""), pct(k, n), f"{100 * low:.0f}-{100 * high:.0f}%"])
         out += table(["agent", "configuration", "right", "95% interval"], rows)
     return "\n".join(out) + "\n"
 

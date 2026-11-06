@@ -149,7 +149,7 @@ def test_a_message_without_a_string_answer_and_a_list_of_evidence_is_a_failed_an
     ('{"file": "a", "t0": "25:00", "t1": "26:00"}', 'evidence[0]: "t0" must be a clock time'),
     ('{"file": "a", "t0": "07:61", "t1": "07:62"}', 'evidence[0]: "t0" must be a clock time'),
     ('{"file": "a", "t0": "7pm", "t1": "8pm"}', 'evidence[0]: "t0" must be a clock time'),
-    ('{"file": "a", "t0": "2026-11-02T07:30:00", "t1": "2026-11-02T07:30:05"}', 'evidence[0]: "t0" must be an ISO date and time with an offset'),
+    ('{"file": "a", "t0": "2026-11-02T07:30:00", "t1": "2026-11-02 07:30:61"}', 'evidence[0]: "t1" must be an ISO date and time'),
     ('{"file": "a", "t0": "07:30", "t1": "2026-11-02T07:30:05+00:00"}', 'evidence[0]: "t0" and "t1" of a file must both be clock times or both ISO'),
     ('{"file": "a", "t0": "2026-11-02T07:30:05+00:00", "t1": "2026-11-02T07:30:00+00:00"}', 'evidence[0]: "t1"'),
     ('{"source": "s", "t0": 1, "t1": 2}', 'evidence[0]: "t0" and "t1" of a source must be ISO times with an offset'),
@@ -294,3 +294,9 @@ def test_a_file_may_be_cited_with_iso_times_as_a_photo_is_and_they_are_kept_as_w
     got = json_of(message)
     assert got == FinalAnswer("2013-12-22", (Citation("DCIM/100RECNX/IMG_0190.JPG", None, "2013-12-22T16:05:20-08:00",
                                                        "2013-12-22T16:05:20-08:00"),), None)
+
+
+@pytest.mark.parametrize("t", ["2013-09-17T01:09:35", "2013-09-17 01:09:35", "2013-09-17T01:09:35-05:00"])
+def test_a_file_cited_with_the_date_and_time_of_its_exif_with_or_without_an_offset_is_read(t):
+    got = json_of(json.dumps({"answer": "2013-09-17", "evidence": [{"file": "DCIM/100RECNX/IMG_0003.JPG", "t0": t, "t1": t}]}))
+    assert got.answer == "2013-09-17" and got.evidence == (Citation("DCIM/100RECNX/IMG_0003.JPG", None, t, t),), got.error
