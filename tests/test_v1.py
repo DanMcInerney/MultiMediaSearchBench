@@ -52,8 +52,8 @@ PHRASES = {"person_opens_trunk": "open a car trunk", "person_closes_trunk": "clo
            "vehicle_makes_u_turn": "make a U-turn", "vehicle_turns_left": "turn left", "vehicle_turns_right": "turn right",
            "person_rides_bicycle": "ride a bicycle", "person_steals_object": "steal something", "person_purchases": "buy something"}
 NEVER = ("person_rides_bicycle", "person_steals_object", "person_purchases")
-LIKE = [{"person_opens_trunk", "person_closes_trunk"}, {"person_opens_vehicle_door", "person_closes_vehicle_door"},
-        {"vehicle_reverses", "vehicle_makes_u_turn", "vehicle_turns_left", "vehicle_turns_right"}]
+MANOEUVRES = {"vehicle_reverses", "vehicle_makes_u_turn", "vehicle_turns_left", "vehicle_turns_right"}  # taken for one another
+LIKE = [{"person_opens_trunk", "person_closes_trunk"}, {"person_opens_vehicle_door", "person_closes_vehicle_door"}, MANOEUVRES]
 
 
 @dataclass(frozen=True)
@@ -107,6 +107,11 @@ def evidence(q) -> list[tuple[str, float, float]]:
     return sorted((s.file, round(s.t0, 2), round(s.t1, 2)) for s in q.truth.evidence)
 
 
+def rivals_of(acts, cam: str, kind: str) -> list[Act]:
+    """The camera's activities that are taken for `kind`: the other manoeuvres, for a manoeuvre."""
+    return [x for k in sorted(MANOEUVRES - {kind}) for x in acts.get((cam, k), [])] if kind in MANOEUVRES else []
+
+
 def check_against_labels(questions, limit: int) -> None:
     """Each question's truth and evidence as the plain reader finds them."""
     acts, files = plain_world(limit)
@@ -123,6 +128,7 @@ def check_against_labels(questions, limit: int) -> None:
         if window:
             a, b = (int(w[:2]) * 3600 + int(w[2:]) * 60 for w in window)
             assert f" between {window[0][:2]}:{window[0][2:]} and {window[1][:2]}:{window[1][2:]}?" in q.question, q.qid
+            assert any(start - 5 <= a and b <= start + length + 5 for _, start, length in files[cam]), f"{q.qid}: the window crosses the recorder's stop"
             assert q.scope.since == pytest.approx(MIDNIGHT + a) and q.scope.until == pytest.approx(MIDNIGHT + b), q.qid
         else:
             assert q.scope.since == pytest.approx(MIDNIGHT + files[cam][0][1]), q.qid
@@ -139,6 +145,7 @@ def check_against_labels(questions, limit: int) -> None:
             assert all((a + 30 <= x.start and x.end <= b - 30) or x.end < a - 30 or x.start > b + 30 for x in mine), f"{q.qid}: an edge cuts one"
             assert q.grade.rule == "count" and q.grade.truth == q.truth.value == str(len(inside)) and 1 <= len(inside) <= 5, q.qid
             assert evidence(q) == spans(inside) and all(x.status == "good" and not x.edge for x in inside), q.qid
+            assert not any(x.end >= a - 30 and x.start <= b + 30 for x in rivals_of(acts, cam, kind)), f"{q.qid}: a like manoeuvre is in or near it"
             assert all(y.start - x.end >= 10 for x, y in pairwise(inside)), f"{q.qid}: two run into each other"
         else:
             e = mine[0] if template == "first" else mine[-1]
@@ -148,6 +155,7 @@ def check_against_labels(questions, limit: int) -> None:
             assert (q.grade.rule, q.grade.date, q.grade.tol_s) == ("time", "2018-03-12", 30.0), q.qid
             assert abs(grade.at(q.grade.time) - grade.at(clock)) <= 1 / 60 and q.truth.value == f"2018-03-12 {q.grade.time}", q.qid
             assert evidence(q) == spans(near), q.qid
+            assert not any(x.end >= middle - 30 and x.start <= middle + 30 for x in rivals_of(acts, cam, kind)), f"{q.qid}: a like manoeuvre is near"
             assert all(x.status == "good" and not x.edge and x.end - x.start <= 30 for x in near), f"{q.qid} rests on a label that is not sure"
 
 
@@ -224,7 +232,7 @@ def test_every_answer_is_the_labels(scale):
     assert [f.path for f in files] == [p for cam in plain for p, _, _ in plain[cam]]
     assert [f.length for f in files] == [length for cam in plain for _, _, length in plain[cam]]
     if scale == "standard":
-        assert len(files) == 6 and len(questions) == 24 and sum(q.kind == "absent" for q in questions) == 6
+        assert len(files) == 6 and len(questions) == 22 and sum(q.kind == "absent" for q in questions) == 6
         assert {a.status for v in acts.values() for a in v} == {"good", "unaudited", "not_good"}, "labels that are not sure are to be kept out"
     check_against_labels(questions, LIMITS[scale])
     length = {f.path: f.length for f in files}
@@ -265,6 +273,67 @@ def test_no_question_rests_on_a_label_that_is_not_sure_or_a_window_that_cuts_an_
     for qid in counts:
         a, b = (int(w[:2]) * 3600 + int(w[2:]) * 60 - 36000 for w in qid.split("-")[-2:])
         assert all((a + 30 <= e.o0 and e.o1 <= b - 30) or e.o1 < a - 30 or e.o0 > b + 30 for e in events if e.kind == "person_opens_trunk"), qid
+
+
+BASE = realdump.local_t(datetime(2018, 3, 12, 10))
+
+
+def made(kind: str, at: float, file: str = "cam1/a.mp4", begins: float = 0.0) -> Event:
+    """A good two-second activity of `kind` on cam1, `at` seconds after 10:00 on the wall clock, in the file that begins `begins` after it."""
+    return Event("cam1", file, kind, "good", at - begins, at - begins + 2.0, BASE + at, BASE + at + 2.0, False)
+
+
+def asked_of(events, files, minutes: int, seeds=range(20)) -> set[str]:
+    """The ids of every question the made-up recording gets over `seeds`, at the standard scale."""
+    span = (datetime(2018, 3, 12, 10), datetime(2018, 3, 12, 10) + timedelta(minutes=minutes))
+    return {q.qid for seed in seeds for q in questions_of(events, files, span, "standard", seed, realdump.local_t)}
+
+
+def window_of(qid: str) -> tuple[int, int]:
+    """A question id's window, in seconds after 10:00."""
+    return tuple(int(w[:2]) * 3600 + int(w[2:]) * 60 - 36000 for w in qid.split("-")[-2:])
+
+
+def test_a_manoeuvre_is_not_asked_about_where_another_is_near():
+    """A car that reverses, turns or U-turns is taken for one that does another of these. A first or last is asked only with none of the
+    others within 30 s of its moment, and a count only with none in the window or within 30 s of it."""
+    files = [realdump.File("cam1/a.mp4", "cam1", BASE, "recording", "video", {}, length=1800.0)]
+    for turn, kept in ((130, False), (140, True)):  # a reverse at 100 and a left turn 30 s after its middle, and 40 s after it
+        qids = asked_of([made("vehicle_reverses", 100), made("vehicle_turns_left", turn), made("vehicle_makes_u_turn", 900),
+                         made("vehicle_turns_right", 1000), made("person_opens_trunk", 500)], files, 30)
+        both = {f"{t}-cam1-{k}" for t in ("first", "last") for k in ("vehicle_reverses", "vehicle_turns_left")}
+        assert both <= qids if kept else not both & qids, f"a turn at {turn} s"
+        alone = {f"{t}-cam1-{k}" for t in ("first", "last") for k in ("vehicle_makes_u_turn", "vehicle_turns_right", "person_opens_trunk")}
+        assert alone <= qids, "the ones with no manoeuvre near are asked"
+    # a count of reverses: the right turn at 1250 keeps out every window that holds it or ends within 30 s of it
+    reverses = [made("vehicle_reverses", 600), made("vehicle_reverses", 640)]
+    counts = {q for q in asked_of(reverses, files, 30) if q.startswith("count-")}
+    assert {window_of(q)[1] for q in counts} > {900, 1200}, "without it, windows of every end are asked"
+    near = {q for q in asked_of([*reverses, made("vehicle_turns_right", 1250)], files, 30) if q.startswith("count-")}
+    assert near and {window_of(q)[1] for q in near} <= {900, 1200}, near
+    # and the real labels: the reviewed questions are not asked
+    acts, _ = plain_world(LIMITS["standard"])
+    u_turn = next(x for x in acts["cam1", "vehicle_makes_u_turn"] if round((x.start + x.end) / 2) == 11 * 3600 + 60)
+    assert all(any(x.start <= u_turn.end + 10 and x.end >= u_turn.start - 10 for x in acts["cam1", k])
+               for k in ("vehicle_turns_left", "vehicle_reverses")), "the U-turn at 11:01:00 has a left turn and a reverse within 10 s"
+    assert len(acts["cam3", "vehicle_makes_u_turn"]) == 11
+    qids = {q.qid for seed in range(1, 6) for q in V1.plan_of(V1.recipe(scale="standard", seed=seed))[1]}
+    assert "first-cam1-vehicle_makes_u_turn" not in qids and not [q for q in qids if q.startswith("count-cam3-vehicle_reverses")]
+
+
+def test_a_window_lies_inside_one_recording_of_its_camera():
+    """A camera that stopped from 10:35 to 10:40 gets no count or absent window across the stop (that holds the trunks of both sides)."""
+    files = [realdump.File("cam1/a.mp4", "cam1", BASE, "recording", "video", {}, length=2100.0),
+             realdump.File("cam1/b.mp4", "cam1", BASE + 2400, "recording", "video", {}, length=2100.0)]
+    trunks = [made("person_opens_trunk", at, "cam1/b.mp4" if at >= 2400 else "cam1/a.mp4", 2400.0 if at >= 2400 else 0.0)
+              for at in (1920, 2040, 2580, 2700)]  # 10:32 and 10:34, 10:43 and 10:45
+    qids = asked_of([*trunks, made("person_opens_vehicle_door", 120)], files, 75)
+    counts, absent = ({q for q in qids if q.startswith(start)} for start in ("count-", "absent-count-"))
+    assert counts and absent
+    for qid in counts | absent:
+        a, b = window_of(qid)
+        assert (a >= 0 and b <= 2100) or (a >= 2400 and b <= 4500), f"{qid} runs across the recorder's stop"
+    assert any(window_of(q)[1] <= 2100 for q in counts) and any(window_of(q)[0] >= 2400 for q in counts), "both recordings get windows"
 
 
 def test_a_label_file_is_read_as_kpf_and_a_clip_with_none_or_two_is_refused(tmp_path, monkeypatch):

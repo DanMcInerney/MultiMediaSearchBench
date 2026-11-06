@@ -24,7 +24,9 @@ from mmmb import scenarios
 from mmmb.core import fs, grade
 from mmmb.core.agents import claude
 from mmmb.core.runfolder import RunFolder
+from mmmb.core.contract import ManifestEntry
 from mmmb.core.runner import Agent
+from mmmb.scenarios import realdump
 from mmmb.scenarios.a1_home_audio.source import SOURCE, write_wav
 
 if not (SOURCE / "labels" / "living_labels.csv").is_file():
@@ -46,6 +48,7 @@ TEMPLATES = {"vacuum_on": ("living_labels.csv", "vacuumcleaner", "start", "was t
              "leave": ("labels.csv", "absence", "start", "did I leave the house"),
              "return": ("labels.csv", "absence", "stop", "did I get back home")}
 COUNTS = {"count_vacuum": "vacuumcleaner", "count_tv": "watching tv", "count_visit": "visit"}
+TOL = {"tv_on": 120.0, "tv_off": 120.0}  # an answer this many seconds out is right: the TV's, whose label marks the watching, not the set
 
 
 def seconds_of(text: str) -> float:
@@ -103,12 +106,14 @@ def check_against_labels(questions, first: int, seconds: int) -> None:
         assert len(moments) == 1, f"{q.qid}: {len(moments)} runs of {cls} have {q.grade.time} as their {edge}"
         a, b = moments[0]
         at = a if edge == "start" else b
-        assert (q.kind, q.grade.rule, q.grade.tol_s, q.grade.date, q.truth.value) == (edge, "time", 60.0, None, q.grade.time), q.qid
+        tol = TOL.get(key, 60.0)
+        assert (q.kind, q.grade.rule, q.grade.tol_s, q.grade.date, q.truth.value) == (edge, "time", tol, None, q.grade.time), q.qid
         assert q.qid == f"{key}-{int(at) // 3600:02d}{int(at) % 3600 // 60:02d}", q.qid
         assert 0 <= a and b <= 86400 and b - a >= 120, f"{q.qid} rests on a run that crosses the day's edge, or a blip"
-        assert lo + 60 <= at <= hi - 60, f"{q.qid}: its window does not hold the tolerance of the moment"
+        assert lo + tol <= at <= hi - tol, f"{q.qid}: its window does not hold the tolerance of the moment"
         assert all(y <= lo - 600 or x >= hi + 600 for x, y in runs if (x, y) != (a, b)), f"{q.qid}: another {cls} run is near its window"
-        assert spans(q) == pytest.approx([max(0.0, at - 60 - first), min(float(seconds), at + 60 - first)]), "the tolerance either side of the moment"
+        assert all(abs(x - at) > 600 and abs(y - at) > 600 for x, y in runs if (x, y) != (a, b)), f"{q.qid}: another {cls} run is near the moment"
+        assert spans(q) == pytest.approx([max(0.0, at - tol - first), min(float(seconds), at + tol - first)]), "the tolerance either side of the moment"
         assert {s.file for s in q.truth.evidence} == {path}
     if seconds == 86400:  # the whole day: every moment that is alone in its stretch is asked
         assert sorted(q.qid for q in questions if q.kind != "absent") == sorted(PRESENT)
@@ -116,30 +121,32 @@ def check_against_labels(questions, first: int, seconds: int) -> None:
 
 def right(q) -> str:
     g = q.grade
-    return {"count": lambda: g.truth, "time": lambda: g.time[:5], "absent": lambda: "unknown"}[g.rule]()
+    return {"count": lambda: g.truth, "time": lambda: g.time, "absent": lambda: "unknown"}[g.rule]()
 
 
 def wrong(q) -> list[str]:
-    """Planted wrong answers: one more or fewer; a time three minutes either side, or that and the truth together; `unknown` on a needle;
-    a time for an absent one."""
+    """Planted wrong answers: one more or fewer; a time 10 s past the tolerance either side, three minutes either side, or that and the truth
+    together; `unknown` on a needle; a time for an absent one."""
     g = q.grade
     if g.rule == "count":
         return [str(int(g.truth) + 1), str(int(g.truth) - 1), "unknown"]
     if g.rule == "time":
-        t = datetime.strptime(g.time, "%H:%M:%S")
+        t, out = datetime.strptime(g.time, "%H:%M:%S"), timedelta(seconds=g.tol_s + 10)
         late, early = (t + timedelta(minutes=3)).strftime("%H:%M"), (t - timedelta(minutes=3)).strftime("%H:%M")
-        return [late, early, f"{g.time[:5]} or {late}", "unknown"]
+        return [late, early, f"{g.time[:5]} or {late}", "unknown", (t + out).strftime("%H:%M:%S"), (t - out).strftime("%H:%M:%S")]
     return ["04:12", "yes, at 14:20"]
 
 
 def natural(q) -> list[str]:
-    """Other ways to answer right: a time to the second, in the 12-hour clock, in a sentence; an abstention with the question's own times."""
+    """Other ways to answer right: a time to the second, to the minute, in the 12-hour clock, in a sentence, and 20 s inside the tolerance
+    either side; an abstention with the question's own times."""
     g = q.grade
     if g.rule == "count":
         return [f"{g.truth}", "twice" if g.truth == "2" else "once" if g.truth == "1" else g.truth]
     if g.rule == "time":
-        t = datetime.strptime(g.time, "%H:%M:%S")
-        return [g.time, t.strftime("%I:%M %p"), f"It was at {g.time[:5]}, I think."]
+        t, inside = datetime.strptime(g.time, "%H:%M:%S"), timedelta(seconds=g.tol_s - 20)
+        return [g.time, (t + timedelta(seconds=30)).strftime("%H:%M"), t.strftime("%I:%M %p"), f"It was at {g.time}, I think.",
+                (t + inside).strftime("%H:%M:%S"), (t - inside).strftime("%H:%M:%S")]
     low, high = sorted(g.ignore)
     return ["no", f"Nothing between {low} and {high}.", f"None. I listened from {low} to {high} and heard nothing of the kind."]
 
@@ -220,7 +227,7 @@ def test_an_absent_question_reads_as_a_present_one_of_its_template():
     for seed in (1, 2, 3):
         questions = A1.plan_of(A1.recipe(scale="standard", seed=seed))[1]
         timed = [q for q in questions if q.kind != "count"]
-        assert all(shape.fullmatch(q.question) and q.tags["shape"] == "<the time, as HH:MM>" for q in timed)
+        assert all(shape.fullmatch(q.question) and q.tags["shape"] == "<the time, as HH:MM:SS>" for q in timed)
         present = {q.tags["template"] for q in timed if q.kind != "absent"}
         absent = [q.tags["template"] for q in timed if q.kind == "absent"]
         assert len(set(absent)) == len(absent) and {t.removeprefix("absent_") for t in absent} <= present, "each of a template the dump asks"
@@ -256,6 +263,62 @@ def test_where_minute_files_overlap_or_leave_a_gap_the_line_is_trimmed_or_held(t
     starts = [datetime.strptime(re.search(r"_(\d{8})_(\d{6})_(\d{3})_", n).expand(r"\1\2\3"), "%Y%m%d%H%M%S%f") for n in names]
     gaps = [(b - a).total_seconds() - 59.9 for a, b in zip(starts, starts[1:])]
     assert min(gaps) < -1.5 and max(gaps) > 0.9, "the stretch is one with an overlap and a gap"
+
+
+def test_a_tv_answer_a_minute_and_a_bit_out_is_right_where_the_vacuum_cleaners_is_not():
+    """The TV's label marks the watching, not the set: its sound ended at 21:57:42, 46 s after the label's 21:56:56, and "21:58" is 64 s
+    out. The tolerance is 120 s for the TV and 60 s for the rest."""
+    questions = {q.qid: q for q in A1.plan_of(A1.recipe(scale="standard", seed=1))[1]}
+    tv, vacuum = questions["tv_off-2156"], questions["vacuum_off-2212"]
+    assert (tv.grade.time, tv.grade.tol_s, vacuum.grade.time, vacuum.grade.tol_s) == ("21:56:56", 120.0, "22:12:43", 60.0)
+    assert [grade.grade(tv.grade, a) for a in ("21:58", "21:57:42", "21:58:50", "21:55", "21:54:57")] == [True] * 5
+    assert [grade.grade(tv.grade, a) for a in ("21:59", "21:59:10", "21:54", "22:00")] == [False] * 4
+    assert [grade.grade(vacuum.grade, a) for a in ("22:13", "22:13:30", "22:12")] == [True] * 3
+    assert [grade.grade(vacuum.grade, a) for a in ("22:14", "22:13:50", "22:11")] == [False] * 3
+    assert all(q.grade.tol_s == (120.0 if q.tags["template"] in TOL else 60.0) for q in questions.values() if q.grade.rule == "time")
+    assert all(q.tags["shape"] == "<the time, as HH:MM:SS>" for q in questions.values() if q.grade.rule != "count")
+
+
+def level(first: float, seconds: int) -> float:
+    """The level in dB of `seconds` of the recording from `first` (seconds after midnight), as the plain reader makes it: the spread of the
+    samples, whatever their offset. The room's quiet is about 31 dB, the TV's sound 45 to 55."""
+    x = plain_wav(MIDNIGHT + timedelta(seconds=first), seconds).astype(float)
+    return float(20 * np.log10(x.std() + 1))
+
+
+@pytest.mark.parametrize("key", ["tv_on", "tv_off"])
+def test_the_tvs_sound_starts_and_stops_inside_the_tolerance_either_side_of_its_label(key):
+    """The room is quiet just outside the tolerance on one side of the label of a TV moment, and the TV is on just outside it on the other:
+    the sound's edge (30 s and 55 s before the starts, 15 s and 45 s after the stops) is inside the tolerance, so that an answer that heard it
+    right is right."""
+    questions = [q for q in A1.plan_of(A1.recipe(scale="standard", seed=1))[1] if q.tags["template"] == key]
+    assert len(questions) == 2
+    for q in questions:
+        at = (datetime.strptime(q.grade.time, "%H:%M:%S") - datetime(1900, 1, 1)).total_seconds()
+        before, after = (level(at + off, 10) for off in (-q.grade.tol_s - 10, q.grade.tol_s))
+        quiet, on = (before, after) if key == "tv_on" else (after, before)
+        assert quiet < 35 and on > 38, f"{q.qid}: {quiet:.0f} dB where it is quiet and {on:.0f} dB where the TV is on"
+
+
+def test_the_probe_fails_a_recording_whose_name_or_metadata_names_a_label_or_a_plain_word_for_one(built, tmp_path):
+    _, recipe, _, _ = built
+
+    def riff(*chunks: tuple[bytes, bytes]) -> bytes:
+        body = b"WAVE" + b"".join(kind + len(data).to_bytes(4, "little") + data + b"\x00" * (len(data) & 1) for kind, data in chunks)
+        return b"RIFF" + len(body).to_bytes(4, "little") + body
+
+    words = ["vacuumcleaner", "vacuum", "cleaner", "watching", "tv", "television", "visit", "visitor", "absence", "away", "node07"]
+    named = tmp_path / "dump"
+    named.mkdir()
+    (named / "REC_20170202_213000.wav").write_bytes(riff((b"fmt ", bytes(16)), (b"data", b"the vacuum cleaner and a visitor in front of the tv")))
+    for n, word in enumerate(words):
+        (named / f"REC_{word}.wav").write_bytes(riff((b"fmt ", bytes(16)), (b"data", bytes(8))))
+        (named / f"REC_{n:02d}.wav").write_bytes(riff((b"fmt ", bytes(16)), (b"LIST", f"a note of {word} here".encode()), (b"data", bytes(8))))
+    entries = tuple(ManifestEntry(p.name, "recorder", 0.0, "recording", "audio", None, False, 0, 0, "", 1.0) for p in sorted(named.iterdir()))
+    result = A1.probe(recipe, realdump.dump_of("k", named, "a1_home_audio", entries), tmp_path, None, 1)
+    assert result.status == "failed" and len(result.failures) == 2 * len(words), result.failures
+    assert not any(f.startswith("REC_20170202_213000") for f in result.failures), "the samples are not read"
+    assert sum("its name says" in f for f in result.failures) == len(words) and sum("its metadata says" in f for f in result.failures) == len(words)
 
 
 def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
@@ -305,7 +368,7 @@ def test_build_run_and_report_over_the_tiny_hour(world, capsys):  # noqa: F811
     asked = next(q for q in run.questions() if q.qid == "vacuum_on-2204")
     prompt = spy.prompts["files", asked.qid]
     assert prompt.startswith("It is now Friday 3 February 2017, 09:00. The files of the voice recorder I left running in my living room are in ")
-    assert asked.question in prompt and "<the time, as HH:MM>" in prompt
+    assert asked.question in prompt and "<the time, as HH:MM:SS>" in prompt
     capsys.readouterr()
     assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
     figures = fs.read_json(folder / "report.json")

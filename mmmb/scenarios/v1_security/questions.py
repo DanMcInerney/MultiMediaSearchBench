@@ -15,7 +15,12 @@ asked when a label that decides it is `unaudited` or `not_good`, or is within a 
 go on in the next clip's, and one activity be two). A `count` window's edges are at least 30 s from every activity of that kind on the camera
 (none is cut or nearly), and the activities in it are at least 10 s apart. The window of an `absent_count` is at least a minute clear of the
 camera's activities of that kind and of its like (a trunk's opening and closing), so a label missed on one is not the answer; and the kind
-does occur on the camera outside the window. Which ones are asked is drawn with the seed, so that the activities and the cameras vary.
+does occur on the camera outside the window. A window lies inside one recording of its camera, not across the recorder's stop. Which ones
+are asked is drawn with the seed, so that the activities and the cameras vary.
+
+A car's manoeuvres (reverse, U-turn, left and right turn) are taken for one another, the more so on cam3, whose cars are small and far: a
+`first` or `last` of one is asked only when none of the others is within 30 s of its moment (TOL_S), and a `count` only when none is in the
+window or within 30 s (EDGE_S) of it. (A trunk's opening is not taken for its closing: only the manoeuvres have rivals.)
 
 No question asks of the activities that are easily taken for another (`person_unloads_vehicle` for `person_loads_vehicle`,
 `vehicle_drops_off_person` for a person getting out), or of a long or uncertain one (`person_talks_to_person`, `vehicle_moving`)."""
@@ -37,6 +42,7 @@ MAX_SPAN_S = 30.0  # `first` and `last` ask of activities that last no longer
 EDGE_S = 30.0  # a counted window's edges are this far from the camera's activities of the kind
 ABSENT_EDGE_S = 60.0  # and an absent one's, which are as far from the activities of its like
 MIN_GAP_S = 10.0  # counted activities are this far apart
+SLACK_S = 5.0  # a window may begin or end this long outside a recording (cam1's recorder starts two seconds past the minute)
 COUNT_MIN, COUNT_MAX = {"tiny": 1, "standard": 2}, 5  # the times a `count` asks of, at each scale (a 1 is easily guessed)
 STEP_MIN = 5  # a window starts and ends on a multiple of this many minutes
 WINDOW_MIN = 10  # and is at least this long
@@ -55,9 +61,11 @@ COUNTED = ("person_opens_trunk", "person_closes_trunk", "person_opens_vehicle_do
 # activities of the dataset that no camera shows in these hours: crisp, and none is easily taken for one that is shown
 NEVER = {"person_rides_bicycle": ("someone", "ride a bicycle"), "person_steals_object": ("someone", "steal something"),
          "person_purchases": ("someone", "buy something")}
-# activities that go together, or are taken for one another: a window that is clear of one is clear of all
-LIKE = (("person_opens_trunk", "person_closes_trunk"), ("person_opens_vehicle_door", "person_closes_vehicle_door"),
-        ("vehicle_reverses", "vehicle_makes_u_turn", "vehicle_turns_left", "vehicle_turns_right"))
+# a car's manoeuvres, which are taken for one another (a reverse ends in a turn, a U-turn is two turns): none is asked about where another
+# is near
+MANOEUVRES = ("vehicle_reverses", "vehicle_makes_u_turn", "vehicle_turns_left", "vehicle_turns_right")
+# activities that go together, or are taken for one another: an absent window is clear of one and all
+LIKE = (("person_opens_trunk", "person_closes_trunk"), ("person_opens_vehicle_door", "person_closes_vehicle_door"), MANOEUVRES)
 
 
 def like(kind: str) -> tuple[str, ...]:
@@ -65,18 +73,29 @@ def like(kind: str) -> tuple[str, ...]:
     return next((group for group in LIKE if kind in group), (kind,))
 
 
+def rival_kinds(kind: str) -> tuple[str, ...]:
+    """The activities that are taken for `kind`: the other manoeuvres, for a manoeuvre; none for the rest (a trunk's opening is not taken
+    for its closing, though they go together)."""
+    return tuple(k for k in MANOEUVRES if k != kind) if kind in MANOEUVRES else ()
+
+
 def sure(e: Event) -> bool:
     return e.status == "good" and not e.edge
 
 
-def needle(es: Sequence[Event], end: int) -> tuple[Event, float, list[Event]] | None:
+def touches(es: Sequence[Event], a: float, b: float, edge: float) -> bool:
+    """Whether any of `es` is in the window `a` to `b` or within `edge` seconds of it."""
+    return any(e.t1 >= a - edge and e.t0 <= b + edge for e in es)
+
+
+def needle(es: Sequence[Event], end: int, rivals: Sequence[Event] = ()) -> tuple[Event, float, list[Event]] | None:
     """The first (`end` 0) or last (-1) of the activities `es` (in time order), the time asked for (the middle of its span, to the second)
     and every activity of `es` the rule accepts that time for; None when one of these is not sure (a label `unaudited` or `not_good`, or
-    at the edge of its clip) or lasts too long."""
+    at the edge of its clip) or lasts too long, or when any of `rivals` (activities taken for these) comes within TOL_S of the time."""
     e = es[end]
     middle = float(round((e.t0 + e.t1) / 2))
     near = [x for x in es if x.t1 >= middle - TOL_S and x.t0 <= middle + TOL_S]
-    if not all(sure(x) and x.o1 - x.o0 <= MAX_SPAN_S for x in near):
+    if not all(sure(x) and x.o1 - x.o0 <= MAX_SPAN_S for x in near) or touches(rivals, middle, middle, TOL_S):
         return None
     return e, middle, near
 
@@ -139,7 +158,14 @@ def questions_of(events: Sequence[Event], files: Sequence[realdump.File], span: 
     groups = {(c, k): sorted((e for e in events if (e.camera, e.kind) == (c, k)), key=lambda e: (e.t0, e.t1)) for c in cameras for k in kinds}
     covered = {c: (min(f.t for f in files if f.source == c), max(f.t + f.length for f in files if f.source == c)) for c in cameras}
     minutes = range(0, int((last - first).total_seconds() // 60) + 1, STEP_MIN)
-    windows = [(first + timedelta(minutes=m), first + timedelta(minutes=n)) for m in minutes for n in minutes if n - m >= WINDOW_MIN]
+    grid = [(first + timedelta(minutes=m), first + timedelta(minutes=n)) for m in minutes for n in minutes if n - m >= WINDOW_MIN]
+    recorded = {c: [(f.t - SLACK_S, f.t + f.length + SLACK_S) for f in files if f.source == c] for c in cameras}
+    # a window lies inside one recording of its camera, not across the recorder's stop
+    windows = {c: [(a, b) for a, b in grid if any(lo <= t_of(a) and t_of(b) <= hi for lo, hi in recorded[c])] for c in cameras}
+
+    def of(camera: str, kinds: Sequence[str]) -> list[Event]:
+        """The camera's activities of `kinds`."""
+        return [e for k in kinds for e in groups.get((camera, k), ())]
 
     def ask(qid: str, text: str, template: str, shape: str, grade, found: Sequence[Event], value: str | None, camera: str,
             since: float, until: float) -> Question:
@@ -150,12 +176,13 @@ def questions_of(events: Sequence[Event], files: Sequence[realdump.File], span: 
 
     def clear(camera: str, kind: str, a: datetime, b: datetime) -> bool:
         """Whether the camera has no activity of `kind`, or its like, within ABSENT_EDGE_S of the window."""
-        return not any(e.t1 >= t_of(a) - ABSENT_EDGE_S and e.t0 <= t_of(b) + ABSENT_EDGE_S for k in like(kind) for e in groups.get((camera, k), ()))
+        return not touches(of(camera, like(kind)), t_of(a), t_of(b), ABSENT_EDGE_S)
 
     out: list[Question] = []
     # first and last: when an activity was first (last) seen on a camera
     for template, end in (("first", 0), ("last", -1)):
-        sought = [(c, k, found) for (c, k), es in groups.items() if k in ACTIVITIES and es and (found := needle(es, end))]
+        sought = [(c, k, found) for (c, k), es in groups.items()
+                  if k in ACTIVITIES and es and (found := needle(es, end, of(c, rival_kinds(k))))]
         for camera, kind, (_, middle, near) in pick(sought, quota[template], rng, used):
             when, (who, what) = datetime.fromtimestamp(middle), ACTIVITIES[kind]
             grade = realdump.grade("time", time=f"{when:%H:%M:%S}", tol_s=TOL_S, date=when.date().isoformat())
@@ -164,10 +191,11 @@ def questions_of(events: Sequence[Event], files: Sequence[realdump.File], span: 
     # count: how many times an activity happened on a camera in a window
     sought = []
     for (camera, kind), es in groups.items():
-        for a, b in windows if kind in COUNTED else ():
+        for a, b in windows[camera] if kind in COUNTED else ():
             found = inside(es, t_of(a), t_of(b), EDGE_S)
             text = count_text(camera, kind, a, b)
-            if COUNT_MIN[scale] <= len(found or ()) <= COUNT_MAX and apart(found):
+            if (COUNT_MIN[scale] <= len(found or ()) <= COUNT_MAX and apart(found)
+                    and not touches(of(camera, rival_kinds(kind)), t_of(a), t_of(b), EDGE_S)):
                 sought.append((camera, kind, (a, b, found, text)))
     for camera, kind, (a, b, found, text) in pick(sought, quota["count"], rng, used):
         n = str(len(found))
@@ -181,7 +209,7 @@ def questions_of(events: Sequence[Event], files: Sequence[realdump.File], span: 
             who, what = NEVER[kind]
             out.append(ask(f"absent-{template}-{camera}-{kind}", f"When did {who} {template} {what} on {camera}?", "absent_" + template, WHEN,
                            realdump.grade("absent"), [], None, camera, *covered[camera]))
-    sought = [(c, k, (a, b)) for (c, k), es in groups.items() if es and k in COUNTED for a, b in windows if clear(c, k, a, b)]
+    sought = [(c, k, (a, b)) for (c, k), es in groups.items() if es and k in COUNTED for a, b in windows[c] if clear(c, k, a, b)]
     for camera, kind, (a, b) in pick(sought, quota["absent_count"], rng, used):
         out.append(ask(f"absent-count-{camera}-{kind}-{a:%H%M}-{b:%H%M}", count_text(camera, kind, a, b), "absent_count", NUMBER,
                        realdump.grade("absent"), [], None, camera, t_of(a), t_of(b)))
