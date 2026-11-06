@@ -61,6 +61,11 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
   build reads them and never writes there; it copies what it needs. Agents are refused any command or output that names the
   sources folder (or its parent, when it is called `sources`), so give it a name of 6 or more letters that no tool prints,
   such as `mmmb-sources`.
+- The files the V1, I3 and M4 builds read (16.7 GB, unchanged copies) are the Hugging Face dataset
+  [DanMcInerney/mmmb-sources](https://huggingface.co/datasets/DanMcInerney/mmmb-sources), private for now:
+  `hf download DanMcInerney/mmmb-sources --repo-type dataset --local-dir D:/mmmb-sources`, then set `MMMB_SOURCES` to that
+  folder. A pile built from it is the same as one built here, file for file. SINS (A1) is not in it, because its licence
+  forbids passing it on: download it from Zenodo as [MEDIA.md](MEDIA.md) says.
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
 - The `mm` extra is a path to Multimem's checkout (`C:/Users/danhm/tools/Multimem` in `pyproject.toml`), because Multimem
   has no git remote. On a machine without it, set `UV_FROZEN=1`: `uv sync` and `uv run` then install from `uv.lock`
