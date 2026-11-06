@@ -80,14 +80,14 @@ def test_the_converted_run_opens_as_the_run_it_was_with_its_three_configurations
 
 
 def test_the_figures_of_the_converted_run_are_the_recorded_report_json(run):
-    got = legacy_view(V8.report(run)[0])
+    got = legacy_view(V8.report([run])[0])
     assert not differences(got, REPORT), differences(got, REPORT)[:5]
     assert got == REPORT
 
 
 def test_the_markdown_of_the_converted_run_is_the_recorded_report_md_byte_for_byte(run, tmp_path):
     """Written as a run writes it (`fs.write_text`, in text mode as the old code wrote report.md, so with Windows line ends)."""
-    fs.write_text(tmp_path / "report.md", V8.report(run)[1])
+    fs.write_text(tmp_path / "report.md", V8.report([run])[1])
     assert (tmp_path / "report.md").read_bytes() == (RECORDED / "report.md").read_bytes()
 
 
@@ -135,7 +135,7 @@ def test_a_flipped_recorded_pass_fails_the_comparison_and_moves_b_or_c_by_one(ru
     record = fs.read_json(file)
     assert record["passed"] is not passed, "a flip changes the recorded pass"
     fs.write_json(file, {**record, "passed": passed})
-    got = legacy_view(V8.report(replace(run, folder=copy))[0])
+    got = legacy_view(V8.report([replace(run, folder=copy)])[0])
 
     assert got != REPORT and differences(got, REPORT), "the comparison with the recorded report fails"
     before, after = REPORT["agents"]["codex"]["d1-3B"]["video"]["mm_files"], got["agents"]["codex"]["d1-3B"]["video"]["mm_files"]
@@ -209,7 +209,7 @@ folder = Path(sys.argv[1])
 meta = fs.read_json(folder / "run.json")
 run = RunFolder(folder, meta["seed"], meta["scale"], tuple(date.fromisoformat(d) for d in meta["days"]), Path(meta["data"]),
                 Path(meta["temp"]), meta["tag"], meta["timeout_s"], scenarios.get(meta["scenario"]), tuple(Config(**c) for c in meta["configs"]))
-fs.write_text(Path(sys.argv[2]), run.scenario.report(run)[1])
+fs.write_text(Path(sys.argv[2]), run.scenario.report([run])[1])
 assert not BLOCKED & set(sys.modules), BLOCKED & set(sys.modules)
 """
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from mmmb.core.question import RULES, Grade
+from mmmb.core.question import ISO_DAY, RULES, Grade
 
 UNITS = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen " \
         "eighteen nineteen".split()
@@ -64,6 +64,9 @@ SEARCHED_MIN = 60
 # an option letter at the start of an answer ("B", "(b)", "B) Alice", "B - Alice"): then its end, a space or one of `.):,-`
 CHOICE = re.compile(r"\(?([A-D](?=$|[\s.):,-])|[a-d](?=$|[.):,-]))")  # a lower-case letter alone or before a mark: "a screwdriver" picks none
 WRAPS = ("<>", "[]", '""', "''", "``")  # what an answer may be wrapped in whole: `<B>`, `[B]`, `"B"`
+# a file name an answer may give for a `set` of files: a name, a dot and an extension that starts with a letter ("IMG_0042.JPG",
+# "clip-0007.wav"; not "1.25"); only the extensions of the set's own files count
+FILE_NAME = re.compile(r"[\w][\w.-]*\.([a-z][a-z0-9]{1,3})\b", re.IGNORECASE)
 # a second letter named after "or", "and", "/", "&" or a comma: "B or C", "B/C", "B, C" are hedges
 HEDGE = re.compile(r"(?i:\bor\b|\band\b)\s*\(?[A-D]\b(?!')|[/&,]\s*\(?[A-D]\b(?!')")
 
@@ -243,6 +246,49 @@ def on_date(text: str, day: str) -> bool:
     return bool(named) and all(all(m is None or m == w for m, w in zip(one, wanted)) for one in named)
 
 
+def base_name(path: str) -> str:
+    """The last part of a path, with either slash, in lower case: a `set` of files is matched by name, wherever the agent saw it."""
+    return re.split(r"[\/]", path)[-1].casefold()
+
+
+def named_items(g: Grade, answer: str) -> tuple[set[str], int]:
+    """The items of a `set` grade that `answer` names, and how many other things of their kind it names. Dates: each date the answer
+    names by its month and day (`date_mentions`; a year, when given, must agree; a weekday alone names no date), with the dates of
+    `g.ignore` (the question's own bounds) passed over unless they are items. Files: each file name with an extension of the items'
+    (`FILE_NAME`), matched by name (`base_name`), each counted once."""
+    if all(ISO_DAY.fullmatch(x) for x in g.items):
+        wanted = {date.fromisoformat(x): x for x in g.items}
+        ignored = {date.fromisoformat(x) for x in g.ignore if ISO_DAY.fullmatch(x)}
+        found: set[str] = set()
+        others: set[tuple] = set()
+        for year, month, day, _ in date_mentions(answer):
+            if month is None or day is None:
+                continue
+            hits = [x for d, x in wanted.items() if (d.month, d.day) == (month, day) and year in (None, d.year)]
+            if hits:
+                found.update(hits)
+            elif not any((d.month, d.day) == (month, day) and year in (None, d.year) for d in ignored):
+                others.add((year, month, day))
+        return found, len(others)
+    wanted_names = {base_name(x): x for x in g.items}
+    suffixes = {name.rsplit(".", 1)[-1] for name in wanted_names}
+    named = {m.group(0).casefold() for m in FILE_NAME.finditer(answer) if m.group(1).casefold() in suffixes}
+    return {wanted_names[n] for n in named if n in wanted_names}, len(named - set(wanted_names))
+
+
+def items_f1(g: Grade, answer: str | None) -> float | None:
+    """For a `set` grade, the F1 of the items the answer names against the grade's (`named_items`): 0 for no answer; None for another
+    rule. It is told beside the verdict, which needs the exact set."""
+    if g.rule != "set":
+        return None
+    if answer is None:
+        return 0.0
+    found, others = named_items(g, answer)
+    precision = len(found) / (len(found) + others) if found or others else 0.0
+    recall = len(found) / len(g.items)
+    return 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+
+
 def grade(g: Grade, answer: str | None) -> bool:
     """Whether `answer` is right by `g`: None is wrong, and so is a hedge, an answer with a number or a time that is neither the
     truth nor in `g.ignore` (the question's own numbers and times).
@@ -253,7 +299,8 @@ def grade(g: Grade, answer: str | None) -> bool:
     - `code_time`: the truth's digits (`E-4417`, `e4417` and `4417` all pass), a time within `tol_s` of `time` (every time of
       the answer within it or ignored), and no other number of as many digits;
     - `absent`: the answer abstains (`abstained`);
-    - `choice`: the answer's letter (`choice`) is the truth, one of A to D ("unknown", an option's words and a hedge are wrong).
+    - `choice`: the answer's letter (`choice`) is the truth, one of A to D ("unknown", an option's words and a hedge are wrong);
+    - `set`: the answer names every one of `items` (dates or file names: `named_items`) and nothing else of their kind.
     A `time` or `code_time` grade may hold a `date` (ISO; None or empty is none): the answer must also name that date, by its
     weekday, as "29 October", "October 29" or "29 Oct" (with a year or not), as "the 29th" or as `2026-10-29`, and name no other
     date: a time alone is wrong (`on_date`). A year in brackets, "(2026)", is no number of an answer (a `number` answer keeps
@@ -287,4 +334,7 @@ def grade(g: Grade, answer: str | None) -> bool:
         return abstained(answer, g.ignore)
     if rule == "choice":
         return choice(answer) == g.truth
+    if rule == "set":
+        found, others = named_items(g, answer)
+        return len(found) == len(g.items) and not others
     raise ValueError(f"a question's grade is one of {', '.join(RULES)}, not {rule!r}")

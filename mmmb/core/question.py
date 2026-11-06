@@ -1,6 +1,7 @@
 """The question file of a scenario: one JSON object per line, one `Question` each (DESIGN 6.1). `load_questions` is the one place
-the file is parsed. It refuses an unknown key, a missing key, a value of the wrong type, an unknown rule and a repeated `qid`,
-so everything after it holds dataclasses and trusts them."""
+the file is parsed. It refuses an unknown key, a missing key (but for a field with a default: a line written before the field was
+added reads as it did), a value of the wrong type, an unknown rule and a repeated `qid`, so everything after it holds dataclasses and
+trusts them."""
 
 from __future__ import annotations
 
@@ -17,7 +18,8 @@ from pathlib import Path
 
 from mmmb.core import fs
 
-RULES = ("number", "count", "time", "code_time", "absent", "choice")  # how an answer is graded (core/grade.py)
+RULES = ("number", "count", "time", "code_time", "absent", "choice", "set")  # how an answer is graded (core/grade.py)
+ISO_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")  # a `set` of dates holds them so
 QID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")  # a qid is a file name in the run folder
 CLOCK = re.compile(r"\d{1,2}:\d{2}(:\d{2})?")
 
@@ -45,6 +47,7 @@ class Grade:
     wrong: tuple[str, ...]
     ignore: tuple[str, ...]
     date: str | None
+    items: tuple[str, ...] = ()  # the `set` rule's: every one the answer must name, and no other (ISO dates, or file names)
 
 
 @dataclass(frozen=True)
@@ -87,9 +90,18 @@ class Question:
     retrieval: RetrievalSpec | None
 
 
+def line_of(q: Question) -> dict:
+    """`q` as a line of the question file: its grade's `items` only when it has some, so that a file with no `set` question is the
+    file it was before them."""
+    out = dataclasses.asdict(q)
+    if not out["grade"]["items"]:
+        del out["grade"]["items"]
+    return out
+
+
 def write_questions(path: Path, questions: Sequence[Question]) -> None:
     """`questions` as the file `load_questions` reads, whole or not at all."""
-    fs.write_text(path, "".join(json.dumps(dataclasses.asdict(q), ensure_ascii=False, allow_nan=False) + "\n" for q in questions))
+    fs.write_text(path, "".join(json.dumps(line_of(q), ensure_ascii=False, allow_nan=False) + "\n" for q in questions))
 
 
 def load_questions(path: Path) -> tuple[Question, ...]:
@@ -138,6 +150,12 @@ def check(q: Question) -> None:
             raise ValueError(f"grade.date {g.date!r} is not an ISO date") from None
     if g.rule in ("number", "count", "code_time", "choice") and g.truth is None:
         raise ValueError(f"grade.truth is missing for the rule {g.rule}")
+    if (g.rule == "set") != bool(g.items):
+        raise ValueError("grade.items is for the rule set, which needs at least one" if g.items else "grade.items is missing for the rule set")
+    if g.items and len(set(g.items)) != len(g.items):
+        raise ValueError(f"grade.items {list(g.items)} repeats one")
+    if g.items and any(ISO_DAY.fullmatch(x) for x in g.items) and not all(ISO_DAY.fullmatch(x) for x in g.items):
+        raise ValueError(f"grade.items {list(g.items)} mixes dates and file names")
     if g.rule == "choice" and g.truth not in tuple("ABCD"):
         raise ValueError(f"grade.truth {g.truth!r} is not a letter from A to D")
     if g.rule in ("time", "code_time"):
@@ -179,9 +197,10 @@ def read(tp, value, at: str):
         fields = hints(tp)
         if unknown := [k for k in value if k not in fields]:
             refuse("unknown key " + ", ".join(repr(k) for k in unknown))
-        if missing := [k for k in fields if k not in value]:
+        defaulted = {f.name for f in dataclasses.fields(tp) if f.default is not dataclasses.MISSING}
+        if missing := [k for k in fields if k not in value and k not in defaulted]:
             refuse("missing key " + ", ".join(repr(k) for k in missing))
-        return tp(**{name: read(ftype, value[name], f"{at}.{name}" if at else name) for name, ftype in fields.items()})
+        return tp(**{name: read(ftype, value[name], f"{at}.{name}" if at else name) for name, ftype in fields.items() if name in value})
     if origin in (typing.Union, types.UnionType):
         arms = [a for a in args if a is not type(None)]
         if value is None and len(arms) < len(args):

@@ -347,7 +347,7 @@ def test_report_writes_its_files_for_a_run_and_pools_runs_of_other_seeds(w, tmp_
     assert text in out and f"written to {w.run.folder / 'report.md'} and report.json" in out and "Runs pooled: 1; seeds 7" in text
     figures = fs.read_json(w.run.folder / "report.json")
     assert figures["runs"][0]["seed"] == 7 and set(figures["agents"]["claude"]) == {"stub/all"}
-    want, markdown = scenarios.get("v7_screen").report(w.run)  # (what the scenario gives for one run: the core's report of it)
+    want, markdown = scenarios.get("v7_screen").report([w.run])  # (what the scenario gives for one run: the core's report of it)
     assert figures == json.loads(json.dumps(want)) == json.loads(json.dumps(report.numbers([w.run]))) and text == markdown.replace("\r\n", "\n")
     # a second run of another seed (the same results under it): pooled, and written in the first run's folder
     other = tmp_path / "eight"

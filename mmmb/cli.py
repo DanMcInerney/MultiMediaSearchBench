@@ -37,7 +37,7 @@ from pathlib import Path
 
 from mmmb import scenarios, systems
 from mmmb.arguments import DEFAULT_SEED, OPTIONS, csv, parser_of
-from mmmb.core import fs, gpu, paths, render, report
+from mmmb.core import fs, gpu, paths, render, report, summary
 from mmmb.core.agents import claude
 from mmmb.core.build import build_run, check_stores, ensure_data, ingest_stores, read_dump, store_hashes, store_of
 from mmmb.core.clockcheck import light_cases, pick, queued_at_once, run_halves, show_sides
@@ -306,13 +306,11 @@ def report_command(args: argparse.Namespace, parser: argparse.ArgumentParser) ->
     runs = [resolve_run(r) for r in args.runs]
     if never := [r.name for r in runs if not (r.folder / "systems.json").exists()]:
         raise ValueError(f"{', '.join(never)} has not been run: it has no systems.json and no results to report")
-    if len({r.scenario.name for r in runs}) > 1:
-        raise ValueError("these runs are of different scenarios: " + ", ".join(f"{r.name} ({r.scenario.name})" for r in runs))
-    if len(runs) == 1:
-        figures, text = runs[0].scenario.report(runs[0])
-    else:  # pooled: the core's report of the control against the tested configurations over the runs
-        figures = report.numbers(runs, args.control)
-        text = render.markdown(figures)
+    if len({r.scenario.name for r in runs}) == 1:  # the scenario's own report, of its runs pooled where it pools them
+        figures, text = runs[0].scenario.report(runs, args.control)
+    else:  # runs of several scenarios: the summary, scenario by scenario and over all of them
+        figures = summary.numbers(runs, args.control)
+        text = summary.markdown(figures)
     folder = runs[0].folder
     fs.write_text(folder / "report.md", text)
     fs.write_json(folder / "report.json", figures)
