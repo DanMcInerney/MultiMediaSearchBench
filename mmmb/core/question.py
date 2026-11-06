@@ -156,6 +156,13 @@ def check(q: Question) -> None:
         raise ValueError(f"grade.items {list(g.items)} repeats one")
     if g.items and any(ISO_DAY.fullmatch(x) for x in g.items) and not all(ISO_DAY.fullmatch(x) for x in g.items):
         raise ValueError(f"grade.items {list(g.items)} mixes dates and file names")
+    for x in g.items if g.items and ISO_DAY.fullmatch(g.items[0]) else ():
+        try:
+            date.fromisoformat(x)
+        except ValueError:
+            raise ValueError(f"grade.items {x!r} is not a date") from None
+    if g.items and not ISO_DAY.fullmatch(g.items[0]) and len({re.split(r"[\\/]", x)[-1].casefold() for x in g.items}) != len(g.items):
+        raise ValueError(f"grade.items {list(g.items)} has two files of one name: an answer names a file by its name (grade.base_name)")
     if g.rule == "choice" and g.truth not in tuple("ABCD"):
         raise ValueError(f"grade.truth {g.truth!r} is not a letter from A to D")
     if g.rule in ("time", "code_time"):

@@ -248,20 +248,24 @@ def on_date(text: str, day: str) -> bool:
 
 def base_name(path: str) -> str:
     """The last part of a path, with either slash, in lower case: a `set` of files is matched by name, wherever the agent saw it."""
-    return re.split(r"[\/]", path)[-1].casefold()
+    return re.split(r"[\\/]", path)[-1].casefold()
 
 
 def named_items(g: Grade, answer: str) -> tuple[set[str], int]:
     """The items of a `set` grade that `answer` names, and how many other things of their kind it names. Dates: each date the answer
-    names by its month and day (`date_mentions`; a year, when given, must agree; a weekday alone names no date), with the dates of
-    `g.ignore` (the question's own bounds) passed over unless they are items. Files: each file name with an extension of the items'
+    names by its month and day (`date_mentions`; a year, when given, must agree; a weekday alone names no date; a day of the month
+    named alone, as "the 4th", is another date unless it is the day of an item), with the dates of `g.ignore` (the question's own
+    bounds) passed over unless they are items. Files: each file name with an extension of the items'
     (`FILE_NAME`), matched by name (`base_name`), each counted once."""
     if all(ISO_DAY.fullmatch(x) for x in g.items):
         wanted = {date.fromisoformat(x): x for x in g.items}
         ignored = {date.fromisoformat(x) for x in g.ignore if ISO_DAY.fullmatch(x)}
         found: set[str] = set()
         others: set[tuple] = set()
+        days = {d.day for d in wanted}
         for year, month, day, _ in date_mentions(answer):
+            if month is None and day is not None and day not in days:  # "and maybe the 4th": a day named alone that is none of them
+                others.add((None, None, day))
             if month is None or day is None:
                 continue
             hits = [x for d, x in wanted.items() if (d.month, d.day) == (month, day) and year in (None, d.year)]

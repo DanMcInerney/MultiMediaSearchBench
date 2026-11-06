@@ -1,7 +1,8 @@
 # MMMB: the plan to production readiness
 
 Agreed with Dan on 5 November 2026, then re-planned the same day: MMMB is a standalone benchmark of realistic media, not
-Multimem's benchmark separated out. Not started.
+Multimem's benchmark separated out. Unit 1 is built and reviewed; the changes from this plan made while building are marked
+"As built".
 
 ## The goal
 
@@ -54,14 +55,18 @@ Defaults taken, each easy to change later:
 1. **A shared builder for real dumps** (`mmmb/scenarios/realdump/`), so the four scenarios stay small: copying and naming files
    with their times, the manifest, a simple shortcut probe (no file name or metadata field carries a label, and needle files are
    not singled out by size), the prompt, the view, the deny words. Each scenario is then a reader of its source and labels plus
-   question templates.
+   question templates. *As built:* the probe does not check sizes: they are the recordings' own (on the trail camera an animal's
+   photo tends to be smaller than an empty one, as on any card), and nothing can be done about them without changing the media.
 2. **One new grading rule, `set`,** for "find every one" questions (clips, nights): right only with the exact set; the F1 is
    recorded beside it. Every other question uses the rules there are (`time`, `count`, `number`, `absent`).
 3. **A neutral report in the core.** The core's report today is V7's mm report ("mm benchmark: with mm and without", "decider
    tier"), and it has nothing to say about a run of `files` alone. The new report gives, per scenario, agent and configuration:
    right out of n with its interval, grounded and lucky answers, wrong answers on absent questions, seconds, tokens and dollars
    per correct answer, the questions `listing` answered (leaks), and, when a system is in the run, its paired comparison with
-   `files`. V7's report moves into `v7_screen` unchanged, so it still matches the recorded pilot byte for byte.
+   `files`. V7's report moves into `v7_screen` unchanged, so it still matches the recorded pilot byte for byte. *As built:* the
+   neutral report is `core/summary.py`, and V7's stays where it was (`core/report.py`, `core/render.py`): `compare`, `repeat`,
+   the dry run and many tests read it there. `mmmb report` gives a scenario's own report for its runs (the summary for the real
+   scenarios) and the summary for runs of several scenarios.
 
 ## How it is checked
 

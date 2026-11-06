@@ -182,8 +182,8 @@ def release(temp: Path, key: str) -> None:
 
 def report(runs: Sequence[RunFolder], control: str = CONTROL) -> tuple[dict, str]:
     """The figures of the one run and the Markdown that renders them (report.json and report.md), against `control`. V8's report is of
-    one run: runs are not pooled."""
+    one run: its runs are not pooled (the core's pooled report, of V7's runs, cannot read V8's results)."""
     if len(runs) != 1:
-        raise ValueError("a v8_egolife report is of one run, not of " + ", ".join(r.name for r in runs))
+        raise ValueError("a v8_egolife report is of one run: report " + ", ".join(r.name for r in runs) + " one at a time")
     figures = numbers(runs[0], control)
     return figures, markdown(figures)

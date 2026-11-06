@@ -35,8 +35,7 @@ def filters_of(runs: Sequence[RunFolder]) -> set[str]:
     """The names of the configurations that are leak filters in any of `runs` (by their systems.json)."""
     out = set()
     for run in runs:
-        file = run.folder / "systems.json"
-        noted = fs.read_json(file) if file.exists() else {}
+        noted = fs.read_json(run.folder / "systems.json")  # (a run that has been run has one: `mmmb report` refuses one that has not)
         out |= {c.name for c in run.configs if is_filter(c, noted.get(c.name, {}))}
     return out
 
@@ -47,7 +46,10 @@ def cell(rows: list[tuple]) -> dict:
     rs = [r for _, r in rows]
     out = side(rs)
     out["interval"] = list(wilson(out["correct"], out["n"])) if rs else None
-    out["usd_per_right"] = out["cost_usd"] / out["correct"] if out["cost_usd"] is not None and out["correct"] else None
+    right = out["correct"]
+    out["usd_per_right"] = out["cost_usd"] / right if out["cost_usd"] is not None and right else None
+    out["s_per_right"] = out["seconds"] / right if right else None
+    out["tokens_per_right"] = out["tokens_all"] / right if out["tokens_all"] is not None and right else None
     out["by_kind"] = tally((q.kind, r) for q, r in rows)
     out["by_media"] = tally((str(q.tags["modality"]), r) for q, r in rows)
     out["items_f1"] = mean([r["items_f1"] for r in rs if r.get("items_f1") is not None])
@@ -120,6 +122,8 @@ def numbers(runs: Sequence[RunFolder], control: str = CONTROL) -> dict:
     """The summary's figures (report.json) over `runs`, scenario by scenario in the order first met, and `overall`, each agent and
     configuration over every scenario, when there are several. Runs of one scenario with the same seed and scale ask the same questions
     and are refused: pooled, each question would count twice."""
+    if not any(control in {c.name for c in run.configs} for run in runs):
+        raise ValueError(f"no run has the configuration {control!r} to set the others beside: name one they have (--control)")
     seen: dict[tuple, str] = {}
     for run in runs:
         key = (run.scenario.name, run.seed, run.scale)
@@ -166,7 +170,7 @@ def accuracy_rows(s: dict) -> list[list]:
             rows.append([agent, name + (" (leak check)" if name in s["filters"] else ""), pct(c["correct"], c["n"]),
                          f"{100 * low:.0f}-{100 * high:.0f}%", "-" if g is None else g["grounded"], "-" if g is None else g["lucky"],
                          "-" if g is None else g["unparsed"], f"{c['absent_answered']}/{c['absent']}", f"{c['abstained']}/{c['needles']}",
-                         num(c["median_s"], 0), num(None if c["tokens_mean"] is None else c["tokens_mean"] / 1000, 0),
+                         num(c["s_per_right"], 0), num(None if c["tokens_per_right"] is None else c["tokens_per_right"] / 1000, 0),
                          num(c["cost_usd"], 2), num(c["usd_per_right"], 2), num(c["items_f1"], 2), c["timeouts"]])
     return rows
 
@@ -186,7 +190,7 @@ def pair_rows(s: dict, control: str) -> list[list]:
 def section_lines(s: dict, control: str) -> list[str]:
     out = ["", f"## {s['code']} ({s['scenario']}): {s['questions']} questions", "", "### What each agent got right", ""]
     out += table(["agent", "configuration", "right", "95% interval", "grounded", "lucky", "unparsed", "answered an absent one",
-                  "unknown on a real one", "median s", "tokens k per exec", "cost $", "$ per right", "find-all F1", "timed out"],
+                  "unknown on a real one", "s per right", "tokens k per right", "cost $", "$ per right", "find-all F1", "timed out"],
                  accuracy_rows(s))
     if few := [f"{a} {n}" for a, by in s["cells"].items() for n, c in by.items() if c["n"] < FEW]:
         out += ["", f"Under {FEW} questions the interval is wide: {', '.join(few)}."]

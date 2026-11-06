@@ -21,7 +21,8 @@ from mmmb.core import fs, grade
 from mmmb.core.agents import claude
 from mmmb.core.runfolder import RunFolder
 from mmmb.core.runner import Agent
-from mmmb.scenarios.i3_trailcam.source import SOURCE
+from mmmb.scenarios.i3_trailcam.questions import questions_of
+from mmmb.scenarios.i3_trailcam.source import SOURCE, Photo
 
 if not (SOURCE / "labels" / "caltech_camera_traps.json.zip").is_file():
     pytest.skip(f"the Caltech Camera Traps source is not at {SOURCE}, so I3 is not built", allow_module_level=True)
@@ -53,6 +54,10 @@ def check_against_labels(questions, card) -> None:
         month = parts[-2] + "-" + parts[-1] if template == "days" and len(parts) > (4 if absent else 2) else None
         of = [(t, f) for t, f, s in card if s == species and (month is None or t[:7] == month)]
         days = sorted({t[:10] for t, _ in of})
+        assert species.replace("_", " ") in q.question, f"{q.qid} asks of another animal: {q.question}"
+        if month:
+            named = datetime.strptime(month, "%Y-%m").strftime("%B %Y")  # (an English locale: the tests run in one)
+            assert f" in {named} " in q.question, f"{q.qid} asks of another month: {q.question}"
         assert (q.kind == "absent") is absent and not (absent and of), q.qid
         if absent:
             assert q.grade.rule == "absent" and not q.truth.evidence
@@ -64,7 +69,8 @@ def check_against_labels(questions, card) -> None:
             assert q.grade.truth == str(len(days)), q.qid
         else:
             t, f = of[0] if template == "first" else of[-1]
-            assert (q.grade.date, q.grade.time) == (t[:10], t[11:19]) and [s.file for s in q.truth.evidence] == [path[f]], q.qid
+            visit = [path[g] for x, g in of if abs((datetime.fromisoformat(x) - datetime.fromisoformat(t)).total_seconds()) <= 60]
+            assert (q.grade.date, q.grade.time) == (t[:10], t[11:19]) and [s.file for s in q.truth.evidence] == visit, q.qid
             assert all(x[11:13] != "12" for x, _ in of if x[:10] == t[:10]), f"{q.qid} rests on a photo whose hour is in doubt"
 
 
@@ -128,6 +134,19 @@ def test_another_seed_asks_other_questions_of_the_same_card():
     files_two, two = I3.plan_of(I3.recipe(scale="standard", seed=2))
     assert files == files_two and {q.qid for q in one} != {q.qid for q in two}
     check_against_labels(two, plain_card("2013-09-10", "2014-02-28"))
+
+
+def test_no_first_or_last_question_rests_on_a_day_whose_hour_12_is_in_doubt():
+    """A made-up card: the fox's first day has a photo at 12:xx (noon or the hour after midnight), the bobcat's last day too."""
+    def photo(n, when, species):
+        return Photo(f"{n}.jpg", datetime.fromisoformat(when), species)
+    card = [photo(1, "2013-12-16 08:00:00", "fox"), photo(2, "2013-12-16 12:10:00", "fox"), photo(3, "2013-12-17 09:00:00", "fox"),
+            photo(4, "2013-12-17 10:00:00", "bobcat"), photo(5, "2013-12-18 06:00:00", "bobcat"), photo(6, "2013-12-18 12:30:00", "bobcat"),
+            photo(7, "2013-12-18 13:00:00", "empty")]
+    for seed in range(5):
+        qids = {q.qid for q in questions_of(card, [f"IMG_{n}.JPG" for n in range(1, 8)], ["bobcat", "fox"], "tiny", seed, lambda w: w.timestamp())}
+        assert "first-fox" not in qids and "last-bobcat" not in qids
+        assert {"last-fox", "first-bobcat"} & qids, "the others are asked"
 
 
 def test_the_grader_takes_each_truth_and_refuses_the_planted_wrong_answers(tiny):

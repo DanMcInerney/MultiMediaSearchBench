@@ -109,3 +109,15 @@ def test_a_recipe_made_in_another_time_zone_is_refused():
     realdump.check_offsets({"days": days, "utc_offsets": realdump.utc_offsets(days)})
     with pytest.raises(ValueError, match="another dump"):
         realdump.check_offsets({"days": days, "utc_offsets": ["+1400", "+1400"]})
+
+
+def test_a_file_whose_metadata_the_probe_cannot_read_fails_it(tmp_path):
+    dump = written(tmp_path, {"cam1/0001.mp4": b"\x00\x00\x00\x18ftypisom" + b"\x00" * 12})
+    outcome = realdump.probe(dump, tmp_path, ["deer"])
+    assert outcome.failures == ("cam1/0001.mp4: its metadata is not read (no reader for .mp4)",)
+    mp4 = {".mp4": lambda path: path.read_bytes()}
+    assert realdump.probe(dump, tmp_path, ["deer"], mp4).status == "passed", "a scenario of other files passes its own reader"
+
+
+def test_with_no_way_to_the_files_the_prompt_still_offers_unknown():
+    assert prompt_of(False, False).endswith('Answer "unknown" with "evidence": [] when what you know does not hold it.')

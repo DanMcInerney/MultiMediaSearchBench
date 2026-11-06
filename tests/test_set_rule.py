@@ -92,3 +92,45 @@ def test_a_set_grade_that_could_not_be_graded_is_refused(tmp_path, g, said):
     write_questions(file, [a_question(g)])
     with pytest.raises(ValueError, match=said):
         load_questions(file)
+
+
+def test_an_answer_may_repeat_the_questions_own_numbers():
+    """The builder puts the question's numbers and times in the grade's `ignore` (`grade.asked`), as V7's questions have them."""
+    def asked(text, g):
+        return realdump.question(code="X", qid="q", now=1.7e9, text=text, kind="absent" if g.rule == "absent" else "days",
+                                 template="days", modality="image", shape="<dates>", grade=g,
+                                 evidence=[] if g.rule == "absent" else [Span("a.jpg", 0, 0)], sources=("camera",), since=0, until=1,
+                                 value=None)
+    absent = asked("On which days in September 2013 did a bobcat come past my trail camera?", realdump.grade("absent"))
+    assert "2013" in absent.grade.ignore and grade.grade(absent.grade, "No, none came in September 2013.")
+    assert not grade.grade(absent.grade, "Not sure; maybe 3 times in September 2013.")
+    found = asked("On which days in September 2013 did a rabbit come past my trail camera?", of(["2013-09-24", "2013-09-28"]))
+    assert grade.grade(found.grade, "In September 2013: 2013-09-24 and 2013-09-28")
+    timed = asked("When did the vacuum run between 21:00 and 23:00?", realdump.grade("time", time="22:04:10", tol_s=60))
+    assert {"21:00", "23:00"} <= set(timed.grade.ignore) and grade.grade(timed.grade, "Between 21:00 and 23:00 it ran at 22:04.")
+
+
+@pytest.mark.parametrize("answer", ["2013-12-16, 2013-12-18 and maybe the 20th", "2013-12-16, 2013-12-18 or Friday 20"])
+def test_a_day_named_alone_that_is_none_of_the_set_is_another_date(answer):
+    assert not grade.grade(DAYS, answer)
+    assert grade.grade(DAYS, "2013-12-16 (the 16th) and 2013-12-18")
+
+
+def test_a_file_with_no_set_question_is_the_file_it_was(tmp_path):
+    file = tmp_path / "questions.jsonl"
+    write_questions(file, [a_question(realdump.grade("count", truth="2"))])
+    assert '"items"' not in file.read_text(encoding="utf-8")
+    write_questions(file, [a_question(DAYS)])
+    assert '"items": ["2013-12-16", "2013-12-18"]' in file.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("g, said", [
+    (of(["2013-02-30"]), "is not a date"),
+    (of(["cam1/clip_0001.mp4", "cam2/clip_0001.mp4"]), "two files of one name"),
+    (of([r"cam1\CLIP.mp4", "cam2/clip.mp4"]), "two files of one name"),
+])
+def test_a_set_that_no_answer_could_name_is_refused(tmp_path, g, said):
+    file = tmp_path / "questions.jsonl"
+    write_questions(file, [a_question(g)])
+    with pytest.raises(ValueError, match=said):
+        load_questions(file)

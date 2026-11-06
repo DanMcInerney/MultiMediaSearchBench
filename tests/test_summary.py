@@ -80,7 +80,12 @@ def test_a_leak_is_left_out_of_every_figure_but_the_filters_and_a_result_to_run_
     assert files["interval"] == pytest.approx(list(stats.wilson(2, 4)))
     assert files["items_f1"] == pytest.approx(0.8) and stub["items_f1"] == 1.0  # two found of two, one named of three wrong
     assert files["by_kind"] == {"absent": [2, 2], "count": [0, 1], "days": [0, 1]}
-    assert files["usd_per_right"] == pytest.approx(0.04)
+    assert files["usd_per_right"] == pytest.approx(0.04) and files["s_per_right"] == pytest.approx(20.0), "4 execs of 10 s, 2 right"
+
+
+def test_a_control_no_run_has_is_refused(run):
+    with pytest.raises(ValueError, match="no run has the configuration 'flies'"):
+        summary.numbers([run], "flies")
 
 
 def test_each_other_configuration_is_set_beside_the_control_on_the_questions_both_have(run):

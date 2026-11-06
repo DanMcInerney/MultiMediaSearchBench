@@ -22,6 +22,7 @@ from pathlib import Path
 
 from mmmb.core import fs
 from mmmb.core.answer import answer_request
+from mmmb.core.grade import asked
 from mmmb.core.contract import Dump, ManifestEntry
 from mmmb.core.question import Grade, Question, Scope, Span, Truth, line_of
 from mmmb.core.runfolder import IN_ONLY
@@ -134,10 +135,12 @@ def grade(rule: str, *, truth: str | None = None, time: str | None = None, tol_s
 def question(*, code: str, qid: str, now: float, text: str, kind: str, template: str, modality: str, shape: str, grade: Grade,
              evidence: Sequence[Span], sources: Sequence[str], since: float, until: float, value: str | None) -> Question:
     """A question of a real dump, `dev` until `split` draws: asked as of `now` over the whole dump (nothing is cut), with the answer's
-    `shape` for the prompt. An absent question (`kind` absent) has no evidence and no value."""
+    `shape` for the prompt. An absent question (`kind` absent) has no evidence and no value. The numbers and clock times of `text` join
+    the grade's `ignore` (`grade.asked`): an answer may repeat them ("none in September 2013")."""
     absent = kind == "absent"
     if absent != (grade.rule == "absent") or absent == bool(evidence):
         raise ValueError(f"{qid}: an absent question has the rule absent and no evidence, and only it")
+    grade = dataclasses.replace(grade, ignore=tuple(dict.fromkeys((*grade.ignore, *asked(text)))))
     return Question(qid=qid, scenario=code, split="dev", now=iso_local(now), question=text, attachments=(), kind=kind, hint="none",
                     truth=Truth(value, tuple(evidence), ()), grade=grade,
                     tags={"modality": modality, "template": template, "level": "none", "absent": absent, "shape": shape},
@@ -173,7 +176,7 @@ def prompt(question: Question, access: Access, what: str, layout: str) -> str:
         holder, plural = "the files", True
     else:
         how.append(f"You cannot see {what}.")
-        holder, plural = None, False
+        holder, plural = "what you know", False
     end = answer_request(access.answer_format, holder, str(question.tags["shape"]), plural)
     return f"{head} {' '.join(how)}\n\n{question.question}\n\n{end}"
 
@@ -215,9 +218,10 @@ METADATA = {".jpg": jpeg_header, ".jpeg": jpeg_header, ".wav": riff_header}  # b
 
 
 def probe(dump: Dump, out: Path, labels: Sequence[str], metadata: Mapping[str, Callable[[Path], bytes]] = METADATA) -> ProbeOutcome:
-    """The leak probe of a real dump: no file's path, nor its metadata (read by its suffix with `metadata`; a file of another suffix
-    by its path alone), names one of `labels` (the source's label words, as whole words, in any case, `_` read as a space). Writes
-    `shortcuts.md` into `out`. The files' sizes are the recordings' own, and are not checked."""
+    """The leak probe of a real dump: no file's path, nor its metadata (read by its suffix with `metadata`: a file of a suffix with no
+    reader fails, so a scenario of other files passes its own readers), names one of `labels` (the source's label words, as whole
+    words, in any case, `_` read as a space). Writes `shortcuts.md` into `out`. The files' sizes are not checked: they are the
+    recordings' own (in I3 an animal's photo tends to be smaller than an empty one, as on any camera's card)."""
     words = sorted({w.casefold().replace("_", " ") for w in labels if w})
     pattern = re.compile(r"(?<![a-z])(" + "|".join(re.escape(w) for w in words) + r")(?![a-z])")
     failures = []
@@ -226,7 +230,9 @@ def probe(dump: Dump, out: Path, labels: Sequence[str], metadata: Mapping[str, C
             failures.append(f"{e.path}: its name says {found[1]!r}")
             continue
         read = metadata.get(Path(e.path).suffix.casefold())
-        if read and (found := pattern.search(read(dump.root / e.path).decode("latin-1").casefold().replace("_", " "))):
+        if read is None:
+            failures.append(f"{e.path}: its metadata is not read (no reader for {Path(e.path).suffix or 'a file with no suffix'})")
+        elif found := pattern.search(read(dump.root / e.path).decode("latin-1").casefold().replace("_", " ")):
             failures.append(f"{e.path}: its metadata says {found[1]!r}")
     lines = ["# Leak probe", "", f"{len(dump.entries)} files; label words: {', '.join(words)}.", ""]
     lines += [f"- {f}" for f in failures] or ["No file's name or metadata names a label."]

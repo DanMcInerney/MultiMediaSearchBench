@@ -3,7 +3,8 @@
 | template      | question                                                                  | rule                    |
 | `days`        | On which days (in a month, at the standard scale) did a deer come past?    | `set` of dates          |
 | `count`       | On how many different days did a bobcat come past?                         | `count`                 |
-| `first`       | When did the camera first photograph a skunk?                              | `time` and date, 60 s   |
+| `first`       | When did the camera first photograph a skunk? (evidence: every photo of    | `time` and date, 60 s   |
+|               | the species within the 60 s, as the camera takes a visit in a burst)       |                         |
 | `last`        | When did the camera last photograph a coyote?                              | `time` and date, 60 s   |
 | `absent`      | `first` of a large animal the dataset has and the card never shows, or (at | `absent`                |
 |               | the standard scale) `days` in a month the species never came               |                         |
@@ -119,8 +120,9 @@ def questions_of(photos: Sequence[Photo], paths: Sequence[str], names: Sequence[
         for species, _ in pick(sure, quota[template], rng):
             photo = of(species)[end]
             clock = photo.wall.strftime("%H:%M:%S")
+            visit = [p for p in of(species) if abs((p.wall - photo.wall).total_seconds()) <= TOL_S]  # the photos the rule takes as it
             out.append(ask(f"{template}-{species}", f"When did my trail camera {template} photograph {spoken(species)}?", template,
-                           WHEN, realdump.grade("time", time=clock, tol_s=TOL_S, date=photo.wall.date().isoformat()), [photo],
+                           WHEN, realdump.grade("time", time=clock, tol_s=TOL_S, date=photo.wall.date().isoformat()), visit,
                            f"{photo.wall.date().isoformat()} {clock}"))
     # absent: a species of the dataset the card never shows; a month a species of the card never came in
     never = [(s, None) for s in NEVER if s in names and s not in seen]

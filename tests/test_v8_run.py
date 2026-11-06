@@ -241,6 +241,11 @@ def test_the_subset_and_only_choose_questions(ran):
 # -- 9. the report ----------------------------------------------------------------------------------------------------------------
 
 
+def test_several_runs_are_refused_one_at_a_time(ran):
+    with pytest.raises(ValueError, match="one at a time"):
+        V8.report([ran.run, dataclasses.replace(ran.run, seed=2)])
+
+
 def test_the_report_counts_the_three_configurations(ran):
     figures, text = V8.report([ran.run])
     m = figures["agents"]["claude"]["stub/all"]
