@@ -19,7 +19,9 @@ from multimem import config
 from mmmb.core.fs import remove_tree
 from mmmb.systems.mm.models import Model
 
-SNAPSHOT_CONFIG = "[memory]\nfree_gb = 0\nremember_max_mb = 500\n\n[decider]\nidle_s = 3600\n"
+# remember_max_mb: the largest file a home takes. The real piles' largest are A1's day of sound (2,765 MB) and V1's videos (up to 1,133
+# MB); at the 500 the pilot's small files allowed, mm refused every one of them and held nothing of A1 or V1.
+SNAPSHOT_CONFIG = "[memory]\nfree_gb = 0\nremember_max_mb = 4000\n\n[decider]\nidle_s = 3600\n"
 COPY_SKIPS = ("daemon.json", "daemon.log*", "daemon.test.log", "daemon.stop", "looks", "fake-decider.jsonl")
 MEDIA_FOLDERS = ("files", "streams")  # what a home keeps of the recordings: a copy of a home links them instead of copying
 PROJECT_PREFIX = "id:bench-"  # the project of every exec's asks and labels: `id:bench-<qid>`, so that they are in no default scope
