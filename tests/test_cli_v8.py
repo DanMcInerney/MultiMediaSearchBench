@@ -160,7 +160,8 @@ def test_the_folders_checked_are_those_the_agent_reads_and_a_dump_that_is_hidden
     own = view_dir(run.temp, run.tag, 0)
     run.check_paths(ISOLATION, own)
     run.check_paths(ISOLATION)
-    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "data")
+    # a dump's name as a run gives it: a bare `data`, denied by name when hidden, is in any path through AppData (pytest's own temp)
+    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "mmb-0123456789-data")
     refused.check_paths(ISOLATION, own)  # the dump is not read: the word in its path is only more reason to keep the agent off it
     with pytest.raises(ValueError, match=r"holds '.*\.codex"):
         refused.check_paths(ISOLATION)
