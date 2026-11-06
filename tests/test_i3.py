@@ -68,7 +68,7 @@ def check_against_labels(questions, card) -> None:
         elif template == "count":
             assert q.grade.truth == str(len(days)), q.qid
         else:
-            t, f = of[0] if template == "first" else of[-1]
+            t = (of[0] if template == "first" else of[-1])[0]
             visit = [path[g] for x, g in of if abs((datetime.fromisoformat(x) - datetime.fromisoformat(t)).total_seconds()) <= 60]
             assert (q.grade.date, q.grade.time) == (t[:10], t[11:19]) and [s.file for s in q.truth.evidence] == visit, q.qid
             assert all(x[11:13] != "12" for x, _ in of if x[:10] == t[:10]), f"{q.qid} rests on a photo whose hour is in doubt"

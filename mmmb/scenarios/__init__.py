@@ -7,7 +7,9 @@ import importlib
 
 from mmmb.core.scenario import Scenario
 
-REGISTRY = {"v7_screen": "mmmb.scenarios.v7_screen", "v8_egolife": "mmmb.scenarios.v8_egolife", "i3_trailcam": "mmmb.scenarios.i3_trailcam"}
+REGISTRY = {"v7_screen": "mmmb.scenarios.v7_screen", "v8_egolife": "mmmb.scenarios.v8_egolife",
+            "v1_security": "mmmb.scenarios.v1_security", "i3_trailcam": "mmmb.scenarios.i3_trailcam",
+            "a1_home_audio": "mmmb.scenarios.a1_home_audio", "m4_samples": "mmmb.scenarios.m4_samples"}
 
 
 def get(name: str) -> Scenario:
