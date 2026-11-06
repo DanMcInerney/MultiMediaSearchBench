@@ -27,6 +27,7 @@ from mmmb.scenarios.m4_samples.source import (
     BYTE_RATE,
     CLIPS,
     SOURCE,
+    clip_file,
     read_labels,
     with_samples_only,
 )
@@ -98,7 +99,7 @@ def build(recipe: Mapping[str, object], out: Path, workers: int = 3) -> tuple[Du
     source = Path(str(recipe["source"]))
 
     def write(f: File, path: Path) -> None:
-        wav = with_samples_only((source / str(f.spec["src"])).read_bytes())
+        wav = with_samples_only(clip_file(source, str(f.spec["src"])).read_bytes())
         if (len(wav) - 44) / BYTE_RATE != f.length:
             raise ValueError(f"{f.spec['src']} plays {(len(wav) - 44) / BYTE_RATE} s, not the {f.length} s its size said")
         path.write_bytes(wav)
@@ -123,7 +124,7 @@ def view(question: Question, slot: int, dump: Dump, temp: Path, key: str, build:
 
 
 def deny_words(others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]:
-    return realdump.deny_words(name, COMMAND_WORDS, ("bench-data",))
+    return realdump.deny_words(name, COMMAND_WORDS, (realdump.source_word(),))
 
 
 def after_exec(question: Question, out: dict, dump: Dump, access: Access) -> dict:

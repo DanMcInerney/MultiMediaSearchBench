@@ -160,12 +160,22 @@ def test_the_folders_checked_are_those_the_agent_reads_and_a_dump_that_is_hidden
     own = view_dir(run.temp, run.tag, 0)
     run.check_paths(ISOLATION, own)
     run.check_paths(ISOLATION)
-    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "data")
+    # a dump's name as a run gives it: a bare `data`, denied by name when hidden, is in any path through AppData (pytest's own temp)
+    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "mmb-0123456789-data")
     refused.check_paths(ISOLATION, own)  # the dump is not read: the word in its path is only more reason to keep the agent off it
     with pytest.raises(ValueError, match=r"holds '.*\.codex"):
         refused.check_paths(ISOLATION)
     with pytest.raises(ValueError, match="holds 'mmb-"):
         run.check_paths(ISOLATION, run.temp / f"mmb-{run.tag}-d0" / f"mmb-{run.tag}-w1")
+
+
+def test_a_temp_folder_an_agent_may_not_name_is_refused_before_the_run(w, tmp_path, monkeypatch):
+    """The first baseline: TEMP was in the tests' folder, a compiler's warning printed its path, and the exec ended as an escape."""
+    monkeypatch.setenv("TMP", str(tmp_path / ".codex" / "tmp"))
+    with pytest.raises(ValueError, match=r"TMP is .*holds '.*\.codex"):
+        w.run.check_paths(ISOLATION)
+    monkeypatch.setenv("TMP", str(tmp_path / "plain"))
+    w.run.check_paths(ISOLATION)
 
 
 def test_an_exec_with_its_own_tools_is_given_a_view_and_a_deny_list_that_names_the_whole_dump(w):

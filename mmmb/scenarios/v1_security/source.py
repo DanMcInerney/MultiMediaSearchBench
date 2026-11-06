@@ -25,7 +25,9 @@ from pathlib import Path
 import av
 import imageio_ffmpeg
 
-SOURCE = Path(r"D:\bench-data\sources\meva")
+from mmmb.scenarios.realdump import sources_root
+
+SOURCE = sources_root() / "meva"
 DAY = "2018-03-12"
 VIDEO = f"video/{DAY}"
 LABELS = "annotations/meva-data-repo-master/annotation/DIVA-phase-2/MEVA"

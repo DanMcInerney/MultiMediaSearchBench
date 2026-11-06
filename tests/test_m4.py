@@ -26,7 +26,7 @@ from mmmb.core.agents import claude
 from mmmb.core.runfolder import RunFolder
 from mmmb.core.runner import Agent
 from mmmb.scenarios.m4_samples.questions import CLASSES, NEAR
-from mmmb.scenarios.m4_samples.source import SOURCE
+from mmmb.scenarios.m4_samples.source import SOURCE, clip_file, clip_sizes
 
 if not (SOURCE / "labels" / "eval.csv").is_file():
     pytest.skip(f"the FSD50K source is not at {SOURCE}, so M4 is not built", allow_module_level=True)
@@ -343,3 +343,15 @@ def test_build_run_and_report_over_the_tiny_folder(world, capsys):  # noqa: F811
     for row in section["rows"]:
         by[row["verdicts"]["claude files"]] += 1
     assert by == {"right": 8}
+
+
+def test_a_clip_is_found_flat_or_in_the_folder_of_its_ids_last_digit(tmp_path):
+    """The Hugging Face copy of the source splits clips/eval into ten folders, as a folder there holds at most 10,000 files."""
+    flat, split = tmp_path / "flat", tmp_path / "split"
+    (flat / "clips" / "eval").mkdir(parents=True)
+    (split / "clips" / "eval" / "7").mkdir(parents=True)
+    (flat / "clips" / "eval" / "123457.wav").write_bytes(b"x" * 80)
+    (split / "clips" / "eval" / "7" / "123457.wav").write_bytes(b"x" * 82)
+    assert clip_file(flat, "clips/eval/123457.wav") == flat / "clips" / "eval" / "123457.wav"
+    assert clip_file(split, "clips/eval/123457.wav") == split / "clips" / "eval" / "7" / "123457.wav"
+    assert clip_sizes(flat) == {"123457.wav": 80} and clip_sizes(split) == {"123457.wav": 82}

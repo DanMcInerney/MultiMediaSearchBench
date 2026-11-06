@@ -16,7 +16,9 @@ import struct
 from dataclasses import dataclass
 from pathlib import Path
 
-SOURCE = Path(r"D:\bench-data\sources\fsd50k")
+from mmmb.scenarios.realdump import sources_root
+
+SOURCE = sources_root() / "fsd50k"
 CLIPS = "clips/eval"
 LABELS = "labels/eval.csv"
 VOCABULARY = "labels/vocabulary.csv"  # `index,label,mid`, with no header
@@ -35,12 +37,33 @@ class Clip:
     seconds: float  # how long it plays
 
 
+def clip_file(root: Path | str, src: str) -> Path:
+    """The file of the clip `src` (`clips/eval/<id>.wav`): there, or in the folder named for its id's last digit (`clips/eval/7/<id>.wav`),
+    as in the Hugging Face copy, whose folders hold at most 10,000 files."""
+    path = Path(root) / src
+    if path.is_file():
+        return path
+    name = Path(src).name
+    return Path(root) / CLIPS / Path(name).stem[-1] / name
+
+
+def clip_sizes(root: Path) -> dict[str, int]:
+    """The size of each clip of the eval split by its file name, in either layout of `clip_file`."""
+    sizes = {}
+    for e in os.scandir(root / CLIPS):
+        if e.is_dir():
+            sizes.update((s.name, s.stat().st_size) for s in os.scandir(e.path))
+        else:
+            sizes[e.name] = e.stat().st_size
+    return sizes
+
+
 @functools.lru_cache(maxsize=2)
 def read_labels(source: str) -> tuple[tuple[Clip, ...], tuple[str, ...]]:
     """The clips of `source`'s eval split, by Freesound id, and the 200 class names of its vocabulary. A labelled clip that is not on disk,
     or not a clip of the shape above, is refused."""
     root = Path(source)
-    sizes = {e.name: e.stat().st_size for e in os.scandir(root / CLIPS)}
+    sizes = clip_sizes(root)
     ratings = json.loads((root / RATINGS).read_text(encoding="utf-8"))
     with open(root / LABELS, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))

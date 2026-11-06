@@ -9,7 +9,8 @@ A server with the agent's own tools has no golden: its expected argv, settings a
 section 4.4, and its environment is the files cell's by the rule that the own tools pick it.
 
 Intended differences (plan 7.3, each asserted somewhere, none ignored): the skill's five drifted lines (test_goldens.py), the
-`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), and the deny words (RunFolder's)."""
+`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
+and longest command Claude's files line names (here, `files_now`)."""
 
 from __future__ import annotations
 
@@ -39,6 +40,18 @@ windows_only = pytest.mark.skipif(os.name != "nt", reason="the goldens are what 
 
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+# Claude's files line names redirects and the longest command Claude Code runs (claude.LONGEST_COMMAND), which the old code's did not
+FILES_WAS = "(no cd, pipes, && or other programs), and write"
+FILES_NOW = "(no cd, pipes, redirects, && or other programs), keep it under 10,000 characters (a longer one is refused), and write"
+
+
+def files_now(text: str) -> str:
+    """A recorded instructions text of Claude's with the files line as the agent writes it now: the words on redirects and the
+    command's length put in, once, and nothing else changed."""
+    assert text.count(FILES_WAS) == 1, "Claude's files line, as recorded"
+    return text.replace(FILES_WAS, FILES_NOW)
 
 
 def sha256(text: str | bytes) -> str:
@@ -91,6 +104,8 @@ def test_the_exec_the_old_code_built_is_the_one_the_new_code_builds(agent, mode,
     for name in sorted(made):
         if name == "mcp.json":
             assert place(json.loads(read(paths["RUN"] / name))) == json.loads(read(golden / name))
+        elif (agent, mode, name) == ("claude", "files", "instructions.md"):
+            assert read(paths["RUN"] / name) == files_now(read(golden / name))
         else:
             assert (paths["RUN"] / name).read_bytes() == (golden / name).read_bytes(), name
     assert paths["WORK"].is_dir()
@@ -151,7 +166,7 @@ def test_a_server_with_own_tools_gets_the_files_exec_plus_the_server_by_the_plan
         assert read(run / "settings.json") == CLAUDE_SETTINGS
         assert place(json.loads(read(run / "mcp.json"))) == json.loads(read(EXEC / "claude-mm" / "mcp.json"))
         # the files line first, then the server's: each as it was recorded
-        assert read(run / "instructions.md") == read(EXEC / "claude-files" / "instructions.md") + "\n\n" + claude_text
+        assert read(run / "instructions.md") == files_now(read(EXEC / "claude-files" / "instructions.md")) + "\n\n" + claude_text
         # the own tools pick the environment: the files cell's, whatever else the exec has
         assert dict(sorted(place(env).items())) == json.loads(read(EXEC / "claude-files" / "env.json"))
         assert {p.name for p in run.iterdir()} == {"instructions.md", "settings.json", "mcp.json"}
@@ -208,7 +223,10 @@ def test_the_settings_and_instructions_every_pilot_exec_had_are_what_the_agents_
             if e["agent"] != agent:
                 continue
             mine = written[cell_mode(e)]
-            if mine["instructions.md"] != e["instructions_sha256"]:
+            now = e["instructions_sha256"]
+            if agent == "claude" and cell_mode(e) == "files":
+                now = sha256(files_now(recorded_text(now)))
+            if mine["instructions.md"] != now:
                 wrong.append((agent, e["dir"], e["qid"], "instructions"))
             if agent == "claude" and mine["settings.json"] != e["settings_sha256"]:
                 wrong.append((agent, e["dir"], e["qid"], "settings"))

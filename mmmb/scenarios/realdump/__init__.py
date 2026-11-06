@@ -33,6 +33,30 @@ DEV_SHARE = 0.3  # of a scenario's questions, the share marked `dev` by the seed
 CODE_WORDS = ("realdump", "from mmmb", "import mmmb")  # code that reaches a scenario: no command may hold it
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+SOURCES_ENV = "MMMB_SOURCES"  # the folder that holds the sources, one folder per source (`meva`, `sins`, ...)
+DEFAULT_SOURCES = Path(r"D:\bench-data\sources")
+SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and would refuse innocent commands
+# The rule an agent with its own tools is held to, said: in the first baseline Codex hunted the disk for Python (C:\Users, Program
+# Files, AppData), its output named the owner's agent setup, and the exec ended as an escape, wrong by a rule it was never told.
+STAY = ("Your tools and ffmpeg are all you have: nothing else on this computer is yours to use or look at, and a command that reaches "
+        "outside the files' folder and your working folder ends your answer as wrong.")
+
+
+def sources_root() -> Path:
+    """Where the sources are: `MMMB_SOURCES`, else D:\\bench-data\\sources. A source's folder in it is named by its id in
+    media/sources.jsonl."""
+    return Path(os.environ.get(SOURCES_ENV) or DEFAULT_SOURCES)
+
+
+def source_word(root: Path | None = None) -> str:
+    """The word no command of an agent, nor what it prints, may hold: the name of the folder the sources are in, or of its parent when
+    that folder is named `sources` (so `bench-data` for the default). Refused when it is too short or too common to tell a reach."""
+    root = sources_root() if root is None else Path(root)
+    word = (root.parent.name if root.name.lower() == "sources" else root.name).lower()
+    if len(word) < SHORTEST_WORD:
+        raise ValueError(f"the sources folder {root} is told by the name {word!r}, which ordinary output could hold: name the folder "
+                         f"(or its parent, when it is `sources`) {SHORTEST_WORD} or more letters, such as mmmb-sources")
+    return word
 
 
 @dataclass(frozen=True)
@@ -169,7 +193,8 @@ def prompt(question: Question, access: Access, what: str, layout: str) -> str:
             raise ValueError(f"the server {served.server.name!r} has no word for itself for the prompt")
         how.append(f"{served.holder} holds {what}." + (f" {served.clock_note}" if served.clock_note else ""))
     if access.own_tools:
-        how.append(f"The files of {what} are in {access.data}: {layout} Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe).")
+        how.append(f"The files of {what} are in {access.data}: {layout} Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). "
+                   f"{STAY}")
     if served.server is not None:
         holder, plural = (f"{served.holder} and these files", True) if access.own_tools else (served.holder, False)
     elif access.own_tools:

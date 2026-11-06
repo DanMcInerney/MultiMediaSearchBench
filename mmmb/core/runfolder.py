@@ -44,6 +44,7 @@ JOBS_MAX = 4  # execs at once, so the working slots; more crashed the laptop onc
 ENDS = ('/', '"', " ", "'")  # what ends a folder's name in a path or a command
 HIDDEN_DATA = tuple("-data" + after for after in ENDS)  # the end of a dump's folder name (`mmb-<tag>-data`) in a path or a command
 IN_ONLY = "in:"  # a deny word that starts with this is checked in what the agent runs (a command, a path), not in what it reads
+TEMP_VARS = ("TEMP", "TMP", "TMPDIR")  # where the agents' tools write their temp files (they inherit these)
 # What keeps an agent with its own tools off the GPU (`schedule.agent_off_gpu` says when): it sees no CUDA device, and may not ask for the
 # GPU's decoder or for the GPU's list of users. Its shell gets the variable (Codex: its shell's; Claude: its process, so its MCP server too).
 OFF_GPU_ENV = {"CUDA_VISIBLE_DEVICES": "-1"}
@@ -183,6 +184,10 @@ class RunFolder:
         for folder in (reads or self.data, self.bin, self.slot(0)):
             if hit := reached(str(folder), deny):
                 raise ValueError(f"{folder} holds {hit!r}, which an agent with its own tools refuses to reach: build with --temp elsewhere")
+        for name in TEMP_VARS:  # the agents inherit them: a compiler's or a tool's message prints its temp file's path
+            if (value := os.environ.get(name)) and (hit := reached(value, deny, output=True)):
+                raise ValueError(f"{name} is {value}, which holds {hit!r}: an agent's tools write their temp files there and print its path, "
+                                 f"and each such exec would end as an escape. Run with {name} elsewhere")
 
     def deny(self, own: Path | None, isolation: Isolation, reads: Path | None = None, off_gpu: bool = False) -> tuple[str, ...]:
         """What no tool input of an agent with its own tools may hold, lower case with forward slashes: this run's folder (and the one it was
