@@ -32,7 +32,7 @@ import fakes
 from agent_spec import spec_of
 from capture_exec import PLACEHOLDERS, placer, plant_git, planted_environment
 from model_folders import model_folder
-from test_exec import CLAUDE_BOTH_ARGV, CLAUDE_SETTINGS, MODELS, pilot_execs, read, recorded_text
+from test_exec import CLAUDE_BOTH_ARGV, CLAUDE_SETTINGS, MODELS, files_now, pilot_execs, read, recorded_text
 
 from multimem import decider
 
@@ -177,6 +177,7 @@ def test_with_the_agents_own_tools_the_files_line_comes_first_and_the_server_is_
             argv = codex.prepare(spec, "gpt-6.1-terra", "medium", MODELS, ["<codex>"])
     place = placer({**paths, "PYTHON": sys.executable, "GIT": git})
     plain = (EXEC / f"{agent}-files" / "instructions.md").read_text(encoding="utf-8")
+    plain = files_now(plain) if agent == "claude" else plain
     assert read(paths["RUN"] / "instructions.md") == plain + "\n\n" + read(EXEC / f"{agent}-mm" / "instructions.md")
     if agent == "claude":
         assert place(argv) == [*CLAUDE_BOTH_ARGV, "--add-dir", "<HOME>\\looks"], "and the folder of the pictures `look` makes, which the system handed it (G1's F4)"

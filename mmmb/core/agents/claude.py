@@ -59,8 +59,13 @@ from mmmb.core.runfolder import OFF_GPU_ENV
 
 # The files arm's Bash runs ffmpeg alone (FILES_ALLOWED), and Claude is told so: in the pilot it was denied a `cd ... && find`,
 # took Bash for gone and answered "unknown" without trying ffmpeg. Codex needs no such line: its shell is the sandbox's, whole.
+# Claude Code (2.1.x) parses no Bash command longer than LONGEST_COMMAND characters, so a longer one matches no allow rule and
+# dontAsk refuses it: in the baseline of 2026-11-06 an 11,000-character ffmpeg montage was refused twice, and Claude took ffmpeg
+# itself for denied and gave up. The line says so.
+LONGEST_COMMAND = 10_000
 BASE_FILES = ("You answer the user's question from their files, using your tools. Bash runs ffmpeg only: start each Bash "
-              "command with ffmpeg (no cd, pipes, && or other programs), and write what it makes in your working folder. "
+              f"command with ffmpeg (no cd, pipes, && or other programs), keep it under {LONGEST_COMMAND:,} characters (a longer "
+              "one is refused), and write what it makes in your working folder. "
               "Find and read files with Glob, Grep and Read; Read shows you the pictures ffmpeg writes.")
 
 # `claude --help` (2.1.302) does not list --max-turns or --append-system-prompt-file, but both are taken (checked on
