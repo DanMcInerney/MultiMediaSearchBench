@@ -6,6 +6,7 @@ model is loaded, and ingest loads none)."""
 
 from __future__ import annotations
 
+import dataclasses
 import os
 import shutil
 
@@ -21,6 +22,7 @@ from mmmb.core.build import Misdated, check_stores, ingest_stores, store_of  # n
 from mmmb.core.cache import INGESTED, report_of  # noqa: E402
 from mmmb.core.config import Config  # noqa: E402
 from mmmb.core.contract import Dump  # noqa: E402
+from mmmb.systems.mm.load import remember  # noqa: E402
 
 CONFIG = Config("mm/fake", "mm", "fake", False)
 
@@ -68,3 +70,41 @@ def test_a_file_mm_refuses_is_in_the_report_with_its_reason_and_the_store_is_mad
     # the next command finds a finished store, and does not ingest again
     ingest_stores(folder, only, described, load=lambda name: pytest.fail("a store that was made is not ingested again"), cache=tmp_path / "cache")
     check_stores(folder, {"mm": described[CONFIG].store_hash})
+
+
+def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_report_naming_it(week, tmp_path):
+    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mm left the
+    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mm keeps one
+    item for a picture, sound or video of its source's bytes, whatever its time; a file of text it keeps each time.)"""
+    _, dump, _ = week
+    photo = next(e for e in dump.entries if e.kind == "photo")
+    root = tmp_path / "data"
+    (root / photo.path).parent.mkdir(parents=True)
+    shutil.copy2(dump.root / photo.path, root / photo.path)
+    twins = []
+    for n, later in enumerate((0.0, 3600.0)):  # the same moment, and an hour on
+        path = f"{photo.path.rsplit('/', 1)[0]}/twin{n}-{photo.path.rsplit('/', 1)[-1]}"
+        shutil.copy2(dump.root / photo.path, root / path)
+        twins.append(dataclasses.replace(photo, path=path, t=photo.t + later, name=None if photo.name is None else f"twin{n}-{photo.name}"))
+    only = Dump("x", root, "v7_screen", (photo, *twins), ())
+    folder, described = tmp_path / "run", {CONFIG: fakes.MM.describe("fake")}
+    ingest_stores(folder, only, described, load=lambda name: fakes.MM, cache=tmp_path / "cache")
+    refused = report_of(store_of(folder, "mm")).refused
+    assert [(r.path, r.reason) for r in refused] == [
+        (twins[0].path, f"the bytes of {photo.path} (at the same time): mm keeps one item for them"),
+        (twins[1].path, f"the bytes of {photo.path} (recorded +3600 s from it): mm keeps one item for them")]
+    check_stores(folder, {"mm": described[CONFIG].store_hash})
+
+
+class Unchanged:
+    """A daemon that leaves every file unchanged, as it does a file whose bytes it holds."""
+
+    def call(self, op: str, **given) -> dict:
+        return {"stored": [], "unchanged": [{"type": "item", "id": 1}], "source": given["source"], "expires": None}
+
+
+def test_a_file_left_unchanged_with_no_earlier_file_of_its_bytes_is_still_an_error(week):
+    _, dump, _ = week
+    note = next(e for e in dump.entries if e.kind == "note")
+    with pytest.raises(RuntimeError, match="was not stored once"):
+        remember(Unchanged(), dump, [note])
