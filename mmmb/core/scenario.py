@@ -49,7 +49,7 @@ class Scenario(Protocol):
     def deny_words(self, others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]: ...
     def after_exec(self, question: Question, out: dict, dump: Dump, access: Access) -> dict: ...  # V8's seen_past_horizon; V7 returns {}
     def release(self, temp: Path, key: str) -> None: ...
-    def report(self, run: RunFolder) -> tuple[dict, str]: ...  # V7: core's; V8: its own
+    def report(self, runs: Sequence[RunFolder], control: str) -> tuple[dict, str]: ...  # runs of this scenario, pooled where it can; V7: core/report.py's, V8: its own, the realistic dumps: core/summary.py's
 
 
 def dump_key(scenario: str, recipe: Mapping[str, object], generator: int) -> str:

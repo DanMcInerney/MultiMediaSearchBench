@@ -15,6 +15,7 @@ from collections.abc import Mapping, Sequence
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
+from mmmb.core.config import CONTROL
 from mmmb.core.contract import Dump
 from mmmb.core.question import Question
 from mmmb.core.render import markdown
@@ -120,8 +121,9 @@ def release(temp: Path, key: str) -> None:
     """V7 makes nothing in the temp folder that a run puts away: the dump is read-only and stays for the next run."""
 
 
-def report(run: RunFolder) -> tuple[dict, str]:
-    """The figures of the run and the Markdown that renders them (report.json and report.md): the core's report, for one run."""
-    figures = numbers([run])
+def report(runs: Sequence[RunFolder], control: str = CONTROL) -> tuple[dict, str]:
+    """The figures of the runs, pooled, and the Markdown that renders them (report.json and report.md): core/report.py's paired comparison
+    of each tested configuration with `control`."""
+    figures = numbers(runs, control)
     return figures, markdown(figures)
 

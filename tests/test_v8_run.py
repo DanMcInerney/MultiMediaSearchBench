@@ -241,8 +241,13 @@ def test_the_subset_and_only_choose_questions(ran):
 # -- 9. the report ----------------------------------------------------------------------------------------------------------------
 
 
+def test_several_runs_are_refused_one_at_a_time(ran):
+    with pytest.raises(ValueError, match="one at a time"):
+        V8.report([ran.run, dataclasses.replace(ran.run, seed=2)])
+
+
 def test_the_report_counts_the_three_configurations(ran):
-    figures, text = V8.report(ran.run)
+    figures, text = V8.report([ran.run])
     m = figures["agents"]["claude"]["stub/all"]
     assert (m["questions"], m["paired"]) == (10, 10) and m["video"]["n"] == 8 and m["speech"]["n"] == 2
     video = m["video"]
@@ -267,7 +272,7 @@ def test_the_report_counts_the_three_configurations(ran):
 
 
 def test_the_retrieval_tier_is_told_from_the_records_with_the_numbers_they_were_planted_with(ran):
-    tier = V8.report(ran.run)[0]["retrieval"]["stub/all"]
+    tier = V8.report([ran.run])[0]["retrieval"]["stub/all"]
     assert (tier["all"]["asked"], tier["all"]["found"], tier["all"]["top5"], tier["all"]["p50"], tier["all"]["p30"]) == (10, 7, 7, 7, 8), \
         "the near miss (p of 0.4) counts at p of 0.3 and not at 0.5"
     assert tier["all"]["p"] == 0.95 and tier["all"]["away"] == 1 and tier["all"]["windows"] == 852 and tier["all"]["stopped"] == 0
@@ -282,7 +287,7 @@ def median_of(values: list[float]) -> float:
 
 
 def test_the_report_text_has_its_tables(ran):
-    text = V8.report(ran.run)[1]
+    text = V8.report([ran.run])[1]
     for line in ("# EgoLifeQA through the stub bench", "8 video questions (2 aged 0-2h, 2 aged 2-6h, 2 aged 6-24h, 2 aged 24h+;",
                  "No shortcut probe: a public dataset, so the blind arm is the floor",
                  "## claude with all: 8 video questions of 10 (paired: done in all three arms)",
@@ -308,7 +313,7 @@ def test_the_report_text_has_its_tables(ran):
 def test_a_run_with_no_results_reports_none(ran, tmp_path):
     folder = tmp_path / "run"
     shutil.copytree(ran.run.folder, folder, ignore=lambda where, names: [n for n in names if n in ("results", "execs", "data-manifest.json")])
-    figures, text = V8.report(dataclasses.replace(ran.run, folder=folder))
+    figures, text = V8.report([dataclasses.replace(ran.run, folder=folder)])
     assert figures["agents"] == {} and figures["retrieval"] == {} and figures["totals"]["results"] == 0
     assert "No agent results yet." in text and "No decider results yet." in text
 
@@ -319,7 +324,7 @@ def test_the_report_reads_a_run_with_no_video_question_paired(ran, tmp_path, mad
     run = dataclasses.replace(ran.run, folder=folder, data=ran.dump.root, temp=tmp_path / "temp")
     fs.write_json(run.manifest, fs.stats_of(ran.dump.root))
     run_over(run, ran.dump, Ego(ran.questions), jobs=1, only=["ego-008"])  # a speech question alone
-    figures, text = V8.report(run)
+    figures, text = V8.report([run])
     m = figures["agents"]["claude"]["stub/all"]
     assert m["video"] is None and m["speech"]["n"] == 1 and m["ages"] == {} and m["paired"] == 1
     assert "## claude with all: 0 video questions of 10" in text and "None paired yet." in text

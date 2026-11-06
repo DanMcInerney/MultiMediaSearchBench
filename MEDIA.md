@@ -5,6 +5,17 @@ real media to start from, except the private ones (X1, X2). 79.4 GB of starter m
 `D:\bench-data\sources\`. Several scenarios fall short of the dump DESIGN asks for, and those gaps need Dan: see
 "Decisions for Dan". How the search was done, and the checks on its result, follow the decisions.
 
+**In use (6 November 2026).** Four sources now make the built scenarios (DESIGN.md section 5.7), each read where it is and
+copied into the dump, never written to:
+- `meva` (V1): the three visible cameras of 12 March 2018, 10:00 to 11:15, with Kitware's two official label sets; the infrared
+  cameras and the night clip are not used, as they have no official labels.
+- `caltech-camera-traps` (I3): location 23, all 4,256 photos, with the species labels. The labels' times drop AM and PM, so the
+  hour after midnight reads as noon; the photos print the right one, and I3 reads it.
+- `sins` (A1): node 7's whole day of 2 February 2017, one channel, with the living room's and the home's activity labels; the
+  FSD50K needles are not mixed in yet.
+- `fsd50k` (M4): the evaluation split with its human-verified labels; a dump leaves out the sounds easily taken for the ones it
+  asks about.
+
 ## Summary
 
 | ID | Scenario | Use | On disk now | Truth it carries | Biggest gap |
@@ -20,7 +31,7 @@ real media to start from, except the private ones (X1, X2). 79.4 GB of starter m
 | (new) | Kitchen | `epic-kitchens` | participant P14, 8.7 min; 2.0 GB | 98 timed sound events, 87 timed actions | far too little for a dump; the server is slow and drops connections |
 | I1 | Phone camera roll | `atm-bench`, then `disbench`, `camroll-yfcc20` | one person's 3,759 phone photos over 4 years (resized to about 1000×750, EXIF time and GPS kept), with 1,013 questions in that person's voice; two DISBench users; 2.6 GB | ATM-Bench: questions with evidence photo ids, written and checked by trained annotators; DISBench: 122 find-all queries | no open roll of 10-30k with HEIC, bursts and WhatsApp copies; no owner-written questions; YFCC copies have no EXIF |
 | I2 | Screenshots folder | `android-in-the-wild`, `rico` | 3,736 real phone screenshots (as PNGs written from the dataset's pixel arrays); 3,000 app screens; 2.5 GB | OCR text and element boxes per screenshot; view hierarchies | not one person's folder; "wifi password" questions need planted screens or Dan's own |
-| I3 | Trail camera SD card | `caltech-camera-traps` | camera location 23, 6 months, 4,256 images (80.5% empty); 2.0 GB | species and capture time to the second for every image | single frames, not bursts; the camera writes midnight as 12:xx |
+| I3 | Trail camera SD card | `caltech-camera-traps` | camera location 23, 6 months, 4,256 images (80.5% empty); 2.0 GB | species and capture time to the second for every image | single frames, not bursts; the labels' times drop AM and PM (the hour after midnight reads as noon; the photos print the right one) |
 | I4 | Home inspection or insurance | `home-inspection-mobilehome`, `bd3-building-defects`, `houses-dataset` | 124 phone photos of one damaged home; 793 labelled defect close-ups; 2,140 room photos; 1.3 GB | a damage list by room (names no photos); one class per defect photo | no open 2k inspection folder; a person must tag which photos show each damage item |
 | I5 | Family archive scans | `ia-family-photos-0487`, `fgnet` | 1,376 scans of one family's prints; 1,002 scans of 82 people at ages 0-69; 0.9 GB | FG-NET: identity and age per scan | no open 8k family archive with people labelled |
 | I6 | Construction time-lapse | `anu-physics-webcam` | 1,918 hourly 4K frames of a building site, 2018-2021 (9 zero-byte, as in the source); 1.5 GB | time per frame; crane up 23-24 Aug 2019 and down on 20 Feb 2021, read by eye | hourly, not every 5 minutes; crane times need a person to confirm |

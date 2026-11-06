@@ -217,6 +217,18 @@ def test_an_offset_a_clock_time_and_a_source_with_iso_times_are_one_absolute_mom
     assert by_clock == by_offset
     assert (by_iso.source, by_iso.start, by_iso.end, by_iso.file) == ("cam", pytest.approx(T0 + 1500.0, abs=1e-3), pytest.approx(T0 + 1510.5, abs=1e-3), None)
     assert resolve(cf("cam/long.mp4", "12:25", "12:25:10"), DUMP) == Placed("cam", T0 + 1500.0, T0 + 1510.0, "cam/long.mp4")
+    by_file_iso = resolve(cf("cam/long.mp4", at(T0 + 1500.0), at(T0 + 1510.5)), DUMP)
+    assert (by_file_iso.start, by_file_iso.end, by_file_iso.file) == (pytest.approx(T0 + 1500.0, abs=1e-3), pytest.approx(T0 + 1510.5, abs=1e-3),
+                                                                     "cam/long.mp4")
+
+
+def test_a_photo_cited_by_its_file_with_an_iso_time_is_grounded_whatever_offset_the_agent_guessed():
+    """As a real agent cited a trail-camera photo: the file with the time from its EXIF and an offset of its own guessing."""
+    picture = question("find", Span("phone/p1.jpg", 0.0, 0.0))
+    assert status(picture, said(cf("phone/p1.jpg", "2026-11-03T14:00:00-08:00", "2026-11-03T14:00:00-08:00"))) == "grounded"
+    assert status(VIDEO, said(cf("cam/long.mp4", at(T0 + 2000.0), at(T0 + 2010.0)))) == "lucky", "a video's instant must still be near"
+    naive = datetime.fromtimestamp(T0 + 1500.0).isoformat()  # with no offset: the dump's wall clock, as a clock time is
+    assert resolve(cf("cam/long.mp4", naive, naive), DUMP) == Placed("cam", T0 + 1500.0, T0 + 1500.0, "cam/long.mp4")
 
 
 def test_a_clock_time_across_midnight_is_on_the_next_day_and_one_before_the_file_starts_is_too():

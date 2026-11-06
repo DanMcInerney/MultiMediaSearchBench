@@ -51,7 +51,8 @@ def work_of(tools: Sequence[dict]) -> dict:
 def record(q: Question, agent: str, config: Config, seed: int, exec_dir: str, at: str, out: dict) -> dict:
     """The result record of one exec of question `q` (no truth is stored: the report grades from the questions). `out` is the agent's
     result with the `answer` that the run read in its final message (`answer.parse_final`; the format's other fields are
-    `grounded.result_fields`'). `exec_dir` is the exec's folder from the run's, `at` when it ended."""
+    `grounded.result_fields`'). `exec_dir` is the exec's folder from the run's, `at` when it ended. A `set` question's result also holds
+    `items_f1`, the F1 of the items its answer named (0 with a problem), told beside `passed`, which needs the exact set."""
     problem, answer = out.get("problem"), out.get("answer")
     tools = out.get("tools") or []
     tags = q.tags
@@ -64,7 +65,8 @@ def record(q: Question, agent: str, config: Config, seed: int, exec_dir: str, at
             "tools": dict(Counter(t["tool"] for t in tools)), "work": work_of(tools),
             "scope_all": sum(1 for t in tools if isinstance(t.get("arguments"), dict) and t["arguments"].get("scope") == "all"),
             "tokens": out.get("tokens"), "cost_usd": out.get("cost_usd"), "used_percent": out.get("used_percent"),
-            "agent_model": out.get("model"), "agent_effort": out.get("effort"), "exec": exec_dir, "at": at}
+            "agent_model": out.get("model"), "agent_effort": out.get("effort"), "exec": exec_dir, "at": at,
+            **({"items_f1": grade.items_f1(q.grade, answer if problem is None else None)} if q.grade.rule == "set" else {})}
 
 
 class Halt:

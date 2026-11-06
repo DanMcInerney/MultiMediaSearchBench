@@ -10,8 +10,8 @@
 | the value passes, and it cites, and every citation hits a truth  | `grounded`     |
 | the value passes, and it cites nothing or a citation hits none   | `lucky`        |
 
-A citation is placed in time (`resolve`): a file with seconds into it, a file with a clock time, or a source with ISO times are one
-absolute time. It hits a truth moment by the truth file's kind (`hits`): a video within 10 s and a sound within 5 s on the same source; a
+A citation is placed in time (`resolve`): a file with seconds into it, a file with a clock time, a file or a source with ISO times are
+one absolute time. It hits a truth moment by the truth file's kind (`hits`): a video within 10 s and a sound within 5 s on the same source; a
 line of a log or a transcript within 5 s on the same source; a picture, a note or a version of a config only by being that file. A
 citation the dump cannot place (a file it does not have) hits nothing and is counted as `unresolved`. For a count, `event_f1` also
 scores the cited moments as events, by distinct moments, with a collar."""
@@ -24,7 +24,7 @@ from collections.abc import Sequence
 from datetime import datetime, time, timedelta
 from typing import Literal
 
-from mmmb.core.answer import AnswerFormat, Citation, FinalAnswer, clock_seconds, iso_epoch
+from mmmb.core.answer import AnswerFormat, Citation, FinalAnswer, clock_seconds, is_iso, iso_epoch
 from mmmb.core.contract import Dump, ManifestEntry
 from mmmb.core.question import Question
 
@@ -92,6 +92,8 @@ def resolve(c: Citation, dump: Dump) -> Placed | None:
         return None
     if isinstance(c.t0, float):
         return Placed(entry.source, entry.t + c.t0, entry.t + c.t1, entry.path)
+    if is_iso(c.t0):
+        return Placed(entry.source, iso_epoch(c.t0, local=True), iso_epoch(c.t1, local=True), entry.path)
     start = at_clock(c.t0, entry.t)
     return Placed(entry.source, start, max(start, at_clock(c.t1, start)), entry.path)
 

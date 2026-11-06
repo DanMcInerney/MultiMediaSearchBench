@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from mmmb.core import fs
 from mmmb.core.contract import Description, System
 
+CONTROL = "files"  # the configuration the others are set beside unless a report is told another: the agent's own tools alone
+
 
 @dataclass(frozen=True)
 class Config:

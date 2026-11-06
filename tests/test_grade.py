@@ -240,3 +240,29 @@ def test_a_count_reads_once_twice_and_thrice_as_numbers():
     assert graded(two, ["once", "thrice", "three times", "twice and once", "unknown"], False) == []
     assert graded(Grade("count", "1", None, None, (), (), None), ["once", "1"], True) == []
     assert graded(Grade("count", "3", None, None, (), (), None), ["thrice", "three times"], True) == []
+
+
+def test_a_count_reads_no_number_in_a_name_and_takes_the_truth_even_when_the_question_holds_it():
+    """A camera named `cam3` in the question or the answer is no count, and a count the question also holds is still right."""
+    assert grade.asked("How many times did a car stop on cam3 between 10:10 and 10:40?") == ["10:10", "10:40"]
+    on_cam3 = Grade("count", "2", None, None, (), ("10:10", "10:40"), None)
+    assert graded(on_cam3, ["2", "2 (cam3)", "twice on cam3, in IMG_0003.JPG and IMG_0010.JPG"], True) == []
+    assert graded(on_cam3, ["3", "2 or 3", "cam3: 4"], False) == []
+    in_3_hours = Grade("count", "3", None, None, (), ("3",), None)  # "in the last 3 hours", and it was 3
+    assert graded(in_3_hours, ["3", "3 times in 3 hours"], True) == []
+    assert graded(in_3_hours, ["2 in 3 hours", "unknown"], False) == []
+
+
+@pytest.mark.parametrize("answer", ["No one rode a bicycle on cam2.", "unknown (nothing on cam2)", "0 times on cam3", "No fox in DCIM/100RECNX",
+                                    "unknown (nothing in REC_20170202_000000.wav then)", "None in cam3_20180312_100000-103500.mp4"])
+def test_an_abstention_that_names_a_camera_a_folder_or_a_file_abstains(answer):
+    """The digits of a name are no number of an answer (Gate 2: they were, once the question's own were no longer ignored)."""
+    assert grade.grade(Grade("absent", None, None, None, (), (), None), answer)
+    assert not grade.grade(Grade("absent", None, None, None, (), (), None), "maybe 2, on cam3")
+
+
+def test_a_count_reads_no_number_in_a_file_name_with_a_dash_nor_in_a_month_of_a_year():
+    three = Grade("count", "3", None, None, (), (), None)
+    assert graded(three, ["3 in cam3_20180312_100000-103500.mp4", "3 (between October 2013 and February 2014)", "3, in May of 2014"],
+                  True) == []
+    assert graded(three, ["4 in cam3_20180312_100000-103500.mp4", "3 or 2013"], False) == []
