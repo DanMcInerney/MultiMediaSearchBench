@@ -5,12 +5,14 @@
 | `count`  | How many clips of a gong are there? (9 to 40)     | `count`                                           |
 | `absent` | `find` of a class whose clips are all left out    | `absent`                                          |
 
-Which sounds are asked about is a short table (CLASSES): leaf classes a person names in plain words, whose sound no other class of the
-vocabulary is easily mistaken for (no bells and drums, no vehicles, no speech, no bird or insect: each has a sibling a careful listener
-confuses with it), drawn with the seed. The source holds 40 to 130 clips of each, too many to list or count, so a class that is asked about is
-thinned to a seeded number of its clips (`find` 2 to 8, `count` 9 to 40): only clips where the raters agreed the sound is predominant stay,
-so that a clip is a plain case of its class, and none that holds two of the asked-about classes. An `absent` class loses every clip. The
-other clips are the dump's rest: all of them at the standard scale, a seeded draw at `tiny`."""
+Which sounds are asked about is a short table (CLASSES): leaf classes a person names in plain words, drawn with the seed. A class of the
+vocabulary a careful listener easily takes for one of them (NEAR: the classes its raters were told to tell it from, its siblings in
+the vocabulary that sound like it, and the sound-alikes a reviewer found: a bell for a gong, a typewriter for a printer) has no clip in the
+dump while that sound is asked about, so that one plausible mistake does not turn an exact set or a count wrong; no sound of the table is
+taken for another. The source holds 40 to 130 clips of each, too many to list or count, so a class that is asked about is thinned to a
+seeded number of its clips (`find` 2 to 8, `count` 9 to 40): only clips where the raters agreed the sound is predominant stay, so that a
+clip is a plain case of its class, and none that holds two of the asked-about classes or one taken for them. An `absent` class loses every
+clip. The other clips are the dump's rest: all of them that are left at the standard scale, a seeded draw at `tiny`."""
 
 from __future__ import annotations
 
@@ -26,13 +28,35 @@ from mmmb.scenarios.m4_samples.source import Clip
 CODE = "M4"
 SOURCE_NAME = "sounds"  # the dump's source
 CLASSES = {  # the class of the vocabulary: how a person says it
-    "Toilet_flush": "a toilet flushing", "Microwave_oven": "a microwave oven", "Meow": "a cat meowing", "Purr": "a cat purring",
-    "Zipper_(clothing)": "a zipper", "Scissors": "scissors cutting", "Printer": "a printer", "Tambourine": "a tambourine", "Gong": "a gong",
-    "Thunder": "thunder", "Hammer": "hammering", "Skateboard": "a skateboard", "Coin_(dropping)": "a coin dropping", "Fart": "a fart",
-    "Burping_and_eructation": "a burp", "Packing_tape_and_duct_tape": "packing tape", "Camera": "a camera shutter", "Harp": "a harp",
-    "Finger_snapping": "fingers snapping", "Sneeze": "a sneeze", "Chewing_and_mastication": "someone chewing", "Drill": "a power drill",
-    "Cough": "a cough", "Writing": "someone writing"}
-QUOTAS = {"tiny": {"find": 4, "count": 2, "absent": 2}, "standard": {"find": 11, "count": 6, "absent": 6}}  # the classes of each template
+    "Toilet_flush": "a toilet flushing", "Microwave_oven": "a microwave oven", "Meow": "a cat meowing", "Zipper_(clothing)": "a zipper",
+    "Scissors": "scissors cutting", "Printer": "a printer", "Tambourine": "a tambourine", "Gong": "a gong", "Thunder": "thunder",
+    "Hammer": "hammering", "Skateboard": "a skateboard", "Coin_(dropping)": "a coin dropping", "Fart": "a fart",
+    "Packing_tape_and_duct_tape": "packing tape", "Camera": "a camera shutter", "Harp": "a harp", "Finger_snapping": "fingers snapping",
+    "Chewing_and_mastication": "someone chewing", "Drill": "a power drill", "Cough": "a cough", "Writing": "someone writing"}
+NEAR = {  # the class of CLASSES: the other classes of the vocabulary easily taken for it, of which the dump then holds no clip. None is a
+    # class of CLASSES (one asked about would be taken for another), and none is a parent of the class's own clips.
+    "Toilet_flush": ("Sink_(filling_or_washing)", "Water_tap_and_faucet", "Bathtub_(filling_or_washing)"),  # its raters: a bathroom's water
+    "Microwave_oven": (),
+    "Meow": ("Purr", "Hiss", "Growling"),  # its raters: the other cat sounds
+    "Zipper_(clothing)": ("Ratchet_and_pawl", "Tearing"),
+    "Scissors": ("Tearing",),
+    "Printer": ("Typing", "Typewriter"),
+    "Tambourine": ("Bell", "Rattle_(instrument)"),
+    "Gong": ("Bell", "Chime", "Church_bell", "Crash_cymbal"),
+    "Thunder": ("Explosion", "Fireworks", "Boom"),
+    "Hammer": ("Thump_and_thud", "Knock", "Tap"),
+    "Skateboard": ("Bicycle",),
+    "Coin_(dropping)": ("Chink_and_clink", "Cutlery_and_silverware", "Keys_jangling"),  # its raters: keys jangling
+    "Fart": ("Burping_and_eructation",),
+    "Packing_tape_and_duct_tape": ("Tearing",),  # its raters: tearing
+    "Camera": ("Tick", "Ratchet_and_pawl"),
+    "Harp": ("Piano", "Acoustic_guitar"),  # its raters: pianos
+    "Finger_snapping": ("Clapping",),  # its raters: clapping
+    "Chewing_and_mastication": (),
+    "Drill": ("Sawing",),
+    "Cough": ("Sneeze",),  # its raters: sneezing
+    "Writing": ("Typing",)}  # its raters: typing
+QUOTAS = {"tiny": {"find": 4, "count": 2, "absent": 2}, "standard": {"find": 10, "count": 6, "absent": 5}}  # the classes of each template
 KEEP = {"find": (2, 8), "count": (9, 40)}  # the clips of a class that stay, by the template that asks about it
 TINY_CLIPS = 240  # the clips of the `tiny` dump, the classes' clips among them
 FILES = "<the names of the files, as in rec_00042.wav, separated by commas>"
@@ -53,22 +77,27 @@ def slug(label: str) -> str:
 
 def choose(clips: Sequence[Clip], scale: str, seed: int) -> tuple[Roles, list[Clip]]:
     """The classes the questions of `scale` ask about, drawn with `seed`, and the clips of the dump (by Freesound id): every clip but those
-    of the classes asked about, and of each class asked about, its seeded few."""
+    of the classes asked about and of the classes taken for them (NEAR), and of each class asked about, its seeded few."""
     quota = QUOTAS[scale]
     drawn = random.Random(f"m4:{seed}:{scale}").sample(sorted(CLASSES), sum(quota.values()))
     roles = Roles(tuple(drawn[:quota["find"]]), tuple(drawn[quota["find"]:quota["find"] + quota["count"]]),
                   tuple(drawn[quota["find"] + quota["count"]:]))
     asked = set(drawn)
+    near = {n for label in asked for n in NEAR[label]}
+    if asked & near:
+        raise ValueError(f"{', '.join(sorted(asked & near))} is asked about and is taken for another sound that is asked about")
+    left = asked | near  # of these, the dump holds a clip only as a seeded few of an asked-about class
     needles: list[Clip] = []
     for template, labels in (("find", roles.find), ("count", roles.count)):
         low, high = KEEP[template]
         for label in labels:
-            pool = [c for c in clips if label in c.strong and not (asked - {label}) & set(c.labels)]
+            pool = [c for c in clips if label in c.strong and not (left - {label}) & set(c.labels)]
             if len(pool) < low:
-                raise ValueError(f"only {len(pool)} clips of {label} are plain cases of it with no other asked-about class: {template} needs {low}")
+                raise ValueError(f"only {len(pool)} clips of {label} are plain cases of it with no other asked-about or taken-for class: "
+                                 f"{template} needs {low}")
             n = random.Random(f"m4:{seed}:keep:{label}").randint(low, min(high, len(pool)))
             needles += random.Random(f"m4:{seed}:pick:{label}").sample(pool, n)
-    others = [c for c in clips if not asked & set(c.labels)]
+    others = [c for c in clips if not left & set(c.labels)]
     if scale == "tiny":
         others = random.Random(f"m4:{seed}:others").sample(others, TINY_CLIPS - len(needles))
     kept = others + needles

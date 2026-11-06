@@ -1,7 +1,9 @@
 """I3, the trail camera: the memory card of one camera in the hills of the south-western United States (Caltech Camera Traps, location
 23), months of photos of whatever passed, day and night (at night in infrared), most of them of nothing. The questions ask which days an
 animal came, how often, when it was first or last seen, and of animals that never came (questions.py). Every answer is from the
-dataset's labels; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+dataset's labels; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump). The photos the
+dataset times as 12:MM:SS, which are noon and the hour after midnight alike, are told apart by the AM or PM burned into their strip, and
+those of the night are at 00:MM:SS (source.py `told`).
 
     recipe = i3_trailcam.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = i3_trailcam.build(recipe, folder, 3)  # the photos copied in with EXIF and their times, and the questions
@@ -20,12 +22,18 @@ from mmmb.core.question import Question
 from mmmb.core.scenario import Access, ProbeOutcome, dump_key
 from mmmb.scenarios import realdump
 from mmmb.scenarios.i3_trailcam.questions import CODE, SOURCE_NAME, questions_of
-from mmmb.scenarios.i3_trailcam.source import IMAGES, SOURCE, read_labels, with_exif
+from mmmb.scenarios.i3_trailcam.source import (
+    IMAGES,
+    SOURCE,
+    read_labels,
+    told,
+    with_exif,
+)
 from mmmb.scenarios.realdump import File, report  # noqa: F401  (`report`: the Scenario's)
 
 name = "i3_trailcam"
 code = CODE
-generator = 1  # bumped when the scenario makes something other than before
+generator = 2  # bumped when the scenario makes something other than before
 
 SCALES = {"tiny": ("2013-12-16", "2013-12-22"), "standard": ("2013-09-10", "2014-02-28")}  # the days of the card at each scale
 RECIPE_KEYS = {"source", "scale", "seed", "days", "utc_offsets"}
@@ -52,7 +60,7 @@ def plan_of(recipe: Mapping[str, object]) -> tuple[tuple[File, ...], tuple[Quest
     realdump.check_offsets(recipe)
     photos, names = read_labels(str(recipe["source"]))
     first, last = recipe["days"][0], recipe["days"][-1]
-    card = [p for p in photos if first <= p.wall.date().isoformat() <= last]
+    card = told(str(recipe["source"]), [p for p in photos if first <= p.wall.date().isoformat() <= last])
     files = tuple(File(f"{FOLDER}/IMG_{n:04d}.JPG", SOURCE_NAME, realdump.local_t(p.wall), "photo", "image",
                        {"src": f"{IMAGES}/{p.file}", "taken": p.wall.isoformat()}, own_time=True) for n, p in enumerate(card, 1))
     return files, questions_of(card, [f.path for f in files], names, str(recipe["scale"]), int(recipe["seed"]), realdump.local_t)

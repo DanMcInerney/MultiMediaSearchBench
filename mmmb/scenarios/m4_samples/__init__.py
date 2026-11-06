@@ -7,9 +7,9 @@ scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared 
     dump, questions = m4_samples.build(recipe, folder, 3)  # the clips copied in (samples only) with their times, and the questions
 
 Scales: `tiny`, 240 clips (0.2 GB, for the tests and a smoke run); `standard`, the split but for the clips of the sounds that are asked
-about, of which a few stay (about 8,700 clips, 7.5 GB). The source gives no recording time: the clips are numbered in the order of a seeded
-draw, and their times, a seeded spread over April (`tiny`) or April to September 2026 (`standard`), rise with the numbers, a minute at least
-after the end of the clip before."""
+about, of which a few stay, and of the sounds easily taken for them (about 6,100 clips, 5.2 GB). The source gives no recording time: the
+clips are numbered in the order of a seeded draw, and their times, a seeded spread over April (`tiny`) or April to September 2026
+(`standard`), rise with the numbers, a minute at least after the end of the clip before."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ from mmmb.scenarios.realdump import File, report  # noqa: F401  (`report`: the S
 
 name = "m4_samples"
 code = CODE
-generator = 1  # bumped when the scenario makes something other than before
+generator = 2  # bumped when the scenario makes something other than before
 
 SCALES = {"tiny": ("2026-04-01", "2026-04-30"), "standard": ("2026-04-01", "2026-09-30")}  # the days the clips are made over
 FOLDERS = {"tiny": 3, "standard": 10}  # the folders the clips are in

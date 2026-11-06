@@ -25,7 +25,7 @@ from mmmb.core import fs, grade
 from mmmb.core.agents import claude
 from mmmb.core.runfolder import RunFolder
 from mmmb.core.runner import Agent
-from mmmb.scenarios.m4_samples.questions import CLASSES
+from mmmb.scenarios.m4_samples.questions import CLASSES, NEAR
 from mmmb.scenarios.m4_samples.source import SOURCE
 
 if not (SOURCE / "labels" / "eval.csv").is_file():
@@ -33,12 +33,16 @@ if not (SOURCE / "labels" / "eval.csv").is_file():
 
 M4 = scenarios.get("m4_samples")
 pytestmark = pytest.mark.xdist_group("m4")
-WORDS = {"toilet_flush": "toilet flushing", "microwave_oven": "microwave oven", "meow": "cat meowing", "purr": "cat purring",
+WORDS = {"toilet_flush": "toilet flushing", "microwave_oven": "microwave oven", "meow": "cat meowing",
          "zipper_clothing": "zipper", "scissors": "scissors cutting", "printer": "printer", "tambourine": "tambourine", "gong": "gong",
          "thunder": "thunder", "hammer": "hammering", "skateboard": "skateboard", "coin_dropping": "coin dropping", "fart": "fart",
-         "burping_and_eructation": "burp", "packing_tape_and_duct_tape": "packing tape", "camera": "camera shutter", "harp": "harp",
-         "finger_snapping": "fingers snapping", "sneeze": "sneeze", "chewing_and_mastication": "someone chewing", "drill": "power drill",
-         "cough": "cough", "writing": "someone writing"}  # what a question about a class says, written here
+         "packing_tape_and_duct_tape": "packing tape", "camera": "camera shutter", "harp": "harp", "finger_snapping": "fingers snapping",
+         "chewing_and_mastication": "someone chewing", "drill": "power drill", "cough": "cough",
+         "writing": "someone writing"}  # what a question about a class says, written here
+REVIEWED = {"Gong": {"Bell", "Chime", "Crash_cymbal", "Church_bell"}, "Printer": {"Typing", "Typewriter"},
+            "Thunder": {"Explosion", "Fireworks", "Boom"}, "Hammer": {"Thump_and_thud", "Knock", "Tap"},
+            "Coin_(dropping)": {"Chink_and_clink", "Cutlery_and_silverware", "Keys_jangling"},
+            "Tambourine": {"Bell", "Rattle_(instrument)"}}  # the classes a reviewer found in the dumps for a sound asked about
 
 
 @functools.cache
@@ -88,6 +92,10 @@ def check_against_labels(files, questions) -> set[str]:
     label_of = slug_of(vocabulary)
     by_path = {f.path: f for f in files}
     asked = {label_of[parse(q.qid)[2]] for q in questions}
+    near = {n for a in asked for n in NEAR[a]}
+    assert not asked & near and near <= set(vocabulary)
+    taken = sorted(p for p, f in by_path.items() if near & set(labels[clip_of(f)]))
+    assert not taken, f"the dump holds clips of a class taken for a sound asked about: {taken[:3]}"
     for q in questions:
         absent, template, key = parse(q.qid)
         label = label_of[key]
@@ -162,19 +170,23 @@ def test_every_answer_is_the_labels_at_the_standard_scale(seed):
     files, questions = M4.plan_of(M4.recipe(scale="standard", seed=seed))
     asked = check_against_labels(files, questions)
     labels = plain_labels()[0]
-    assert len(questions) == 23 and sum(q.kind == "absent" for q in questions) == 6 and len(asked) == 23
-    assert [sum(q.kind == k for q in questions) for k in ("find", "count")] == [11, 6]
-    assert 6 <= sum(q.split == "dev" for q in questions) <= 8
-    # the dump is the split but for the asked-about sounds: all the clips holding none of them, and of each of theirs its few
+    assert len(questions) == 21 and sum(q.kind == "absent" for q in questions) == 5 and len(asked) == 21
+    assert [sum(q.kind == k for q in questions) for k in ("find", "count")] == [10, 6]
+    assert 5 <= sum(q.split == "dev" for q in questions) <= 7
+    # the dump is the split but for the asked-about sounds and those taken for them: all the clips holding none of them, and of each of
+    # the asked-about its few
     here = {clip_of(f) for f in files}
-    plain = {c for c, ls in labels.items() if not asked & set(ls)}
+    near = {n for a in asked for n in NEAR[a]}
+    plain = {c for c, ls in labels.items() if not (asked | near) & set(ls)}
     kept = here - plain
-    assert plain <= here and all(len(asked & set(labels[c])) == 1 for c in kept)
+    assert plain <= here and all(len(asked & set(labels[c])) == 1 and not near & set(labels[c]) for c in kept)
     needles = sum(len(q.grade.items) if q.kind == "find" else int(q.grade.truth) for q in questions if q.kind != "absent")
-    assert len(kept) == needles and len(files) == len(plain) + needles and 8000 < len(files) < 9500
+    assert len(kept) == needles and len(files) == len(plain) + needles and 5500 < len(files) < 6600
+    for label in asked & set(REVIEWED):  # what a reviewer found: none of those classes is in the dump, whichever way the sound is asked
+        assert not [c for c in here if REVIEWED[label] & set(labels[c])], f"a class taken for {label} is in the dump"
     seconds = {f.path: (os.path.getsize(SOURCE / f.spec["src"]) - 78) / 88200 for f in files}
     assert all(f.length == seconds[f.path] for f in files)
-    assert 7e9 < sum(s * 88200 + 44 for s in seconds.values()) < 8.5e9
+    assert 4.8e9 < sum(s * 88200 + 44 for s in seconds.values()) < 5.6e9
 
 
 def test_every_answer_is_the_labels_at_the_tiny_scale(tiny):
@@ -205,6 +217,23 @@ def test_every_sound_asked_about_is_a_leaf_class_of_the_vocabulary():
     assert set(CLASSES) <= set(vocabulary) and set(WORDS) == {re.sub(r"[^a-z0-9]+", "_", k.lower()).strip("_") for k in CLASSES}
     for name in CLASSES:
         assert not [other for other in clips if other != name and clips[other] <= clips[name]], f"{name} has a child class"
+
+
+def test_each_sound_asked_about_names_the_classes_taken_for_it():
+    """Every class of the table has its list (empty for a sound nothing is taken for); each class listed is of the vocabulary, none is a
+    sound of the table (two asked about would be taken for each other) nor a parent of the sound's own clips (they would all go); and the
+    lists include what a reviewer found in the dumps."""
+    labels, _, vocabulary = plain_labels()
+    clips = defaultdict(set)
+    for c, ls in labels.items():
+        for name in ls:
+            clips[name].add(c)
+    assert set(NEAR) == set(CLASSES) and all(isinstance(n, tuple) for n in NEAR.values())
+    for name, near in NEAR.items():
+        assert set(near) <= set(vocabulary) and not set(near) & set(CLASSES), name
+        assert not [n for n in near if clips[name] <= clips[n]], f"{name}: a parent of its own clips is no class taken for it"
+        assert len(near) == len(set(near)) and name not in near
+    assert all(set(REVIEWED[name]) <= set(NEAR[name]) for name in REVIEWED)
 
 
 @pytest.mark.parametrize("scale, folders", [("tiny", 3), ("standard", 10)])

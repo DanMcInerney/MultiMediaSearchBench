@@ -23,8 +23,8 @@ from cli_world import world  # noqa: F401
 from mmmb import scenarios
 from mmmb.core import fs, grade
 from mmmb.core.agents import claude
-from mmmb.core.runfolder import RunFolder
 from mmmb.core.contract import ManifestEntry
+from mmmb.core.runfolder import RunFolder
 from mmmb.core.runner import Agent
 from mmmb.scenarios import realdump
 from mmmb.scenarios.a1_home_audio.source import SOURCE, write_wav

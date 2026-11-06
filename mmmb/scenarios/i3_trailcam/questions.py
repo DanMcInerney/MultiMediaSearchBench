@@ -9,9 +9,13 @@
 | `absent`      | `first` of a large animal the dataset has and the card never shows, or (at | `absent`                |
 |               | the standard scale) `days` in a month the species never came               |                         |
 
-A `first` or `last` question is not asked of a species with a photo on its first (or last) day whose hour is 12: the camera writes the
-hour after midnight as 12, so which of that day's photos came first is not known. A date is never in doubt. Which ones are asked is drawn
-with the seed, a species at a time so that the species vary."""
+No question is about a bird: a small one in a frame called empty is a label a careful annotator may have missed (as a bat or a rodent
+would be). A `first` or `last` question is not asked of a species with a photo on its first (or last) day whose hour the dataset wrote
+as 12: that is noon or the hour after midnight, which `told` (source.py) tells from the photo's strip, but a question does not rest on
+it. Nor is one asked whose photo is, or is within the 60 s of, the card's first (last) photo that is not a time-lapse photo (the camera
+also takes one every hour on the dot, whatever is before it): only time-lapse photos come after the last one, so the list of the files
+alone would give its time. A date is never in doubt. Which ones are asked is drawn with the seed, a species at a time so that the
+species vary."""
 
 from __future__ import annotations
 
@@ -21,7 +25,7 @@ from datetime import datetime, time, timedelta
 
 from mmmb.core.question import Question, Span
 from mmmb.scenarios import realdump
-from mmmb.scenarios.i3_trailcam.source import EMPTY, MIDNIGHT_HOUR, Photo
+from mmmb.scenarios.i3_trailcam.source import EMPTY, Photo
 
 CODE = "I3"
 SOURCE_NAME = "camera"  # the dump's source
@@ -29,13 +33,19 @@ TOL_S = 60.0  # a photo's time is told to the second; a minute either side is th
 MAX_DAYS = 8  # a `days` question lists no more dates than this
 COUNT_DAYS = (2, 40)  # the days a `count` question's answer is within
 QUOTAS = {"tiny": {"days": 2, "count": 1, "first": 2, "last": 1, "absent_first": 2, "absent_days": 0},
-          "standard": {"days": 6, "count": 4, "first": 4, "last": 3, "absent_first": 4, "absent_days": 3}}
-NOT_ANIMALS = (EMPTY, "car", "insect")  # labels no question asks about
-NEVER = ("badger", "cow", "fox", "mountain_lion", "opossum")  # what an absent `first` asks of: large and unlike the animals that came (not
-# `cat`, which a bobcat is, nor a bat or a rodent, which a labeller may miss in a frame called empty)
+          "standard": {"days": 6, "count": 4, "first": 4, "last": 3, "absent_first": 3, "absent_days": 3}}
+NOT_ANIMALS = (EMPTY, "car", "insect", "bird")  # labels no question asks about (a small bird is one a labeller may miss in an empty frame)
+NEVER = ("badger", "cow", "mountain_lion", "opossum")  # what an absent `first` asks of: large and unlike the animals that came (not `cat`,
+# which a bobcat is, nor a bat or a rodent, which a labeller may miss in a frame called empty, nor a fox: the card's coyotes, most of them
+# in infrared at night, are the animal to take for one)
 DATES = "<the dates, as YYYY-MM-DD, separated by commas>"
 WHEN = "<the date and time, as YYYY-MM-DD HH:MM>"
 NUMBER = "<a number>"
+
+
+def timelapse(photo: Photo) -> bool:
+    """A photo on the hour on the dot: the camera takes one every hour, whatever is before it (an animal there is chance)."""
+    return photo.wall.minute == 0 and photo.wall.second == 0
 
 
 def spoken(species: str) -> str:
@@ -79,6 +89,8 @@ def questions_of(photos: Sequence[Photo], paths: Sequence[str], names: Sequence[
     now = t_of(datetime.combine(last_day + timedelta(days=1), time(9)))
     since, until = t_of(photos[0].wall), t_of(photos[-1].wall) + 1
     months = sorted({p.wall.strftime("%Y-%m") for p in photos}) if scale != "tiny" else []
+    motion = [p for p in photos if not timelapse(p)]
+    edge = {"first": motion[0].wall, "last": motion[-1].wall}  # the listing alone gives the time of these
 
     def of(species: str, month: str | None = None) -> list[Photo]:
         return [p for p in animals if p.species == species and (month is None or p.wall.strftime("%Y-%m") == month)]
@@ -110,12 +122,14 @@ def questions_of(photos: Sequence[Photo], paths: Sequence[str], names: Sequence[
         n = str(len(days_of(found)))
         out.append(ask(f"count-{species}", f"On how many different days did {spoken(species)} come past my trail camera?", "count",
                        NUMBER, realdump.grade("count", truth=n), found, n))
-    # first and last: when a species was first (last) photographed, when the hour of no photo of it on that day is in doubt
+    # first and last: when a species was first (last) photographed, when the hour of no photo of it on that day is in doubt, and the
+    # time is not that of the card's first (last) photo that is not a time-lapse one
     for template, end in (("first", 0), ("last", -1)):
         sure = []
         for s in seen:
             day = of(s)[end].wall.date()
-            if all(p.wall.hour != MIDNIGHT_HOUR for p in of(s) if p.wall.date() == day):
+            if (not any(p.twelve for p in of(s) if p.wall.date() == day)
+                    and abs((of(s)[end].wall - edge[template]).total_seconds()) > TOL_S):
                 sure.append((s, None))
         for species, _ in pick(sure, quota[template], rng):
             photo = of(species)[end]

@@ -142,8 +142,9 @@ SOME_CODE = ('python -c "import wave, numpy as np; x = np.frombuffer(w.readframe
 @pytest.mark.parametrize("name", ["v1_security", "i3_trailcam", "a1_home_audio", "m4_samples"])
 def test_no_deny_word_of_a_real_scenario_is_in_ordinary_code(name, tmp_path):
     """Gate 2: "sins" is in `isinstance`, "meva" in `timevalue`; an agent's own script must not end its exec as an escape."""
-    from mmmb.core.agents.common import reached
     import importlib
+
+    from mmmb.core.agents.common import reached
     words = tuple(w.lower() for w in importlib.import_module(f"mmmb.scenarios.{name}").deny_words((), tmp_path, "k"))
     assert reached({"command": SOME_CODE}, words) is None
     assert reached({"command": r"dir D:\bench-data\sources"}, words) == "bench-data"
