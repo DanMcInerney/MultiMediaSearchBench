@@ -3,8 +3,8 @@
 How the build is checked, what it is held to, and what has not been run. The design is in [DESIGN.md](DESIGN.md). Dated
 notes are at the end, newest last; add to them whenever testing teaches something.
 
-The suite has 1,078 tests: 854 under `tests/`, 93 under `tests/oracles/` and 131 under `tests/mm/` (counted after the G2 repair,
-on 5 November 2026; five are slow). None starts a paid agent, uses the GPU, or needs the network.
+The fast suite ran 1,198 tests on 6 November 2026, after the real scenarios were built (1,197 passed and 1 skipped, once one
+V7 check was told of the `set` rule); five more are slow. None starts a paid agent, uses the GPU, or needs the network.
 
 ## 1. Environment
 
@@ -66,7 +66,7 @@ These hold for every test and every check:
 | `gpu` | loads a model on the GPU | none |
 
 ```
-uv run pytest                          # the fast suite: about 8 to 10 minutes (484 s for 1,048 tests at U14's end; 489 s for 1,073 after the G2 repair)
+uv run pytest                          # the fast suite: about 8 to 10 minutes (484 s for 1,048 tests at U14's end; 489 s for 1,073 after the G2 repair; 465 s for 1,198 on 6 November)
 uv run pytest tests/mm --require-mm    # the tests that need the mm extra; a skip is a failure
 uv run pytest -m slow <file>           # one slow test file (section 4)
 ```
@@ -388,3 +388,6 @@ independent review and at most one repair pass.
 - **The full-size dumps,** each built once and probed with the new probe, then deleted: V1 5.5 GiB in 8 s (stream copy);
   A1 2.6 GiB in 67 s; I3 1.8 GiB in 24 s (375 photos at 00:xx, 204 at noon, the names in time order); M4 5.0 GiB in
   45 s. Every probe passed.
+- **The fast suite, once at the end:** 1,196 passed, 1 skipped and 1 failed in 465 s at 4 workers, in US Eastern time. The
+  failure was a V7 check that every rule but `choice` is in its grading table; `set` is tested in `test_set_rule.py`, and the
+  check now says so. No golden or recorded file changed.
