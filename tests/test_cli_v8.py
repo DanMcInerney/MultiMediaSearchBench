@@ -168,6 +168,15 @@ def test_the_folders_checked_are_those_the_agent_reads_and_a_dump_that_is_hidden
         run.check_paths(ISOLATION, run.temp / f"mmb-{run.tag}-d0" / f"mmb-{run.tag}-w1")
 
 
+def test_a_temp_folder_an_agent_may_not_name_is_refused_before_the_run(w, tmp_path, monkeypatch):
+    """The first baseline: TEMP was in the tests' folder, a compiler's warning printed its path, and the exec ended as an escape."""
+    monkeypatch.setenv("TMP", str(tmp_path / ".codex" / "tmp"))
+    with pytest.raises(ValueError, match=r"TMP is .*holds '.*\.codex"):
+        w.run.check_paths(ISOLATION)
+    monkeypatch.setenv("TMP", str(tmp_path / "plain"))
+    w.run.check_paths(ISOLATION)
+
+
 def test_an_exec_with_its_own_tools_is_given_a_view_and_a_deny_list_that_names_the_whole_dump(w):
     run = w.run
     assert run_command(w, "--agents", "claude", "--configs", "blind,files,stub", "--only", "ego-001,ego-018") == 0
