@@ -15,6 +15,7 @@ UNITS = "zero one two three four five six seven eight nine ten eleven twelve thi
         "eighteen nineteen".split()
 TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
 ONCE = {"once": "1", "twice": "2", "thrice": "3"}
+NAMED = re.compile(r"\b[^\W\d]+\d[\w.]*", re.IGNORECASE)  # a name led by letters with digits in it (cam3, IMG_0003.JPG): no number
 WORD = re.compile(r"\b(?:(" + "|".join(TENS) + r")(?:[ -](one|two|three|four|five|six|seven|eight|nine))?|("
                   + "|".join(UNITS) + r"))\b")
 TIME = re.compile(r"\b(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([ap])\.?m\b\.?)?")
@@ -147,8 +148,8 @@ def code(text: str, n: str) -> bool:
 
 def asked(question: str) -> list[str]:
     """The numbers and the clock times ("HH:MM") a question holds itself, for a grade's `ignore`: an answer may repeat them
-    ("ERR-731", the hours of "in the evening (18:00 to 24:00)"; dates are not numbers)."""
-    out = list(dict.fromkeys(numbers(question)))
+    ("ERR-731", the hours of "in the evening (18:00 to 24:00)"; dates and the digits of a name such as `cam3` are not numbers)."""
+    out = list(dict.fromkeys(numbers(NAMED.sub(" ", question))))
     for m in TIME.finditer(clocks(question)):
         if int(m.group(2)) < 60:
             out.append(f"{int(m.group(1)):02d}:{m.group(2)}")
@@ -297,8 +298,8 @@ def grade(g: Grade, answer: str | None) -> bool:
     """Whether `answer` is right by `g`: None is wrong, and so is a hedge, an answer with a number or a time that is neither the
     truth nor in `g.ignore` (the question's own numbers and times).
     - `number`: the truth is among the answer's numbers, no other number is, and no wrong answer is;
-    - `count`: the answer's numbers, with the `ignore` ones taken out (an error code's digits), are exactly the truth (`once`,
-      `twice` and `thrice` are 1, 2 and 3);
+    - `count`: the answer's numbers, with the `ignore` ones other than the truth taken out (an error code's digits) and names such
+      as `cam3` or `IMG_0003.JPG` left out, are exactly the truth (`once`, `twice` and `thrice` are 1, 2 and 3);
     - `time`: a time of the answer is within `tol_s` of `time`, every time of it is, or is ignored, and none is a wrong time;
     - `code_time`: the truth's digits (`E-4417`, `e4417` and `4417` all pass), a time within `tol_s` of `time` (every time of
       the answer within it or ignored), and no other number of as many digits;
@@ -320,8 +321,8 @@ def grade(g: Grade, answer: str | None) -> bool:
         found = set(numbers(answer, keep=[g.truth, *g.wrong]))
         return g.truth in found and not set(g.wrong) & found and found <= {g.truth} | digits
     if rule == "count":
-        text = re.sub(r"\b(?:once|twice|thrice)\b", lambda m: ONCE[m.group(0)], norm(answer))
-        for ignored in digits:
+        text = re.sub(r"\b(?:once|twice|thrice)\b", lambda m: ONCE[m.group(0)], NAMED.sub(" ", norm(answer)))
+        for ignored in digits - {g.truth}:
             text = re.sub(rf"\b{re.escape(ignored)}\b", " ", text)
         return set(numbers(text)) == {g.truth}
     if rule == "time":

@@ -240,3 +240,14 @@ def test_a_count_reads_once_twice_and_thrice_as_numbers():
     assert graded(two, ["once", "thrice", "three times", "twice and once", "unknown"], False) == []
     assert graded(Grade("count", "1", None, None, (), (), None), ["once", "1"], True) == []
     assert graded(Grade("count", "3", None, None, (), (), None), ["thrice", "three times"], True) == []
+
+
+def test_a_count_reads_no_number_in_a_name_and_takes_the_truth_even_when_the_question_holds_it():
+    """A camera named `cam3` in the question or the answer is no count, and a count the question also holds is still right."""
+    assert grade.asked("How many times did a car stop on cam3 between 10:10 and 10:40?") == ["10:10", "10:40"]
+    on_cam3 = Grade("count", "2", None, None, (), ("10:10", "10:40"), None)
+    assert graded(on_cam3, ["2", "2 (cam3)", "twice on cam3, in IMG_0003.JPG and IMG_0010.JPG"], True) == []
+    assert graded(on_cam3, ["3", "2 or 3", "cam3: 4"], False) == []
+    in_3_hours = Grade("count", "3", None, None, (), ("3",), None)  # "in the last 3 hours", and it was 3
+    assert graded(in_3_hours, ["3", "3 times in 3 hours"], True) == []
+    assert graded(in_3_hours, ["2 in 3 hours", "unknown"], False) == []
