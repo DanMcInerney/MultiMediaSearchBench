@@ -103,6 +103,16 @@ def test_the_deny_words_hold_the_code_and_the_source_names_in_commands_and_the_s
     assert set(words) == {IN_ONLY + w for w in ("i9_thing", "realdump", "from mmmb", "import mmmb", "caltech")} | {"bench-data"}
 
 
+def test_the_sources_folder_is_set_by_its_variable_and_is_denied_by_its_name(monkeypatch):
+    monkeypatch.delenv(realdump.SOURCES_ENV, raising=False)
+    assert realdump.sources_root() == Path(r"D:\bench-data\sources") and realdump.source_word() == "bench-data"
+    monkeypatch.setenv(realdump.SOURCES_ENV, "/srv/MMMB-Media")
+    assert realdump.sources_root() == Path("/srv/MMMB-Media") and realdump.source_word() == "mmmb-media"
+    assert realdump.source_word(Path("/srv/clips-store/sources")) == "clips-store", "a folder named `sources` is told by its parent"
+    with pytest.raises(ValueError, match="ordinary output"):
+        realdump.source_word(Path("/data/sources"))
+
+
 def test_a_recipe_made_in_another_time_zone_is_refused():
     days = realdump.span_days(datetime(2013, 12, 16).date(), datetime(2013, 12, 22).date())
     assert len(days) == 7 and days[-1] == "2013-12-22"

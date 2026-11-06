@@ -33,6 +33,26 @@ DEV_SHARE = 0.3  # of a scenario's questions, the share marked `dev` by the seed
 CODE_WORDS = ("realdump", "from mmmb", "import mmmb")  # code that reaches a scenario: no command may hold it
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+SOURCES_ENV = "MMMB_SOURCES"  # the folder that holds the sources, one folder per source (`meva`, `sins`, ...)
+DEFAULT_SOURCES = Path(r"D:\bench-data\sources")
+SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and would refuse innocent commands
+
+
+def sources_root() -> Path:
+    """Where the sources are: `MMMB_SOURCES`, else D:\\bench-data\\sources. A source's folder in it is named by its id in
+    media/sources.jsonl."""
+    return Path(os.environ.get(SOURCES_ENV) or DEFAULT_SOURCES)
+
+
+def source_word(root: Path | None = None) -> str:
+    """The word no command of an agent, nor what it prints, may hold: the name of the folder the sources are in, or of its parent when
+    that folder is named `sources` (so `bench-data` for the default). Refused when it is too short or too common to tell a reach."""
+    root = sources_root() if root is None else Path(root)
+    word = (root.parent.name if root.name.lower() == "sources" else root.name).lower()
+    if len(word) < SHORTEST_WORD:
+        raise ValueError(f"the sources folder {root} is told by the name {word!r}, which ordinary output could hold: name the folder "
+                         f"(or its parent, when it is `sources`) {SHORTEST_WORD} or more letters, such as mmmb-sources")
+    return word
 
 
 @dataclass(frozen=True)

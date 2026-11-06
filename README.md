@@ -56,11 +56,15 @@ uv sync --extra mm                   # also Multimem, for the mm system
 uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's real decision model
 ```
 
-- The four scenarios read their sources from `D:\bench-data\sources\` (`meva`, `caltech-camera-traps`, `sins`, `fsd50k`;
-  [MEDIA.md](MEDIA.md) says where each comes from) and never write there. A build copies what it needs.
+- The four scenarios read their sources from the folder `MMMB_SOURCES` names, else `D:\bench-data\sources\`. It holds one
+  folder per source: `meva`, `caltech-camera-traps`, `sins`, `fsd50k` ([MEDIA.md](MEDIA.md) says where each comes from). A
+  build reads them and never writes there; it copies what it needs. Agents are refused any command or output that names the
+  sources folder (or its parent, when it is called `sources`), so give it a name of 6 or more letters that no tool prints,
+  such as `mmmb-sources`.
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
 - The `mm` extra is a path to Multimem's checkout (`C:/Users/danhm/tools/Multimem` in `pyproject.toml`), because Multimem
-  has no git remote. Change it on another machine.
+  has no git remote. On a machine without it, set `UV_FROZEN=1`: `uv sync` and `uv run` then install from `uv.lock`
+  without looking for Multimem, which they otherwise fail to find even when the extra is not asked for.
 - The libraries that write the V7 week are pinned, because its bytes depend on them. ffmpeg comes with `imageio-ffmpeg`.
 
 ## Run it

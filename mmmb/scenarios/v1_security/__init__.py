@@ -117,7 +117,7 @@ def view(question: Question, slot: int, dump: Dump, temp: Path, key: str, build:
 
 
 def deny_words(others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]:
-    return realdump.deny_words(name, COMMAND_WORDS, ("bench-data",))
+    return realdump.deny_words(name, COMMAND_WORDS, (realdump.source_word(),))
 
 
 def after_exec(question: Question, out: dict, dump: Dump, access: Access) -> dict:

@@ -16,7 +16,9 @@ import struct
 from dataclasses import dataclass
 from pathlib import Path
 
-SOURCE = Path(r"D:\bench-data\sources\fsd50k")
+from mmmb.scenarios.realdump import sources_root
+
+SOURCE = sources_root() / "fsd50k"
 CLIPS = "clips/eval"
 LABELS = "labels/eval.csv"
 VOCABULARY = "labels/vocabulary.csv"  # `index,label,mid`, with no header

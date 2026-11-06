@@ -23,7 +23,9 @@ from pathlib import Path
 import av
 import numpy as np
 
-SOURCE = Path(r"D:\bench-data\sources\sins")
+from mmmb.scenarios.realdump import sources_root
+
+SOURCE = sources_root() / "sins"
 NODE = "node07"
 LIVING, HOME = "labels/living_labels.csv", "labels/labels.csv"
 STAMP = re.compile(r"Node7_(\d{8})_(\d{6})_(\d{3})_audio\.flac")

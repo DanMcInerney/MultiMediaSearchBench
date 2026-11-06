@@ -23,7 +23,9 @@ from pathlib import Path
 
 from PIL import Image, ImageStat
 
-SOURCE = Path(r"D:\bench-data\sources\caltech-camera-traps")
+from mmmb.scenarios.realdump import sources_root
+
+SOURCE = sources_root() / "caltech-camera-traps"
 LABELS = "labels/caltech_camera_traps.json.zip"
 MEMBER = "caltech_images_20210113.json"
 IMAGES = "images"
