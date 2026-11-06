@@ -9,8 +9,8 @@ A server with the agent's own tools has no golden: its expected argv, settings a
 section 4.4, and its environment is the files cell's by the rule that the own tools pick it.
 
 Intended differences (plan 7.3, each asserted somewhere, none ignored): the skill's five drifted lines (test_goldens.py), the
-`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the longest
-command Claude's files line names (here, `files_now`)."""
+`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
+and longest command Claude's files line names (here, `files_now`)."""
 
 from __future__ import annotations
 
@@ -42,16 +42,16 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# Claude's files line names the longest command Claude Code runs (claude.LONGEST_COMMAND), which the old code's line did not
-LENGTH_WAS = "other programs), and write"
-LENGTH_NOW = "other programs), keep it under 10,000 characters (a longer one is refused), and write"
+# Claude's files line names redirects and the longest command Claude Code runs (claude.LONGEST_COMMAND), which the old code's did not
+FILES_WAS = "(no cd, pipes, && or other programs), and write"
+FILES_NOW = "(no cd, pipes, redirects, && or other programs), keep it under 10,000 characters (a longer one is refused), and write"
 
 
 def files_now(text: str) -> str:
-    """A recorded instructions text of Claude's with the files line as the agent writes it now: the words on the command's length
-    put in, once, and nothing else changed."""
-    assert text.count(LENGTH_WAS) == 1, "Claude's files line, as recorded"
-    return text.replace(LENGTH_WAS, LENGTH_NOW)
+    """A recorded instructions text of Claude's with the files line as the agent writes it now: the words on redirects and the
+    command's length put in, once, and nothing else changed."""
+    assert text.count(FILES_WAS) == 1, "Claude's files line, as recorded"
+    return text.replace(FILES_WAS, FILES_NOW)
 
 
 def sha256(text: str | bytes) -> str:
