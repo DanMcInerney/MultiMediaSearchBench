@@ -8,10 +8,14 @@ import subprocess
 
 from mmmb.core.contract import Description
 
+# Windows' own desktop, which nvidia-smi may list as a compute app (explorer.exe, 2026-11-06, with its memory "[N/A]", as every
+# process's is under Windows' display driver): it loads no model, and no run would start beside it
+DESKTOP = ("explorer.exe", "dwm.exe")
+
 
 def gpu_busy() -> str | None:
-    """What nvidia-smi lists as running on the GPU, or None when nothing does. The GPU runs alone (on Windows with a display
-    the list can be empty while a window uses it: look at the machine too)."""
+    """What nvidia-smi lists as running on the GPU apart from Windows' desktop (`DESKTOP`), or None when nothing else does. The GPU
+    runs alone (on Windows with a display the list can be empty while a window uses it: look at the machine too)."""
     exe = shutil.which("nvidia-smi")
     if exe is None:
         raise RuntimeError("nvidia-smi is not on PATH, so whether the GPU is free for a real model cannot be told")
@@ -19,7 +23,13 @@ def gpu_busy() -> str | None:
                           text=True, timeout=30)
     if done.returncode:
         raise RuntimeError(f"nvidia-smi exited {done.returncode}: {done.stderr.strip()[-300:]}")
-    return "; ".join(line.strip() for line in done.stdout.splitlines() if line.strip()) or None
+    apps = [line.strip() for line in done.stdout.splitlines() if line.strip()]
+    return "; ".join(a for a in apps if program(a) not in DESKTOP) or None
+
+
+def program(app: str) -> str:
+    """The program's file name, lower case, of a line `pid, process_name` of nvidia-smi."""
+    return app.rpartition(",")[2].strip().replace("/", "\\").rpartition("\\")[2].lower()
 
 
 def check_gpu(description: Description) -> None:

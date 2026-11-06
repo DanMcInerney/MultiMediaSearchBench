@@ -201,6 +201,10 @@ def test_the_gpu_is_checked_before_a_session_opens_only_for_a_system_that_needs_
         with pytest.raises(RuntimeError, match="GPU is busy.*python.exe"):
             gpu.check_gpu(needs)
         gpu.check_gpu(free)
+        patch.setattr(gpu, "subprocess", smi("7112, C:\\Windows\\explorer.exe\n"))
+        assert gpu.gpu_busy() is None, "Windows' desktop, as nvidia-smi listed it on 2026-11-06, loads no model"
+        patch.setattr(gpu, "subprocess", smi("7112, C:\\Windows\\explorer.exe\n1234, C:\\x\\python.exe\n"))
+        assert gpu.gpu_busy() == "1234, C:\\x\\python.exe", "and hides nothing beside it"
         patch.setattr(gpu, "subprocess", smi("\n"))
         assert gpu.gpu_busy() is None
         gpu.check_gpu(needs)
