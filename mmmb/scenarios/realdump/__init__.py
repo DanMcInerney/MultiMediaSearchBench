@@ -36,6 +36,10 @@ MONTHS = ("January", "February", "March", "April", "May", "June", "July", "Augus
 SOURCES_ENV = "MMMB_SOURCES"  # the folder that holds the sources, one folder per source (`meva`, `sins`, ...)
 DEFAULT_SOURCES = Path(r"D:\bench-data\sources")
 SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and would refuse innocent commands
+# The rule an agent with its own tools is held to, said: in the first baseline Codex hunted the disk for Python (C:\Users, Program
+# Files, AppData), its output named the owner's agent setup, and the exec ended as an escape, wrong by a rule it was never told.
+STAY = ("Your tools and ffmpeg are all you have: nothing else on this computer is yours to use or look at, and a command that reaches "
+        "outside the files' folder and your working folder ends your answer as wrong.")
 
 
 def sources_root() -> Path:
@@ -189,7 +193,8 @@ def prompt(question: Question, access: Access, what: str, layout: str) -> str:
             raise ValueError(f"the server {served.server.name!r} has no word for itself for the prompt")
         how.append(f"{served.holder} holds {what}." + (f" {served.clock_note}" if served.clock_note else ""))
     if access.own_tools:
-        how.append(f"The files of {what} are in {access.data}: {layout} Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe).")
+        how.append(f"The files of {what} are in {access.data}: {layout} Your working folder is yours to write in. ffmpeg is on PATH (there is no ffprobe). "
+                   f"{STAY}")
     if served.server is not None:
         holder, plural = (f"{served.holder} and these files", True) if access.own_tools else (served.holder, False)
     elif access.own_tools:

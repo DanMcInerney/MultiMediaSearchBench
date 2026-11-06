@@ -90,8 +90,10 @@ def test_the_prompt_says_the_time_how_the_files_are_reached_and_the_answer_shape
     assert files.startswith("It is now Monday 23 December 2013, 09:00. The files of the memory card of my trail camera are in ")
     assert "DCIM holds the photos. Your working folder is yours to write in." in files and "On how many days did a deer come?" in files
     assert '{"answer": "<a number>", "evidence": [...]}' in files and 'when the files do not hold it' in files
+    assert f"(there is no ffprobe). {realdump.STAY}" in files, "an agent with its own tools is told the rule an escape breaks"
     system = prompt_of(False, True)
     assert "memo holds the memory card of my trail camera." in system and "when memo does not hold it" in system and "DCIM" not in system
+    assert realdump.STAY not in system, "an agent with no tools of its own reaches nothing"
     both = prompt_of(True, True)
     assert "when memo and these files do not hold it" in both
     assert "You cannot see the memory card of my trail camera." in prompt_of(False, False)
