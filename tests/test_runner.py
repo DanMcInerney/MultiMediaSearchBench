@@ -205,6 +205,13 @@ def test_the_gpu_is_checked_before_a_session_opens_only_for_a_system_that_needs_
         assert gpu.gpu_busy() is None, "Windows' desktop, as nvidia-smi listed it on 2026-11-06, loads no model"
         patch.setattr(gpu, "subprocess", smi("7112, C:\\Windows\\explorer.exe\n1234, C:\\x\\python.exe\n"))
         assert gpu.gpu_busy() == "1234, C:\\x\\python.exe", "and hides nothing beside it"
+        patch.setattr(gpu, "subprocess", smi("1234, C:\\x\\python.exe\n5678, C:\\y\\ChatGPT.exe\n9012, C:\\x\\python.exe\n"))
+        patch.setenv(gpu.BESIDE, "1234, 5678")
+        assert gpu.gpu_busy() == "9012, C:\\x\\python.exe", "the owner's named processes are shared, by id: another python is not"
+        patch.setenv(gpu.BESIDE, "1234,5678,9012")
+        assert gpu.gpu_busy() is None
+        gpu.check_gpu(needs)
+        patch.delenv(gpu.BESIDE)
         patch.setattr(gpu, "subprocess", smi("\n"))
         assert gpu.gpu_busy() is None
         gpu.check_gpu(needs)
