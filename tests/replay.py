@@ -290,13 +290,19 @@ def differences(new: dict, recorded: dict, *, work_extra: Callable[[dict], dict]
     """The fields in which a replayed result is not the recorded one, as strings (empty: the same). The `work` of a result is compared
     on its neutral fields, and on all of them where `work_extra` says what the system adds; `extra` are further fields of the record."""
     out = [f"{k}: {new.get(k)!r} != recorded {recorded.get(k)!r}" for k in (*SAME, *extra)
-           if k not in skip and new.get(k) != (recorded.get(k) if k in OPTIONAL else recorded[k])]
+           if k not in skip and new.get(k) != (recorded.get(k) if k in OPTIONAL else recorded[k]) and not said_now(k, new, recorded)]
     if work_extra is None:
         out += [f"work.{k}: {new['work'].get(k)!r} != recorded {recorded['work'][k]!r}" for k in NEUTRAL_WORK
                 if new["work"].get(k) != recorded["work"][k]]
     else:
         out += [f"work: {new['work']!r} != recorded {recorded['work']!r}"] if new["work"] != recorded["work"] else []
     return out
+
+
+def said_now(key: str, new: dict, recorded: dict) -> bool:
+    """The intended difference of 5449e06: a Claude result says the effort it ran at, the default when none was asked
+    (`claude.effort()`), where the pilot's results, recorded before, say none."""
+    return key == "agent_effort" and new.get("agent") == "claude" and recorded.get(key) is None and new.get(key) == claude.effort()
 
 
 def class_counts(sources: Sequence[Source]) -> Counter:
