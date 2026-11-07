@@ -10,8 +10,8 @@ from mmmb.core.agents.spec import SessionSpec
 from mmmb.core.contract import Isolation, McpServer, Served
 
 # what the system.toml of the system with a private home declare (plan 4.2); the recorded env.json files are the check of these
-ISOLATION = Isolation(env_drop_prefixes=("MULTIMEM_",), deny_words=(".multimem",), deny_package_roots=("multimem",),
-                      env_nowhere={"MULTIMEM_HOME": "no-mm-home"})
+ISOLATION = Isolation(env_drop_prefixes=("MULTIMEM_",), deny_words=(".multimem/", '.multimem"', ".multimem ", ".multimem'"),
+                      deny_package_roots=("multimem",), env_nowhere={"MULTIMEM_HOME": "no-mm-home"})
 NO_ISOLATION = Isolation(env_drop_prefixes=(), deny_words=(), deny_package_roots=(), env_nowhere={})
 TOOLS = ("ask", "find", "look", "label")
 BASE_LINE = "You answer the user's question from their memory, using the mm tools."

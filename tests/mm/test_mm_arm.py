@@ -224,7 +224,8 @@ def test_every_configuration_ran_every_question_the_system_ones_in_a_project_of_
         folder, qid = spec.run_dir.parent.name, spec.run_dir.name
         assert spec.work.parent == run.temp and spec.work.name.startswith(f"mmb-{run.tag}-w") and spec.bin_dir == run.bin
         assert spec.own_tools == (folder != "mm-fake") and (spec.data == run.data) == spec.own_tools and (spec.server is None) == (folder == "files")
-        assert probe.marks[folder, qid] == (f"bench-{qid}" if folder != "files" else None), "the system's slots held a project of their own"
+        assert probe.marks[folder, qid] == (exec_project(qid).removeprefix("id:") if folder != "files" else None), \
+            "the system's slots held a project of their own"
         assert ("mm has recorded" in spec.prompt) == (folder != "files") and (str(run.data) in spec.prompt) == spec.own_tools
     both = next(s.prompt for s in probe.execs if s.run_dir.parent.name == "mm-fake+files")
     assert "Answer from what mm holds or from these files." in both

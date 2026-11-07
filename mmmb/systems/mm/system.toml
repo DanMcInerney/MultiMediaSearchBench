@@ -8,7 +8,9 @@ horizon = "cut"
 
 [isolation]
 env_drop_prefixes = ["MULTIMEM_"]
-deny_words = [".multimem"]
+# a home, `.multimem`, as a path part: before a slash, a quote or a space (as runfolder.ENDS ends a folder's name). Not `.multimem`
+# alone, which `.multimem-project` holds: the marker an mm exec's own working folder has (2026-11-07: a listing of it was an escape)
+deny_words = [".multimem/", ".multimem\"", ".multimem ", ".multimem'"]
 deny_package_roots = ["multimem"]
 
 [isolation.env_nowhere]

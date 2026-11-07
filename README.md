@@ -36,13 +36,42 @@ About a quarter of each scenario's questions are about things that never happene
   and metadata only: the floor and the leak check), and any plug-in search system. `mm` (Multimem's local model) is one,
   optional.
 - **Agents:** Claude Code and Codex, locked down.
-- **Checked with real agents:** a tiny run of `i3_trailcam` with Claude and Codex in `files` and `listing` (TESTING.md).
+- **Checked with real agents:** a tiny run of `i3_trailcam` with Claude and Codex in `files` and `listing` (TESTING.md), and
+  the baseline below: 5 questions of each scenario.
 - **Extras:** V7, the synthetic week of a screen, phone, door camera, microphone and logs that mm was tuned on, and V8,
   EgoLifeQA over the EgoLife smart-glasses video. Both came from Multimem's work and stay as they were.
 - **Not done:** full runs of the four scenarios with real agents (paid), and everything that needs the GPU (DESIGN.md
   section 12).
 
 Tested on Windows 11 only.
+
+## Baseline (6 November 2026)
+
+The first paid run: each agent alone with the files (`files`), on 5 `test` questions of each scenario (`--splits test --limit 5`,
+seed 1, full size), 900 s an exec. Claude Code ran Haiku at `xhigh` effort, Codex ran `gpt-6-luna` at `xhigh`.
+
+| Scenario | The 5 questions | Claude (Haiku) | Codex (Luna) |
+| --- | --- | --- | --- |
+| `i3_trailcam` | 2 which-days, 1 count, 1 first, 1 absent | 4/5 | 3/5 (1 of them lucky) |
+| `a1_home_audio` | 2 start times, 1 stop time, 1 count, 1 absent | 3/5 | 1/5 |
+| `v1_security` | 2 first, 1 last, 1 count, 1 absent | 2/5 | 1/5 |
+| `m4_samples` | 2 find-every-clip, 2 count, 1 absent | 1/5 | 0/5 (all 5 timed out) |
+| **All four** | 20 | **10/20**, all grounded | **5/20**, 4 grounded |
+
+- **Too few questions to rank the two.** With 5 questions a cell's 95% interval spans about 60 points, and 20 questions an
+  agent still leave the gap unproven.
+- **Codex ran out of time** on 7 of its 20 (all of M4, one count in A1, one absent in V1), its mean exec 615 s. Claude timed out
+  once and hit its 60-turn cap twice. A full run should give more than 900 s (`--timeout`).
+- **Claude's line was fixed during the run.** Claude Code refuses a Bash command over 10,000 characters, and refuses a
+  redirect: Claude took the refusals for ffmpeg itself being off and gave up on 2 of M4's 5. Its files line now says both. M4's
+  Claude figure is a rerun with the length named; its I3, A1 and V1 ran with the old line.
+- **No leaks.** In `listing` (names, sizes and times only) both agents answered "unknown" to all 20: right only on the 4
+  absent questions, as they should be.
+- **Cost:** Claude's execs came to $8.07 at list price (on the plan: 69% to 72% of the week). Codex's cost is not recorded
+  (on the plan: 0% to 1%), nor the tokens of an exec that timed out.
+
+The four reports are in [results/2026-11-06-baseline](results/2026-11-06-baseline/): [I3](results/2026-11-06-baseline/i3.md),
+[A1](results/2026-11-06-baseline/a1.md), [V1](results/2026-11-06-baseline/v1.md), [M4](results/2026-11-06-baseline/m4.md).
 
 ## Install
 
@@ -139,7 +168,7 @@ video, text and records; `mm+files` is asked them all.
 | `mmmb/systems/` | `files/`, `listing/`, `mm/`, each with a `system.toml` |
 | `mmmb/scenarios/` | `realdump/` (the builder the real scenarios share), `v1_security/`, `i3_trailcam/`, `a1_home_audio/`, `m4_samples/`; the extras `v7_screen/`, `v8_egolife/` |
 | `tests/` | the tests; `tests/oracles/recorded/` holds the recorded pilot and EgoLife runs they are held to |
-| `results/` | published reports: [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
+| `results/` | published reports: [the baseline](results/2026-11-06-baseline/) (6 November 2026), [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
 | `D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (change them with `--out`, `--temp`, `--cache`; keep them on one drive) |
 
 The published pilot asked 24 questions about 3 synthetic days of mm and of the files alone. With mm, Codex was right on 23 of 24

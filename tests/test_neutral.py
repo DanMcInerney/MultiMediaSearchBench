@@ -83,7 +83,7 @@ WALK = textwrap.dedent("""\
     assert not BLOCKED & {m.split(".")[0] for m in sys.modules}, BLOCKED & {m.split(".")[0] for m in sys.modules}
 
     mm = systems.infos()["mm"]
-    assert (mm.extra, mm.default_variant) == ("mm", "d1-3B") and mm.isolation.deny_words == (".multimem",)
+    assert (mm.extra, mm.default_variant) == ("mm", "d1-3B") and mm.isolation.deny_words == (".multimem/", '.multimem"', ".multimem ", ".multimem'")
     assert systems.isolation().deny_package_roots == ("multimem",) and systems.isolation().env_nowhere == {"MULTIMEM_HOME": "no-mm-home"}
     try:
         systems.load("mm")

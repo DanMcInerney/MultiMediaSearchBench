@@ -6,6 +6,7 @@ the daemon's API and the answers become `Moment`s."""
 from __future__ import annotations
 
 import time
+from collections.abc import Collection
 
 from multimem import config
 
@@ -31,16 +32,20 @@ def warm(api, params: dict) -> float:
     return seconds
 
 
-def warm_params(dump: Dump) -> dict:
-    """The ask that loads a model before its execs: one window of the dump's earliest picture, else of its earliest video (the
-    earliest, so that no earlier one is read)."""
-    for media in ("image", "video"):
+WARM_QUESTIONS = {"image": "Is anything in view?", "video": "Is anything in view?", "audio": "Is anything heard?"}
+
+
+def warm_params(dump: Dump, reads: Collection[str] = ("image", "video")) -> dict:
+    """The ask that loads a model before its execs: one window of the dump's earliest picture, else of its earliest video, else of its
+    earliest sound, of those the model `reads` (the earliest, so that no earlier one is read). A dump of sound alone (A1, M4) loads a
+    model that hears on a sound."""
+    for media in (m for m in WARM_QUESTIONS if m in reads):
         found = [e for e in dump.entries if e.media == media]
         if found:
             first = min(found, key=lambda e: (e.t, e.path))
-            return {"question": "Is anything in view?", "sources": [first.source], "since": first.t, "until": first.t + 1, "limit": 1,
+            return {"question": WARM_QUESTIONS[media], "sources": [first.source], "since": first.t, "until": first.t + 1, "limit": 1,
                     "candidates": 0}
-    raise ValueError(f"{dump.scenario}'s dump has no picture and no video to load the model on")
+    raise ValueError(f"{dump.scenario}'s dump has nothing the model reads ({', '.join(sorted(reads))}) to load it on")
 
 
 def ask_params(query: RetrievalQuery, since: float, until: float) -> dict:

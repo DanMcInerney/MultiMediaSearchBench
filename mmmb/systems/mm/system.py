@@ -196,15 +196,15 @@ class Mm:
                          context)
 
     def open(self, store: Path, dump: Dump, context: SessionContext) -> MmSession:
-        """A copy of the store for (agent, variant), its daemon started, the model loaded by one window of the dump's first picture or
-        video, and what an earlier run left of the execs' labels swept out. The daemon is stopped by `MmSession.close`."""
+        """A copy of the store for (agent, variant), its daemon started, the model loaded by one window of the dump's first picture,
+        video or sound it reads, and what an earlier run left of the execs' labels swept out. The daemon is stopped by `MmSession.close`."""
         model = self.ready_model(context.variant)
         snapshot = Path(store) / "home"
         table = fs.read_json(Path(store) / "windows.json")
         home = copy_home(snapshot, context.homes / f"{context.agent}-{model.slug}", model)
         daemon = Daemon(home).start()
         try:
-            warm(daemon.api, warm_params(dump))
+            warm(daemon.api, warm_params(dump, model.about.reads))
             kept = kept_items(snapshot)  # the store's, not the live home's: an interrupted exec's keeps are not the baseline
             scrub_home(home, kept, prefix=PROJECT_PREFIX)  # the warm ask's label, and an interrupted exec's
         except BaseException:
