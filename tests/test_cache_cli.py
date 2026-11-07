@@ -181,7 +181,8 @@ def test_the_cache_and_the_dumps_are_denied_to_an_agent_with_its_own_tools_in_wh
 
 @pytest.mark.skipif(os.name != "nt", reason="drives are a Windows thing")
 def test_a_cache_on_another_volume_than_the_runs_is_refused_before_anything_is_written(world, capsys):
-    other = "C:/mmmb-cache-that-is-never-made"
+    # a drive other than the runs', which are in pytest's temp folder: on C: or, with TEMP moved, on D:
+    other = ("D:" if world.out.drive.casefold() == "c:" else "C:") + "/mmmb-cache-that-is-never-made"
     assert world.main(*build_args(world), "--cache", other) == 1
     assert "must share a volume" in capsys.readouterr().err and not Path(other).exists() and not world.out.exists() and not world.temp.exists()
 
