@@ -15,7 +15,7 @@ import pytest
 RECORDED = Path(__file__).with_name("recorded")
 PILOT, EXEC = RECORDED / "pilot-s1", RECORDED / "exec"
 CELLS = {("claude", "files"): 31, ("claude", "mm-d1-3B"): 24, ("codex", "files"): 31, ("codex", "mm-d1-3B"): 24}
-# plan 7.3, difference 3: five lines of mm's skill changed in Multimem since the pilot ("this machine" became "the developer's machine";
+# plan 7.3, difference 3: five lines of mm's skill changed in MultimediaSearch since the pilot ("this machine" became "the developer's machine";
 # one of the four lines wraps after "this")
 SKILL_DRIFT = {"nervelet simulator": "robot simulator", "on this": "on the developer's"}
 

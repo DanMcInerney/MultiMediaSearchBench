@@ -1,4 +1,4 @@
-"""Ported from tests/test_bench.py of Multimem at fe0ece5 (plan 7.4), `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`
+"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4), `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`
 (test_bench.py:933-971): which questions a configuration is asked, the pilot and the controls. `family` and `arm_jobs` are the mm
 system's and are tests/mm's (U7). `model` is the configuration and `About.reads` is `Description.reads`; the expected sets are written
 from the questions' own modalities, and the controls' rule is the source's: a needle of text, one of records and an absent one, each with
@@ -13,9 +13,9 @@ import math
 import pytest
 from stub_system import FILES, STUB, StubSystem, run_of, tiny_questions
 
-from mmmb.core import fs
-from mmmb.core.config import Config
-from mmmb.core.select import (CONTROL_TYPES, MEDIA, MODALITIES, SUBSETS, Selection, Separation, asked_modalities, canaries_of, config_questions,
+from mmsb.core import fs
+from mmsb.core.config import Config
+from mmsb.core.select import (CONTROL_TYPES, MEDIA, MODALITIES, SUBSETS, Selection, Separation, asked_modalities, canaries_of, config_questions,
                               discriminating, pick_controls, pilot_questions, select, selected, separate, stratified)
 
 SYSTEM = StubSystem()

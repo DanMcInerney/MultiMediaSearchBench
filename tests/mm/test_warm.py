@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
-from mmmb.core.contract import Dump, ManifestEntry  # noqa: E402
-from mmmb.systems.mm.oracle import warm_params  # noqa: E402
+from mmsb.core.contract import Dump, ManifestEntry  # noqa: E402
+from mmsb.systems.mm.oracle import warm_params  # noqa: E402
 
 
 def entry(path: str, media: str, t: float) -> ManifestEntry:

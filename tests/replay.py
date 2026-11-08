@@ -25,15 +25,15 @@ from pathlib import Path
 import imageio_ffmpeg
 from agent_spec import server_of
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.agents import claude, codex
-from mmmb.core.contract import Case, Description, Dump, PlainSession, Served
-from mmmb.core.question import Question, write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.agents import claude, codex
+from mmsb.core.contract import Case, Description, Dump, PlainSession, Served
+from mmsb.core.question import Question, write_questions
+from mmsb.core.runfolder import RunFolder
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 RECORDED = Path(__file__).parent / "oracles" / "recorded"
 PILOT = RECORDED / "pilot-s1"
@@ -111,7 +111,7 @@ def pilot_questions() -> tuple[Question, ...]:
 
 
 def mm_installed() -> bool:
-    return importlib.util.find_spec("multimem") is not None
+    return importlib.util.find_spec("mms") is not None
 
 
 def mm_audit(case: Case, calls: Sequence[dict]) -> dict:
@@ -119,7 +119,7 @@ def mm_audit(case: Case, calls: Sequence[dict]) -> dict:
     ask jobs of its calls. Without the mm extra the replay of an mm cell compares the neutral fields only, and this adds nothing."""
     if not mm_installed():
         return {}
-    from mmmb.systems.mm.audit import work_of
+    from mmsb.systems.mm.audit import work_of
 
     return {"work": work_of(calls)}
 
@@ -128,9 +128,9 @@ def mm_estimate(sources: Sequence[str], ranges: Sequence[tuple[float, float]]) -
     """The mm system's estimate of the GPU seconds of a case for d1-3B, from the pilot's table of windows (0.0 without the mm extra)."""
     if not mm_installed():
         return 0.0
-    from multimem import decider
+    from mms import decider
 
-    from mmmb.systems.mm.estimate import estimate_s
+    from mmsb.systems.mm.estimate import estimate_s
 
     return estimate_s(json.loads(PILOT_WINDOWS.read_text(encoding="utf-8")), decider.known("d1-3B")[1], sources, ranges)
 
@@ -139,7 +139,7 @@ def mm_record(case: Case) -> dict:
     """What the mm system's `serve` adds to a result that a replay can compute (MM_FIELDS), for the case's estimate."""
     if not mm_installed():
         return {}
-    from mmmb.systems.mm.system import serve_record
+    from mmsb.systems.mm.system import serve_record
 
     return {k: v for k, v in serve_record(case.estimate_s, RECORDED_TIMEOUT_S, None).items() if k in MM_FIELDS}
 
@@ -179,7 +179,7 @@ class ReplaySystem:
 
 COMMAND = threading.local()  # the command the patched `claude_command` and `codex_command` give, for the exec this thread is running
 # The name of the pilot's temp folder, where it read the data and worked, in a recorded stream (in every way a path is written there: escaped in the
-# JSON text, with slashes, quoted for PowerShell). A run's deny words name the temp folder of the runs recorded before MMMB (G1's F1: their answers
+# JSON text, with slashes, quoted for PowerShell). A run's deny words name the temp folder of the runs recorded before MMSB (G1's F1: their answers
 # are on that disk), which a recorded stream of them cannot help naming: the replay's folder has another name.
 EARLIER_TEMP = re.compile(r"mm-bench-temp", re.IGNORECASE)
 REPLAY_TEMP = "replay-temp"
@@ -226,7 +226,7 @@ def install(monkeypatch, tmp_path: Path) -> Path:
         (git / sub).mkdir(parents=True, exist_ok=True)
     (git / "bin" / "bash.exe").write_text("")
     monkeypatch.setattr(claude, "git_root", lambda: git)
-    monkeypatch.setenv("MMMB_CODEX_EFFORT", "medium")  # the pilot ran Codex at medium
+    monkeypatch.setenv("MMSB_CODEX_EFFORT", "medium")  # the pilot ran Codex at medium
     ffmpeg = tmp_path / "ffmpeg-source.exe"
     ffmpeg.write_bytes(b"x")
     monkeypatch.setattr(imageio_ffmpeg, "get_ffmpeg_exe", lambda: str(ffmpeg))  # `ensure_bin` copies a made-up file, not 80 MB

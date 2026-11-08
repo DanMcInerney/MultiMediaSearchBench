@@ -13,10 +13,10 @@ It writes, in DIR (refused if it exists: a golden is not regenerated to make a t
     systems.json                              models.json as the runner writes it now (`note_configs`): for the tested configuration, its
                                               system, variant and folder, what its system reads (`readable`) and what it was `asked`
     run.json                                  what `RunFolder.open` needs (the recipe, the hashes, the configurations) and the run's
-                                              probe and creation time; `mm_commit` is `mmmb_commit` (the benchmark then lived in
-                                              Multimem's repository, so it was the same commit); `timeout_s` is the 900 s the old code
+                                              probe and creation time; `mm_commit` is `COMMIT_KEY` (the benchmark then lived in
+                                              MultimediaSearch's repository, so it was the same commit); `timeout_s` is the 900 s the old code
                                               had for every run, which the results' `timeout: no answer in 900 s` show; `agents`
-                                              has each agent's model and effort, from its results, for `mmmb repeat`
+                                              has each agent's model and effort, from its results, for `mmsb repeat`
 The expected report (report.json, report.md) is the recorded pair one folder up.
 
 EgoLife's folder has the same files, from the V8 writer, and these differences. The recorded run's `clips.json` is its clip table, which
@@ -40,15 +40,16 @@ from pathlib import Path
 
 import v7_recorded
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.config import Config, parse_config
-from mmmb.core.question import write_questions
-from mmmb.core.scenario import dump_key
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v8_egolife import manifest as v8_manifest
-from mmmb.scenarios.v8_egolife import questions as v8_questions
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.config import Config, parse_config
+from mmsb.core.question import write_questions
+from mmsb.core.runfolder import COMMIT_KEY
+from mmsb.core.scenario import dump_key
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v8_egolife import manifest as v8_manifest
+from mmsb.scenarios.v8_egolife import questions as v8_questions
 
 RUNS = Path(r"D:\mm-bench")
 PILOT = RUNS / "20261104-0314-pilot-s1"
@@ -161,7 +162,7 @@ def convert_pilot(source: Path, out: Path) -> None:
         "seed": meta["seed"], "scale": meta["scale"], "days": meta["days"], "data": meta["data"], "temp": meta["temp"], "tag": meta["tag"],
         "timeout_s": TIMEOUT_S, "plan": meta["plan"], "files": meta["files"], "question_hash": fs.sha256_of(out / "questions.jsonl"),
         "configs": [dataclasses.asdict(c) for c in configs], "agents": agents_of(results), "probe": meta["probe"],
-        "created": meta["created"], "mmmb_commit": meta["mm_commit"]})
+        "created": meta["created"], COMMIT_KEY: meta["mm_commit"]})
     print(f"{len(results)} results, {len(questions)} questions -> {out}")
 
 
@@ -196,7 +197,7 @@ def convert_egolife(source: Path, out: Path) -> None:
         "seed": meta["seed"], "scale": meta["scale"], "days": meta["days"], "data": meta["data"], "temp": meta["temp"], "tag": meta["tag"],
         "timeout_s": meta["timeout_s"], "plan": meta["plan"], "files": meta["files"], "question_hash": fs.sha256_of(out / "questions.jsonl"),
         "configs": [dataclasses.asdict(c) for c in configs], "agents": agents_of(results), "probe": meta["probe"],
-        "created": meta["created"], "mmmb_commit": meta["mm_commit"], "decode_s": meta["decode_s"], "pools": meta["pools"]})
+        "created": meta["created"], COMMIT_KEY: meta["mm_commit"], "decode_s": meta["decode_s"], "pools": meta["pools"]})
     print(f"{len(results)} results, {asked} retrieval records, {len(questions)} questions -> {out}")
 
 

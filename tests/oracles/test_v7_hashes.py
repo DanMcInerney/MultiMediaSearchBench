@@ -1,4 +1,4 @@
-"""Oracle 1a: the V7 plan without Multimem. The plan the recorded pilot's recipe makes now has the plan hash and files hash the pilot's
+"""Oracle 1a: the V7 plan without MultimediaSearch. The plan the recorded pilot's recipe makes now has the plan hash and files hash the pilot's
 run.json recorded, its 1,572 files and 3 logs are the 1,575 the recorded manifest holds, each with the time the pilot's file was set to,
 and the manifest and questions made from the recorded sizes and hashes are the whole week's. Takes about 2 s. (The file is not called
 test_v7_plan.py, like the plan's other oracle files, because tests/test_v7_plan.py has that name and pytest keeps one test module of a name.)
@@ -14,9 +14,9 @@ from datetime import datetime
 import pytest
 from v7_recorded import MANIFEST, META, SHA256, V7, needs_the_recorded_zone, recipe
 
-from mmmb.core.question import load_questions, write_questions
-from mmmb.scenarios.v7_screen.manifest import entries_of, log_path
-from mmmb.scenarios.v7_screen.questions import questions_of
+from mmsb.core.question import load_questions, write_questions
+from mmsb.scenarios.v7_screen.manifest import entries_of, log_path
+from mmsb.scenarios.v7_screen.questions import questions_of
 
 needs_the_recorded_zone()
 

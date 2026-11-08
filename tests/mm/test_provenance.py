@@ -12,21 +12,21 @@ from datetime import date, datetime
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import D13_MODEL, MM, Opened, context  # noqa: E402
 from model_folders import model_folder  # noqa: E402
 
-from mmmb import cli, scenarios  # noqa: E402
-from mmmb.core import fs  # noqa: E402
-from mmmb.core.build import INGESTED, write_dump  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Case, Description  # noqa: E402
-from mmmb.core.question import write_questions  # noqa: E402
-from mmmb.core.runfolder import RunFolder  # noqa: E402
-from mmmb.systems.mm import estimate, models, system  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb import cli, scenarios  # noqa: E402
+from mmsb.core import fs  # noqa: E402
+from mmsb.core.build import INGESTED, write_dump  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Case, Description  # noqa: E402
+from mmsb.core.question import write_questions  # noqa: E402
+from mmsb.core.runfolder import RunFolder  # noqa: E402
+from mmsb.systems.mm import estimate, models, system  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 
@@ -73,7 +73,7 @@ def test_the_hashes_are_the_same_for_the_same_system_and_config_hash_covers_ever
                         "its notes file": dataclasses.replace(D13_MODEL, about=dataclasses.replace(about, notes="d1.md"))}.items():
         changed = Mm(models={"d1-3B": model}).describe("d1-3B")
         assert changed.config_hash != base.config_hash and changed.store_hash == base.store_hash, what
-    # the version of Multimem is both: a store is of the version that ingested it
+    # the version of MultimediaSearch is both: a store is of the version that ingested it
     with monkeypatch.context() as patch:
         patch.setattr(system, "version_of", lambda: "abc1234+dirty")
         moved = described()
@@ -82,6 +82,28 @@ def test_the_hashes_are_the_same_for_the_same_system_and_config_hash_covers_ever
         patch.setattr(system, "INGEST_VERSION", system.INGEST_VERSION + 1)
         assert described().store_hash != base.store_hash, "and so is what ingest stores"
     assert system.sha_of("a") != system.sha_of("b") and estimate.HEAVY_S == system.HEAVY_S
+
+
+def test_a_git_install_of_mms_is_told_by_its_commit_and_any_other_by_its_version(monkeypatch):
+    """The `mms` extra is a git source, and its version, 0.1.0, would not tell two commits apart: uv records the commit it installed in
+    `direct_url.json`, and `installed_version` gives its short form."""
+    import importlib.metadata
+
+    class Dist:
+        version = "0.1.0"
+
+        def __init__(self, direct):
+            self.direct = direct
+
+        def read_text(self, name):
+            assert name == "direct_url.json"
+            return self.direct
+
+    git = json.dumps({"url": "https://github.com/DanMcInerney/MultimediaSearch",
+                      "vcs_info": {"vcs": "git", "commit_id": "66db8910302bb3ff976a7cda3c3091080fe3b5df"}})
+    for direct, told in ((git, "66db891"), (None, "0.1.0"), (json.dumps({"url": "file:///x", "dir_info": {}}), "0.1.0")):
+        monkeypatch.setattr(importlib.metadata, "distribution", lambda name, d=direct: Dist(d))
+        assert system.installed_version() == told
 
 
 def test_the_variants_of_one_store_share_its_hash_and_each_has_its_own_configuration():
@@ -115,10 +137,10 @@ def test_describe_and_preview_need_the_facts_of_a_model_and_not_that_it_can_run_
     preview = nowhere.preview(store, dump, context(homes, variant="d1-3B"))
     q = questions[0]
     assert preview.max_jobs([], 3) == 3 and preview.estimate(q.scope.sources, q.cost_ranges) >= 0.0
-    with pytest.raises(ValueError, match="d1-3B: not downloaded: mm model use d1-3B"):
+    with pytest.raises(ValueError, match="d1-3B: not downloaded: mms model use d1-3B"):
         nowhere.open(store, dump, context(homes, variant="d1-3B"))
     assert not homes.exists(), "nothing was copied or started for a model that cannot run"
-    # downloaded, and this environment lacks what a model that mm runs itself needs: the way to get it is this project's
+    # downloaded, and this environment lacks what a model that mms runs itself needs: the way to get it is this project's
     models_dir = tmp_path / "models"
     model_folder(models_dir, "d1-3B")
     monkeypatch.setattr(models.modelenv, "installed", lambda: {})
@@ -128,15 +150,15 @@ def test_describe_and_preview_need_the_facts_of_a_model_and_not_that_it_can_run_
         here.open(store, dump, context(homes, variant="d1-3B"))
     message = str(lacking.value)
     assert message.startswith("d1-3B: its env is not ready: torch is not installed") and message.endswith("run `uv sync --group mm-gpu`"), message
-    assert "group d1" not in message and "mm's project" not in message and not homes.exists()
+    assert "group d1" not in message and "mms's project" not in message and not homes.exists()
 
 
 def test_a_dry_run_of_the_command_prints_the_exec_of_a_model_this_environment_cannot_run_and_starts_nothing(week, store, tmp_path, monkeypatch, capsys):
-    """`mmmb run RUN --dry-run --configs mm/d1-3B` with no torch installed (G1's F9), over the real system and the tiny week's real store."""
-    from mmmb.core import dryrun
-    from mmmb.core.agents import claude
-    from mmmb.systems.mm import home as mm_home
-    from mmmb.systems.mm.daemon import Daemon
+    """`mmsb run RUN --dry-run --configs mm/d1-3B` with no torch installed (G1's F9), over the real system and the tiny week's real store."""
+    from mmsb.core import dryrun
+    from mmsb.core.agents import claude
+    from mmsb.systems.mm import home as mm_home
+    from mmsb.systems.mm.daemon import Daemon
 
     recipe, dump, questions = week
     config = Config("mm/d1-3B", "mm", "d1-3B", False)

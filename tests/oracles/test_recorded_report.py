@@ -18,9 +18,9 @@ import convert_recorded
 import pytest
 from v7_recorded import needs_the_recorded_zone
 
-from mmmb import scenarios
-from mmmb.core import fs, grade, render, report
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs, grade, render, report
+from mmsb.core.runfolder import RunFolder
 
 needs_the_recorded_zone()
 
@@ -153,7 +153,7 @@ def test_the_checked_in_conversion_is_what_the_converter_writes_from_the_recorde
 
 NEUTRAL = """
 import sys
-BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "multimem", "conftest", "day",
+BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "mms", "conftest", "day",
            "fake_decider"}
 
 
@@ -165,9 +165,9 @@ class Blocker:
 
 sys.meta_path.insert(0, Blocker())
 from pathlib import Path
-from mmmb import scenarios
-from mmmb.core import fs, render, report
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs, render, report
+from mmsb.core.runfolder import RunFolder
 
 run = RunFolder.open(Path(sys.argv[1]), scenarios.get)
 fs.write_text(Path(sys.argv[2]), render.markdown(report.numbers([run])))
@@ -175,7 +175,7 @@ assert not BLOCKED & set(sys.modules), BLOCKED & set(sys.modules)
 """
 
 
-def test_the_report_of_the_converted_pilot_is_the_same_with_the_old_modules_and_multimem_refused(run, tmp_path):
+def test_the_report_of_the_converted_pilot_is_the_same_with_the_old_modules_and_mms_refused(run, tmp_path):
     import subprocess
     import sys
 

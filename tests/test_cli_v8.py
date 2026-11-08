@@ -1,6 +1,6 @@
-"""The command line over EgoLife (V8): ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4) the tests of what its command
+"""The command line over EgoLife (V8): ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4) the tests of what its command
 line did (`test_a_dry_run_names_the_files_folder_and_makes_nothing`, `test_the_commands_say_what_they_will_run_and_report_writes_its_files`,
-`test_the_estimate_prices_a_blind_exec_at_its_own_figure`), and new: `mmmb build` of a download, and the finding of U6's notes, that the
+`test_the_estimate_prices_a_blind_exec_at_its_own_figure`), and new: `mmsb build` of a download, and the finding of U6's notes, that the
 agents with their own tools must not read the whole dump. Over the fake download of tests/v8_fake.py and the stand-in system of
 tests/stub_system.py; nothing starts a real agent.
 
@@ -29,16 +29,16 @@ from cli_world import world  # noqa: F401
 from stub_system import StubSession, StubSystem
 from v8_fake import DAYS, V8, oracle_file, recipe, source  # noqa: F401
 
-from mmmb import cli, scenarios
-from mmmb.core import dryrun, fs
-from mmmb.core.agents import claude, codex
-from mmmb.core.agents.common import reached
-from mmmb.core.build import read_dump
-from mmmb.core.contract import IngestReport
-from mmmb.core.costing import BLIND_MIN, EXEC_MIN
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.scenarios.v8_egolife.view import view_dir
+from mmsb import cli, scenarios
+from mmsb.core import dryrun, fs
+from mmsb.core.agents import claude, codex
+from mmsb.core.agents.common import reached
+from mmsb.core.build import read_dump
+from mmsb.core.contract import IngestReport
+from mmsb.core.costing import BLIND_MIN, EXEC_MIN
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.scenarios.v8_egolife.view import view_dir
 
 pytestmark = pytest.mark.xdist_group("v8")
 MEASURED = IngestReport(0.0, 0.0, 0, (), (), {"decode_s": 0.024})
@@ -79,7 +79,7 @@ class Spy:
 
 @pytest.fixture(scope="module")
 def built(tmp_path_factory, source, recipe):  # noqa: F811
-    """`mmmb build` of the fake download with the blind, files and stand-in configurations: the run folder and the registry."""
+    """`mmsb build` of the fake download with the blind, files and stand-in configurations: the run folder and the registry."""
     root = tmp_path_factory.mktemp("cli-v8")
     ffmpeg = root / "ffmpeg-source.exe"
     ffmpeg.write_bytes(b"x")

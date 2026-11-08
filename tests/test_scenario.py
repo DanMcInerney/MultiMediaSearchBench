@@ -1,4 +1,4 @@
-"""New tests for mmmb/core/scenario.py (the plan and files hashes) and the session with nothing to run (mmmb/core/contract.py). The
+"""New tests for mmsb/core/scenario.py (the plan and files hashes) and the session with nothing to run (mmsb/core/contract.py). The
 expected hashes are those of bytes written out here by hand; the V7 plan's recorded hashes are checked in U2 (oracle 1a)."""
 
 from __future__ import annotations
@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core.contract import Case, PlainSession, RetrievalQuery
-from mmmb.core.scenario import dump_key, files_hash, plan_hash
+from mmsb.core.contract import Case, PlainSession, RetrievalQuery
+from mmsb.core.scenario import dump_key, files_hash, plan_hash
 
 
 def sha(text: str) -> str:

@@ -1,5 +1,5 @@
 """New tests for the finding of U7's notes, over the real mm system: `Mm.ingest` reports a file it stored at a time other than its own as
-`misdated`, and a run is refused for it, by name, through the core (mmmb/core/build.py, which names no system); a file it refuses is in the report with
+`misdated`, and a run is refused for it, by name, through the core (mmsb/core/build.py, which names no system); a file it refuses is in the report with
 its reason (G1's F7). The neutral half, with a stand-in
 system, is tests/test_cli_build.py; this is the same route with the real `ingest` of the system that can make the report (the fake decider: no
 model is loaded, and ingest loads none)."""
@@ -12,17 +12,17 @@ import shutil
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from mmmb.core import fs  # noqa: E402
-from mmmb.core.build import Misdated, check_stores, ingest_stores, store_of  # noqa: E402
-from mmmb.core.cache import INGESTED, report_of  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Dump  # noqa: E402
-from mmmb.systems.mm.load import remember  # noqa: E402
+from mmsb.core import fs  # noqa: E402
+from mmsb.core.build import Misdated, check_stores, ingest_stores, store_of  # noqa: E402
+from mmsb.core.cache import INGESTED, report_of  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Dump  # noqa: E402
+from mmsb.systems.mm.load import remember  # noqa: E402
 
 CONFIG = Config("mm/fake", "mm", "fake", False)
 
@@ -73,8 +73,8 @@ def test_a_file_mm_refuses_is_in_the_report_with_its_reason_and_the_store_is_mad
 
 
 def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_report_naming_it(week, tmp_path):
-    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mm left the
-    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mm keeps one
+    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mms left the
+    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mms keeps one
     item for a picture, sound or video of its source's bytes, whatever its time; a file of text it keeps each time.)"""
     _, dump, _ = week
     photo = next(e for e in dump.entries if e.kind == "photo")
@@ -91,8 +91,8 @@ def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_
     ingest_stores(folder, only, described, load=lambda name: fakes.MM, cache=tmp_path / "cache")
     refused = report_of(store_of(folder, "mm")).refused
     assert [(r.path, r.reason) for r in refused] == [
-        (twins[0].path, f"the bytes of {photo.path} (at the same time): mm keeps one item for them"),
-        (twins[1].path, f"the bytes of {photo.path} (recorded +3600 s from it): mm keeps one item for them")]
+        (twins[0].path, f"the bytes of {photo.path} (at the same time): mms keeps one item for them"),
+        (twins[1].path, f"the bytes of {photo.path} (recorded +3600 s from it): mms keeps one item for them")]
     check_stores(folder, {"mm": described[CONFIG].store_hash})
 
 

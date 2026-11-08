@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 
-from multimem.decider_d1 import ABOUT  # noqa: F401 - the loader reads ABOUT from this module: d1's, like the fake's
+from mms.decider_d1 import ABOUT  # noqa: F401 - the loader reads ABOUT from this module: d1's, like the fake's
 
 _found = importlib.util.spec_from_file_location("fake_decider_of_env_decider", Path(__file__).with_name("fake_decider.py"))
 _fake = importlib.util.module_from_spec(_found)

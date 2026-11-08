@@ -1,6 +1,6 @@
 """What the tests of the listing system share (tests/test_listing.py, test_listing_run.py): a small dump of the files a leak would come out of,
 with its secrets planted; a real MCP client over stdio to the server; the case a session serves; and the stand-in agent that reads the listing
-through the server it is given. Nothing here starts a real agent or imports multimem.
+through the server it is given. Nothing here starts a real agent or imports mms.
 
 The planted dump holds, beside a note, a config and a log whose bodies say `SECRET`, a PNG whose pixels are the bytes of `SECRET` (stored, not
 compressed, so the word is in the file's bytes), a WAV whose samples are the same bytes, and a JPEG that says a comment in its EXIF. The
@@ -25,9 +25,9 @@ from mcp import Client
 from mcp.client.stdio import StdioServerParameters
 from PIL import ExifTags, Image
 
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.contract import Case, Dump, ManifestEntry
-from mmmb.systems.listing.system import Listing, ListingSession
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.contract import Case, Dump, ManifestEntry
+from mmsb.systems.listing.system import Listing, ListingSession
 
 SECRET = "ZEBRAQUARTZ"
 T, KIND, SHA = 424242.5, "KINDWORD", "ab" * 32  # what the manifest says and no file does (T: a time that no row says, for a test that plants it)

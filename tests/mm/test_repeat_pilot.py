@@ -1,11 +1,11 @@
-"""`mmmb repeat` of the recorded pilot, through the real registry and the real `Mm` (plan 8.1): the dry run that Dan reads before the 3-hour re-run
+"""`mmsb repeat` of the recorded pilot, through the real registry and the real `Mm` (plan 8.1): the dry run that Dan reads before the 3-hour re-run
 prints the 110 execs with the recorded agents, models, efforts and configurations, and starts and makes nothing; it counts the `files` cells at
 `--jobs` and the `mm` cells at `--gpu-jobs` (1 unless asked), which is how the pilot ran, and the wall time it prints is what those counts give; and
 a repeat on a machine where mm cannot run (no torch) is refused before it builds, not after. The expected values are the recorded results' own, read here from their
 files. Nothing is built, started or loaded.
 
 The recorded pilot is the converted run, recorded/pilot-s1/converted: the folder recorded/pilot-s1 holds the file as the old code wrote it,
-which names no scenario and which `mmmb` does not read. Its plan is local time, so this skips outside the pilot's time zone (v7_recorded.py)."""
+which names no scenario and which `mmsb` does not read. Its plan is local time, so this skips outside the pilot's time zone (v7_recorded.py)."""
 
 from __future__ import annotations
 
@@ -16,14 +16,14 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 from v7_recorded import needs_the_recorded_zone  # noqa: E402
 
-from mmmb import cli, scenarios  # noqa: E402
-from mmmb.core import paths  # noqa: E402
-from mmmb.core.repeat import repeat_of, run_argv  # noqa: E402
-from mmmb.core.runfolder import RunFolder  # noqa: E402
+from mmsb import cli, scenarios  # noqa: E402
+from mmsb.core import paths  # noqa: E402
+from mmsb.core.repeat import repeat_of, run_argv  # noqa: E402
+from mmsb.core.runfolder import RunFolder  # noqa: E402
 
 needs_the_recorded_zone()
 
@@ -99,10 +99,10 @@ def test_the_dry_run_at_gpu_jobs_2_counts_the_mm_cells_two_at_once_prints_the_wa
         assert f"about {wall_hours(files=jobs, mm=gpu_jobs):.1f} h, 13,044 session seconds" in mean, (jobs, gpu_jobs)
 
 
-def test_the_folder_as_the_old_code_wrote_it_is_not_a_run_mmmb_reads_and_the_converted_one_beside_it_is(tmp_path, capsys):
+def test_the_folder_as_the_old_code_wrote_it_is_not_a_run_mmsb_reads_and_the_converted_one_beside_it_is(tmp_path, capsys):
     assert cli.main(["repeat", str(RECORDED), "--dry-run"], agents=no_agents) == 1
-    assert "was made before mmmb (its run.json names no scenario)" in capsys.readouterr().err
-    assert cli.main(["compare", str(RECORDED), str(CONVERTED)], agents=no_agents) == 1 and "was made before mmmb" in capsys.readouterr().err
+    assert "was made before mmsb (its run.json names no scenario)" in capsys.readouterr().err
+    assert cli.main(["compare", str(RECORDED), str(CONVERTED)], agents=no_agents) == 1 and "was made before mmsb" in capsys.readouterr().err
 
 
 def test_the_repeat_runs_the_recorded_agents_at_their_settings_over_the_recorded_questions_of_each_cell(pilot):

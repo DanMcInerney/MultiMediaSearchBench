@@ -1,4 +1,4 @@
-"""New tests for what U8 added to the mm system (mmmb/systems/mm/system.py): `Mm.preview`, the session of a dry run, and the figures `ingest` measures.
+"""New tests for what U8 added to the mm system (mmsb/systems/mm/system.py): `Mm.preview`, the session of a dry run, and the figures `ingest` measures.
 
 `preview` is `open` without the daemon, the copy of the store and the model: the tests set it beside an opened session over the same store (the
 tiny week ingested once for the worker, tests/mm/conftest.py), for the jobs, the estimate and the server and instructions an exec would get, and
@@ -11,15 +11,15 @@ from datetime import datetime
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import MM, Opened, context  # noqa: E402
 
-from mmmb.core import fs  # noqa: E402
+from mmsb.core import fs  # noqa: E402
 
-from mmmb.core.contract import Case  # noqa: E402
-from mmmb.systems.mm.system import MmPreview, measured_of  # noqa: E402
+from mmsb.core.contract import Case  # noqa: E402
+from mmsb.systems.mm.system import MmPreview, measured_of  # noqa: E402
 
 
 def case_of(q, work, run_dir, slot: int = 0, estimate: float = 3.0) -> Case:

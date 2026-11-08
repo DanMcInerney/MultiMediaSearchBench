@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_bench.py at fe0ece5 (the junction, frozen-folder and permissions tests), with `bench.` now `fs.`;
+"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5 (the junction, frozen-folder and permissions tests), with `bench.` now `fs.`;
 the tests marked new are not from there. Files and folders: JSON written whole, deletion of read-only files and links, the frozen
 data folder."""
 
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import fs
+from mmsb.core import fs
 
 
 @pytest.mark.skipif(os.name != "nt", reason="a directory junction is a Windows link")

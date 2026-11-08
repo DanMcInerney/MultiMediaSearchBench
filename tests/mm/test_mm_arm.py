@@ -1,10 +1,10 @@
-"""Ported from tests/test_bench.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order: the tests of the mm arm, which the neutral loop
+"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the tests of the mm arm, which the neutral loop
 (tests/test_runner.py) leaves to the system, over the tiny V7 week ingested by the system (conftest's `week` and `store`) and a daemon with the
 fake decider. What moved, by the plan's 4.5 and 4.6, and what the expectations are:
 - the arm is the configuration `mm/fake` (the system's tools) and `mm/fake+files` (and the agent's own); the `built` run is `fakes.run_of`;
   `bench.run_arm` is `run_config` over an opened session; `bench.Exec` is a `SessionSpec`; `arm` and `model` are `config`, `system`, `variant`;
-- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmmb.systems.mm.home`, `jobs`), `gpu_estimate` is `Session.estimate`;
-- the ask-job half of `work_of` is `mmmb.systems.mm.audit.work_of`, which `Session.audit` merges over the core's `work`;
+- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmsb.systems.mm.home`, `jobs`), `gpu_estimate` is `Session.estimate`;
+- the ask-job half of `work_of` is `mmsb.systems.mm.audit.work_of`, which `Session.audit` merges over the core's `work`;
 - the oracle's level rules (5 sightings for a `last` question, 50 for a count, `oldest_first` left out of a `last` one) are the question writer's and
   tests/test_v7_questions.py's; here the query they make is what the ask passes.
 Not ported, with reasons: `test_remove_tree_removes_a_junction...` (the core's, tests/test_fs.py); the report, run-folder, stop, resume, files-arm
@@ -29,7 +29,7 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from agent_spec import clocked  # noqa: E402
@@ -37,24 +37,25 @@ from fakes import FAKE, FAKE_MODEL, FILES, MM, S, S_FILES, Probe, context, home_
 from model_folders import model_folder  # noqa: E402
 from stub_system import right  # noqa: E402
 
-from multimem import config, decider  # noqa: E402
+from mms import config, decider  # noqa: E402
 
-from mmmb import systems  # noqa: E402
-from mmmb.core import fs, render, report, retrieval  # noqa: E402
-from mmmb.core.agents.common import scrubbed  # noqa: E402
-from mmmb.core.clock import WALL  # noqa: E402
-from mmmb.core.contract import Case, RetrievalQuery  # noqa: E402
-from mmmb.core.record import Halt  # noqa: E402
-from mmmb.core.runner import Agent, run_agents, run_config  # noqa: E402
-from mmmb.systems.mm import estimate, models, system  # noqa: E402
-from mmmb.systems.mm.audit import work_of  # noqa: E402
-from mmmb.systems.mm.daemon import Api, Daemon  # noqa: E402
-from mmmb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
-from mmmb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
-from mmmb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
-from mmmb.systems.mm.models import Model, needs_gpu  # noqa: E402
-from mmmb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa: E402
-from mmmb.systems.mm.system import MmSession, serve_record  # noqa: E402
+from mmsb import systems  # noqa: E402
+from mmsb.core import fs, render, report, retrieval  # noqa: E402
+from mmsb.core.agents.common import scrubbed  # noqa: E402
+from mmsb.core.clock import WALL  # noqa: E402
+from mmsb.core.contract import Case, RetrievalQuery  # noqa: E402
+from mmsb.core.record import Halt  # noqa: E402
+from mmsb.core.runfolder import COMMIT_KEY  # noqa: E402
+from mmsb.core.runner import Agent, run_agents, run_config  # noqa: E402
+from mmsb.systems.mm import estimate, models, system  # noqa: E402
+from mmsb.systems.mm.audit import work_of  # noqa: E402
+from mmsb.systems.mm.daemon import Api, Daemon  # noqa: E402
+from mmsb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
+from mmsb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
+from mmsb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
+from mmsb.systems.mm.models import Model, needs_gpu  # noqa: E402
+from mmsb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa: E402
+from mmsb.systems.mm.system import MmSession, serve_record  # noqa: E402
 
 AS_OF = ("notes", "config")  # the sources whose files are versions (the dump's text)
 pytestmark = pytest.mark.xdist_group("mm-arm")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
@@ -280,7 +281,7 @@ def test_the_decider_tier_scores_the_fake_questions(week, store, tiny, tmp_path,
     assert {"part", "day", "week"} <= {q["level"] for q in asked} and any(q.get("last") for q in asked) and any(q["absent"] for q in asked)
     assert any(q["fake"]["check"] == "count" for q in asked)
     run = run_of(tmp_path, recipe, questions, dump, [FILES, S])
-    fs.write_json(run.folder / "run.json", {"mmmb_commit": "abc123", "probe": {"status": "passed", "failures": []}})  # (what the report reads of a run)
+    fs.write_json(run.folder / "run.json", {COMMIT_KEY: "abc123", "probe": {"status": "passed", "failures": []}})  # (what the report reads of a run)
     fs.write_json(run.folder / "systems.json", {"mm/fake": {"system": "mm", "variant": "fake", "dir": "mm-fake", "readable": sorted(MM.describe("fake").reads),
                                                        "asked": sorted(MM.describe("fake").reads)}})
     mine = [q for q in questions if q.qid in {a["qid"] for a in asked}]
@@ -334,7 +335,7 @@ def test_models_are_resolved_and_the_ones_that_are_not_ready_say_why(tmp_path, m
     ready = mm.ready_model("d1-3b")  # (a name is matched without regard to case)
     assert ready.name == "d1-3B" and ready.spec == (folder / "d1-3B").resolve().as_posix()
     assert ready.url is None and ready.slug == "d1-3B" and ready.about is decider.known("d1-3B")[1]
-    for name, why in (("D3-EDGE", "d3-edge: not downloaded: mm model use d3-edge"), ("h2o-lightning-4b", "not serving"), ("nonsense", "not a model mm knows")):
+    for name, why in (("D3-EDGE", "d3-edge: not downloaded: mms model use d3-edge"), ("h2o-lightning-4b", "not serving"), ("nonsense", "not a model mms knows")):
         with pytest.raises(ValueError, match=why):
             mm.ready_model(name)
     monkeypatch.setattr(models, "serving", lambda url: True)
@@ -352,7 +353,7 @@ def test_models_are_resolved_and_the_ones_that_are_not_ready_say_why(tmp_path, m
     assert mm.model_of("fake") is FAKE_MODEL and mm.model_of("d1-3B").spec == (folder / "d1-3B").resolve().as_posix()
     assert mm.ready_model("fake") is FAKE_MODEL and mm.ready_model("d1-3B") == mm.model_of("d1-3B")
     assert mm.model_of("d3-edge").name == "d3-edge", "its facts, though it is not downloaded"
-    with pytest.raises(ValueError, match="d3-edge: not downloaded: mm model use d3-edge"):
+    with pytest.raises(ValueError, match="d3-edge: not downloaded: mms model use d3-edge"):
         mm.ready_model("d3-edge")
     with pytest.raises(ValueError, match="mm has variants"):
         mm.model_of(None)
@@ -360,7 +361,7 @@ def test_models_are_resolved_and_the_ones_that_are_not_ready_say_why(tmp_path, m
     assert (mm.describe("d1-3B").needs_gpu, mm.describe("fake").needs_gpu, mm.describe("fake").has_oracle) == (True, False, True)
     assert mm.describe("d1-3B").store_hash == mm.describe("fake").store_hash != mm.describe("d1-3B").config_hash != mm.describe("fake").config_hash
     assert mm.describe("d1-3B").reads == frozenset({"text", "records", "image", "video"}) and mm.describe("d1-3B").horizon == "cut"
-    assert mm.describe("d1-3B").license == "see Multimem" and mm.describe("d1-3B").version == system.version_of()
+    assert mm.describe("d1-3B").license == "MIT" and mm.describe("d1-3B").version == system.version_of()
 
 
 # -- an oracle ask: what the query passes, and what it gets back -------------------------------------------------------------------
@@ -521,7 +522,7 @@ class Probing:
 
 
 def labels_left(home: Path, pattern: str = "id:bench-%") -> tuple[int, int, int]:
-    """How many labels, project rows and session rows of the bench's execs an mm home holds."""
+    """How many labels, project rows and session rows of the bench's execs an mms home holds."""
     with closing(sqlite3.connect(home / "index.sqlite")) as db:
         return (db.execute("SELECT COUNT(*) FROM labels WHERE project LIKE ?", (pattern,)).fetchone()[0],
                 db.execute("SELECT COUNT(*) FROM projects WHERE id LIKE ?", (pattern,)).fetchone()[0],
@@ -852,9 +853,9 @@ def test_the_windows_table_is_kept_beside_the_store_s_home_and_not_in_a_copy_of_
 
 
 def test_a_daemon_is_never_started_over_a_folder_outside_pytests_own_temp_folder(tmp_path):
-    """The guard of tests/mm/conftest.py: any folder that is not under pytest's temp folder (the owner's `~/.multimem` is one) is refused before a
+    """The guard of tests/mm/conftest.py: any folder that is not under pytest's temp folder (the owner's `~/.mms` is one) is refused before a
     process starts, so no test can start, stop or call the daemon that runs on this machine for live sessions."""
-    for outside in (Path("D:/not-pytests-temp-folder/.multimem"), Path("C:/not-pytests-temp-folder/.multimem")):
+    for outside in (Path("D:/not-pytests-temp-folder/.mms"), Path("C:/not-pytests-temp-folder/.mms")):
         with pytest.raises(AssertionError, match="only over a folder of pytest's temp folder"):
             Daemon(outside).start()
         assert not outside.exists() and not outside.parent.exists(), "and nothing was made there"

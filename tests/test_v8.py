@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order: V8, EgoLifeQA without Multimem, over a
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: V8, EgoLifeQA without MultimediaSearch, over a
 two-day fake download (tests/v8_fake.py) that is read, selected from, planned and built into a dump with its questions. What an agent with its
 own tools reads is tests/test_v8_view.py, the run loop and the report tests/test_v8_run.py. No real agent or model runs, and no daemon: the
 old `built` fixture started one to load a snapshot, and is the dump (`built`) and the run over it (`ran` in test_v8_run.py) here.
@@ -29,14 +29,14 @@ import pytest
 from v8_fake import (DAYS, ITEMS, ORACLES, OPTIONS, SHADE, V8, built, clip_ends, ep, offset_of, oracle_file,  # noqa: F401
                      pl, plan, recipe, source, table, view_files, write_run)
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.contract import LogSource
-from mmmb.core.question import load_questions, write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.scenario import ProbeOutcome, dump_key, files_hash, plan_hash
-from mmmb.scenarios.v8_egolife import choose, manifest, questions as writer, source as src
-from mmmb.scenarios.v8_egolife import plan as plans
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.contract import LogSource
+from mmsb.core.question import load_questions, write_questions
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.scenario import ProbeOutcome, dump_key, files_hash, plan_hash
+from mmsb.scenarios.v8_egolife import choose, manifest, questions as writer, source as src
+from mmsb.scenarios.v8_egolife import plan as plans
 
 
 pytestmark = pytest.mark.xdist_group("v8")
@@ -49,7 +49,7 @@ pytestmark = pytest.mark.xdist_group("v8")
 
 
 def test_the_registry_has_the_scenario_by_its_name_and_it_has_the_names_of_a_scenario():
-    assert scenarios.get("v8_egolife") is sys.modules["mmmb.scenarios.v8_egolife"]
+    assert scenarios.get("v8_egolife") is sys.modules["mmsb.scenarios.v8_egolife"]
     assert (V8.name, V8.code, V8.generator) == ("v8_egolife", "V8", 1)
     assert all(callable(getattr(V8, name)) for name in ("recipe", "hashes", "build", "probe", "prompt", "view", "deny_words", "after_exec",
                                                         "release", "report"))

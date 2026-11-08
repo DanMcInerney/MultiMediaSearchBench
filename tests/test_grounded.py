@@ -1,4 +1,4 @@
-"""New tests for grounded scoring (mmmb/core/grounded.py, DESIGN 6.3, plan 5.5): where a citation is in time, whether it hits the truth by the
+"""New tests for grounded scoring (mmsb/core/grounded.py, DESIGN 6.3, plan 5.5): where a citation is in time, whether it hits the truth by the
 kind of file the truth is in, the status beside the verdict, the event F1 of a count, the fields a result holds, and the report's figures.
 
 Expected values are written by hand from DESIGN 6.3 and the plan's table, over a small dump made here by hand (a video, a sound, two
@@ -23,16 +23,17 @@ from test_report import run_of as report_run_of
 from test_report import stub_out, tiny  # noqa: F401
 from test_runner import go, world  # noqa: F401
 
-from mmmb.core import fs, grade, render, report
-from mmmb.core.agents.common import result_json  # noqa: F401
-from mmmb.core.answer import Citation, FinalAnswer, parse_final
-from mmmb.core.contract import Dump, ManifestEntry
-from mmmb.core.grounded import Grounding, Placed, event_f1, ground, resolve, result_fields, status_of
-from mmmb.core.question import Grade, Question, Scope, Span, Truth
-from mmmb.core.record import record
-from mmmb.core.runner import Agent
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb.core import fs, grade, render, report
+from mmsb.core.agents.common import result_json  # noqa: F401
+from mmsb.core.answer import Citation, FinalAnswer, parse_final
+from mmsb.core.contract import Dump, ManifestEntry
+from mmsb.core.grounded import Grounding, Placed, event_f1, ground, resolve, result_fields, status_of
+from mmsb.core.question import Grade, Question, Scope, Span, Truth
+from mmsb.core.record import record
+from mmsb.core.runfolder import COMMIT_KEY
+from mmsb.core.runner import Agent
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 
 def local(*parts) -> float:
@@ -252,7 +253,7 @@ def test_a_file_is_found_by_its_path_or_by_a_longer_path_that_ends_with_it_and_n
     want = Placed("cam", T0 + 5, T0 + 6, "cam/long.mp4")
     assert resolve(cf("cam/long.mp4", 5.0, 6.0), DUMP) == want
     assert resolve(cf("cam\\long.mp4", 5.0, 6.0), DUMP) == want, "backslashes are slashes"
-    assert resolve(cf(r"D:\mmmb-data\mmb-1-data\cam\long.mp4", 5.0, 6.0), DUMP) == want, "the path the agent read it by"
+    assert resolve(cf(r"D:\mmsb-data\mmb-1-data\cam\long.mp4", 5.0, 6.0), DUMP) == want, "the path the agent read it by"
     assert resolve(cf("/work/view/cam/long.mp4", 5.0, 6.0), DUMP) == want
     assert resolve(cf("long.mp4", 5.0, 6.0), DUMP) is None, "a bare name is no path"
     assert resolve(cf("xcam/long.mp4", 5.0, 6.0), DUMP) is None, "a path that ends with the name but not after a folder"
@@ -458,7 +459,7 @@ def test_the_evidence_a_stand_in_agent_cites_reaches_the_result_and_the_report_t
         assert got[lucky.qid]["evidence"][-1]["t0"] == 0.0 and len(got[lucky.qid]["evidence"]) == len(lucky.truth.evidence) + 1
         assert all(got[q.qid]["f1_1s"] == got[q.qid]["f1_5s"] == 1.0 for q in counts if q.qid not in planted), "the truth's own moments: perfect"
         assert {q.qid for q in tiny if "f1_1s" in got[q.qid]} == {q.qid for q in counts}, "a count only"
-    fs.write_json(w.run.folder / "run.json", {"mmmb_commit": "abc123"})
+    fs.write_json(w.run.folder / "run.json", {COMMIT_KEY: "abc123"})
     both = report.numbers([w.run])["agents"]["claude"]["stub/all"]["all"]
     n = len(tiny)
     assert both["tested"]["grounding"] == both["control"]["grounding"] == {

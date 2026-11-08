@@ -1,4 +1,4 @@
-"""New tests for mmmb/core/cache.py (plan 6.3, DESIGN 8.4): the keys of dumps and stores, a dump or a store made once and found again, made
+"""New tests for mmsb/core/cache.py (plan 6.3, DESIGN 8.4): the keys of dumps and stores, a dump or a store made once and found again, made
 whole or not at all, a dump that changed refused and one that was lost written again and compared, and two commands after one key at once.
 Over `cache_world.Toy`, a scenario of three files that counts its builds, and `Ingester`, a system that counts its ingests. The command
 line over the cache (a build twice, a repeat, the stores of a run) is tests/test_cache_cli.py's, and V7 through mm tests/mm/test_cached_ingest.py's.
@@ -22,14 +22,14 @@ import pytest
 from cache_world import FILES, RECIPE, Ingester, Toy, stamps_of
 from stub_system import tiny_questions
 
-import mmmb
-from mmmb.core import fs
-from mmmb.core.cache import (BUILT, BUILT_NOW, FOUND, INGESTED, MANIFEST, OUTCOME, PROBE, QUESTIONS, REWRITTEN, STATS, Busy, cached_dump,
+import mmsb
+from mmsb.core import fs
+from mmsb.core.cache import (BUILT, BUILT_NOW, FOUND, INGESTED, MANIFEST, OUTCOME, PROBE, QUESTIONS, REWRITTEN, STATS, Busy, cached_dump,
                              cached_probe, cached_store, clone_store, dump_folder, dump_meta, locked, part_of, store_folder, store_key)
-from mmmb.core.question import load_questions
-from mmmb.core.runfolder import check_temp
-from mmmb.core.scenario import dump_key
-from mmmb.scenarios import v7_screen
+from mmsb.core.question import load_questions
+from mmsb.core.runfolder import check_temp
+from mmsb.core.scenario import dump_key
+from mmsb.scenarios import v7_screen
 
 KEY = dump_key(Toy.name, RECIPE, Toy.generator)
 SHORT = KEY[:10]
@@ -225,7 +225,7 @@ def test_the_temp_folder_that_holds_a_part_passes_the_check_that_it_holds_only_r
 def test_a_command_that_finds_the_lock_held_stops_with_busy_and_touches_nothing(where):
     temp, cache = where
     toy = Toy()
-    with locked(cache, f"dump-{SHORT}", "the dump"), pytest.raises(Busy, match=r"another mmmb command is making the dump mmb-\w+-data .*wait for it to finish, then run this again"):
+    with locked(cache, f"dump-{SHORT}", "the dump"), pytest.raises(Busy, match=r"another mmsb command is making the dump mmb-\w+-data .*wait for it to finish, then run this again"):
         cached_dump(toy, RECIPE, temp, cache)
     assert toy.builds == [] and not temp.exists(), "no part, no folder"
     assert cached_dump(toy, RECIPE, temp, cache).what == BUILT_NOW, "the lock is let go at the end of the block"
@@ -236,9 +236,9 @@ import sys
 from pathlib import Path
 sys.path[:0] = [{tests!r}, {source!r}]
 import cache_world
-import mmmb
-assert Path(mmmb.__file__).resolve().parents[1] == Path({source!r}).resolve(), mmmb.__file__
-from mmmb.core.cache import cached_dump
+import mmsb
+assert Path(mmsb.__file__).resolve().parents[1] == Path({source!r}).resolve(), mmsb.__file__
+from mmsb.core.cache import cached_dump
 toy = cache_world.Toy(started=Path({started!r}), wait_for=Path({go!r}))
 cached_dump(toy, cache_world.RECIPE, Path({temp!r}), Path({cache!r}))
 """
@@ -248,7 +248,7 @@ def second_process(tmp_path: Path, temp: Path, cache: Path) -> tuple[subprocess.
     """A python that builds the toy dump into `temp` and blocks half way, after its first file, until `go` exists; its `started` file says
     when it is there. Its stderr is kept in a file."""
     started, go = tmp_path / "started", tmp_path / "go"
-    script = SCRIPT.format(tests=str(Path(__file__).parent), source=str(Path(mmmb.__file__).resolve().parents[1]), started=str(started), go=str(go),
+    script = SCRIPT.format(tests=str(Path(__file__).parent), source=str(Path(mmsb.__file__).resolve().parents[1]), started=str(started), go=str(go),
                            temp=str(temp), cache=str(cache))
     process = subprocess.Popen([sys.executable, "-c", script], stderr=(tmp_path / "stderr.txt").open("w"))
     deadline = time.monotonic() + 60
@@ -263,7 +263,7 @@ def test_a_second_process_after_the_same_dump_stops_and_leaves_the_first_ones_pa
     process, _, go = second_process(tmp_path, temp, cache)
     try:
         toy = Toy()
-        with pytest.raises(Busy, match="another mmmb command is making the dump"):
+        with pytest.raises(Busy, match="another mmsb command is making the dump"):
             cached_dump(toy, RECIPE, temp, cache)
         part = part_of(dump_folder(temp, KEY))
         assert toy.builds == [] and (part / "notes" / "a.md").read_text(encoding="utf-8") == "a notev1", "the first command's work is where it left it"
@@ -382,7 +382,7 @@ def test_a_store_ingested_over_the_dump_in_another_place_is_refused_and_one_bein
         cached_store(system, "a", elsewhere, cache)
     fresh = Ingester(store_hash="h2")
     name = store_folder(cache, fresh.describe("a"), store_key(fresh.describe("a"), dump.key)).name
-    with locked(cache, f"store-{name}", "the store"), pytest.raises(Busy, match=f"another mmmb command is making the store {name}"):
+    with locked(cache, f"store-{name}", "the store"), pytest.raises(Busy, match=f"another mmsb command is making the store {name}"):
         cached_store(fresh, "a", dump, cache)
     assert fresh.ingests == []
 

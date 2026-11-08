@@ -22,8 +22,8 @@ MM_SKIPS = """
     import sys
     import pytest
 
-    sys.modules["multimem"] = None  # what a missing extra looks like to importorskip
-    pytest.importorskip("multimem")
+    sys.modules["mms"] = None  # what a missing extra looks like to importorskip
+    pytest.importorskip("mms")
 
 
     def test_one(): pass
@@ -54,7 +54,7 @@ GUARD = """
 
 
     def test_a_rename_out_of_the_owners_folder_is_refused():
-        os.rename(OWNER / ".multimem" / "keep.txt", OWNER / "elsewhere.txt")
+        os.rename(OWNER / ".mms" / "keep.txt", OWNER / "elsewhere.txt")
 
 
     def test_where_codex_home_pointed_at_start_is_the_owners_too():
@@ -72,14 +72,14 @@ GUARD = """
     def test_the_session_has_throwaway_homes():
         home = Path.home()
         assert home != OWNER and OWNER not in home.parents
-        for var, folder in (("CLAUDE_CONFIG_DIR", ".claude"), ("CODEX_HOME", ".codex"), ("MULTIMEM_HOME", ".multimem")):
+        for var, folder in (("CLAUDE_CONFIG_DIR", ".claude"), ("CODEX_HOME", ".codex"), ("MMS_HOME", ".mms")):
             assert Path(os.environ[var]) == home / folder
         (Path(os.environ["CLAUDE_CONFIG_DIR"])).mkdir()
 """
 
 
-MMMB_GUARD = """
-    from mmmb.core import paths
+MMSB_GUARD = """
+    from mmsb.core import paths
 
 
     def test_a_write_to_the_cache_is_refused():
@@ -157,7 +157,7 @@ def project(root: Path, files: dict[str, str]) -> Path:
 
 def pytest_in(root: Path, *args: str, **env: str) -> subprocess.CompletedProcess:
     base = {k: v for k, v in os.environ.items()
-            if k not in ("PYTEST_ADDOPTS", "PYTHONPATH", "HOME", "USERPROFILE", "CODEX_HOME", "CLAUDE_CONFIG_DIR", "MULTIMEM_HOME")}
+            if k not in ("PYTEST_ADDOPTS", "PYTHONPATH", "HOME", "USERPROFILE", "CODEX_HOME", "CLAUDE_CONFIG_DIR", "MMS_HOME")}
     return subprocess.run([sys.executable, "-m", "pytest", "-p", "no:cacheprovider", "--color=no", "-v", *args], cwd=root,
                           env={**base, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1", **env}, capture_output=True, text=True,
                           encoding="utf-8", timeout=180)
@@ -203,7 +203,7 @@ def test_an_mm_test_that_is_here_or_that_skips_for_another_reason_makes_no_banne
 def test_a_test_may_read_the_owners_folders_and_may_not_change_them(tmp_path):
     owner = tmp_path / "owner"
     codex = tmp_path / "owner-codex"
-    for folder in (".claude", ".codex", ".multimem"):
+    for folder in (".claude", ".codex", ".mms"):
         (owner / folder).mkdir(parents=True)
         (owner / folder / "keep.txt").write_text("owner", encoding="utf-8")
     codex.mkdir()
@@ -221,17 +221,17 @@ def test_a_test_may_read_the_owners_folders_and_may_not_change_them(tmp_path):
     # refused before anything changed
     assert not (owner / ".claude" / "settings.json").exists()
     assert not (owner / ".codex" / "made").exists()
-    assert (owner / ".multimem" / "keep.txt").read_text(encoding="utf-8") == "owner" and not (owner / "elsewhere.txt").exists()
+    assert (owner / ".mms" / "keep.txt").read_text(encoding="utf-8") == "owner" and not (owner / "elsewhere.txt").exists()
     assert not (codex / "sessions.json").exists()
     assert (owner / ".claude-other").is_dir()
     assert sorted(p.name for p in (owner / ".claude").iterdir()) == ["keep.txt"]
 
 
 def test_a_test_may_read_the_folders_of_runs_dumps_and_cache_and_may_not_change_them(tmp_path):
-    from mmmb.core import paths
+    from mmsb.core import paths
 
     before = [folder.exists() for folder in (paths.CACHE, paths.TEMP, paths.RUNS)]
-    done = pytest_in(project(tmp_path / "p", {"test_guard.py": MMMB_GUARD}))
+    done = pytest_in(project(tmp_path / "p", {"test_guard.py": MMSB_GUARD}))
     found = outcomes(done)
     refused = {"test_a_write_to_the_cache_is_refused", "test_a_write_to_the_temp_folder_is_refused",
                "test_a_swallowed_write_to_the_runs_folder_still_fails_the_test"}
@@ -264,7 +264,7 @@ def test_a_test_may_not_start_the_owners_agents_or_a_program_in_the_owners_folde
     for name in ("claude", "codex", "stand_in"):
         program(stand_ins / f"{name}{ext}")
     helper = program(owner / ".codex" / f"helper{ext}")
-    for folder in (".claude", ".multimem"):
+    for folder in (".claude", ".mms"):
         (owner / folder).mkdir(parents=True)
     done = pytest_in(project(tmp_path / "p", {"test_guard.py": PROGRAM_GUARD}), HOME=str(owner), USERPROFILE=str(owner), CODEX_HOME=str(owner / ".codex"),
                      OWNER_HOME=str(owner), STAND_INS=str(stand_ins))

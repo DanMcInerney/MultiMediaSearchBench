@@ -1,9 +1,9 @@
-"""What is copied from Multimem, still agrees with it (plan 3.5, 7.4; U7's acceptance). The benchmark's core and V7 run without Multimem, so they hold
-small copies of what Multimem decides: the reader's frames, the fake decider's and the day's constants, the ask script's words, ffmpeg's path, the
+"""What is copied from MultimediaSearch, still agrees with it (plan 3.5, 7.4; U7's acceptance). The benchmark's core and V7 run without MultimediaSearch, so they hold
+small copies of what MultimediaSearch decides: the reader's frames, the fake decider's and the day's constants, the ask script's words, ffmpeg's path, the
 packet duration of a clip, and the share of an exec's time an ask may have. Each is run here beside the original, on the same files and inputs,
-and the expected value is the original's. A change in Multimem that this finds is a change to take over or to refuse.
+and the expected value is the original's. A change in MultimediaSearch that this finds is a change to take over or to refuse.
 
-Expected values are Multimem's, from the installed package (fe0ece5 on this machine) and from the copies of its tests (tests/mm/day.py,
+Expected values are MultimediaSearch's, from the installed package (fe0ece5 on this machine) and from the copies of its tests (tests/mm/day.py,
 tests/mm/fake_decider.py)."""
 
 from __future__ import annotations
@@ -16,23 +16,23 @@ import os
 import numpy as np
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import day
 import fake_decider
 from test_v7_media import packet_duration as v7_packet_duration
 
-from multimem import media, reader
-from multimem.config import ffmpeg_exe as multimems_ffmpeg
-from multimem.scripts import ask as ask_script
+from mms import media, reader
+from mms.config import ffmpeg_exe as mmss_ffmpeg
+from mms.scripts import ask as ask_script
 
-from mmmb.core import render
-from mmmb.scenarios.v7_screen import constants, frames, media_common
-from mmmb.scenarios.v8_egolife import plan as v8_plan
-from mmmb.scenarios.v8_egolife import source as v8_source
-from mmmb.systems.mm import estimate
+from mmsb.core import render
+from mmsb.scenarios.v7_screen import constants, frames, media_common
+from mmsb.scenarios.v8_egolife import plan as v8_plan
+from mmsb.scenarios.v8_egolife import source as v8_source
+from mmsb.systems.mm import estimate
 
-v8_report = importlib.import_module("mmmb.scenarios.v8_egolife.report")  # (the package's own `report` is a function)
+v8_report = importlib.import_module("mmsb.scenarios.v8_egolife.report")  # (the package's own `report` is a function)
 
 
 def first_of(dump, kind: str, count: int = 1):
@@ -96,13 +96,13 @@ def test_the_shade_and_the_pitch_of_the_writers_checks_are_the_fake_deciders_on_
     assert constants.pitch_share(np.zeros(100), 16000, 440.0) == fake_decider.pitch_share(np.zeros(100), 16000, 440.0) == 0.0
 
 
-def test_the_ffmpeg_of_the_writer_is_the_one_multimem_falls_back_to_and_not_one_on_path(monkeypatch, tmp_path):
+def test_the_ffmpeg_of_the_writer_is_the_one_mms_falls_back_to_and_not_one_on_path(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", str(tmp_path))  # no ffmpeg on it
-    assert media_common.ffmpeg_exe() == multimems_ffmpeg(), "with none on PATH they are the same binary"
+    assert media_common.ffmpeg_exe() == mmss_ffmpeg(), "with none on PATH they are the same binary"
     fake = tmp_path / ("ffmpeg.exe" if os.name == "nt" else "ffmpeg")
     fake.write_bytes(b"x")
-    assert multimems_ffmpeg().lower() == str(fake).lower(), "Multimem prefers one on PATH"
-    assert media_common.ffmpeg_exe() != multimems_ffmpeg(), "the writer's bytes are those of the shipped binary alone"
+    assert mmss_ffmpeg().lower() == str(fake).lower(), "MultimediaSearch prefers one on PATH"
+    assert media_common.ffmpeg_exe() != mmss_ffmpeg(), "the writer's bytes are those of the shipped binary alone"
 
 
 def test_the_length_of_a_clip_is_the_packet_duration_mm_stores(week):
@@ -130,7 +130,7 @@ def test_the_share_of_an_execs_time_an_ask_may_have_is_the_same_in_the_report_an
 
 
 def test_a_window_is_priced_as_mm_prices_it_and_the_records_window_is_the_readers():
-    from multimem import decider
+    from mms import decider
 
     about = decider.known("d1-3B")[1]
     for kind in ("video", "audio", "text", "records"):

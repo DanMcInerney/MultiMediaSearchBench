@@ -1,4 +1,4 @@
-"""Oracle 1 for V8: the EgoLife plan without Multimem. The plan the recorded run's recipe makes now has the plan hash and files hash the
+"""Oracle 1 for V8: the EgoLife plan without MultimediaSearch. The plan the recorded run's recipe makes now has the plan hash and files hash the
 run's run.json recorded; its pool before choosing, its 50 questions with their ages, categories and horizons, and its 2,592 clips and 3
 transcript files are the recorded run's; the questions the writer makes of it are the checked-in ones, with their evidence inside the files
 they cite; and the recipe that reading the download makes, with its clip table, is the recorded one. Takes a few seconds (the clip table, a
@@ -17,10 +17,10 @@ from pathlib import Path
 import pytest
 from v8_recorded import CONVERTED, META, RECIPE, REPORT, RUN, V8, download_skip, zone_skip
 
-from mmmb.core.question import load_questions
-from mmmb.scenarios.v8_egolife.choose import AGE_NAMES
-from mmmb.scenarios.v8_egolife.manifest import entries_of, transcript_path
-from mmmb.scenarios.v8_egolife.questions import questions_of
+from mmsb.core.question import load_questions
+from mmsb.scenarios.v8_egolife.choose import AGE_NAMES
+from mmsb.scenarios.v8_egolife.manifest import entries_of, transcript_path
+from mmsb.scenarios.v8_egolife.questions import questions_of
 
 if reason := download_skip() or zone_skip():
     pytest.skip(reason, allow_module_level=True)

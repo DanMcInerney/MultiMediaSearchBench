@@ -1,4 +1,4 @@
-"""New tests for mmmb/scenarios/v7_screen/questions.py and manifest.py: the plan's question dicts written as `Question`s, with the evidence
+"""New tests for mmsb/scenarios/v7_screen/questions.py and manifest.py: the plan's question dicts written as `Question`s, with the evidence
 of each found in the manifest. Nothing is written to disk but the question file: the manifest is made from the plan with made-up sizes.
 
 Expected values are the plan's own specs (a file's length, a note's text, a state's overlay, a sound's time), a recomputation of the
@@ -14,13 +14,13 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import grade
-from mmmb.core.question import load_questions, write_questions
-from mmmb.scenarios.v7_screen.manifest import entries_of, log_path
-from mmmb.scenarios.v7_screen.media_common import NEEDLE_RGB
-from mmmb.scenarios.v7_screen.plan import days_before
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb.core import grade
+from mmsb.core.question import load_questions, write_questions
+from mmsb.scenarios.v7_screen.manifest import entries_of, log_path
+from mmsb.scenarios.v7_screen.media_common import NEEDLE_RGB
+from mmsb.scenarios.v7_screen.plan import days_before
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 REPLAYS = Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "replay"
 PILOT_DAYS = [date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)]

@@ -4,7 +4,7 @@
 
 The pilot's table is counted from its data by the reader's own demux (the data is at D:/mm-bench-temp, frozen); tests/mm/tables/pilot-windows.json
 is that table, made once, so the first test needs no data, and the second asserts that the data still gives it. EgoLife's clips have a length (a
-camera's clip plays all of it: a window a second, rounded up, as Multimem's index estimate counts a video) so its table needs no clip but the
+camera's clip plays all of it: a window a second, rounded up, as MultimediaSearch's index estimate counts a video) so its table needs no clip but the
 first, for its size; the transcript's lines are the recorded run's (read in place)."""
 
 from __future__ import annotations
@@ -14,20 +14,20 @@ import time
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 from recorded import EGOLIFE, EGOLIFE_RUN, PILOT_DATA, PILOT_WINDOWS, pilot_dump, pilot_results
 from v7_recorded import zone_skip as pilot_zone_skip
 from v8_recorded import CONVERTED, RECIPE, V8, download_skip
 from v8_recorded import zone_skip as ego_zone_skip
 
-from multimem import decider
+from mms import decider
 
-from mmmb.core.contract import Dump
-from mmmb.core.question import load_questions
-from mmmb.scenarios.v8_egolife.manifest import TRANSCRIPT, entries_of
-from mmmb.systems.mm.estimate import ASK_SHARE, HEAVY_S, estimate_s, table_of, windows_in
-from mmmb.systems.mm.system import serve_record
+from mmsb.core.contract import Dump
+from mmsb.core.question import load_questions
+from mmsb.scenarios.v8_egolife.manifest import TRANSCRIPT, entries_of
+from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, estimate_s, table_of, windows_in
+from mmsb.systems.mm.system import serve_record
 
 D13 = decider.known("d1-3B")[1]
 TIMEOUT_S = 900.0  # both recorded runs

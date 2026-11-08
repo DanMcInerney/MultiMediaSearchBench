@@ -15,12 +15,12 @@ import pytest
 from cli_world import build_args, world  # noqa: F401
 from stub_system import Stub, StubSystem, tiny_questions
 
-from mmmb import scenarios
-from mmmb.core import costing, dryrun, fs, paths
-from mmmb.core.agents import claude, codex
-from mmmb.core.config import Config
-from mmmb.core.costing import BLIND_MIN, EXEC_MIN, Cell, Figures, Typical, earlier_runs, forecast, history_of, typical_of
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import costing, dryrun, fs, paths
+from mmsb.core.agents import claude, codex
+from mmsb.core.config import Config
+from mmsb.core.costing import BLIND_MIN, EXEC_MIN, Cell, Figures, Typical, earlier_runs, forecast, history_of, typical_of
+from mmsb.core.runfolder import RunFolder
 
 pytestmark = pytest.mark.xdist_group("cli")
 N = len(tiny_questions())
@@ -81,7 +81,7 @@ def test_earlier_runs_are_those_of_the_same_scenario_and_scale_in_the_runs_folde
     earlier(tmp_path / "d", {}, "toy", "tiny")
     (tmp_path / "e").mkdir()  # not a run
     fs.write_json(tmp_path / "f.json", {"scenario": "toy", "scale": "tiny"})
-    fs.write_json((tmp_path / "g").joinpath("run.json"), {"seed": 1, "scale": "tiny"})  # made before mmmb: names no scenario
+    fs.write_json((tmp_path / "g").joinpath("run.json"), {"seed": 1, "scale": "tiny"})  # made before mmsb: names no scenario
     assert earlier_runs(tmp_path, "toy", "tiny") == [tmp_path / "a", tmp_path / "d"]
     assert earlier_runs(tmp_path / "nowhere", "toy", "tiny") == []
 
@@ -120,7 +120,7 @@ def test_a_cell_with_no_history_is_counted_at_exec_min_and_blind_at_its_own_figu
 
 def run_history(w, tmp_path, *, seconds: float = 100.0):
     """`paths.RUNS` is a folder with one earlier run of the toy scenario at scale tiny, where claude's files took `seconds` an exec and its
-    stub/all took half of that with 5 GPU seconds; it is where `mmmb run` looks for history."""
+    stub/all took half of that with 5 GPU seconds; it is where `mmsb run` looks for history."""
     folder = tmp_path / "hist"
     qids = [q.qid for q in tiny_questions()]
     earlier(folder / "20261101-0000-v7-tiny-s7", {("claude", "files"): [result(q, seconds, usd=0.5) for q in qids],
@@ -248,7 +248,7 @@ def test_the_selection_flags_are_given_to_the_run_said_step_by_step_and_a_select
         capsys.readouterr()
         with pytest.raises(SystemExit):
             world.main("run", str(run.folder), "--agents", "claude", *bad)
-        assert capsys.readouterr().err.strip().splitlines()[-1].startswith("mmmb: error: ")
+        assert capsys.readouterr().err.strip().splitlines()[-1].startswith("mmsb: error: ")
     # the selection is `--only` of the qids it picks, so a later command without it asks the rest
     stub.execs.clear()
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", agents=cli_world.agents_of(stub)) == 0

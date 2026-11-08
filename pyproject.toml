@@ -1,8 +1,10 @@
 [project]
-name = "mmmb"
+name = "mmsb"
 version = "0.1.0"
-description = "MultiMediaMemoryBench: how well a memory system for agents answers questions about recorded screen, sound, cameras, files and logs"
+description = "MultiMediaSearchBench: how well a memory system for agents answers questions about recorded screen, sound, cameras, files and logs"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 # The bytes of the generated V7 week depend on these four: they are pinned to what the recorded pilot was written with.
 dependencies = [
@@ -14,10 +16,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-mm = ["multimem"]
+mm = ["mms"]
 
 [project.scripts]
-mmmb = "mmmb.cli:main"
+mmsb = "mmsb.cli:main"
 
 [dependency-groups]
 dev = [
@@ -25,7 +27,7 @@ dev = [
     "pytest-xdist==3.8.0",
 ]
 # mm runs d1 in the python that started its daemon, so a run of the mm system needs torch in this environment.
-# transformers is pinned as in Multimem's pyproject: 5.22.1 breaks d1's `_lfm2_conv`.
+# transformers is pinned as in MultimediaSearch's pyproject: 5.22.1 breaks d1's `_lfm2_conv`.
 mm-gpu = [
     "torch",
     "torchvision",
@@ -36,8 +38,7 @@ mm-gpu = [
 default-groups = ["dev"]
 
 [tool.uv.sources]
-# Multimem has no git remote, so the mm extra is a path on this machine.
-multimem = { path = "C:/Users/danhm/tools/Multimem", editable = true }
+mms = { git = "https://github.com/DanMcInerney/MultimediaSearch", rev = "66db8910302bb3ff976a7cda3c3091080fe3b5df" }
 torch = { index = "pytorch-cu128" }
 torchvision = { index = "pytorch-cu128" }
 
@@ -52,9 +53,9 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-root = ""
-module-name = "mmmb"
+module-name = "mmsb"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Four workers: a GPU run beside 12-worker suites hung the laptop's GPU driver and crashed Windows (Multimem, 2026-10-30).
+# Four workers: a GPU run beside 12-worker suites hung the laptop's GPU driver and crashed Windows (MultimediaSearch, then called Multimem, 2026-10-30).
 addopts = "-n 4 --dist loadgroup -m 'not slow and not paid and not gpu'"

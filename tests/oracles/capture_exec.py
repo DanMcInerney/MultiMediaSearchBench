@@ -3,14 +3,19 @@
 The argv of an exec is not on disk in any recorded run, so it is captured from the code that made them: bench.py, claude_run.py,
 codex_run.py and egolife.py as commit bb498a6 holds them (U8 deleted them from the tree: they are read with `git show bb498a6:<file>`
 into a temporary folder). No CLI is started and nothing is asked. `claude_run.prepare` and
-`codex_run.prepare` are called with a stand-in command, and the files they write are copied. Run it with Multimem's own venv,
+`codex_run.prepare` are called with a stand-in command, and the files they write are copied. Run it with the search tool's own venv,
 which has what the old modules import, from the repo root:
 
     set PYTHONDONTWRITEBYTECODE=1
     C:\\Users\\danhm\\tools\\Multimem\\.venv\\Scripts\\python.exe tests\\oracles\\capture_exec.py
 
-The old modules were written to live in Multimem's benchmarks/ folder and find the skill relative to their own file, so here they
-are pointed at Multimem's skill: the file the pilot used, at the commit Multimem is at now (its text drifted by 5 lines since the
+It was run once, when the tool was called Multimem (package `multimem`, command `mm`, commit fe0ece5), and recorded/exec
+holds what it wrote. The tool is now MultimediaSearch (`mms`) and this script names it so, as the tests that import its helpers (`placer`,
+`plant_git`, `planted_environment`) need; the tool's checkout is still the folder `Multimem`. Run again it would capture the renamed tool, with
+the old modules' old names, so it is not run again: tests/golden_names.py maps the recording's names to the tool's present ones.
+
+The old modules were written to live in the tool's benchmarks/ folder and find the skill relative to their own file, so here they
+are pointed at its skill: the file the pilot used, at the commit the tool was at then (its text drifted by 5 lines since the
 pilot: plan section 1). The folders of the exec are real but temporary, and are replaced in the output by <RUN> <WORK> <HOME> <DATA>
 <BIN>, with <PYTHON> for the interpreter that starts mm's server and <GIT> for the planted Git for Windows. The process environment
 is planted, not the owner's. The run is Windows-only, as the code is.
@@ -32,7 +37,7 @@ from __future__ import annotations
 
 import sys
 
-sys.dont_write_bytecode = True  # before any import of the repo or of Multimem: neither is written to
+sys.dont_write_bytecode = True  # before any import of the repo or of MultimediaSearch: neither is written to
 
 import argparse
 import hashlib
@@ -46,7 +51,7 @@ from pathlib import Path
 from unittest import mock
 
 REPO = Path(__file__).resolve().parents[2]
-MULTIMEM = Path(r"C:\Users\danhm\tools\Multimem")
+MMS_CHECKOUT = Path(r"C:\Users\danhm\tools\Multimem")  # the checkout of the search tool; its folder keeps the old name
 OLD_COMMIT = "bb498a6"  # the commit that holds the old modules
 OLD_MODULES = ("bench.py", "claude_run.py", "codex_run.py", "egolife.py", "haystack.py", "grade.py")
 OLD_FILES = (*OLD_MODULES, "haystack_media.py", "shortcuts.py", "egolife_oracles.json")  # (what they import of each other, and their data)
@@ -67,7 +72,7 @@ def planted_environment(git: Path) -> dict[str, str]:
     return {"PATH": os.pathsep.join([str(git / "cmd"), r"C:\owner\bin", r"C:\owner\venv\Scripts"]),
             "SYSTEMROOT": r"C:\Windows", "USERPROFILE": r"C:\owner", "KEEP_ME": "kept",
             "ANTHROPIC_API_KEY": "sk-planted", "ANTHROPIC_AUTH_TOKEN": "planted-token",
-            "MULTIMEM_HOME": r"C:\owner\mm-home", "MULTIMEM_MODELS": r"D:\models", "MULTIMEM_DEBUG": "1",
+            "MMS_HOME": r"C:\owner\mm-home", "MMS_MODELS": r"D:\models", "MMS_DEBUG": "1",
             "VIRTUAL_ENV": r"C:\owner\venv"}
 
 
@@ -125,15 +130,15 @@ def old_code(folder: Path) -> None:
 
 
 def import_old_modules(old: Path):
-    """The old modules (in `old`), with Multimem's tests folder on the path (haystack and bench import its day, fake_decider and
-    conftest) and the skill's place pointed at Multimem's."""
-    sys.path[:0] = [str(old), str(MULTIMEM / "tests")]
+    """The old modules (in `old`), with MultimediaSearch's tests folder on the path (haystack and bench import its day, fake_decider and
+    conftest) and the skill's place pointed at MultimediaSearch's."""
+    sys.path[:0] = [str(old), str(MMS_CHECKOUT / "tests")]
     import bench
     import claude_run
     import codex_run
     import egolife
 
-    skill = MULTIMEM / "src" / "multimem" / "skills" / "multimem-questions" / "SKILL.md"
+    skill = MMS_CHECKOUT / "src" / "mms" / "skills" / "mms-questions" / "SKILL.md"
     codex_run.SKILL, codex_run.NOTES_DIR = skill, skill.parent / "models"
     codex_run.NOTES = codex_run.NOTES_DIR / "d1.md"
     claude_run.SKILL = skill
@@ -180,16 +185,16 @@ def main() -> int:
         sys.exit("the goldens are what the old code builds on Windows")
     if out.exists():
         sys.exit(f"{out} exists: a golden is not regenerated to make a test pass; remove it on purpose to capture again")
-    old = Path(tempfile.mkdtemp(prefix="mmmb-old-"))
+    old = Path(tempfile.mkdtemp(prefix="mmsb-old-"))
     old_code(old)
     modules = import_old_modules(old)
     _, claude_run, codex_run, _ = modules
-    from multimem import decider
+    from mms import decider
 
     notes = next(a.notes for a in decider.known_abouts() if a.name == MODEL)
     models = json.loads(MODELS.read_text(encoding="utf-8"))
     files: dict[str, str] = {}
-    with tempfile.TemporaryDirectory(prefix="mmmb-capture-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="mmsb-capture-") as tmp:
         git = Path(tmp) / "git"
         plant_git(git)
         planted = planted_environment(git)
@@ -215,9 +220,9 @@ def main() -> int:
         for name in ("v7", "v8"):
             write(f"deny-{name}.json", dump({"inputs": deny["inputs"], name: deny[name]}).encode())
         skill = codex_run.SKILL
-        from multimem import adapter
+        from mms import adapter
 
-        meta = {"repo_commit": git_head(REPO), "old_commit": git_head_of(OLD_COMMIT), "multimem_commit": git_head(MULTIMEM),
+        meta = {"repo_commit": git_head(REPO), "old_commit": git_head_of(OLD_COMMIT), "multimem_commit": git_head(MMS_CHECKOUT),
                 "python": sys.version.split()[0], "model": MODEL, "notes": notes, "claude": CLAUDE, "codex": CODEX,
                 "old_modules": {n: sha256(old_source(n)) for n in OLD_MODULES},
                 "read": {"SKILL.md": sha256(skill.read_bytes()), notes: sha256((codex_run.NOTES_DIR / notes).read_bytes()),

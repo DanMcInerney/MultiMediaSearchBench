@@ -20,11 +20,11 @@ from listing_world import planted_dump
 from stub_system import Stub
 from v8_fake import built, oracle_file, recipe, source  # noqa: F401
 
-from mmmb.core.agents import claude
-from mmmb.core.build import Misdated, refuse_misdated
-from mmmb.core.contract import ManifestEntry
-from mmmb.systems.listing import read as reading
-from mmmb.systems.listing.system import Listing
+from mmsb.core.agents import claude
+from mmsb.core.build import Misdated, refuse_misdated
+from mmsb.core.contract import ManifestEntry
+from mmsb.systems.listing import read as reading
+from mmsb.systems.listing.system import Listing
 
 pytestmark = pytest.mark.xdist_group("v8")
 DAY = 86400.0

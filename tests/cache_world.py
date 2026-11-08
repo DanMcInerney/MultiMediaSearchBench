@@ -1,6 +1,6 @@
 """What the tests of the cache (tests/test_cache.py) build over: a scenario of three small files that counts its builds, can be told to block
 half way (for a second process to meet it) or to fail, and a system that counts its ingests. Nothing here starts an agent or imports
-multimem; the scenario is a module-like object with the names core/cache.py reads (`name`, `generator`, `build`)."""
+mms; the scenario is a module-like object with the names core/cache.py reads (`name`, `generator`, `build`)."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from pathlib import Path
 
 from stub_system import tiny_questions
 
-from mmmb.core.contract import Description, Dump, IngestReport, LogSource, ManifestEntry, Refusal
-from mmmb.core.scenario import dump_key
+from mmsb.core.contract import Description, Dump, IngestReport, LogSource, ManifestEntry, Refusal
+from mmsb.core.scenario import dump_key
 
 RECIPE = {"scale": "tiny", "seed": 1, "days": ["2026-10-30", "2026-10-31"], "utc_offsets": ["-0400", "-0400", "-0400"]}
 FILES = {"notes/a.md": "a note", "screen/s.mkv": "a screen", "logs/web.jsonl": "{}"}

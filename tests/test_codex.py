@@ -1,7 +1,7 @@
-"""Ported from tests/test_codex.py of Multimem at fe0ece5 (plan 7.4, oracle 4): the fast tests of the harness of the old Codex recall
+"""Ported from tests/test_codex.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): the fast tests of the harness of the old Codex recall
 run, which are the table of its graders and the reading of Codex's answers, events and plan use. Not ported:
 `test_codex_recalls_the_day`, the paid run (19 questions to a real `codex exec` over a daemon of the old recall tier, which
-spends the plan's quota); its fixtures went with it. The graders are the ones of `mmmb.core.grade`."""
+spends the plan's quota); its fixtures went with it. The graders are the ones of `mmsb.core.grade`."""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from typing import NamedTuple
 import pytest
 from agent_spec import served_of, server_of, spec_of
 
-from mmmb.core.agents import codex, common
-from mmmb.core.answer import answer_of
-from mmmb.core.grade import code, near, norm, numbers, unknown
+from mmsb.core.agents import codex, common
+from mmsb.core.answer import answer_of
+from mmsb.core.grade import code, near, norm, numbers, unknown
 
 STOP_AT = 60.0  # percent of the plan's use at which the remaining questions are skipped
 QUOTA: dict = {"used": None, "ran": False}  # the last weekly plan use read, in percent; whether an exec has run

@@ -1,6 +1,6 @@
-"""New tests for the V7 scenario as the runner sees it (mmmb/scenarios/__init__.py and v7_screen/__init__.py, prompt.py): the recipe and
+"""New tests for the V7 scenario as the runner sees it (mmsb/scenarios/__init__.py and v7_screen/__init__.py, prompt.py): the recipe and
 the time zone it records, the hashes, a week built and measured, the prompts as the pilot recorded them, the words an agent may not
-reach, and the scenario run with Multimem and the old modules blocked.
+reach, and the scenario run with MultimediaSearch and the old modules blocked.
 
 Expected values are the recipe's definition, an independent read of the machine's time zone, the files a build left on disk, the pilot's
 recorded prompts (tests/oracles/recorded/pilot-s1/execs.json), and the golden deny words of the old code (tests/oracles/recorded/exec)."""
@@ -22,14 +22,14 @@ import imageio_ffmpeg
 import pytest
 from test_runfolder import DENY, MM_ISOLATION, SENTINEL, between, check_against, posix, run_of, sentinels  # noqa: F401
 
-from mmmb import scenarios
-from mmmb.core.contract import Dump, LogSource, McpServer, Served
-from mmmb.core.question import load_questions, write_questions
-from mmmb.core.runfolder import IN_ONLY
-from mmmb.core.scenario import Access, ProbeOutcome, dump_key, files_hash, plan_hash
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb import scenarios
+from mmsb.core.contract import Dump, LogSource, McpServer, Served
+from mmsb.core.question import load_questions, write_questions
+from mmsb.core.runfolder import IN_ONLY
+from mmsb.core.scenario import Access, ProbeOutcome, dump_key, files_hash, plan_hash
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 V7 = scenarios.get("v7_screen")
 RECORDED = Path(__file__).parent / "oracles" / "recorded" / "pilot-s1"
@@ -47,7 +47,7 @@ def offset_of(day: date) -> str:
 
 
 def test_the_registry_has_the_scenario_by_its_name_and_the_scenario_has_the_names_of_a_scenario():
-    assert scenarios.get("v7_screen") is sys.modules["mmmb.scenarios.v7_screen"]
+    assert scenarios.get("v7_screen") is sys.modules["mmsb.scenarios.v7_screen"]
     assert (V7.name, V7.code, V7.generator) == ("v7_screen", "V7", 6)
     assert all(callable(getattr(V7, name)) for name in PROTOCOL)
     with pytest.raises(ValueError, match="'nonesuch' is not a scenario: v7_screen"):
@@ -112,7 +112,7 @@ def test_the_prompt_is_the_one_the_pilot_recorded_for_each_of_its_110_execs_but_
 
 def test_a_system_and_the_files_together_get_both_sentences_and_one_way_to_answer(pilot_questions):
     question = pilot_questions["video-porch-parcel-1"]
-    data = Path(r"D:\mmmb-temp\mmb-0123456789-data")
+    data = Path(r"D:\mmsb-temp\mmb-0123456789-data")
     got = V7.prompt(question, Access(True, data, MM, "line"))
     assert got == (
         "It is now Wednesday 04 November 2026, 12:00. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. "
@@ -142,7 +142,7 @@ def test_the_deny_words_of_v7_are_the_old_eight_and_three_that_name_the_new_pack
     golden = DENY["v7"]["v7"]
     old = between(golden["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0")
     assert len(old) == 8
-    new = tuple(IN_ONLY + word for word in ("v7_screen", "from mmmb", "import mmmb"))
+    new = tuple(IN_ONLY + word for word in ("v7_screen", "from mmsb", "import mmsb"))
     assert V7.deny_words([0, 1], Path("t"), "k") == (*old, *new) and V7.deny_words([], Path("t"), "k") == (*old, *new), "whatever the slots"
     for own, key in ((None, "none"), (0, "slot0")):
         run = run_of(V7)
@@ -152,8 +152,8 @@ def test_the_deny_words_of_v7_are_the_old_eight_and_three_that_name_the_new_pack
 
 
 def test_no_word_is_in_the_path_of_a_folder_a_run_makes_the_default_ones_included(sentinels):
-    """`check_paths` refuses a run whose data, bin or slot a word is in: a bare `mmmb` would, with `D:\\mmmb-data`."""
-    from mmmb.core import paths
+    """`check_paths` refuses a run whose data, bin or slot a word is in: a bare `mmsb` would, with `D:\\mmsb-data`."""
+    from mmsb.core import paths
 
     run = run_of(V7)
     words = [w.removeprefix(IN_ONLY) for w in V7.deny_words([], paths.TEMP, run.tag)]
@@ -235,9 +235,9 @@ def test_the_probe_of_a_built_week_passes_and_reports_in_the_run_folder_and_neve
         V7.probe(recipe, broken, tmp_path / "run", ffmpeg, 7)
 
 
-# -- Multimem absent ---------------------------------------------------------------------------------------------------------------
+# -- MultimediaSearch absent ---------------------------------------------------------------------------------------------------------------
 
-OLD_MODULES = ("multimem", "conftest", "day", "fake_decider", "haystack", "haystack_media", "shortcuts", "grade", "bench", "claude_run",
+OLD_MODULES = ("mms", "conftest", "day", "fake_decider", "haystack", "haystack_media", "shortcuts", "grade", "bench", "claude_run",
                "codex_run", "egolife")
 BLOCKED = f"""
 import sys
@@ -247,19 +247,19 @@ class Blocked:
             raise ImportError(f"{{name}} is blocked: V7 must not need it")
 sys.meta_path.insert(0, Blocked())
 import importlib, pkgutil
-import mmmb.scenarios.v7_screen as package
+import mmsb.scenarios.v7_screen as package
 names = [m.name for m in pkgutil.iter_modules(package.__path__)]
 for name in names:
-    importlib.import_module("mmmb.scenarios.v7_screen." + name)
-import mmmb.core.probe
-from mmmb import scenarios
+    importlib.import_module("mmsb.scenarios.v7_screen." + name)
+import mmsb.core.probe
+from mmsb import scenarios
 v7 = scenarios.get("v7_screen")
 print(len(names), *v7.hashes(v7.recipe(scale="tiny", seed=3, days={DAYS!r})))
 """
 
 
-def test_v7_imports_and_plans_with_multimem_and_the_old_modules_blocked():
-    """The blocker refuses `multimem` and the tests' own `conftest`, `day`, `fake_decider`, and the old root modules, which the editable
+def test_v7_imports_and_plans_with_mms_and_the_old_modules_blocked():
+    """The blocker refuses `mms` and the tests' own `conftest`, `day`, `fake_decider`, and the old root modules, which the editable
     install would otherwise let `import haystack` find without a word."""
     done = subprocess.run([sys.executable, "-c", BLOCKED], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stderr[-1500:]
@@ -267,8 +267,8 @@ def test_v7_imports_and_plans_with_multimem_and_the_old_modules_blocked():
     assert int(count) >= 14 and (plan, files) == V7.hashes(V7.recipe(scale="tiny", seed=3, days=DAYS)), "and the hashes are those of this process"
 
 
-def test_no_module_of_the_scenario_names_the_old_modules_or_multimem():
-    root = Path(__file__).resolve().parents[1] / "mmmb"
+def test_no_module_of_the_scenario_names_the_old_modules_or_mms():
+    root = Path(__file__).resolve().parents[1] / "mmsb"
     checked = [*(root / "scenarios").rglob("*.py"), root / "core" / "probe.py"]
     for path in checked:
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):

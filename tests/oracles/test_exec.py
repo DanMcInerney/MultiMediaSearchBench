@@ -9,7 +9,7 @@ A server with the agent's own tools has no golden: its expected argv, settings a
 section 4.4, and its environment is the files cell's by the rule that the own tools pick it.
 
 Intended differences (plan 7.3, each asserted somewhere, none ignored): the skill's five drifted lines (test_goldens.py), the
-`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
+`MM_*` variables renamed `MMSB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
 and longest command Claude's files line names (here, `files_now`)."""
 
 from __future__ import annotations
@@ -25,10 +25,11 @@ from unittest import mock
 import pytest
 from agent_spec import BASE_LINE, server_of, spec_of
 from capture_exec import PLACEHOLDERS, placer, plant_git, planted_environment
+from golden_names import golden_bytes, golden_json, golden_text
 
-from mmmb.core.agents import claude, codex, common
-from mmmb.core.answer import answer_of
-from mmmb.core.contract import Served
+from mmsb.core.agents import claude, codex, common
+from mmsb.core.answer import answer_of
+from mmsb.core.contract import Served
 
 RECORDED = Path(__file__).with_name("recorded")
 EXEC, PILOT = RECORDED / "exec", RECORDED / "pilot-s1"
@@ -40,6 +41,10 @@ windows_only = pytest.mark.skipif(os.name != "nt", reason="the goldens are what 
 
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+# A golden is read with `golden_text`, `golden_bytes` and `golden_json` (tests/golden_names.py), which put in the names the tool has changed
+# since it was recorded and nothing else; what the code writes is read with `read`.
 
 
 # Claude's files line names redirects and the longest command Claude Code runs (claude.LONGEST_COMMAND), which the old code's did not
@@ -88,7 +93,7 @@ def test_the_exec_the_old_code_built_is_the_one_the_new_code_builds(agent, mode,
     git = tmp_path / "git"
     plant_git(git)
     planted = planted_environment(git)
-    spec, paths = cell(tmp_path / "cell", mode, read(EXEC / "claude-mm" / "instructions.md"), read(EXEC / "codex-mm" / "instructions.md"))
+    spec, paths = cell(tmp_path / "cell", mode, golden_text(EXEC / "claude-mm" / "instructions.md"), golden_text(EXEC / "codex-mm" / "instructions.md"))
     with mock.patch.dict(os.environ, planted, clear=True):
         if agent == "claude":
             argv = claude.prepare(spec, command=["<claude>"])
@@ -97,17 +102,17 @@ def test_the_exec_the_old_code_built_is_the_one_the_new_code_builds(agent, mode,
             argv = codex.prepare(spec, "gpt-6.1-terra", "medium", MODELS, ["<codex>"])
             env = common.path_with(spec.bin_dir)
     place = placer({**paths, "PYTHON": sys.executable, "GIT": git})
-    assert place(argv) == json.loads(read(golden / "argv.json"))
-    assert dict(sorted(place(env).items())) == json.loads(read(golden / "env.json"))
+    assert place(argv) == golden_json(golden / "argv.json")
+    assert dict(sorted(place(env).items())) == golden_json(golden / "env.json")
     made = {p.name for p in paths["RUN"].iterdir()}
     assert made == {p.name for p in golden.iterdir()} - {"argv.json", "env.json"}, "the same files, and no other"
     for name in sorted(made):
         if name == "mcp.json":
-            assert place(json.loads(read(paths["RUN"] / name))) == json.loads(read(golden / name))
+            assert place(json.loads(read(paths["RUN"] / name))) == golden_json(golden / name)
         elif (agent, mode, name) == ("claude", "files", "instructions.md"):
-            assert read(paths["RUN"] / name) == files_now(read(golden / name))
+            assert read(paths["RUN"] / name) == files_now(golden_text(golden / name))
         else:
-            assert (paths["RUN"] / name).read_bytes() == (golden / name).read_bytes(), name
+            assert (paths["RUN"] / name).read_bytes() == golden_bytes(golden / name), name
     assert paths["WORK"].is_dir()
 
 
@@ -133,9 +138,9 @@ CODEX_BOTH_SETTINGS = [
     "model_reasoning_effort=medium", "model_catalog_json='<RUN>/catalog.json'", "model_instructions_file='<RUN>/instructions.md'",
     "shell_environment_policy.set.PATH='<BIN>;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;"
     "C:\\Windows\\System32\\WindowsPowerShell\\v1.0'",
-    "shell_environment_policy.set.MULTIMEM_HOME='<WORK>/no-mm-home'",
+    "shell_environment_policy.set.MMS_HOME='<WORK>/no-mm-home'",
     "mcp_servers.mm.command='<PYTHON>'",
-    "mcp_servers.mm.args=['-m','multimem.cli','--home','<HOME>','mcp','--tools','ask,find,look,label']",
+    "mcp_servers.mm.args=['-m','mms.cli','--home','<HOME>','mcp','--tools','ask,find,look,label']",
     "mcp_servers.mm.required=true", "mcp_servers.mm.default_tools_approval_mode=approve", "mcp_servers.mm.startup_timeout_sec=60",
     "mcp_servers.mm.tool_timeout_sec=900", "mcp_servers.mm.env.CLAUDE_PROJECT_DIR='<WORK>'",
 ]
@@ -150,7 +155,7 @@ def test_a_server_with_own_tools_gets_the_files_exec_plus_the_server_by_the_plan
     git = tmp_path / "git"
     plant_git(git)
     planted = planted_environment(git)
-    claude_text, codex_text = read(EXEC / "claude-mm" / "instructions.md"), read(EXEC / "codex-mm" / "instructions.md")
+    claude_text, codex_text = golden_text(EXEC / "claude-mm" / "instructions.md"), golden_text(EXEC / "codex-mm" / "instructions.md")
     spec, paths = cell(tmp_path / "cell", "mm+files", claude_text, codex_text)
     place = placer({**paths, "PYTHON": sys.executable, "GIT": git})
     with mock.patch.dict(os.environ, planted, clear=True):
@@ -164,11 +169,11 @@ def test_a_server_with_own_tools_gets_the_files_exec_plus_the_server_by_the_plan
     if agent == "claude":
         assert place(argv) == CLAUDE_BOTH_ARGV
         assert read(run / "settings.json") == CLAUDE_SETTINGS
-        assert place(json.loads(read(run / "mcp.json"))) == json.loads(read(EXEC / "claude-mm" / "mcp.json"))
+        assert place(json.loads(read(run / "mcp.json"))) == golden_json(EXEC / "claude-mm" / "mcp.json")
         # the files line first, then the server's: each as it was recorded
-        assert read(run / "instructions.md") == files_now(read(EXEC / "claude-files" / "instructions.md")) + "\n\n" + claude_text
+        assert read(run / "instructions.md") == files_now(golden_text(EXEC / "claude-files" / "instructions.md")) + "\n\n" + claude_text
         # the own tools pick the environment: the files cell's, whatever else the exec has
-        assert dict(sorted(place(env).items())) == json.loads(read(EXEC / "claude-files" / "env.json"))
+        assert dict(sorted(place(env).items())) == golden_json(EXEC / "claude-files" / "env.json")
         assert {p.name for p in run.iterdir()} == {"instructions.md", "settings.json", "mcp.json"}
     else:
         expected = ["<codex>", "exec", "--json", "--skip-git-repo-check", "--ignore-user-config", "--ignore-rules", "--strict-config",
@@ -178,20 +183,20 @@ def test_a_server_with_own_tools_gets_the_files_exec_plus_the_server_by_the_plan
         for feature in CODEX_BOTH_OFF:
             expected += ["--disable", feature]
         assert place(argv) == [*expected, "-C", "<WORK>", "--", "-"]
-        assert read(run / "instructions.md") == read(EXEC / "codex-files" / "instructions.md") + "\n\n" + codex_text
-        assert (run / "catalog.json").read_bytes() == (EXEC / "codex-mm" / "catalog.json").read_bytes()
-        assert dict(sorted(place(env).items())) == json.loads(read(EXEC / "codex-mm" / "env.json"))
+        assert read(run / "instructions.md") == golden_text(EXEC / "codex-files" / "instructions.md") + "\n\n" + codex_text
+        assert (run / "catalog.json").read_bytes() == golden_bytes(EXEC / "codex-mm" / "catalog.json")
+        assert dict(sorted(place(env).items())) == golden_json(EXEC / "codex-mm" / "env.json")
         assert {p.name for p in run.iterdir()} == {"instructions.md", "catalog.json"}
 
 
 # -- the 110 recorded pilot execs ----------------------------------------------------------------------------------------------
 
 def pilot_execs() -> list[dict]:
-    return [e for e in json.loads(read(PILOT / "execs.json"))["execs"] if not e["excluded"]]
+    return [e for e in golden_json(PILOT / "execs.json")["execs"] if not e["excluded"]]
 
 
 def recorded_text(sha: str) -> str:
-    return read(PILOT / "instructions" / f"{sha[:12]}.md")
+    return golden_text(PILOT / "instructions" / f"{sha[:12]}.md")
 
 
 def cell_mode(e: dict) -> str:
@@ -223,9 +228,9 @@ def test_the_settings_and_instructions_every_pilot_exec_had_are_what_the_agents_
             if e["agent"] != agent:
                 continue
             mine = written[cell_mode(e)]
-            now = e["instructions_sha256"]
+            now = sha256(recorded_text(e["instructions_sha256"]))  # the recorded text with the renames (a server cell's differs from the recorded sha256)
             if agent == "claude" and cell_mode(e) == "files":
-                now = sha256(files_now(recorded_text(now)))
+                now = sha256(files_now(recorded_text(e["instructions_sha256"])))
             if mine["instructions.md"] != now:
                 wrong.append((agent, e["dir"], e["qid"], "instructions"))
             if agent == "claude" and mine["settings.json"] != e["settings_sha256"]:

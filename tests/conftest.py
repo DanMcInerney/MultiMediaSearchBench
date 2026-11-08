@@ -1,12 +1,12 @@
 """Setup every test shares.
 
-- Throwaway homes: for the whole session HOME, USERPROFILE, CODEX_HOME, CLAUDE_CONFIG_DIR and MULTIMEM_HOME lead into a
+- Throwaway homes: for the whole session HOME, USERPROFILE, CODEX_HOME, CLAUDE_CONFIG_DIR and MMS_HOME lead into a
   temporary folder, so code that finds the owner's agent setup through the environment finds an empty one.
-- The guard: the real `~/.claude`, `~/.codex`, `~/.multimem` (and wherever the three variables pointed when pytest
-  started) may be read but not changed, and so may the folders MMMB keeps its runs, dumps and cache in (`paths.RUNS`,
+- The guard: the real `~/.claude`, `~/.codex`, `~/.mms` (and wherever the three variables pointed when pytest
+  started) may be read but not changed, and so may the folders MMSB keeps its runs, dumps and cache in (`paths.RUNS`,
   `paths.TEMP`, `paths.CACHE`: a test gives its commands a --out, --temp and --cache under its own tmp_path). An audit hook
   catches the change where it happens, and the test that caused it fails even when the code under test swallowed the error.
-  A snapshot of those folders would not do: a live Claude Code or Codex session or the mm daemon changes them while the
+  A snapshot of those folders would not do: a live Claude Code or Codex session or the mms daemon changes them while the
   suite runs. A process a test starts is not watched: it gets the throwaway environment instead.
 - The same hook refuses to start a real `claude` or `codex` (any program of that name, or any program inside the owner's three
   folders), which spends the plan or reads the owner's login. A test that needs an agent puts a stand-in in its place (a program of
@@ -27,11 +27,11 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import paths
+from mmsb.core import paths
 
-HOME_FOLDERS = (".claude", ".codex", ".multimem")
-HOME_VARS = {"CLAUDE_CONFIG_DIR": ".claude", "CODEX_HOME": ".codex", "MULTIMEM_HOME": ".multimem"}  # variable -> folder it overrides
-MM_MISSING = "could not import 'multimem'"  # the start of the reason `pytest.importorskip("multimem")` gives
+HOME_FOLDERS = (".claude", ".codex", ".mms")
+HOME_VARS = {"CLAUDE_CONFIG_DIR": ".claude", "CODEX_HOME": ".codex", "MMS_HOME": ".mms"}  # variable -> folder it overrides
+MM_MISSING = "could not import 'mms'"  # the start of the reason `pytest.importorskip("mms")` gives
 BANNER = "the mm extra is not installed; run uv sync --extra mm"
 AGENTS = frozenset({"claude", "codex"})  # programs a test must not start: the owner's agents
 SHELLS = frozenset({"cmd", "sh", "bash", "zsh", "powershell", "pwsh"})  # a program that runs the command it is given: the program is that command's
@@ -56,7 +56,7 @@ def real_homes() -> tuple[str, ...]:
 
 
 REAL_HOMES = real_homes()
-MMMB_FOLDERS = tuple(normal(folder) for folder in (paths.RUNS, paths.TEMP, paths.CACHE))  # where a real run, dump and cache are kept
+MMSB_FOLDERS = tuple(normal(folder) for folder in (paths.RUNS, paths.TEMP, paths.CACHE))  # where a real run, dump and cache are kept
 REFUSED: list[str] = []  # what the guard refused, in order, for the autouse fixture to tell
 
 
@@ -70,11 +70,11 @@ def within(path, folders: tuple[str, ...]) -> bool:
 
 
 def guarded(path) -> str | None:
-    """What a test must not change `path` of: the owner's agent setup, or the folders MMMB's real runs, dumps and cache are in; else None."""
+    """What a test must not change `path` of: the owner's agent setup, or the folders MMSB's real runs, dumps and cache are in; else None."""
     if within(path, REAL_HOMES):
         return "the owner's agent setup"
-    if within(path, MMMB_FOLDERS):
-        return "the folders MMMB keeps its runs, dumps and cache in (give the command a --out, --temp and --cache of the test's own)"
+    if within(path, MMSB_FOLDERS):
+        return "the folders MMSB keeps its runs, dumps and cache in (give the command a --out, --temp and --cache of the test's own)"
     return None
 
 
@@ -177,7 +177,7 @@ def real_homes_untouched():
 
 
 class MmSkips:
-    """The tests under a folder named `mm` that were skipped because multimem is not installed. A module that skips itself
+    """The tests under a folder named `mm` that were skipped because mms is not installed. A module that skips itself
     at import is one skip in pytest's report: its tests are counted from its source (a parametrized test counts once)."""
 
     def __init__(self, config: pytest.Config) -> None:

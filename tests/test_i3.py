@@ -1,6 +1,6 @@
 """I3, the trail camera, from its real source on disk: the tiny card built (photos in order, with EXIF and their times), every answer
 derived again here by a plain reader of the label file (never the scenario's), the hour after midnight read again from the photos'
-own strips, the grader taking each truth and refusing planted wrong answers, the leak probe, and `mmmb build`, `run` and `report`
+own strips, the grader taking each truth and refusing planted wrong answers, the leak probe, and `mmsb build`, `run` and `report`
 over it with a stand-in agent. Skips, and says so, without the source."""
 
 from __future__ import annotations
@@ -19,13 +19,13 @@ from agent_spec import clocked
 from cli_world import world  # noqa: F401
 from PIL import Image
 
-from mmmb import scenarios
-from mmmb.core import fs, grade
-from mmmb.core.agents import claude
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.scenarios.i3_trailcam.questions import questions_of
-from mmmb.scenarios.i3_trailcam.source import SOURCE, Photo
+from mmsb import scenarios
+from mmsb.core import fs, grade
+from mmsb.core.agents import claude
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.scenarios.i3_trailcam.questions import questions_of
+from mmsb.scenarios.i3_trailcam.source import SOURCE, Photo
 
 if not (SOURCE / "labels" / "caltech_camera_traps.json.zip").is_file():
     pytest.skip(f"the Caltech Camera Traps source is not at {SOURCE}, so I3 is not built", allow_module_level=True)
@@ -296,7 +296,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = I3.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:caltech" in deny and "in:i3_trailcam" in deny and "in:from mmmb" in deny
+    assert "bench-data" in deny and "in:caltech" in deny and "in:i3_trailcam" in deny and "in:from mmsb" in deny
 
 
 class Spy:
@@ -333,7 +333,7 @@ def test_build_run_and_report_over_the_tiny_card(world, capsys):  # noqa: F811
     assert "When did my trail camera first photograph a skunk?" in prompt and "<the date and time, as YYYY-MM-DD HH:MM>" in prompt
     assert "You have 900 seconds: " in prompt
     capsys.readouterr()
-    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
+    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMSB report")
     figures = fs.read_json(folder / "report.json")
     (section,) = figures["scenarios"]
     files, listing = section["cells"]["claude"]["files"], section["cells"]["claude"]["listing"]

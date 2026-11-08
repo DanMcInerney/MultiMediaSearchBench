@@ -1,5 +1,5 @@
 """A stand-in system, session and agent for the tests of the runner (plan 7.4: neutral loop tests use a `StubSystem` built from recorded
-fields), and the folders of a run they run in. Nothing here starts a process or imports multimem.
+fields), and the folders of a run they run in. Nothing here starts a process or imports mms.
 
 What the stub system copies from the recorded runs is the shape of what a real session adds to a result (the fields `gpu_estimate_s`,
 `exclusive`, `beyond_timeout`, `busy_at_start`, `left`, `cancelled`, `unended`, `orphans`, `settle_s` of the pilot's results), and from the
@@ -18,15 +18,15 @@ from pathlib import Path
 
 from agent_spec import clocked
 
-from mmmb.core import fs
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.config import Config
-from mmmb.core.contract import (Case, Description, Dump, IngestReport, McpServer, PlainSession, Served, SessionContext, Usage)
-from mmmb.core.question import Question, write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb.core import fs
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.config import Config
+from mmsb.core.contract import (Case, Description, Dump, IngestReport, McpServer, PlainSession, Served, SessionContext, Usage)
+from mmsb.core.question import Question, write_questions
+from mmsb.core.runfolder import RunFolder
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 MODALITIES = frozenset({"image", "video", "audio", "text", "records"})
 READS = {"all": MODALITIES, "narrow": frozenset({"image", "video", "text", "records"}), "media": frozenset({"image", "video"})}
@@ -235,7 +235,7 @@ class Stub:
 def run_of(root: Path, configs=(FILES, STUB), scenario=None, questions=None, tag: str = "t1") -> tuple[RunFolder, Dump]:
     """A run folder in `root` for the tiny week's questions: a few made-up files as the frozen data, its manifest, the question file, and
     the dump that says where the data is. The ffmpeg of `ensure_bin` is a made-up file too (the caller patches it)."""
-    from mmmb import scenarios
+    from mmsb import scenarios
 
     questions = tuple(questions or tiny_questions())
     folder, temp = root / "run", root / "temp"

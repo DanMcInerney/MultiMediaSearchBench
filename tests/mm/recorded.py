@@ -1,6 +1,6 @@
 """What the mm tests compare with, from the recorded runs (read only): the pilot's 48 mm results and the dump they were asked of, rebuilt from
 its recorded manifest (tests/oracles/recorded/pilot-s1) and read in place where its data is (D:/mm-bench-temp), and the recorded EgoLife run's 50.
-`pilot-windows.json` is the pilot's table of windows (mmmb/systems/mm/estimate.py) that `capture_windows.py` made once from that data; the test that
+`pilot-windows.json` is the pilot's table of windows (mmsb/systems/mm/estimate.py) that `capture_windows.py` made once from that data; the test that
 reads the data asserts the system still makes it (test_recorded_estimate.py)."""
 
 from __future__ import annotations
@@ -9,11 +9,11 @@ import json
 from datetime import date
 from pathlib import Path
 
-from mmmb.core.contract import Dump
-from mmmb.core.question import Question
-from mmmb.scenarios.v7_screen.manifest import LOGS, entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb.core.contract import Dump
+from mmsb.core.question import Question
+from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 ORACLES = Path(__file__).parent.parent / "oracles" / "recorded"
 PILOT, EGOLIFE = ORACLES / "pilot-s1", ORACLES / "egolife-s1"

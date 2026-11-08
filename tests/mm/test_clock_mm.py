@@ -1,6 +1,6 @@
-"""mm and the working clock (plan 6.5, 8.2, decision D3; written for this repository, U14): Multimem keeps no per-job wait, so neither of mm's sessions
+"""mm and the working clock (plan 6.5, 8.2, decision D3; written for this repository, U14): MultimediaSearch keeps no per-job wait, so neither of mm's sessions
 can say how long a case queued for the GPU, and the clock runs on the wall. That is exact at one exec at a time and wrong at several, so the core
-refuses several on the working clock (`mmmb run`, before any agent starts) and `mmmb clock-check` refuses mm altogether until Multimem reports the
+refuses several on the working clock (`mmsb run`, before any agent starts) and `mmsb clock-check` refuses mm altogether until MultimediaSearch reports the
 queue. Over the real system, the tiny week's real store and the fake decider; no agent, no model and no daemon of the owner's.
 
 mm needs the GPU, so it runs one exec at a time unless `--gpu-jobs` asks for more (core/atonce.py): the defaults are never refused, `--gpu-jobs 2`
@@ -17,25 +17,25 @@ from datetime import datetime
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import MM, Opened, context  # noqa: E402
 
-from mmmb import cli, scenarios  # noqa: E402
-from mmmb.core import dryrun, fs  # noqa: E402
-from mmmb.core.agents import claude  # noqa: E402
-from mmmb.core.build import INGESTED, write_dump  # noqa: E402
-from mmmb.core.clock import WALL, WORKING, check_queue  # noqa: E402
-from mmmb.core.clockcheck import queued_at_once  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Case  # noqa: E402
-from mmmb.core.question import write_questions  # noqa: E402
-from mmmb.core.runfolder import RunFolder  # noqa: E402
-from mmmb.systems.mm import home as mm_home  # noqa: E402
-from mmmb.systems.mm import models  # noqa: E402
-from mmmb.systems.mm.daemon import Daemon  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb import cli, scenarios  # noqa: E402
+from mmsb.core import dryrun, fs  # noqa: E402
+from mmsb.core.agents import claude  # noqa: E402
+from mmsb.core.build import INGESTED, write_dump  # noqa: E402
+from mmsb.core.clock import WALL, WORKING, check_queue  # noqa: E402
+from mmsb.core.clockcheck import queued_at_once  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Case  # noqa: E402
+from mmsb.core.question import write_questions  # noqa: E402
+from mmsb.core.runfolder import RunFolder  # noqa: E402
+from mmsb.systems.mm import home as mm_home  # noqa: E402
+from mmsb.systems.mm import models  # noqa: E402
+from mmsb.systems.mm.daemon import Daemon  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 D1 = Config("mm/d1-3B", "mm", "d1-3B", False)

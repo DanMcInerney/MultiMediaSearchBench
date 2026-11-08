@@ -1,4 +1,4 @@
-"""New tests for mmmb/core/runfolder.py and paths.py. The deny words are held to the goldens the old code wrote (U0:
+"""New tests for mmsb/core/runfolder.py and paths.py. The deny words are held to the goldens the old code wrote (U0:
 tests/oracles/recorded/exec/deny-v7.json and deny-v8.json, from `Run.deny` and `EgoRun.deny` over sentinel folders); the intended
 differences of plan 7.3 (difference 7) are asserted, not ignored. What belongs to a scenario's own words (V7's `haystack` words, V8's
 folders of recordings) is fed in from the same goldens here and compared against the real scenarios in U2 and U6."""
@@ -13,31 +13,32 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+from golden_names import golden_json
 from test_question import BASE, file_of
 
-from mmmb.core import fs, paths
-from mmmb.core.agents.common import reached
-from mmmb.core.config import parse_config
-from mmmb.core.contract import Isolation
-from mmmb.core.question import load_questions, write_questions
-from mmmb.core.runfolder import IN_ONLY, JOBS_MAX, RunFolder, check_temp, package_root
+from mmsb.core import fs, paths
+from mmsb.core.agents.common import reached
+from mmsb.core.config import parse_config
+from mmsb.core.contract import Isolation
+from mmsb.core.question import load_questions, write_questions
+from mmsb.core.runfolder import IN_ONLY, JOBS_MAX, RunFolder, check_temp, package_root
 
 RECORDED = Path(__file__).parent / "oracles" / "recorded"
-DENY = {name: json.loads((RECORDED / "exec" / f"deny-{name}.json").read_text(encoding="utf-8")) for name in ("v7", "v8")}
+DENY = {name: golden_json(RECORDED / "exec" / f"deny-{name}.json") for name in ("v7", "v8")}  # with the renames of tests/golden_names.py: `.mms`
 PILOT = json.loads((RECORDED / "pilot-s1" / "run.json").read_text(encoding="utf-8"))
 RECIPE = {"scale": "pilot", "seed": 1}  # what the stub scenario is built from; its hashes are the recorded pilot's
 SENTINEL = DENY["v7"]["inputs"]  # D:\__RUN__, D:\__TEMP__, D:\__OUT__, D:\__ROOT__, tag TAG
 CACHE = r"D:\__CACHE__"  # the golden has no cache folder: the old code had none
 NO_ISOLATION = Isolation((), (), (), {})
-MM_ISOLATION = Isolation(("MULTIMEM_",), (".multimem",), (), {"MULTIMEM_HOME": "no-mm-home"})
+MM_ISOLATION = Isolation(("MMS_",), (".mms",), (), {"MMS_HOME": "no-mm-home"})
 DEFAULTS = {"files": None, "mm": "d1-3B"}
 # the old DENY_WORDS' path part for the old out folder, which G1's F1 keeps, and the same rule for the sentinel runs and cache folders, for the
-# results and the temp folder of the runs recorded before MMMB, and for the tests' folder
+# results and the temp folder of the runs recorded before MMSB, and for the tests' folder
 OLD_OUT_WORDS = ("/mm-bench/", '/mm-bench"', "/mm-bench ", "/mm-bench'")
 NEW_RUNS_WORDS = ("/__out__/", '/__out__"', "/__out__ ", "/__out__'")
 NEW_CACHE_WORDS = ("/__cache__/", '/__cache__"', "/__cache__ ", "/__cache__'")
 EARLIER_TEMP_WORDS = ("/mm-bench-temp/", '/mm-bench-temp"', "/mm-bench-temp ", "/mm-bench-temp'")
-TESTS_WORDS = ("d:/mmmb-temp", "/mmmb-temp/", '/mmmb-temp"', "/mmmb-temp ", "/mmmb-temp'")
+TESTS_WORDS = ("d:/mmsb-temp", "/mmsb-temp/", '/mmsb-temp"', "/mmsb-temp ", "/mmsb-temp'")
 
 
 class StubScenario:
@@ -125,8 +126,8 @@ def test_the_isolation_given_adds_its_words_and_the_agents_setup_is_denied_whate
     scenario = StubScenario()
     with_mm = run_of(scenario).deny(None, MM_ISOLATION)
     without = run_of(scenario).deny(None, NO_ISOLATION)
-    assert set(with_mm) - set(without) == {".multimem"} and set(without) <= set(with_mm)
-    assert ".claude" in without and ".codex" in without and ".multimem" not in without
+    assert set(with_mm) - set(without) == {".mms"} and set(without) <= set(with_mm)
+    assert ".claude" in without and ".codex" in without and ".mms" not in without
 
 
 def test_every_word_is_lower_case_with_forward_slashes_and_only_the_other_slots_are_denied_by_name(sentinels):
@@ -166,10 +167,10 @@ def test_a_package_installed_in_site_packages_denies_its_own_folder_and_not_the_
 
 # -- the answers elsewhere on the disk (G1's F1) ---------------------------------------------------------------------------------
 
-REAL_RUN = Path(r"D:\mmmb-runs\20261201-0000-v7-pilot-s1")
+REAL_RUN = Path(r"D:\mmsb-runs\20261201-0000-v7-pilot-s1")
 # where an agent with its own tools once could read a recorded or planted answer, each the way the review reached it
 ELSEWHERE = {
-    "a run of the tests": r"D:\mmmb-temp\pytest-coord\popen-gw0\pilot0\20261104-0314-pilot-s1\questions.jsonl",
+    "a run of the tests": r"D:\mmsb-temp\pytest-coord\popen-gw0\pilot0\20261104-0314-pilot-s1\questions.jsonl",
     "a recorded run, by a bash path": "cat /d/mm-bench/20261104-0314-pilot-s1/results/claude/files/text-config-asof-1.json",
     "a recorded run's report": r"type D:\mm-bench\20261104-0314-pilot-s1\report.md",
     "the temp folder of a recorded run": r"D:\mm-bench-temp\mmb-de178c4d7f-data\notes\a.md",
@@ -188,14 +189,14 @@ def test_what_a_run_of_the_tests_or_a_recorded_run_holds_is_denied_to_a_run_that
 
 
 def test_the_temp_folder_a_run_uses_by_default_is_not_the_folder_the_tests_use_and_the_earlier_runs_words_keep_their_form():
-    assert paths.TEMP == Path(r"D:\mmmb-data") and not paths.TEMP.is_relative_to(paths.TESTS) and paths.TESTS == Path(r"D:\mmmb-temp")
+    assert paths.TEMP == Path(r"D:\mmsb-data") and not paths.TEMP.is_relative_to(paths.TESTS) and paths.TESTS == Path(r"D:\mmsb-temp")
     assert [p.name for p in paths.EARLIER] == ["mm-bench", "mm-bench-temp"]
     words = real_run().deny(None, NO_ISOLATION)
     assert {*OLD_OUT_WORDS, *EARLIER_TEMP_WORDS, *TESTS_WORDS} <= set(words)
 
 
 def test_the_tests_folder_is_denied_unless_the_run_is_in_it_so_the_tests_still_run():
-    sibling = r"D:\mmmb-temp\pytest-coord\popen-gw0\pilot0\questions.jsonl"
+    sibling = r"D:\mmsb-temp\pytest-coord\popen-gw0\pilot0\questions.jsonl"
     assert reached(sibling, real_run().deny(None, NO_ISOLATION)) in TESTS_WORDS
     in_tests = paths.TESTS / "pytest-x" / "run"
     for run in (real_run(in_tests, paths.TESTS / "pytest-x" / "temp"), real_run(REAL_RUN, paths.TESTS / "pytest-x" / "temp"),
@@ -219,7 +220,7 @@ def test_a_run_started_from_a_worktree_cannot_read_the_recorded_answers_in_the_m
     run = real_run(tmp_path / "run", tmp_path / "temp")
     monkeypatch.setattr(paths, "ROOT", tree)
     words = run.deny(None, NO_ISOLATION)
-    assert reached(str(answers), words) == posix(main) and reached(str(tree / "mmmb" / "x.py"), words) == posix(tree)
+    assert reached(str(answers), words) == posix(main) and reached(str(tree / "mmsb" / "x.py"), words) == posix(tree)
     assert paths.checkouts() == (tree, main)
     monkeypatch.setattr(paths, "ROOT", main)
     assert paths.checkouts() == (main,) and posix(main) in run.deny(None, NO_ISOLATION), "from the main checkout itself, once"
@@ -277,7 +278,7 @@ def test_the_three_folders_share_a_volume_and_the_check_says_when_they_do_not():
     paths.check_volume(Path("D:/a"), Path("d:/b/c"))
     with pytest.raises(ValueError, match="share a volume"):
         paths.check_volume(Path("D:/a"), Path("C:/b"))
-    assert (paths.ROOT / "pyproject.toml").is_file() and (paths.ROOT / "mmmb" / "core" / "paths.py").is_file()
+    assert (paths.ROOT / "pyproject.toml").is_file() and (paths.ROOT / "mmsb" / "core" / "paths.py").is_file()
 
 
 # -- opening a run again ------------------------------------------------------------------------------------------------

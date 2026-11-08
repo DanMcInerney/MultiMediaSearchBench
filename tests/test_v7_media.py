@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_haystack_media.py at fe0ece5 (37 of its 39 tests; the other 2 are tests/mm's).
+"""Ported from MultimediaSearch tests/test_haystack_media.py at fe0ece5 (37 of its 39 tests; the other 2 are tests/mm's).
 
 The 2 left out run the real reader's change gate (`reader._video`); `reader` is `frames.py` in the others.
 
@@ -27,20 +27,20 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from mmmb.scenarios.v7_screen import constants, media_sound, shortcuts
-from mmmb.scenarios.v7_screen.constants import PITCH_RMS, PITCH_SHARE, PROFILE, RATE, SHADE_TOL, pitch_share, shade_share
-from mmmb.scenarios.v7_screen.frames import audio_span, decode_frames, fit, frame_times
-from mmmb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, SHADE_GAP, SOURCE_NEEDLES, _px, distance, gap
-from mmmb.scenarios.v7_screen.media_photo import PHOTO, photo, sign_box
-from mmmb.scenarios.v7_screen.media_porch import (
+from mmsb.scenarios.v7_screen import constants, media_sound, shortcuts
+from mmsb.scenarios.v7_screen.constants import PITCH_RMS, PITCH_SHARE, PROFILE, RATE, SHADE_TOL, pitch_share, shade_share
+from mmsb.scenarios.v7_screen.frames import audio_span, decode_frames, fit, frame_times
+from mmsb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, SHADE_GAP, SOURCE_NEEDLES, _px, distance, gap
+from mmsb.scenarios.v7_screen.media_photo import PHOTO, photo, sign_box
+from mmsb.scenarios.v7_screen.media_porch import (
     BOX, BOX_AREA, BOX_H, BOX_W, BOX_X0, BOX_Y1, PORCH, TOP_STRIP, _stamp_text, parcel_box, porch_frame, write_porch,
 )
-from mmmb.scenarios.v7_screen.media_screen import (
+from mmsb.scenarios.v7_screen.media_screen import (
     ACCENTS, APPS, DIALOG, DIALOG_AREA, DIALOG_AT, FLOOR_S, SCREEN, TASKBAR_H, TASKBAR_ICON, TASKBAR_INK, TASKBAR_LINE, TASKBAR_LOGO,
     TASKBAR_RGB, TICK_S, TITLE_PX, TYPING, ScreenFrame, _rows, dialog_at, screen_frame, screen_frames, screen_layers, screen_state, stamp,
     typed_text, typing_cap, typing_limit, typing_text, with_floor, write_screen,
 )
-from mmmb.scenarios.v7_screen.media_sound import (
+from mmsb.scenarios.v7_screen.media_sound import (
     ALARM_DUR, ALARM_HZ, BED_DBFS, BEEPER_HZ, CHIME_DUR, DING_HZ, DOORBELL_PAIRS, LOUD_GAIN, MAX_PEAK, PITCH_GAP, RING_HZ, TIMER_HZ,
     mic_samples, write_mic,
 )
@@ -48,7 +48,7 @@ from mmmb.scenarios.v7_screen.media_sound import (
 
 
 def packet_duration(path: Path) -> float | None:
-    """How long a media file plays, from its packets (copied from `media.duration` of Multimem at fe0ece5)."""
+    """How long a media file plays, from its packets (copied from `media.duration` of MultimediaSearch at fe0ece5)."""
     first = last = None
     with av.open(str(path)) as container:
         for packet in container.demux():
@@ -727,7 +727,7 @@ def test_a_parcel_is_where_its_box_says_within_the_places_of_its_area_and_a_visi
     """`box` is where the parcel's face is (any of the places of BOX_AREA, the whole box and its top face inside it, on the step); a box
     outside is refused. In BOX_AREA a brown filter finds more in the visitor's coat than in a parcel at any place: the area holds no brown
     door, so a crop of it keeping brown is not a way to the parcel."""
-    from mmmb.scenarios.v7_screen import shortcuts  # (its hue bands: what an agent's filter for "brown" keeps)
+    from mmsb.scenarios.v7_screen import shortcuts  # (its hue bands: what an agent's filter for "brown" keeps)
 
     w, h = PORCH
     ax0, ay0, ax1, ay1 = BOX_AREA

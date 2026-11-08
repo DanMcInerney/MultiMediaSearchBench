@@ -1,7 +1,7 @@
 """The world the tests of the command line run in (tests/test_cli.py, test_cli_build.py, test_cli_v8.py): a registry folder of systems with
 a stand-in system `stub` beside the real `files` (and the real system.toml of the others), and a scenario `toy` that is V7's plan, prompts
 and views over a dump of three small files, written in a second instead of a week's media in half a minute. Nothing here starts a process
-or imports multimem.
+or imports mms.
 
 `toy` is a module with the names of a `Scenario`, as the real ones are; `use` puts it in the scenario registry for a test. Its probe
 returns what a test sets (`PROBE`) and notes how it was called (`PROBED`), as the old tests' stand-in for `shortcuts.run` did."""
@@ -18,14 +18,14 @@ import imageio_ffmpeg
 import pytest
 from stub_system import Stub, StubSession, StubSystem
 
-from mmmb import cli, scenarios, systems
-from mmmb.core.contract import Description, Dump, IngestReport, RetrievalResult
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.core.scenario import ProbeOutcome, dump_key
-from mmmb.scenarios import v7_screen as v7
-from mmmb.scenarios.v7_screen.manifest import LOGS, entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
+from mmsb import cli, scenarios, systems
+from mmsb.core.contract import Description, Dump, IngestReport, RetrievalResult
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.core.scenario import ProbeOutcome, dump_key
+from mmsb.scenarios import v7_screen as v7
+from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
 
 DAYS = "2026-10-30,2026-10-31"
 SEED = 7
@@ -149,7 +149,7 @@ def build_args(w, seed: int = SEED, configs: str = "files,stub", *extra: str) ->
 
 
 def built_run(w, seed: int = SEED, configs: str = "files,stub", *extra: str) -> RunFolder:
-    """The run `mmmb build` makes in the world, opened."""
+    """The run `mmsb build` makes in the world, opened."""
     assert w.main(*build_args(w, seed, configs, *extra)) == 0
     (folder,) = [p for p in w.out.iterdir() if p.name.endswith(f"-s{seed}")]
     return RunFolder.open(folder, scenarios.get)

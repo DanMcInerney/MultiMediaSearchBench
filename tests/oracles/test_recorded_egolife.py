@@ -22,12 +22,12 @@ import convert_recorded
 import pytest
 from v8_recorded import CONVERTED, RECORDED, REPORT, V8, download_skip, zone_skip
 
-from mmmb import scenarios
-from mmmb.core import fs, grade, report
-from mmmb.core.config import Config
-from mmmb.core.contract import McpServer, Served
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.scenario import Access
+from mmsb import scenarios
+from mmsb.core import fs, grade, report
+from mmsb.core.config import Config
+from mmsb.core.contract import McpServer, Served
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.scenario import Access
 
 NAME = "20261103-0257-egolife-s1"  # the run's folder name is in the report, so the converted run is copied to a folder of that name
 RENAMES = {"control": "files", "tested": "mm", "tested_control": "mm_files", "control_blind": "files_blind", "tested_blind": "mm_blind",
@@ -182,7 +182,7 @@ def test_the_checked_in_conversion_is_what_the_converter_writes_from_the_recorde
 
 NEUTRAL = """
 import sys
-BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "multimem", "conftest", "day",
+BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "mms", "conftest", "day",
            "fake_decider"}
 
 
@@ -194,16 +194,16 @@ class Blocker:
 
 sys.meta_path.insert(0, Blocker())
 import importlib, pkgutil
-import mmmb.scenarios.v8_egolife as package
+import mmsb.scenarios.v8_egolife as package
 for module in pkgutil.iter_modules(package.__path__):
-    importlib.import_module("mmmb.scenarios.v8_egolife." + module.name)
+    importlib.import_module("mmsb.scenarios.v8_egolife." + module.name)
 import json
 from datetime import date
 from pathlib import Path
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.config import Config
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.config import Config
+from mmsb.core.runfolder import RunFolder
 
 folder = Path(sys.argv[1])
 meta = fs.read_json(folder / "run.json")
@@ -214,7 +214,7 @@ assert not BLOCKED & set(sys.modules), BLOCKED & set(sys.modules)
 """
 
 
-def test_the_report_of_the_converted_run_is_the_same_with_the_old_modules_and_multimem_refused(run, tmp_path):
+def test_the_report_of_the_converted_run_is_the_same_with_the_old_modules_and_mms_refused(run, tmp_path):
     done = subprocess.run([sys.executable, "-c", NEUTRAL, str(run.folder), str(tmp_path / "report.md")], capture_output=True, text=True,
                           cwd=tmp_path)
     assert done.returncode == 0, done.stderr[-2000:]

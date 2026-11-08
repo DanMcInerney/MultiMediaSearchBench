@@ -1,0 +1,17 @@
+[system]
+name = "mm"
+class = "mmsb.systems.mm.system:Mm"
+extra = "mm"
+license = "MIT"
+default_variant = "d1-3B"
+horizon = "cut"
+
+[isolation]
+env_drop_prefixes = ["MMS_"]
+# a home, `.mms`, as a path part: before a slash, a quote or a space (as runfolder.ENDS ends a folder's name). Not `.mms`
+# alone, which `.mms-project` holds: the marker an mm exec's own working folder has (2026-11-07: a listing of it was an escape)
+deny_words = [".mms/", ".mms\"", ".mms ", ".mms'"]
+deny_package_roots = ["mms"]
+
+[isolation.env_nowhere]
+MMS_HOME = "no-mm-home"

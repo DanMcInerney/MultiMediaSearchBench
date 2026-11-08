@@ -1,10 +1,10 @@
-# MultiMediaMemoryBench (MMMB): design
+# MultiMediaSearchBench (MMSB): design
 
-Status: built (6 November 2026). [VISION.md](VISION.md) says what MMMB is for; this file says how. MMMB is a standalone
+Status: built (6 November 2026). [VISION.md](VISION.md) says what MMSB is for; this file says how. MMSB is a standalone
 benchmark of real piles of media: four scenarios, one for each media shape, built from real recordings with every answer
 taken from the source's own labels (5.7), on a shared builder (7.2), graded by fixed rules (6.1) and reported by a neutral
-report (6.3). The benchmark first copied from Multimem (P0, 5 November) is `mmmb` too: the V7 and V8 scenarios and the `mm`
-system stay as extras, and the core runs with Multimem not installed. Not done: full runs of the four scenarios with real
+report (6.3). The benchmark first copied from MultimediaSearch, then called Multimem (P0, 5 November) is `mmsb` too: the V7 and V8 scenarios and the `mm`
+system stay as extras, and the core runs with MultimediaSearch not installed. Not done: full runs of the four scenarios with real
 agents, the pilot re-run, the first `mm+files` run, and the check of the working-time clock (section 12). A section says
 where it describes what later work will build, and every estimate is marked as one. Section 8.1 is measured.
 [TESTING.md](TESTING.md) says how the build was checked.
@@ -14,7 +14,7 @@ where it describes what later work will build, and every estimate is marked as o
 **The task:** a user hands an AI agent a large dump of their own media and asks for something in it ("when was the parcel
 taken?", "find the voice memo where I said the gate code"). A **search system** is anything that ingests a dump and gives
 the agent tools to search it:
-- a local model that scans time windows (Multimem);
+- a local model that scans time windows (MultimediaSearch);
 - an embedding index;
 - a transcript search;
 - a long-context model.
@@ -50,11 +50,11 @@ Six layers. Only the last knows any system.
 **The layout as built:**
 
 ```
-MultiMediaMemoryBench/
+MultiMediaSearchBench/
   VISION.md  DESIGN.md  TESTING.md  README.md  MEDIA.md  pyproject.toml  uv.lock  .python-version
-  mmmb/cli.py       build, ingest, run, retrieve, report, compare, repeat, clock-check: the order of each command's steps
-  mmmb/arguments.py   the commands' names, options and defaults
-  mmmb/core/        the neutral half; one module for each part of the runner
+  mmsb/cli.py       build, ingest, run, retrieve, report, compare, repeat, clock-check: the order of each command's steps
+  mmsb/arguments.py   the commands' names, options and defaults
+  mmsb/core/        the neutral half; one module for each part of the runner
     contract.py config.py       the types a system and the runner exchange (3.1); a configuration's name (4)
     question.py grade.py        the question file (6.1) and the value rules
     answer.py grounded.py       the final answer and its grounded score (6.2, 6.3)
@@ -65,33 +65,33 @@ MultiMediaMemoryBench/
     summary.py                  the neutral report of the real scenarios (6.3)
     fs.py paths.py gpu.py probe.py     files and permissions; where things live; the GPU check; the probe's outcome
     agents/     spec.py (one exec as the agents get it), common.py, claude.py, codex.py
-  mmmb/systems/     a registry that reads every system.toml; files/  listing/  mm/       # one folder per plug-in
-  mmmb/scenarios/   a registry; realdump/ (the real scenarios' shared builder); v1_security/  i3_trailcam/  a1_home_audio/
+  mmsb/systems/     a registry that reads every system.toml; files/  listing/  mm/       # one folder per plug-in
+  mmsb/scenarios/   a registry; realdump/ (the real scenarios' shared builder); v1_security/  i3_trailcam/  a1_home_audio/
                     m4_samples/; the extras v7_screen/  v8_egolife/                     # recipe, builder, questions, prompts
   tests/            unit tests; oracles/ (the recorded goldens and the code that made them); mm/ (needs the mm extra)
   results/          <date>-<selection>/                                                 # published reports
   media/            sources.jsonl (MEDIA.md)
 ```
 
-Each system's dependencies are an optional extra of `pyproject.toml` (`mmmb[mm]`). The `mm` extra is a path source on this
-machine, because Multimem has no remote (13.8).
+Each system's dependencies are an optional extra of `pyproject.toml` (`mmsb[mm]`). The `mm` extra is `mms`, MultimediaSearch, a git source
+pinned to one commit (D4).
 
 **Where things live (correction C4).** Downloads stay in `D:\bench-data`, fetched once (V8 reads `D:\bench-data\egolife`).
-A prepared dump cannot be there, because V8 denies that folder to its agents. A prepared dump is `D:\mmmb-data\mmb-<key10>-data`,
-read-only; its record and each system's store are in `D:\mmmb-cache`; a run's folder is in `D:\mmmb-runs`. The three are
+A prepared dump cannot be there, because V8 denies that folder to its agents. A prepared dump is `D:\mmsb-data\mmb-<key10>-data`,
+read-only; its record and each system's store are in `D:\mmsb-cache`; a run's folder is in `D:\mmsb-runs`. The three are
 changed with `--temp`, `--cache` and `--out`. They must share a volume, because a store is copied into a run with hard
-links, and the commands refuse folders on two drives. `D:\mmmb-data` may hold only `mmb-*` folders (`check_temp`), because an
-agent with its own tools can list it. The tests keep theirs in `D:\mmmb-temp`. The runs recorded before MMMB (`D:\mm-bench`,
+links, and the commands refuse folders on two drives. `D:\mmsb-data` may hold only `mmb-*` folders (`check_temp`), because an
+agent with its own tools can list it. The tests keep theirs in `D:\mmsb-temp`. The runs recorded before MMSB (`D:\mm-bench`,
 `D:\mm-bench-temp`) hold the pilot's answers, so they are on every agent's deny list, as are this repository and its main
 checkout.
 
 **The neutrality check (as built, `tests/test_neutral.py`).** The core, the `files` and `listing` systems and every
-scenario install and run on a machine where Multimem has never been installed.
-- Every run, fast: a subprocess whose import system refuses `multimem`, the tests' helpers and the old root modules imports
-  every module under `mmmb.core`, `mmmb.scenarios` and each system but `mm`, reads mm's `system.toml`, and sees opening `mm`
+scenario install and run on a machine where MultimediaSearch has never been installed.
+- Every run, fast: a subprocess whose import system refuses `mms`, the tests' helpers and the old root modules imports
+  every module under `mmsb.core`, `mmsb.scenarios` and each system but `mm`, reads mm's `system.toml`, and sees opening `mm`
   give "mm needs the mm extra: uv sync --extra mm".
-- Every run, two scans of the source: no import of `multimem` outside `mmmb/systems/mm` and `tests/mm`; and no import or
-  name of a system inside `mmmb/core` or `mmmb/scenarios`, apart from a short list that gives its reason for each
+- Every run, two scans of the source: no import of `mms` outside `mmsb/systems/mm` and `tests/mm`; and no import or
+  name of a system inside `mmsb/core` or `mmsb/scenarios`, apart from a short list that gives its reason for each
   (`files` as the name of a configuration, a text anchor of PIL that is spelled `mm`). Words in text are not scanned:
   the report's text still quotes the recorded pilot's words about mm.
 - Slow (`-m slow`): a fresh environment made with `uv sync --frozen --no-default-groups` builds V7 tiny, runs its probe,
@@ -101,7 +101,7 @@ scenario install and run on a machine where Multimem has never been installed.
 
 ### 3.1 The contract
 
-A system is a folder under `mmmb/systems/` with a `system.toml` and a class. The registry reads every `system.toml` as
+A system is a folder under `mmsb/systems/` with a `system.toml` and a class. The registry reads every `system.toml` as
 TOML and imports a class only when a configuration names that system. That is how the core knows what every agent shell
 must keep out (`[isolation]`: environment prefixes to drop, words no command may hold, the repositories of installed
 packages, variables that lead nowhere) while the system itself is absent. A system whose extra is not installed is refused
@@ -109,7 +109,7 @@ when it is named, with the extra's name. There is no fallback.
 
 **Correction C2.** A daemon and a model load span many cases, so a system cannot be a set of per-case calls. The `System`
 builds stores, and `open` returns a `Session` that lives across the cases of one agent and configuration. `serve`, `reset`,
-`usage` and `oracle` are the session's. The types are in `mmmb/core/contract.py`.
+`usage` and `oracle` are the session's. The types are in `mmsb/core/contract.py`.
 
 | `System` operation | Does | Rules |
 | --- | --- | --- |
@@ -150,7 +150,7 @@ A session with nothing to do (`PlainSession`) serves no server and costs nothing
 
 ### 3.2 The systems to ship
 
-A benchmark with one contestant only tests that contestant. MMMB ships common, cheap baselines beside mm:
+A benchmark with one contestant only tests that contestant. MMSB ships common, cheap baselines beside mm:
 
 | System | What it is | Tools it gives the agent | Ingest |
 | --- | --- | --- | --- |
@@ -158,7 +158,7 @@ A benchmark with one contestant only tests that contestant. MMMB ships common, c
 | `listing` | the floor and the leak filter (section 7.3) | a listing of names, sizes, times, EXIF and container fields; no pixels or sound | seconds |
 | `embed` | the common "multimodal RAG" setup | `search(text or picture, since, until, k)` over frames at 1 fps and photos (SigLIP or CLIP) and 5 s sound windows (CLAP); `frame(file, t)` | GPU: every frame and window once |
 | `transcript` | speech made searchable | `search(words, since, until)` over a timestamped transcript (Whisper) | GPU: all sound once |
-| `mm` | Multimem: a small local model reads every window in a range against the agent's question, at question time | `find`, `ask`, `look`, `label`, and mm's skill | CPU only; the GPU works per question |
+| `mm` | MultimediaSearch (`mms`): a small local model reads every window in a range against the agent's question, at question time | `find`, `ask`, `look`, `label`, and mm's skill | CPU only; the GPU works per question |
 | hosted (later) | a long-context model given the dump in chunks | `ask(question, files)` | none; API dollars per case |
 
 `embed` and `transcript` pay the GPU once at ingest, and `mm` pays it on every case. The report will show both, amortised
@@ -178,7 +178,7 @@ P0 builds `files`, `listing` and `mm`. `embed`, `transcript` and the hosted syst
   cut every clip from every question and the agent got an empty listing. So `ingest` compares each file's `mtime` with the
   manifest's `t`, read for that check only and never listed or served, and reports a file more than one second off as
   `misdated`; every command that would use the store then refuses the run, naming the files and both times. `listing` on V8
-  is refused at the build or at `mmmb ingest`, before any agent. One second is the tolerance because it is mm's own for the time
+  is refused at the build or at `mmsb ingest`, before any agent. One second is the tolerance because it is mm's own for the time
   it stored a file at, and covers a volume that keeps whole seconds. A log is only required not to be before its first line,
   because its `mtime` is its last line's. A cached listing store is valid only for a dump with the same `mtime`s.
 - It reads all five media, so every question is asked of it. It is a filter for leaks, not a reader (7.3).
@@ -213,8 +213,8 @@ copied code did.
 **Agents:** Claude Code and Codex for now.
 - Each runs headless and locked down: no network, no access outside its run, none of the owner's skills or plugins.
 - Model, effort and turn cap are the same in every configuration. Claude is `sonnet` at `high` effort with a cap of 60
-  turns; Codex is `gpt-6.1-terra` at `high`, and the pilot ran it at `medium`. The environment (`MMMB_CLAUDE_MODEL`,
-  `MMMB_CLAUDE_EFFORT`, `MMMB_CODEX_MODEL`, `MMMB_CODEX_EFFORT`) and the flags of `mmmb run` set them; `mmmb repeat` uses what
+  turns; Codex is `gpt-6.1-terra` at `high`, and the pilot ran it at `medium`. The environment (`MMSB_CLAUDE_MODEL`,
+  `MMSB_CLAUDE_EFFORT`, `MMSB_CODEX_MODEL`, `MMSB_CODEX_EFFORT`) and the flags of `mmsb run` set them; `mmsb repeat` uses what
   the recorded run's results say.
 - The prompt skeleton is shared: the user's question, the date and time "now", where the dump is, and the answer format
   (section 6.2). A system adds its own instructions and tool schemas. The agent builds its command line from what the
@@ -232,9 +232,9 @@ once per system. The questions mix the kinds in section 5.6. The tables give one
 [MEDIA.md](MEDIA.md) says where each scenario's media comes from, what is already downloaded, and what is still missing
 (4 November 2026). Licences are recorded there but are not a filter (section 11.3).
 
-P0 built V7 and V8 only; V1, I3, A1 and M4 followed on 6 November (5.7). A scenario is a module under `mmmb/scenarios/` named
+P0 built V7 and V8 only; V1, I3, A1 and M4 followed on 6 November (5.7). A scenario is a module under `mmsb/scenarios/` named
 so that it can be imported (C6): `v1_security` and `v7_screen`, not `V1-security`. Its questions keep the ID of the tables below (`Question.scenario` is `V7`, `V8`).
-A scenario is the functions of the `Scenario` protocol (`mmmb/core/scenario.py`): `recipe`, `hashes`, `build`, `probe`,
+A scenario is the functions of the `Scenario` protocol (`mmsb/core/scenario.py`): `recipe`, `hashes`, `build`, `probe`,
 `prompt`, `view`, `deny_words`, `after_exec`, `release`, `report`, and a line in the registry. It never knows a system.
 Agents cannot hear, so the truth of every sound question comes from a mixing list, a script or a dataset's labels, never
 from an agent listening. Speech-heavy scenarios (A3, M1-M3) are reported apart as well as in the totals, since some
@@ -381,7 +381,7 @@ One JSON object per line, kept outside the dump and never visible to a system or
 Evidence spans are in seconds into the file. The dump's manifest gives each file's true start time, so the grader can
 read a cited time either way.
 
-**As built (`mmmb/core/question.py`).** The example is shortened. `load_questions` is the one place the file is parsed. It
+**As built (`mmsb/core/question.py`).** The example is shortened. `load_questions` is the one place the file is parsed. It
 refuses an unknown key, a missing key, a value of the wrong type, an unknown rule or a repeated `qid`, and everything after
 it holds dataclasses. A line also has the keys the separation turned out to need:
 - `options`: the choices of a multiple-choice question (V8), else null;
@@ -422,7 +422,7 @@ Every agent ends with one JSON object:
 A cited span may be wall-clock times or seconds into the file. A system that works in wall-clock time and an agent that
 works in file offsets are graded alike.
 
-**As built (`mmmb/core/answer.py`).**
+**As built (`mmsb/core/answer.py`).**
 - **Two formats.** `json` is the default. `line`, one final line `ANSWER: <answer>` with no evidence, is the recorded
   runs' format; it exists for the pilot re-run and is to go once Dan accepts that re-run (D1, section 12).
   `--answer-format` picks one; a run keeps its format in `run.json`, and changing it on a run that has results is refused. A
@@ -462,7 +462,7 @@ works in file offsets are graded alike.
 - **Cost:** agent tokens and dollars, and system GPU seconds and API dollars, per correct answer. Ingest cost is reported per
   dump and amortised over 1, 10 and 100 questions. A Pareto plot shows accuracy against seconds and dollars.
 
-**As built (`mmmb/core/grounded.py`).** `passed` is what it always was: the value rule, and no problem. The grounded status
+**As built (`mmsb/core/grounded.py`).** `passed` is what it always was: the value rule, and no problem. The grounded status
 is told beside it, so that a re-run compares with the recorded verdicts on `passed` and reports grounded accuracy next to
 them. The report's headline is still `passed`, because the recorded runs have no status. The statuses:
 
@@ -491,7 +491,7 @@ them. The report's headline is still `passed`, because the recorded runs have no
   1, 10 and 100 questions, and the count of searches an absent question drew. The report has seconds, tokens and GPU seconds
   per correct answer.
 
-**The neutral report (`mmmb/core/summary.py`, 6 November 2026).** The core's first report (`report.py`, `render.py`) is V7's
+**The neutral report (`mmsb/core/summary.py`, 6 November 2026).** The core's first report (`report.py`, `render.py`) is V7's
 mm report and stays where it is, because `compare`, `repeat`, the dry run and the recorded pilot's oracle read it there. The
 real scenarios report with `summary`, which names no system. Per scenario, agent and configuration: right out of n with its
 Wilson interval, grounded, lucky and unparsed answers, absent questions answered, `unknown` on a real one, seconds, thousands
@@ -499,7 +499,7 @@ of tokens and dollars per right answer, the mean `items_f1` of the `set` questio
 that a leak filter (`listing`) answered right, and that has something to find, is listed as a leak and left out of every other
 configuration's figures; a result that is not done (a limit, a setup fault) is counted under "to run again" and left out. Each
 other configuration, filters aside, is set beside the control (`files`, `--control`) on the questions both answered, with
-McNemar's counts. `mmmb report` gives a scenario's own report for its runs (the summary for the four real scenarios, which
+McNemar's counts. `mmsb report` gives a scenario's own report for its runs (the summary for the four real scenarios, which
 pool runs of other seeds and refuse the same questions twice; V8 one run at a time), and the summary with a table over all
 for runs of several scenarios.
 
@@ -513,7 +513,7 @@ Every scenario has a public **dev** split (about 30% of its questions) and a **t
 - For public datasets, which questions are in test stays private to the run.
 
 As built, V7 writes `dev` for seeds 1-10 and `test` for others, and V8 writes `dev` for all 50 questions, because mm's skill
-was tuned on those runs. `mmmb run --splits dev,test` selects by it. No test split exists yet.
+was tuned on those runs. `mmsb run --splits dev,test` selects by it. No test split exists yet.
 
 ## 7. Building the dumps
 
@@ -544,7 +544,7 @@ Dumps keep what real ones have:
 - EXIF present, stripped or wrong, time zones and daylight saving;
 - duplicates, nested folders, and names like `IMG_4821.HEIC` and `VID_20250612_181502.mp4`.
 
-**As built (`mmmb/scenarios/realdump`, 6 November 2026),** what the four real scenarios share:
+**As built (`mmsb/scenarios/realdump`, 6 November 2026),** what the four real scenarios share:
 - **Writing.** Each file is copied (never linked: the source stays read-only) into the dump under the name a device or folder would
   give it, in parallel, and its modified time is set to its recording time; the manifest entry measures it. A wall time with no
   zone is this machine's local time, so the recipe records the UTC offsets of its days and a dump built in another zone is
@@ -553,7 +553,7 @@ Dumps keep what real ones have:
   file), and puts the question's own numbers and times into the grade's `ignore`; `split` marks about 30% `dev` by the seed.
 - **The prompt** says the time it is ("It is now Monday 23 December 2013, 09:00"), what the pile is and where it is (or which
   system holds it), how its files are named and timed, and the answer request (6.2).
-- **The deny words:** the scenario's and the builder's code (`from mmmb`, `import mmmb`), the source's names in commands (as
+- **The deny words:** the scenario's and the builder's code (`from mmsb`, `import mmsb`), the source's names in commands (as
   paths where a name is inside ordinary code: `/sins` and not `sins`, which is in `isinstance`), and `bench-data`, where the
   sources are, in a command and in what it prints.
 - **The probe** (7.3).
@@ -564,11 +564,11 @@ Dumps keep what real ones have:
 container field, frame difference, splice seam, colour, loudness or frequency band may single out a needle.
 
 **Correction C1.** The probe is the scenario's, not the core's. `shortcuts.py` is V7 throughout: its floors are by V7's
-scale, and it reads V7's frame lists and the areas of its dialogs and boxes. It is `mmmb/scenarios/v7_screen/shortcuts.py`,
+scale, and it reads V7's frame lists and the areas of its dialogs and boxes. It is `mmsb/scenarios/v7_screen/shortcuts.py`,
 and each scenario brings its own probe. The core keeps the outcome (`passed`, `failed`, `skipped`, or `none` for a scenario
 with no probe, such as V8, a public dataset) and says what to say of a run whose probe did not pass (`core/probe.py`). The
 outcome is in `run.json`, the probe's files are `shortcuts.json` and `shortcuts.md` in the run folder, and the outcome is
-cached with the dump. `mmmb run` refuses a run whose probe failed unless `--anyway`; `mmmb build --no-probe` skips the
+cached with the dump. `mmsb run` refuses a run whose probe failed unless `--anyway`; `mmsb build --no-probe` skips the
 probe, and the report says so.
 
 **The real scenarios' probe (`realdump.probe`).** No file's path, and no text of its metadata, names a label: each label as a
@@ -610,7 +610,7 @@ Once per dump per system version:
 Every system meets the large-file track (L) here. The copied pilot already found two limits in mm this way (section 10.3).
 
 As built, a store's `ingest.json` holds the seconds, GPU seconds, bytes written, the files refused with the reason, the files
-misdated, and the system's `store_hash`. `mmmb build` and `mmmb ingest` print them. A misdated file refuses the run and every
+misdated, and the system's `store_hash`. `mmsb build` and `mmsb ingest` print them. A misdated file refuses the run and every
 later command over that store, even for another run. GB per minute and the time to the first answer are not built.
 
 ### 7.5 The size ladder
@@ -637,7 +637,7 @@ The pilot ran one system (mm with d1-3B) against `files`, on 3 synthetic days, s
 
 The run took about 3 hours of work, and 4 with a driver crash and a reboot. The laptop's NVIDIA driver has crashed under
 one GPU job and under three, so **exactly one GPU job runs at a time**, whatever the system. In the code that is one rule
-(`mmmb/core/atonce.py`, 8.4): a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` says
+(`mmsb/core/atonce.py`, 8.4): a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` says
 more, and `--jobs` and `--clock` do not. A per-question GPU system
 already keeps the GPU busy 76-85% of the time, so running more agents against it saves little. Time is saved by choosing
 cases, running GPU-free work beside GPU work, and ingesting once.
@@ -649,7 +649,7 @@ Running faster means choosing fewer cases. Nothing else about a run changes.
 - **Select** by case ID, scenario, media shape, question kind, split, rung of the size ladder, or any tag:
 
   ```
-  mmmb run --scenarios V1,A1,M4 --rung 1h --kinds last,absent --limit 12 --agents claude --configs files,mm+files
+  mmsb run --scenarios V1,A1,M4 --rung 1h --kinds last,absent --limit 12 --agents claude --configs files,mm+files
   ```
 
 - **`--limit N`** draws N cases at random, stratified by scenario and kind, with a fixed seed. A small run keeps the mix of
@@ -695,12 +695,12 @@ saving of running side by side at 25-35% of a run's wall time (an estimate: noth
 
 Two conditions:
 - **Dan's go-ahead.** CPU-heavy work beside a GPU job goes against the laptop's current "GPU runs alone" rule. This is
-  question 13.2, still unanswered, so running side by side is **off** unless `mmmb run --side-by-side` asks for it, and the
+  question 13.2, still unanswered, so running side by side is **off** unless `mmsb run --side-by-side` asks for it, and the
   run prints that it is on. Without the flag the cells of a run run one after another, as the copied `run_agents` did.
 - **Agents stay off the GPU:** CUDA is hidden from their environment, and `-hwaccel` and `nvidia-smi` are on their deny
   list. An agent decoding on the GPU would be a second GPU user.
 
-**As built (`mmmb/core/schedule.py`).** A cell is one agent and one configuration. With the flag, each cell gets a thread,
+**As built (`mmsb/core/schedule.py`).** A cell is one agent and one configuration. With the flag, each cell gets a thread,
 and the threads share the pools:
 - **The GPU token.** A cell that needs the GPU holds its one token for its whole length, its session's `open` and `close`
   included. The cells that need it take it in the order they would have run one after another. Cells that need none start
@@ -757,13 +757,13 @@ user's system has the GPU to itself. So:
 - A tool that returns early with partial results counts that time from when its GPU work starts, not from when it was
   queued, so a queued request does not come back empty and invite polling.
 - **Before trusting it,** run 10 cases both alone and queued, and compare answers, tokens and charged seconds
-  (`mmmb clock-check`, below).
+  (`mmsb clock-check`, below).
 
 **Budgets sized to the haystack:** 300 working seconds for an hour of media, 900 for a day or more, with a wall cap of 3×
 that. A case that the retrieval run shows no system can scan within its budget gets its hint narrowed, or is left out of
 default selections.
 
-**As built (P0), `mmmb/core/clock.py`.**
+**As built (P0), `mmsb/core/clock.py`.**
 - **The clock.** An exec is held to `working = wall - queue` against its limit (`--timeout`, 900 s for V7 and V8), and to a wall
   cap of 3× the limit whatever the queue. The agents look at it at least once a second while they wait for their process, so a
   queue that grows moves the end of the limit.
@@ -775,7 +775,7 @@ default selections.
 - **`--clock working|wall`,** on `run` and `repeat`, default `working`. `wall` charges wall time throughout.
 - **Result fields.** `clock`, `working_s` (what the limit was measured on) and `queue_s` (`null` when not reported). `seconds`
   stays the wall time, so the report is unchanged. A result made before the clock has none of them and is still done.
-- **How many at once (`mmmb/core/atonce.py`).** One rule, asked by the runner, every dry run and estimate, the refusal below and
+- **How many at once (`mmsb/core/atonce.py`).** One rule, asked by the runner, every dry run and estimate, the refusal below and
   `clock-check`. A cell runs `--jobs` execs at once (default 3), unless its system needs the GPU (`Description.needs_gpu`):
   then it runs `--gpu-jobs` (default 1), because three decision-model execs at once crashed the NVIDIA driver on 2 November
   2026. Neither is raised by the other, nor by `--clock`. The system's own limit (`Session.max_jobs`: mm is one at a time
@@ -793,12 +793,12 @@ default selections.
   with `--gpu-jobs` above 1 is allowed, because the owner asked for them, and prints the warning.
 - **`budget_s(media_hours)`** is linear from 300 s at 1 hour to 900 s at 24 hours (300 below and 900 above). It is unused until
   a scenario has an hour rung.
-- **mm reports no queue (C10, decision D3).** Multimem keeps no per-job wait, so `NoQueue`, the base of both of mm's sessions,
+- **mm reports no queue (C10, decision D3).** MultimediaSearch keeps no per-job wait, so `NoQueue`, the base of both of mm's sessions,
   answers `None`: mm is `clock: wall` until D3. That is exact at one exec at a time, which is mm's default (`--gpu-jobs 1`), as
   the pilot ran its mm cells: three mm execs at once crashed the NVIDIA driver on 2 November 2026. So several are only for
   `--gpu-jobs`, and until D3 the working clock refuses them. "Partial results count from GPU start" is in mm's adapter
-  too (its `ask` waits up to 45 s from the call). Both are changes to Multimem, about 30-50 lines. Not made.
-- **`mmmb clock-check RUN --config CONFIG [--agents --cases N --jobs N --gpu-jobs N]`** is the check before trusting it, **not yet
+  too (its `ask` waits up to 45 s from the call). Both are changes to MultimediaSearch, about 30-50 lines. Not made.
+- **`mmsb clock-check RUN --config CONFIG [--agents --cases N --jobs N --gpu-jobs N]`** is the check before trusting it, **not yet
   run.** It asks N cases (default 10) of each agent twice, alone and then all queued, the queued half at the execs at once of the
   rule above: `--gpu-jobs` for a system that needs the GPU, so for mm it needs `--gpu-jobs 2` or more (the default 1 queues
   nothing), else `--jobs` (default 3). It prints for each case its
@@ -811,9 +811,9 @@ default selections.
   system would run the cases fewer than two at a time (`--jobs 1`, or `--gpu-jobs 1`, the default, for a system that needs the GPU;
   a limit of the system's own is told apart), so nothing would queue; the system gives no queue figure and the queued half is over
   one exec at once (D3, which is every case of mm today); every case is exclusive; the system is not ready; or the configuration
-  has no system. It has no model or effort flags: `MMMB_*` apply. Cost and command: 12.2.
+  has no system. It has no model or effort flags: `MMSB_*` apply. Cost and command: 12.2.
 
-**Ingest once (`mmmb/core/cache.py`, as built):**
+**Ingest once (`mmsb/core/cache.py`, as built):**
 - Downloads are fetched once and content-hashed (EgoLife stays in `D:\bench-data`).
 - Each prepared dump is cached by the hash of its recipe. Its **key** is the sha256 of the scenario's name, its recipe and
   its generator as canonical JSON (reordering a dict changes nothing; a bump of the generator makes another dump). The dump is
@@ -837,7 +837,7 @@ default selections.
   and each system's store is kept beside it.
 - **To force a rebuild,** remove `<temp>/mmb-<key10>-data` and `<cache>/dumps/<key>`, and the stores
   (`<cache>/stores/<system>-<key10>`) if the bytes changed.
-- `mmmb build` and `mmmb repeat` take `--temp` and `--cache`; `run`, `ingest` and `retrieve` read them from `run.json`. A run
+- `mmsb build` and `mmsb repeat` take `--temp` and `--cache`; `run`, `ingest` and `retrieve` read them from `run.json`. A run
   made before the cache has none and is refused.
 - The synthetic generator writes with `--workers` files at once (default 3, the recorded build's).
 
@@ -850,7 +850,7 @@ default selections.
 
 - **The retrieval run:** each system's `oracle()` per needle, with no agent. It reports recall at k, average precision and
   seconds. It is cheap, needs no quota, and separates a system's search from the agent's use of it. As built it is
-  `mmmb retrieve RUN [--configs ...] [--dry-run]`, for the systems that declare an oracle (mm). Each needle question asks the
+  `mmsb retrieve RUN [--configs ...] [--dry-run]`, for the systems that declare an oracle (mm). Each needle question asks the
   yes/no its `retrieval` spec holds (`k` sightings, 5 for a `last` question and 50 for a count; 5 candidates besides; 1,800 s),
   and the ranked moments are scored
   against the truth within the spec's tolerance: found, top 5, the needle's best p, the first rank, false sightings, and why a
@@ -858,7 +858,7 @@ default selections.
   Recall at k and average precision as named here are not computed; the report's "recall" and "top 5" columns are these
   counts. It holds the GPU alone.
 - **Re-grading:** recorded runs are graded and reported again after a grader or report change (Harbor's `regrade`), with no
-  agent and no GPU. As built there is no command for it. `mmmb report` reads each result's `passed`, and the tests regrade the
+  agent and no GPU. As built there is no command for it. `mmsb report` reads each result's `passed`, and the tests regrade the
   260 recorded answers through the question files (`Question.grade`) and check that they equal the recorded verdicts, 110 of
   110 and 150 of 150.
 - **Replays for harness tests:** recorded tool results are replayed at their recorded latency, so the runner can be tested
@@ -896,20 +896,20 @@ smaller effect, or a smaller selection, is reported as not certified, never impl
 - **Sequential stopping, pre-registered:** cases run in a random order, and a comparison stops when an anytime-valid rule
   (an e-process or a confidence sequence) decides it, capped at 150. It saves most when the effect is large.
 
-## 10. Where the copied code stands, and how it becomes MMMB
+## 10. Where the copied code stands, and how it becomes MMSB
 
-### 10.1 What was tied to Multimem
+### 10.1 What was tied to MultimediaSearch
 
 The copied benchmark was nine files at the repository root, about 9,000 lines: `bench.py`, `claude_run.py`, `codex_run.py`,
 `egolife.py`, `grade.py`, `haystack.py`, `haystack_media.py`, `shortcuts.py` and `egolife_oracles.json`. They reached into
-Multimem for its reader, its config and ffmpeg lookup, and its test helpers (`day`, `fake_decider`, `conftest`); the `mm`
+MultimediaSearch for its reader, its config and ffmpeg lookup, and its test helpers (`day`, `fake_decider`, `conftest`); the `mm`
 arm's server, tool names and prompt were written into the agents; and `bench.py` held mm's daemon, snapshot homes, scrubbing,
 jobs, GPU estimate and model-only tier. All of it has moved and the old files are gone. Commit bb498a6 holds them, and
 `tests/oracles/capture_exec.py` reads them from there. Where each part went is the layout in section 2. Three moves were not
 a literal reading of the first design:
 - **The probe (C1)** is the scenario's: 7.3.
-- **Deny words (C3).** V7's are the old generator's eight words, because copies of `haystack.py` still sit in Multimem's
-  `benchmarks/` on this machine, and words for the new modules (`v7_screen`, `from mmmb`, `import mmmb`). A bare `mmmb` is not
+- **Deny words (C3).** V7's are the old generator's eight words, because copies of `haystack.py` still sit in MultimediaSearch's
+  `benchmarks/` on this machine, and words for the new modules (`v7_screen`, `from mmsb`, `import mmsb`). A bare `mmsb` is not
   one, because it would match the data folder's name.
 - **The window count (C5).** mm's `windows_in` read V7's plan, which a system may not see. It is rebuilt at ingest from the
   dump (`store/windows.json`) and held to the recorded `gpu_estimate_s`, `exclusive` and `beyond_timeout` of all 48 pilot and
@@ -923,13 +923,13 @@ commands and names no longer apply, and the repository README is new.
 
 ### 10.2 The order of the work
 
-1. Copy in the few helpers from Multimem's `tests/` (font, sample rate, the shade and pitch constants), and give the
-   synthetic week its own ffmpeg lookup. V7 then builds with no Multimem. **Done.**
+1. Copy in the few helpers from MultimediaSearch's `tests/` (font, sample rate, the shade and pitch constants), and give the
+   synthetic week its own ffmpeg lookup. V7 then builds with no MultimediaSearch. **Done.**
 2. Write the question-file format, and make V7 and V8 write it. **Done.**
 3. Split `bench.py` into `core/runner` and `systems/mm`, and make the agent runners take tools from `serve()`. **Done.**
 4. Re-run the copied pilot through the new runner. The same verdicts for `files` and `mm` (the pilot's mm-only
    configuration) show that nothing was lost. Then `mm+files` runs for the first time. **Not done:** it needs the GPU and
-   Dan's go-ahead, and P0 ran no GPU and no paid agent. `mmmb repeat` and `mmmb compare` are built; what stands in place of
+   Dan's go-ahead, and P0 ran no GPU and no paid agent. `mmsb repeat` and `mmsb compare` are built; what stands in place of
    the re-run is the offline proof in TESTING.md. The command and what "the same verdicts" means (D1) are in section 12.
 5. Add case selection, `listing`, then `embed` and `transcript`. Case selection and `listing` are done; `embed` and
    `transcript` are P1.
@@ -940,12 +940,12 @@ The ingest report and track L will exercise two limits of mm today:
 - `remember` refuses any file over 2 GB (`remember_max_mb`).
 - A folder source keeps a file over 50 MB in place, dated by when mm saw it rather than by its recording time.
 
-These belong to mm's notes, not to MMMB's design. Track L is built so that any system's handling of big files shows the
+These belong to mm's notes, not to MMSB's design. Track L is built so that any system's handling of big files shows the
 same way.
 
-The port found four more, all Multimem's:
+The port found four more, all MultimediaSearch's:
 - `remember` treats two files with identical bytes as unchanged, so a duplicate makes ingest fail with "not stored once".
-- The window estimate depends on two private functions of Multimem's reader (`reader._times`, `reader._video`). A test
+- The window estimate depends on two private functions of MultimediaSearch's reader (`reader._times`, `reader._video`). A test
   compares the copies in `v7_screen/frames.py` with them and fails if they are renamed or change.
 - `set_horizon` writes into the live index while the daemon runs, and relies on the daemon rereading it at each call.
 - mm's skill changed in 5 lines (41 characters) between the pilot and the commit the goldens were captured at; a test pins
@@ -971,7 +971,7 @@ theirs.
 | [Lifelog Search Challenge](https://arxiv.org/abs/2506.06743), [Video Browser Showdown](https://videobrowsershowdown.org/about-vbs/) | timed known-item search over months of images and thousands of hours of video, many systems on one task | 725K images / ~2,300-3,800 h |
 | [MIRIX ScreenshotVQA](https://arxiv.org/abs/2507.07957) | memory of one's own screen, owner-written questions (not released) | 5-18K screenshots per person |
 
-**What none of them does, and MMMB does:**
+**What none of them does, and MMSB does:**
 - Hand an agent a real dump at real size and in real mess.
 - Cover many small audio files as well as long ones.
 - Compare search systems behind one plug-in contract, each against the agent's own tools on the same files.
@@ -982,7 +982,7 @@ screen-video memory was found.
 
 ### 11.2 What to take
 
-| # | Idea | From | In MMMB |
+| # | Idea | From | In MMSB |
 | --- | --- | --- | --- |
 | 1 | Grounded scoring: correct only if the cited file and span hold the answer | CG-Bench, Ego4D NLQ, TVR, ATM-Bench (Joint@k) | 6.3 |
 | 2 | Real footage on a plausible schedule, with real needles spliced at set depths | X-LeBench, TimeScope, MLVU | 7.1 |
@@ -1005,8 +1005,8 @@ screen-video memory was found.
 | 19 | Accuracy against cost on a Pareto plot | AI Agents That Matter, HAL | 6.3 |
 
 **Taken as warnings:**
-- AudioMarathon builds long audio by concatenating clips. Its seams are the artificial shortcut MMMB avoids.
-- TV Needle concatenates videos into one. MMMB keeps files separate, as a user's are.
+- AudioMarathon builds long audio by concatenating clips. Its seams are the artificial shortcut MMSB avoids.
+- TV Needle concatenates videos into one. MMSB keeps files separate, as a user's are.
 
 ### 11.3 Datasets
 
@@ -1033,14 +1033,14 @@ licence each source states. No agent accepts an agreement or makes an account, s
 
 | Phase | What | Done when |
 | --- | --- | --- |
-| P0 | The separation (section 10.2, steps 1-4); the question-file format; grounded answers; case selection; `listing`; cached ingest; GPU-free configurations beside GPU ones; the working-time clock checked on 10 cases | the core runs without Multimem installed, and the copied pilot gives the same verdicts through `systems/mm` |
+| P0 | The separation (section 10.2, steps 1-4); the question-file format; grounded answers; case selection; `listing`; cached ingest; GPU-free configurations beside GPU ones; the working-time clock checked on 10 cases | the core runs without MultimediaSearch installed, and the copied pilot gives the same verdicts through `systems/mm` |
 | P1 | `embed` and `transcript`; the priority-1 scenarios (V1, V5, I1, I3, A1, A3, M4) and track L | each has 15+ questions, a passing probe and a retrieval run for every system |
 | P2 | The priority-2 scenarios (V4, I2, A2, A4, M1, M5, M6, X1, X2); the size ladder; session mode | a full run has 70+ discriminating questions per agent |
 | P3 | The priority-3 scenarios, once sources are found; hosted systems if wanted | as P1 |
 
 ### 12.1 P0's state (5 November 2026), and the real scenarios (6 November)
 
-**6 November 2026: the real scenarios.** MMMB was re-planned as a standalone benchmark of real piles of media (`PLAN.md`). Built
+**6 November 2026: the real scenarios.** MMSB was re-planned as a standalone benchmark of real piles of media (`PLAN.md`). Built
 and checked offline: V1, I3, A1 and M4 (5.7) on the shared builder (7.2), the `set` rule (6.1), the neutral report (6.3), and
 the real scenarios' probe (7.3). Each full-size dump was built once and probed (TESTING.md section 9). Two independent reviews
 gated the work: one of the builder, the rule, the report and I3 before the other three copied them, and one of the whole. Real
@@ -1049,15 +1049,15 @@ cited with an ISO time read as unparsed (6.2), which is fixed. Not done: a full 
 and the priority-1 scenarios not yet built (V5, I1, A3, the track L). P1's search systems (`embed`, `transcript`) are not built; `mm` is optional. The smoke run's
 Claude (Sonnet) execs on the tiny card cost $0.37 and $0.51 each; a full-size exec is not measured.
 
-**Built, and checked offline** (how: [TESTING.md](TESTING.md)). The core runs without Multimem: the neutrality tests import
-it with Multimem refused, and in an environment made without the `mm` extra they build V7 tiny, probe it and run a `files` cell.
-- The separation, steps 1-3 of 10.2: V7 and V8 build and ask with no Multimem, and `systems/mm` reproduces the old `mm` arm.
+**Built, and checked offline** (how: [TESTING.md](TESTING.md)). The core runs without MultimediaSearch: the neutrality tests import
+it with MultimediaSearch refused, and in an environment made without the `mm` extra they build V7 tiny, probe it and run a `files` cell.
+- The separation, steps 1-3 of 10.2: V7 and V8 build and ask with no MultimediaSearch, and `systems/mm` reproduces the old `mm` arm.
   Four oracles were held to the recorded pilot and EgoLife runs (TESTING.md): the V7 build (the whole week, 1,575 files,
   byte for byte); the report (figures and Markdown); the exec each agent builds (the pilot's 110 execs); and a replay of the
   recorded execs through the real run loop.
 - The question-file format, grounded answers (`json`), case selection (`--limit`, `--discriminating`), `listing`, cached
-  ingest, side-by-side scheduling (off by default), `mmmb compare` and `mmmb repeat`.
-- The working-time clock (`--clock`, 8.4) and `mmmb clock-check`, which has not been run.
+  ingest, side-by-side scheduling (off by default), `mmsb compare` and `mmsb repeat`.
+- The working-time clock (`--clock`, 8.4) and `mmsb clock-check`, which has not been run.
 
 **Not done, because it needs the GPU, a paid agent or Dan's go-ahead.** No GPU and no paid agent ran in P0. Real Claude and
 Codex have not seen the `json` request, the `S+files` prompt, the listing server, a second `--add-dir` for mm's `looks`
@@ -1067,10 +1067,10 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
 
 | # | Question | Default taken |
 | --- | --- | --- |
-| D1 | "The same verdicts" cannot mean identical per question: the agents are stochastic, and no repeat run exists to measure the noise. | Accept when each cell's correct count is within 2 of the recorded one (Claude `files` 23, Claude `mm` 22, Codex `files` 27, Codex `mm` 23); McNemar of the recorded run against the new one is not significant (p under 0.05) in any cell; the verdict lines read the same; no `setup` result; and a person has read every flip. Run once in `json`; run `line` too (another $19 and about 3 h) only if a cell falls outside the band. It is written once, in `mmmb/core/compare.py` (`BAND`, `ALPHA`). A pass means no large loss; it does not mean the runs agree (a band of 2 is about 6 points of 31 questions, and McNemar over a few discordant pairs has little power) |
+| D1 | "The same verdicts" cannot mean identical per question: the agents are stochastic, and no repeat run exists to measure the noise. | Accept when each cell's correct count is within 2 of the recorded one (Claude `files` 23, Claude `mm` 22, Codex `files` 27, Codex `mm` 23); McNemar of the recorded run against the new one is not significant (p under 0.05) in any cell; the verdict lines read the same; no `setup` result; and a person has read every flip. Run once in `json`; run `line` too (another $19 and about 3 h) only if a cell falls outside the band. It is written once, in `mmsb/core/compare.py` (`BAND`, `ALPHA`). A pass means no large loss; it does not mean the runs agree (a band of 2 is about 6 points of 31 questions, and McNemar over a few discordant pairs has little power) |
 | D2 | When may the re-run and the clock check spend? | Not until Stage 2 passed its review, and with the GPU free |
-| D3 | mm cannot report queue time. The working clock and the 10-case check need a small Multimem change: per-job queue seconds from `gpu.py` and `jobs.py`, and `ask`'s early return counted from GPU start. About 30-50 lines there | Make it in Multimem as its own task before the clock check. P0's code is ready for it; until then mm is `clock: wall`, more than one mm exec at once on the working clock is refused, and the 10-case check stays open |
-| D4 | Multimem has no remote, so `mmmb[mm]` is a path source with this machine's path in `pyproject.toml` | Keep the absolute path. Publishing MMMB (13.8) needs Multimem published first, or `mm`'s plug-in moved |
+| D3 | mm cannot report queue time. The working clock and the 10-case check need a small MultimediaSearch change: per-job queue seconds from `gpu.py` and `jobs.py`, and `ask`'s early return counted from GPU start. About 30-50 lines there | Make it in MultimediaSearch as its own task before the clock check. P0's code is ready for it; until then mm is `clock: wall`, more than one mm exec at once on the working clock is refused, and the 10-case check stays open |
+| D4 | Multimem had no remote, so `mmsb[mm]` was a path source with this machine's path in `pyproject.toml` | Resolved on 7 November 2026: the tool, now MultimediaSearch (`mms`), is public at github.com/DanMcInerney/MultimediaSearch, and `mmsb[mm]` is a git source pinned to a commit in `pyproject.toml` and `uv.lock`. Publishing MMSB (13.8) no longer needs a path |
 | D5 | 13.2, CPU work beside a GPU job | Stays off; `--side-by-side` exists and is tested |
 | D6 | What holds a GPU configuration to one exec at a time? (G2's blocker: only D3's refusal did, and the refusal offered `--clock wall`) | The owner's rule, built: a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` (default 1) asks for more; `--jobs` and `--clock` do not. One rule in `core/atonce.py` for the runner, every dry run and estimate, the refusal and `clock-check` (8.4) |
 
@@ -1081,7 +1081,7 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
   tested and never reads `leak_filter`, would need to honour it (7.3). P1.
 - mm's instructions are over the 2,000-token rule of 3.1, and nothing enforces it.
 - Nothing guards two cells that share a home under `--side-by-side` (8.3).
-- Multimem's four limits (10.3).
+- MultimediaSearch's four limits (10.3).
 - The report's text still quotes the pilot's words about mm ("decider tier", "asks / finds / looks"), and the report reads the
   tool names `ask`, `find`, `look` and the file `ambient-labels.json` when they are there. The imports are neutral; the wording
   is not.
@@ -1096,9 +1096,9 @@ another zone is refused.
 
 ```
 uv sync --extra mm --group mm-gpu
-uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted --dry-run
-uv run mmmb repeat tests/oracles/recorded/pilot-s1/converted
-uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new run>
+uv run mmsb repeat tests/oracles/recorded/pilot-s1/converted --dry-run
+uv run mmsb repeat tests/oracles/recorded/pilot-s1/converted
+uv run mmsb compare tests/oracles/recorded/pilot-s1/converted D:\mmsb-runs\<new run>
 ```
 
 - **The defaults are the pilot's.** The `files` cells run `--jobs` (3) at once and `mm/d1-3B` runs one exec at a time
@@ -1113,8 +1113,8 @@ uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new 
   the configurations (`files`, `mm/d1-3B`), the questions of each cell, and each agent's model and effort (Codex
   `gpt-6.1-terra` at `medium`; Claude records no effort, so only its model is checked). It builds or finds the cached dump and
   store, runs `files` and `mm/d1-3B`, and prints the `compare` command. `--answer-format json` is the default.
-  `--into D:\mmmb-runs\<new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
-- `mmmb compare` prints, for each cell, the correct counts of the recorded run and the new one against the band, the
+  `--into D:\mmsb-runs\<new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
+- `mmsb compare` prints, for each cell, the correct counts of the recorded run and the new one against the band, the
   questions that flipped (with both answers), McNemar's p, the problems of each run, and the verdict lines, and then the four
   numeric conditions of D1. A person reads every flip.
 - **Cost, from the pilot's measurements.** 110 execs, 13,044 session-seconds, 3,655 GPU-seconds (the dry run prints the same
@@ -1129,7 +1129,7 @@ uv run mmmb compare tests/oracles/recorded/pilot-s1/converted D:\mmmb-runs\<new 
 **2. `mm+files` for the first time (10.2 step 4, last sentence).** After the re-run, in the same run folder:
 
 ```
-uv run mmmb run D:\mmmb-runs\<new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium
+uv run mmsb run D:\mmsb-runs\<new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium
 ```
 
 No cost was measured. A rough ceiling is the `files` cell plus the GPU: Claude about $16 and 2 hours, Codex about 45
@@ -1140,11 +1140,11 @@ from the agent's environment (8.3) does not break mm's server; and how much slow
 **3. The clock check on 10 cases (8.4).**
 
 ```
-$env:MMMB_CODEX_EFFORT = "medium"
-uv run mmmb clock-check <new run> --agents codex,claude --config mm/d1-3B --cases 10 --gpu-jobs 2
+$env:MMSB_CODEX_EFFORT = "medium"
+uv run mmsb clock-check <new run> --agents codex,claude --config mm/d1-3B --cases 10 --gpu-jobs 2
 ```
 
-(The first line is PowerShell. `clock-check` has no effort flag: Codex runs at `MMMB_CODEX_EFFORT`, else high, and the cost
+(The first line is PowerShell. `clock-check` has no effort flag: Codex runs at `MMSB_CODEX_EFFORT`, else high, and the cost
 below is the pilot's Codex at `medium`.)
 
 It asks 10 cases of each agent alone and then queued, in the two folders of 8.4, and prints the answers, tokens and charged
@@ -1161,9 +1161,9 @@ lower bounds: queued execs take longer.
 1. **Licences:** decided on 4 November 2026: not a filter for use on this machine. Gated sources still need Dan
    ([MEDIA.md](MEDIA.md), "Decisions for Dan").
 2. **CPU work beside a GPU job:** may GPU-free configurations and builds run while a system holds the GPU? Still
-   unanswered. It stays off: `mmmb run --side-by-side` exists and is tested, and nothing turns it on by itself (8.3).
-3. **Where mm's plug-in lives:** decided for P0: in MMMB as `systems/mm`, with Multimem as the optional `mm` extra. Multimem
-   has no remote, so the extra is a path source with this machine's path in `pyproject.toml` (D4, section 12.1).
+   unanswered. It stays off: `mmsb run --side-by-side` exists and is tested, and nothing turns it on by itself (8.3).
+3. **Where mm's plug-in lives:** decided for P0: in MMSB as `systems/mm`, with MultimediaSearch as the optional `mm` extra, a git source
+   pinned to a commit in `pyproject.toml` (D4, section 12.1).
 4. **Which other systems first:** `embed` (SigLIP or CLIP, plus CLAP) and `transcript` (Whisper)? Both download models.
 5. **Hosted systems:** may a paid long-context model run on the public scenarios?
 6. **Dan's own media and scripted recordings:**
@@ -1175,5 +1175,5 @@ lower bounds: queued execs take longer.
 7. **Sources:** on 4 November 2026 every public scenario got a starter source. Some fall short: V1 cannot reach 48 h
    per camera, A5 has no long base, and M5 has frogs, not owls. The gaps and the decisions they need are in
    [MEDIA.md](MEDIA.md).
-8. **Publishing:** will MMMB be public? That decides the dev/test policy for the real-data scenarios, and the project's
+8. **Publishing:** will MMSB be public? That decides the dev/test policy for the real-data scenarios, and the project's
    own licence.

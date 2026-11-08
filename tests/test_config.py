@@ -1,11 +1,11 @@
-"""New tests for mmmb/core/config.py. The expected results are the plan's section 4.3 table (written by hand) and the folder names
+"""New tests for mmsb/core/config.py. The expected results are the plan's section 4.3 table (written by hand) and the folder names
 of the recorded runs (`mm-d1-3B`, `files`, `blind`)."""
 
 from __future__ import annotations
 
 import pytest
 
-from mmmb.core.config import Config, parse_config
+from mmsb.core.config import Config, parse_config
 
 DEFAULTS = {"files": None, "listing": None, "mm": "d1-3B", "other": "v1.2"}  # what the registry reads from the system.toml files
 

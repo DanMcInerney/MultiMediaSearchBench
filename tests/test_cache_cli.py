@@ -1,6 +1,6 @@
-"""New tests for the cache as the commands use it (mmmb/core/build.py, mmmb/cli.py, mmmb/core/costing.py; plan 6.3): `mmmb build` twice says
+"""New tests for the cache as the commands use it (mmsb/core/build.py, mmsb/cli.py, mmsb/core/costing.py; plan 6.3): `mmsb build` twice says
 `cached` and writes nothing, the stores are copied into each run, two runs of one dump keep their own slots, a lost or changed dump is dealt
-with by every command that reads it, a misdated store still refuses a run, and `mmmb repeat --dry-run` says what is cached and makes nothing.
+with by every command that reads it, a misdated store still refuses a run, and `mmsb repeat --dry-run` says what is cached and makes nothing.
 Over the scenario `toy` (V7's plan, three files) and the stand-in system `stub`, as tests/test_cli_build.py is. The cache itself is
 tests/test_cache.py's, and V7 through mm tests/mm/test_cached_ingest.py's.
 
@@ -22,16 +22,16 @@ from echo_agent import agents_of as echoing
 from echo_agent import record_toy
 from stub_system import Stub, tiny_questions
 
-from mmmb import cli, scenarios
-from mmmb.core import fs, paths
-from mmmb.core.agents import claude
-from mmmb.core.agents.common import reached
-from mmmb.core.build import ensure_data, read_dump, store_of
-from mmmb.core.cache import INGESTED, dump_folder, dump_meta, report_of
-from mmmb.core.contract import IngestReport, Refusal
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.scenario import dump_key
-from mmmb.scenarios import v7_screen as v7
+from mmsb import cli, scenarios
+from mmsb.core import fs, paths
+from mmsb.core.agents import claude
+from mmsb.core.agents.common import reached
+from mmsb.core.build import ensure_data, read_dump, store_of
+from mmsb.core.cache import INGESTED, dump_folder, dump_meta, report_of
+from mmsb.core.contract import IngestReport, Refusal
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.scenario import dump_key
+from mmsb.scenarios import v7_screen as v7
 
 pytestmark = pytest.mark.xdist_group("cli")
 FIRST = tiny_questions()[0].qid
@@ -182,7 +182,7 @@ def test_the_cache_and_the_dumps_are_denied_to_an_agent_with_its_own_tools_in_wh
 @pytest.mark.skipif(os.name != "nt", reason="drives are a Windows thing")
 def test_a_cache_on_another_volume_than_the_runs_is_refused_before_anything_is_written(world, capsys):
     # a drive other than the runs', which are in pytest's temp folder: on C: or, with TEMP moved, on D:
-    other = ("D:" if world.out.drive.casefold() == "c:" else "C:") + "/mmmb-cache-that-is-never-made"
+    other = ("D:" if world.out.drive.casefold() == "c:" else "C:") + "/mmsb-cache-that-is-never-made"
     assert world.main(*build_args(world), "--cache", other) == 1
     assert "must share a volume" in capsys.readouterr().err and not Path(other).exists() and not world.out.exists() and not world.temp.exists()
 
@@ -207,7 +207,7 @@ def test_a_run_made_before_the_cache_has_no_cache_and_cannot_be_asked_for_its_da
         ensure_data(old, read_dump(old))
 
 
-# -- mmmb repeat --------------------------------------------------------------------------------------------------------------------
+# -- mmsb repeat --------------------------------------------------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -252,7 +252,7 @@ def test_a_second_repeat_finds_the_dump_and_the_stores_the_first_made_and_a_resu
     assert w.main(*repeat_args(w), agents=echoing(stub)) == 0
     (first,) = w.new.out.iterdir()
     capsys.readouterr()
-    w.patch.setattr("mmmb.core.build.name_of", lambda scenario, recipe: "second-run")
+    w.patch.setattr("mmsb.core.build.name_of", lambda scenario, recipe: "second-run")
     assert w.main(*repeat_args(w), agents=echoing(Stub())) == 0
     out = capsys.readouterr().out
     assert "dump mmb-" in out and "cached (writing it took " in out and "stub: cached, ingested in 0 s when it was made" in out

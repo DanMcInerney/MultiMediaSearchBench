@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: the run loop of V8 with a
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: the run loop of V8 with a
 stub agent and the report, over the fake download of tests/v8_fake.py. The tests of the scenario's data, build, views and deny words are
 tests/test_v8.py. What moved, by the plan's 3.4, 4.5 and 5.2:
 - the mm arm is the configuration `stub/all` of a stand-in system (tests/stub_system.py), as in tests/test_runner.py; its words in the
@@ -24,16 +24,16 @@ from stub_system import STUB, StubSession, StubSystem
 from v8_fake import (BLIND, FILES, OPTIONS, SHADE, V8, built, clip_ends, line_at, lines_by, oracle_file, plan, recipe, source, table,  # noqa: F401
                      view_files, write_run)
 
-from mmmb import systems
-from mmmb.core import fs
-from mmmb.core.contract import Dump
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent, run_agents
-from mmmb.core.select import selected
-from mmmb.core.stats import mcnemar
-from mmmb.scenarios.v8_egolife import choose
-from mmmb.scenarios.v8_egolife.report import ROLES
-from mmmb.scenarios.v8_egolife.view import view_dir
+from mmsb import systems
+from mmsb.core import fs
+from mmsb.core.contract import Dump
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent, run_agents
+from mmsb.core.select import selected
+from mmsb.core.stats import mcnemar
+from mmsb.scenarios.v8_egolife import choose
+from mmsb.scenarios.v8_egolife.report import ROLES
+from mmsb.scenarios.v8_egolife.view import view_dir
 
 pytestmark = pytest.mark.xdist_group("v8")
 
@@ -108,7 +108,7 @@ def made_up_ffmpeg(tmp_path, monkeypatch):
 
 def run_over(run: RunFolder, dump: Dump, agent, configs=(BLIND, FILES, STUB), system=None, jobs: int = 3, **kw) -> StubSystem:
     """`run_agents` over `run` with the stand-in system for `stub` and the real registry for the rest."""
-    from mmmb import systems
+    from mmsb import systems
 
     system = system or EgoSystem(rules=False)
     run_agents(run, {"claude": Agent(agent)}, list(configs), dump, lambda name: run.folder / "stores" / name, jobs,

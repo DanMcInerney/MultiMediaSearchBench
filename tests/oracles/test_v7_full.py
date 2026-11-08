@@ -1,8 +1,8 @@
-"""Oracle 1c: the V7 pilot's whole week built with no Multimem, and compared with the recorded pilot's. All 1,575 files (1,572 and 3 logs)
+"""Oracle 1c: the V7 pilot's whole week built with no MultimediaSearch, and compared with the recorded pilot's. All 1,575 files (1,572 and 3 logs)
 have the size, mtime and sha256 the pilot's had; the shortcut probe over the build passes, as the pilot's did, and writes the
 `shortcuts.json` and `shortcuts.md` the pilot's did, but for the seconds it took.
 
-    uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=D:/mmmb-temp/oracle1c -n 0      # about 8 minutes, at 3 workers
+    uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=D:/mmsb-temp/oracle1c -n 0      # about 8 minutes, at 3 workers
 
 builds the week in `FOLDER/data` (a build that is already there is read, not made again), runs the probe into `FOLDER/run` and compares.
 `--v7-workers=N` is the files written at once (the pilot's build wrote 3). The bytes hold only with the libraries pyproject pins and in the
@@ -22,9 +22,9 @@ import imageio_ffmpeg
 import pytest
 from v7_recorded import MANIFEST, META, RECORDED, SHA256, V7, needs_the_recorded_zone, recipe
 
-from mmmb.core.contract import Dump
-from mmmb.core.scenario import ProbeOutcome, dump_key
-from mmmb.scenarios.v7_screen.manifest import LOGS, entries_of, measure_disk
+from mmsb.core.contract import Dump
+from mmsb.core.scenario import ProbeOutcome, dump_key
+from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of, measure_disk
 
 pytestmark = [pytest.mark.slow, pytest.mark.xdist_group("v7-full")]  # one worker builds it
 needs_the_recorded_zone()
@@ -35,7 +35,7 @@ def folder(request) -> Path:
     given = request.config.getoption("--v7-full")
     if not given:
         pytest.skip("oracle 1c builds the pilot's whole week (about 8 minutes) and compares it: pytest -m slow tests/oracles/test_v7_full.py "
-                    "--v7-full=D:/mmmb-temp/oracle1c -n 0")
+                    "--v7-full=D:/mmsb-temp/oracle1c -n 0")
     return Path(given)
 
 

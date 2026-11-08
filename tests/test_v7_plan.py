@@ -1,10 +1,10 @@
-"""Ported from Multimem tests/test_haystack.py at fe0ece5 (24 of its 31 tests; the other 7 are tests/mm's or the select tests).
+"""Ported from MultimediaSearch tests/test_haystack.py at fe0ece5 (24 of its 31 tests; the other 7 are tests/mm's or the select tests).
 
 The 7 left out start a daemon, use `load`, `windows_in` or the real reader, or ask which model reads what. Its graders are the core's now.
 
 The V7 plan (plan.py, week.py): it is pure, the same for a seed, and checks itself; the levels of its questions are balanced and each
 question's scope holds what its level says (one needle, the last needle, none), with distractors of the needle's colour or pitch in
-every scope; the week is written in a few seconds, and what is written is what the plan says; and the graders (`mmmb/core/grade.py`)
+every scope; the week is written in a few seconds, and what is written is what the plan says; and the graders (`mmsb/core/grade.py`)
 grade as their table says. The files are made once for the module on each worker that runs it, and only read.
 
 Two of the tests changed more than their names: `test_the_levels_are_balanced_as_the_plan_says` takes the 24 questions of a model that
@@ -26,24 +26,24 @@ import numpy as np
 import pytest
 from PIL import ExifTags, Image, ImageChops
 
-from mmmb.core import grade
-from mmmb.core.question import RULES, Grade
-from mmmb.scenarios.v7_screen import week as v7_week
-from mmmb.scenarios.v7_screen.constants import RATE
-from mmmb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, distance
-from mmmb.scenarios.v7_screen.media_porch import BOX_X0, BOX_Y1
-from mmmb.scenarios.v7_screen.media_screen import (
+from mmsb.core import grade
+from mmsb.core.question import RULES, Grade
+from mmsb.scenarios.v7_screen import week as v7_week
+from mmsb.scenarios.v7_screen.constants import RATE
+from mmsb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, distance
+from mmsb.scenarios.v7_screen.media_porch import BOX_X0, BOX_Y1
+from mmsb.scenarios.v7_screen.media_screen import (
     APPS, CURSOR_HOME, DIALOG_AT, FLOOR_S, SCREEN, screen_frame, screen_frames, screen_layers, typing_cap,
 )
-from mmmb.scenarios.v7_screen.media_sound import BEEPER_HZ, mic_samples, sound
-from mmmb.scenarios.v7_screen.pictures import photo_image, photo_needle
-from mmmb.scenarios.v7_screen.plan import (
+from mmsb.scenarios.v7_screen.media_sound import BEEPER_HZ, mic_samples, sound
+from mmsb.scenarios.v7_screen.pictures import photo_image, photo_needle
+from mmsb.scenarios.v7_screen.plan import (
     ABSENT, ACT_KINDS, ACTIVE_SHARE, ACTIVITY, LEVELS, MOVE_PX, PARTS, SCALES, SERVICES, SOURCES, TEMPLATES, TYPES, VERSION, WEEKDAYS,
     File, Plan, arrange, at, clock, date_text, days_before, last_days, needle_moments, part_of, segments, share_out, verify,
 )
-from mmmb.scenarios.v7_screen.questions import grade_for
-from mmmb.scenarios.v7_screen.week import _Week
-from mmmb.scenarios.v7_screen.write import check_shades, check_sounds, write
+from mmsb.scenarios.v7_screen.questions import grade_for
+from mmsb.scenarios.v7_screen.week import _Week
+from mmsb.scenarios.v7_screen.write import check_shades, check_sounds, write
 
 DAYS = [date(2026, 10, 30), date(2026, 10, 31)]
 KEYS = {"qid", "type", "template", "absent", "level", "last", "source", "since", "until", "hint", "question", "truth", "grade",
@@ -136,8 +136,8 @@ def test_the_plan_does_not_depend_on_the_hash_seed():
     import subprocess
     import sys
 
-    code = ("import hashlib, json; from datetime import date; from mmmb.scenarios.v7_screen.plan import SCALES, days_before; "
-            "from mmmb.scenarios.v7_screen.week import plan; "
+    code = ("import hashlib, json; from datetime import date; from mmsb.scenarios.v7_screen.plan import SCALES, days_before; "
+            "from mmsb.scenarios.v7_screen.week import plan; "
             "out = [hashlib.sha256(json.dumps([list(p.questions), [(f.path, f.t, f.spec) for f in p.files], p.logs], sort_keys=True, default=str).encode()).hexdigest() "
             "for p in (plan(5, s, days_before(date(2026, 11, 2), SCALES[s].days)) for s in ('tiny', 'pilot'))]; print(out)")
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1,6 +1,6 @@
 """Side-by-side scheduling over the real mm system and its real daemon with the fake decider (plan 6.4, U13): V7's tiny week through `mm/fake` and
 `files` gives the same results beside each other as one after another; and the agent kept off the GPU does not take the GPU from the model, because
-the model is in mm's daemon, which the run starts with the run's own environment (mmmb/systems/mm/daemon.py), and the server the agent starts does no
+the model is in mm's daemon, which the run starts with the run's own environment (mmsb/systems/mm/daemon.py), and the server the agent starts does no
 GPU work. Written for this repository (U13); no paid agent runs and no model is loaded.
 
 Expected values are the plan's words (the same set of results), and what the test planted: a decider that writes the environment of the process it
@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 import seam  # noqa: E402
@@ -28,13 +28,13 @@ from stub_system import right  # noqa: E402
 from test_mm_arm import asks, by_qid, go, result  # noqa: E402
 from test_seam import git  # noqa: E402, F401
 
-from multimem import decider_d1  # noqa: E402
+from mms import decider_d1  # noqa: E402
 
-from mmmb.core.agents import claude, codex  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.schedule import Pools, SideBySide  # noqa: E402
-from mmmb.systems.mm.models import Model  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb.core.agents import claude, codex  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.schedule import Pools, SideBySide  # noqa: E402
+from mmsb.systems.mm.models import Model  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 ENVS = Model("envs", f"python:{Path(fakes.ROOT / 'env_decider.py')}", decider_d1.ABOUT)  # the fake decider that writes its process's environment
