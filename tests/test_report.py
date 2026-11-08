@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_bench.py at fe0ece5: the report's, the verdicts' and the retrieval scoring's tests, in that file's order
+"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5: the report's, the verdicts' and the retrieval scoring's tests, in that file's order
 (the statistics are in test_stats.py, the run loop's are in test_runner.py, and what needs mm's daemon is in tests/mm). The mechanical
 changes: `bench.` is the module that has the name now; an arm is a configuration, the two sides of a comparison are `control` and
 `tested` in the figures, and the model `fake` is the configuration `mm/fake`; a question is a `Question`; and a run is a `RunFolder`

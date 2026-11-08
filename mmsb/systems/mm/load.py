@@ -1,11 +1,11 @@
-"""Loading a dump into an mm home (replaces `load` of haystack.py and the remember loop and `check_snapshot` of egolife.py of this repository at
+"""Loading a dump into an mms home (replaces `load` of haystack.py and the remember loop and `check_snapshot` of egolife.py of this repository at
 bb498a6, which read the scenario's plan; this reads the `Dump` alone): each file remembered at its time, each log added as a source, and
 the home checked against the dump when the daemon has taken them in.
 
 A file is given its time `t`, except one whose time is its own (`own_time`: a camera roll's EXIF or `creation_time`), which must come back
-stored at it, `time_from` metadata, within a second: one that does not is a `misdated` entry of the report, not an error. A file mm refuses
-(the daemon's API says so) is a `refused` entry with its reason. A file mm leaves unchanged because an earlier file of its source has its
-bytes is a `refused` entry too, naming that file: mm keeps one item for them (a camera's two identical photos of one moment, a clip a sound
+stored at it, `time_from` metadata, within a second: one that does not is a `misdated` entry of the report, not an error. A file mms refuses
+(the daemon's API says so) is a `refused` entry with its reason. A file mms leaves unchanged because an earlier file of its source has its
+bytes is a `refused` entry too, naming that file: mms keeps one item for them (a camera's two identical photos of one moment, a clip a sound
 library holds twice). Any other file not stored once (stored twice; unchanged with no such twin) is an error: the home would not hold what
 the dump does."""
 
@@ -51,7 +51,7 @@ def remember(api: Api, dump: Dump, entries: Sequence[ManifestEntry]) -> tuple[li
             continue
         if not out["stored"] and len(out["unchanged"]) == 1 and (twin := first.get(e.sha256)) is not None:
             when = "at the same time" if twin.t == e.t else f"recorded {e.t - twin.t:+.0f} s from it"
-            refused.append(Refusal(e.path, f"the bytes of {twin.path} ({when}): mm keeps one item for them"))
+            refused.append(Refusal(e.path, f"the bytes of {twin.path} ({when}): mms keeps one item for them"))
             continue
         if len(out["stored"]) != 1 or out["unchanged"]:
             raise RuntimeError(f"{e.path} was not stored once: {out}")
@@ -92,7 +92,7 @@ def load(api: Api, dump: Dump) -> tuple[list[Refusal], list[Refusal]]:
 def check_snapshot(home: Path, dump: Dump, refused: Collection[str] = ()) -> None:
     """The home holds what the dump says (the daemon must be stopped, so the index is whole): as many items in each source as the dump has
     files of it, a file with a `length` as an item at its `t` and `t + length` that is shown, and as many records in each log as it has lines,
-    at their times. The files of `refused` (paths of the dump that mm refused: they are in the report, with their reasons) are not counted.
+    at their times. The files of `refused` (paths of the dump that mms refused: they are in the report, with their reasons) are not counted.
     Raises a RuntimeError naming the first difference."""
     with closing(sqlite3.connect(home / "index.sqlite", timeout=30)) as db:
         items = db.execute("SELECT source, name, t0, t1, state FROM items").fetchall()

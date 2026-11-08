@@ -1,6 +1,6 @@
 """New tests for `mmsb build` and `mmsb ingest` (mmsb/cli.py, mmsb/core/build.py) and the run.json writer (`RunFolder.write`). Over the scenario
 `toy` (V7's plan, a dump of three files) and the stand-in system `stub`, unless a test says it builds the real week. Ported from
-tests/test_bench.py of Multimem at fe0ece5 (plan 7.4): `test_a_probe_that_fails_or_is_skipped_is_recorded_and_a_build_that_fails_it_exits_1`
+tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4): `test_a_probe_that_fails_or_is_skipped_is_recorded_and_a_build_that_fails_it_exits_1`
 and `test_the_probe_runs_over_the_written_and_loaded_week_with_the_files_arms_ffmpeg_and_is_recorded`; its `bench.build` is the command. The
 other tests are new: the run.json this repository writes (plan 4.7), what a store's report does to a run (the finding of U7's notes: a file
 stored at a time other than its own refuses the run), and what a system measured.

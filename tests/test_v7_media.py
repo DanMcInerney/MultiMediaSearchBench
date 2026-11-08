@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_haystack_media.py at fe0ece5 (37 of its 39 tests; the other 2 are tests/mm's).
+"""Ported from MultimediaSearch tests/test_haystack_media.py at fe0ece5 (37 of its 39 tests; the other 2 are tests/mm's).
 
 The 2 left out run the real reader's change gate (`reader._video`); `reader` is `frames.py` in the others.
 
@@ -48,7 +48,7 @@ from mmsb.scenarios.v7_screen.media_sound import (
 
 
 def packet_duration(path: Path) -> float | None:
-    """How long a media file plays, from its packets (copied from `media.duration` of Multimem at fe0ece5)."""
+    """How long a media file plays, from its packets (copied from `media.duration` of MultimediaSearch at fe0ece5)."""
     first = last = None
     with av.open(str(path)) as container:
         for packet in container.demux():

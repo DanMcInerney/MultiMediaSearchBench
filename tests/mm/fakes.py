@@ -3,7 +3,7 @@ built once for a session of tests and ingested once, a session opened over a cop
 stand-in agent. Nothing here starts a real agent or loads a real model; every daemon is over a folder of the test's own and has the fake
 decider (`python:` models need no GPU).
 
-Moved from tests/conftest.py of Multimem at fe0ece5: `FAKE`, `DECIDER`, `span`. Written for this repository: the rest."""
+Moved from tests/conftest.py of MultimediaSearch at fe0ece5: `FAKE`, `DECIDER`, `span`. Written for this repository: the rest."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ from pathlib import Path
 import imageio_ffmpeg
 
 from agent_spec import clocked
-from multimem import config as configuration
-from multimem import decider, decider_d1
+from mms import config as configuration
+from mms import decider, decider_d1
 
 from mmsb import scenarios
 from mmsb.core import fs
@@ -38,7 +38,7 @@ MM = Mm(models={"fake": FAKE_MODEL, "d1-3B": D13_MODEL})
 S = Config("mm/fake", "mm", "fake", False)  # the system's tools alone
 S_FILES = Config("mm/fake+files", "mm", "fake", True)  # and with the agent's own tools
 FILES = Config("files", "files", None, True)
-DAYS = ["2026-10-30", "2026-10-31"]  # the tiny week of the old tests: Multimem's tests/test_haystack.py
+DAYS = ["2026-10-30", "2026-10-31"]  # the tiny week of the old tests: MultimediaSearch's tests/test_haystack.py
 SEED = 7
 V7 = scenarios.get("v7_screen")
 
@@ -70,7 +70,7 @@ def ingested(dump: Dump, store: Path, system: Mm = MM) -> Path:
 
 
 def home_of(spec: SessionSpec) -> Path:
-    """The mm home a spec's server is over (its `--home` argument): where an agent of the test looks for the daemon."""
+    """The mms home a spec's server is over (its `--home` argument): where an agent of the test looks for the daemon."""
     args = spec.served.server.args
     return Path(args[args.index("--home") + 1])
 
@@ -124,7 +124,7 @@ class Probe:
     def __call__(self, spec: SessionSpec) -> dict:
         qid, folder = spec.run_dir.name, spec.run_dir.parent.name
         q, began = self.questions[qid], time.monotonic()
-        marker = spec.work / ".multimem-project"
+        marker = spec.work / ".mms-project"
         with self.lock:
             self.execs.append(spec)
             self.marks[folder, qid] = marker.read_text(encoding="utf-8") if marker.exists() else None

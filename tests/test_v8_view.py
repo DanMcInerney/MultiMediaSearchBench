@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: what an agent with its own tools
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: what an agent with its own tools
 reads in V8 and what it may not reach: the folder of the clips and lines up to a question's horizon, the deny words of the other slots and
 of the download, the prompts, and the tripwire for a recording past the horizon in an exec's output. The scenario's data, plan and build are
 tests/test_v8.py, the run loop and the report tests/test_v8_run.py, over the fake download of tests/v8_fake.py. The messages of the moved

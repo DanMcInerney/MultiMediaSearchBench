@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_bench_rules.py at fe0ece5 (its 13 grader tests; the 6 about the fake decider go to tests/mm), with
+"""Ported from MultimediaSearch tests/test_bench_rules.py at fe0ece5 (its 13 grader tests; the 6 about the fake decider go to tests/mm), with
 the literal specs now `Grade`s: `kind` is `rule`, `tol_min` is `tol_s`, lists are tuples. The one case dropped is a spec with no
 `date` key, which a `Grade` cannot be (test_question refuses a question line without one)."""
 

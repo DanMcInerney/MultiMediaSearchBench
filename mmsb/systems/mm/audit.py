@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from contextlib import closing
 from pathlib import Path
 
-from multimem import config
+from mms import config
 
 from mmsb.core.agents.common import result_json, result_jsons
 
@@ -41,7 +41,7 @@ def work_of(tools: Sequence[dict]) -> dict:
 
 def tool_times(tool: dict, home: Path | None) -> list[float]:
     """The times of recordings in an mm tool's results (every JSON block of them: a `look` of several moments has one each): an
-    ask's sightings and candidates, a find's rows (not its labels, which the agent made itself and mm dates by its own clock), the
+    ask's sightings and candidates, a find's rows (not its labels, which the agent made itself and mms dates by its own clock), the
     end of each item a look returned (from the home's index), and for a sheet the end of each item its tiles were cut from. A
     sheet's range and tile times are the times the agent asked for, as an ask's `until` is, so they are not counted."""
     name, times, items = tool.get("tool"), [], []
@@ -65,7 +65,7 @@ def tool_times(tool: dict, home: Path | None) -> list[float]:
 
 def accepted_asks(tools: Sequence[dict]) -> list[dict]:
     """The arguments of the asks mm took (their result holds a `job`): an ask with `question` or `questions`, not a call that
-    collects or cancels a job, and not one mm refused."""
+    collects or cancels a job, and not one mms refused."""
     return [t["arguments"] for t in tools if t.get("tool") == "ask" and isinstance(t.get("arguments"), dict)
             and ("question" in t["arguments"] or "questions" in t["arguments"])
             and any("job" in got for got in result_jsons(t.get("result")))]
@@ -73,8 +73,8 @@ def accepted_asks(tools: Sequence[dict]) -> list[dict]:
 
 def audit(tools: Sequence[dict], h: float, home: Path | None) -> dict:
     """What an mm exec's calls held past the horizon `h`: `after_horizon`, the distinct recording times after it in the results
-    (any is a leak of the harness), and of the asks mm took (`asks`) those with an `until` past it (`asks_past_horizon`: the
-    agent's confusion about mm's clock, which reads days later than the question, and harmless)."""
+    (any is a leak of the harness), and of the asks mms took (`asks`) those with an `until` past it (`asks_past_horizon`: the
+    agent's confusion about mms's clock, which reads days later than the question, and harmless)."""
     late = {t for tool in tools for t in tool_times(tool, home) if t > h + AUDIT_S}
     starts = accepted_asks(tools)
     past = [a for a in starts if a.get("until") is None or config.parse_when(a["until"]) > h + AUDIT_S]

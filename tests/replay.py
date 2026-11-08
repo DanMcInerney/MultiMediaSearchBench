@@ -111,7 +111,7 @@ def pilot_questions() -> tuple[Question, ...]:
 
 
 def mm_installed() -> bool:
-    return importlib.util.find_spec("multimem") is not None
+    return importlib.util.find_spec("mms") is not None
 
 
 def mm_audit(case: Case, calls: Sequence[dict]) -> dict:
@@ -128,7 +128,7 @@ def mm_estimate(sources: Sequence[str], ranges: Sequence[tuple[float, float]]) -
     """The mm system's estimate of the GPU seconds of a case for d1-3B, from the pilot's table of windows (0.0 without the mm extra)."""
     if not mm_installed():
         return 0.0
-    from multimem import decider
+    from mms import decider
 
     from mmsb.systems.mm.estimate import estimate_s
 

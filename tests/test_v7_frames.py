@@ -1,7 +1,7 @@
-"""New tests for mmsb/scenarios/v7_screen/frames.py and constants.py: the small copies of what Multimem's reader and its fake decider do
+"""New tests for mmsb/scenarios/v7_screen/frames.py and constants.py: the small copies of what MultimediaSearch's reader and its fake decider do
 to a file or a picture, which V7 uses so that it needs neither. Expected values are laws of the functions (a picture is never scaled
 up, a tone has its own pitch, a plain colour is all of its own shade) and files written here with known frames and sound. That the copies
-agree with Multimem's, byte for byte, is tests/mm's: it needs Multimem."""
+agree with MultimediaSearch's, byte for byte, is tests/mm's: it needs MultimediaSearch."""
 
 from __future__ import annotations
 

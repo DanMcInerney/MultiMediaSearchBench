@@ -12,7 +12,7 @@ import shutil
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from PIL import Image  # noqa: E402
@@ -73,8 +73,8 @@ def test_a_file_mm_refuses_is_in_the_report_with_its_reason_and_the_store_is_mad
 
 
 def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_report_naming_it(week, tmp_path):
-    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mm left the
-    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mm keeps one
+    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mms left the
+    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mms keeps one
     item for a picture, sound or video of its source's bytes, whatever its time; a file of text it keeps each time.)"""
     _, dump, _ = week
     photo = next(e for e in dump.entries if e.kind == "photo")
@@ -91,8 +91,8 @@ def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_
     ingest_stores(folder, only, described, load=lambda name: fakes.MM, cache=tmp_path / "cache")
     refused = report_of(store_of(folder, "mm")).refused
     assert [(r.path, r.reason) for r in refused] == [
-        (twins[0].path, f"the bytes of {photo.path} (at the same time): mm keeps one item for them"),
-        (twins[1].path, f"the bytes of {photo.path} (recorded +3600 s from it): mm keeps one item for them")]
+        (twins[0].path, f"the bytes of {photo.path} (at the same time): mms keeps one item for them"),
+        (twins[1].path, f"the bytes of {photo.path} (recorded +3600 s from it): mms keeps one item for them")]
     check_stores(folder, {"mm": described[CONFIG].store_hash})
 
 

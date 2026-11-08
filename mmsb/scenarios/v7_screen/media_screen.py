@@ -22,7 +22,7 @@ decider but about 8 px in a contact sheet 5 frames across, so that an agent must
 "Confirm" and the red-headed warnings, as with a real dialog.
 
 The screen follows the real recorder (DESIGN.md §6: ddagrab at about 2 fps with the cursor drawn, then `mpdecimate=max=119` and
-`-fps_mode vfr`): a frame whenever the picture changes, at most one every half second (a tick, TICK_S), and at least one every 60 s. mm's
+`-fps_mode vfr`): a frame whenever the picture changes, at most one every half second (a tick, TICK_S), and at least one every 60 s. mms's
 reader takes the first frame of each second, so a segment's windows are at most its seconds with a frame, and the files arm sees every
 frame. A frame is a state's start, an act (a cursor move, typing or a scroll) or a minute change of the taskbar's clock; `screen_frames`
 is the one place that says where they are, and the writer, the checks, the window counts and the probe all use it. Each frame differs from

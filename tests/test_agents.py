@@ -1,4 +1,4 @@
-"""Ported from tests/test_agents.py of Multimem at fe0ece5 (plan 7.4, oracle 4): the benchmark's two agents, Claude Code and Codex, in
+"""Ported from tests/test_agents.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): the benchmark's two agents, Claude Code and Codex, in
 all four modes of an exec (blind, files, a server, a server and files) (TESTBED.md, Benchmark): the command lines, the checks of what
 a session may use, and the reading of a stream. No real `claude` or `codex` runs: a command line is built and read, an event is made
 up, and the few tests that start a process start a stand-in script that prints made-up events.
@@ -83,7 +83,7 @@ def test_claudes_command_lines_give_each_arm_its_tools_and_nothing_of_the_owners
     servers = json.loads((run / "mcp.json").read_text())["mcpServers"]
     assert list(servers) == ["mm"], "one server"
     assert servers["mm"] == {"command": sys.executable, "env": {"CLAUDE_PROJECT_DIR": str(work)},
-                             "args": ["-m", "multimem.cli", "--home", str(home), "mcp", "--tools", "ask,find,look,label"]}
+                             "args": ["-m", "mms.cli", "--home", str(home), "mcp", "--tools", "ask,find,look,label"]}
     assert after(argv, "--append-system-prompt-file") == [str(run / "instructions.md")]
     assert (run / "instructions.md").read_text() == f"{BASE_LINE}\n\nTHE SKILL\n\nTHE NOTES"
     assert work.is_dir()
@@ -160,32 +160,32 @@ def fake_git(tmp_path, monkeypatch):
     return root
 
 
-def test_claudes_files_arm_shell_cannot_reach_the_owners_mm(tmp_path, monkeypatch, fake_git):
-    """Under `uv run` PATH starts with the repo's venv folder (mm.exe), and MULTIMEM_HOME may be the owner's."""
+def test_claudes_files_arm_shell_cannot_reach_the_owners_mms(tmp_path, monkeypatch, fake_git):
+    """Under `uv run` PATH starts with the repo's venv folder (mms.exe), and MMS_HOME may be the owner's."""
     venv, bin_dir, work = tmp_path / ".venv" / "Scripts", tmp_path / "bin", tmp_path / "w0"
     venv.mkdir(parents=True)
-    (venv / "mm.exe").write_text("")
-    (venv / "mm.exe").chmod(0o755)
+    (venv / "mms.exe").write_text("")
+    (venv / "mms.exe").chmod(0o755)
     monkeypatch.setenv("PATH", str(venv) + os.pathsep + os.environ["PATH"])
     monkeypatch.setenv("VIRTUAL_ENV", str(tmp_path / ".venv"))
-    monkeypatch.setenv("MULTIMEM_HOME", str(tmp_path / "owners-home"))
-    monkeypatch.setenv("MULTIMEM_MODELS", "D:/models")
+    monkeypatch.setenv("MMS_HOME", str(tmp_path / "owners-home"))
+    monkeypatch.setenv("MMS_MODELS", "D:/models")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test")
-    assert shutil.which("mm.exe", path=os.environ["PATH"]), "the owner's PATH does reach mm"
+    assert shutil.which("mms.exe", path=os.environ["PATH"]), "the owner's PATH does reach mms"
 
     env = claude.env_of(bin_dir, True, work, ISOLATION)
     folders = env["PATH"].split(os.pathsep)
     assert folders[0] == str(bin_dir)
     assert folders[1:4] == [str(fake_git / "cmd"), str(fake_git / "bin"), str(fake_git / "usr" / "bin")]
     assert folders[4:] == common.system_path(), "then the system's folders and nothing else"
-    assert not any(".venv" in f for f in folders) and shutil.which("mm.exe", path=env["PATH"]) is None
-    assert env["MULTIMEM_HOME"] == str(work / "no-mm-home") and not Path(env["MULTIMEM_HOME"]).exists()
-    assert not {"VIRTUAL_ENV", "MULTIMEM_MODELS", "ANTHROPIC_API_KEY"} & set(env)
+    assert not any(".venv" in f for f in folders) and shutil.which("mms.exe", path=env["PATH"]) is None
+    assert env["MMS_HOME"] == str(work / "no-mm-home") and not Path(env["MMS_HOME"]).exists()
+    assert not {"VIRTUAL_ENV", "MMS_MODELS", "ANTHROPIC_API_KEY"} & set(env)
     assert env["CLAUDE_CODE_GIT_BASH_PATH"] == str(fake_git / "bin" / "bash.exe")
     assert all(env[k] == v for k, v in claude.ENV_SET.items())
 
     env = claude.env_of(bin_dir)
-    assert str(venv) in env["PATH"] and env["MULTIMEM_HOME"] == str(tmp_path / "owners-home"), "the mm arm is as it was"
+    assert str(venv) in env["PATH"] and env["MMS_HOME"] == str(tmp_path / "owners-home"), "the mm arm is as it was"
     with pytest.raises(ValueError, match="working folder"):
         claude.env_of(bin_dir, True)
     with pytest.raises(ValueError, match="isolation"):
@@ -199,17 +199,17 @@ def test_claudes_files_arm_shell_cannot_reach_the_owners_mm(tmp_path, monkeypatc
 def test_what_the_shell_of_own_tools_keeps_out_is_what_the_isolation_says_and_nothing_else(tmp_path, monkeypatch, fake_git):
     """The words are the systems' (system.toml): the same environment gives a different shell when the isolation differs."""
     work = tmp_path / "w0"
-    monkeypatch.setenv("MULTIMEM_HOME", str(tmp_path / "owners-home"))
-    monkeypatch.setenv("MULTIMEM_MODELS", "D:/models")
+    monkeypatch.setenv("MMS_HOME", str(tmp_path / "owners-home"))
+    monkeypatch.setenv("MMS_MODELS", "D:/models")
     monkeypatch.setenv("OTHER_THING_HOME", "kept")
     monkeypatch.setenv("VIRTUAL_ENV", str(tmp_path / ".venv"))
     none = claude.env_of(tmp_path / "bin", True, work, NO_ISOLATION)
-    assert none["MULTIMEM_HOME"] == str(tmp_path / "owners-home") and none["MULTIMEM_MODELS"] == "D:/models"
+    assert none["MMS_HOME"] == str(tmp_path / "owners-home") and none["MMS_MODELS"] == "D:/models"
     assert "VIRTUAL_ENV" not in none, "the virtual environment is the agent's own business, not a system's"
     other = claude.env_of(tmp_path / "bin", True, work, dataclasses.replace(
         NO_ISOLATION, env_drop_prefixes=("OTHER_",), env_nowhere={"ANOTHER": "second"}))
     assert "OTHER_THING_HOME" not in other and other["ANOTHER"] == str(work / "second")
-    assert other["MULTIMEM_HOME"] == str(tmp_path / "owners-home"), "only what the isolation names"
+    assert other["MMS_HOME"] == str(tmp_path / "owners-home"), "only what the isolation names"
 
 
 @pytest.mark.skipif(os.name != "nt", reason="Git for Windows")
@@ -396,7 +396,7 @@ def test_a_limit_a_login_and_a_missing_result_are_told_apart():
 
 
 def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_path):
-    deny = (lower(tmp_path / "mm-bench"), ".multimem")
+    deny = (lower(tmp_path / "mm-bench"), ".mms")
     leak = f"{tmp_path}/mm-bench/run1/results/claude/files/x.json:3: 47"
 
     def returned(content, id: str = "g1") -> dict:
@@ -409,8 +409,8 @@ def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_
     assert watch(returned(leak)) == f"escaped: Grep output reached {deny[0]}"
     assert watch(returned([{"type": "text", "text": f"see {tmp_path / 'MM-Bench' / 'run1'}"}])) == \
         f"escaped: Grep output reached {deny[0]}", "a path in a list of blocks, in any case"
-    assert watch(returned("/home/dan/.MultiMem/index.db", "unknown-id")) == "escaped: a tool output reached .multimem"
-    picture = {"type": "image", "source": {"type": "base64", "data": ".multimem" * 20}}
+    assert watch(returned("/home/dan/.Mms/index.db", "unknown-id")) == "escaped: a tool output reached .mms"
+    picture = {"type": "image", "source": {"type": "base64", "data": ".mms" * 20}}
     assert watch(returned([picture, {"type": "text", "text": "ok"}])) is None, "a picture's data is not text"
     watch = claude.watcher(spec_of("mm", deny=deny))
     assert watch(init()) is None and watch(use("mcp__mm__find", {}, "g1")) is None
@@ -425,15 +425,15 @@ def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_
     assert codex.check_event(output(leak), spec_of("files", deny=deny)) == f"shell output reached {deny[0]}"
     assert codex.check_event(output(f"{tmp_path}\\MM-BENCH\\run1\\x"), spec_of("files", deny=deny)) == \
         f"shell output reached {deny[0]}", "backslashes and case do not matter"
-    home_file = output("C:/Users/dan/.multimem/index.db")
-    assert codex.check_event(home_file, spec_of("files", deny=deny)) == "shell output reached .multimem"
+    home_file = output("C:/Users/dan/.mms/index.db")
+    assert codex.check_event(home_file, spec_of("files", deny=deny)) == "shell output reached .mms"
     assert codex.check_event(output(leak), spec_of("files")) is None and codex.check_event(output(""), spec_of("files", deny=deny)) is None
 
 
 # -- the server and the own tools together: a server's tool is checked by name, the own tools by the deny words ------------
 
 def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_words(tmp_path):
-    deny = (lower(tmp_path / "answers"), ".multimem")
+    deny = (lower(tmp_path / "answers"), ".mms")
     both = spec_of("mm+files", deny=deny)
     assert claude.session_tools(both) == (*claude.FILES_TOOLS, *MM_TOOLS)
     both_init = init(tools=[*claude.FILES_TOOLS, *MM_TOOLS])
@@ -449,15 +449,15 @@ def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_wor
     watch = claude.watcher(both)
     assert watch(both_init) is None
     # a server's call and its output may hold the system's own words, as its results hold paths under its own home
-    assert watch(use("mcp__mm__find", {"since": "2026-11-01", "note": ".multimem"}, "s1")) is None
-    assert watch(returned('{"home": "C:/Users/dan/.multimem/index.db"}', "s1")) is None
+    assert watch(use("mcp__mm__find", {"since": "2026-11-01", "note": ".mms"}, "s1")) is None
+    assert watch(returned('{"home": "C:/Users/dan/.mms/index.db"}', "s1")) is None
     assert watch(returned([{"type": "text", "text": f"{lower(tmp_path / 'answers')}/x"}], "s1")) is None
     # the own tools are held to them, in the call and in the output, and a result of an id nobody knows is one of them
     assert watch(use("Read", {"file_path": str(tmp_path / "Answers" / "x.json")}, "r1")) == f"escaped: Read reached {deny[0]}"
     watch = claude.watcher(both)
     assert watch(both_init) is None and watch(use("Grep", {"pattern": "x", "path": str(tmp_path / "data")}, "r1")) is None
-    assert watch(returned("/home/dan/.MultiMem/index.db", "r1")) == "escaped: Grep output reached .multimem"
-    assert watch(returned("/home/dan/.MultiMem/index.db", "who-knows")) == "escaped: a tool output reached .multimem"
+    assert watch(returned("/home/dan/.Mms/index.db", "r1")) == "escaped: Grep output reached .mms"
+    assert watch(returned("/home/dan/.Mms/index.db", "who-knows")) == "escaped: a tool output reached .mms"
     # a tool of another server is not the mode's
     assert claude.watcher(both)(both_init) is None
     assert "mcp__other__ask" in claude.check_event(use("mcp__other__ask", {}), both)
@@ -474,11 +474,11 @@ def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_wor
     assert "server 'other'" in codex.check_event(item("mcp_tool_call", server="other", tool="t"), both)
     hit = codex.check_event(item("command_execution", command=f"type {tmp_path}\\Answers\\truth.json"), both)
     assert hit == f"shell reached {deny[0]}"
-    assert codex.check_event(item("command_execution", "item.completed", command="dir", aggregated_output="C:/.multimem/x"),
-                             both) == "shell output reached .multimem"
+    assert codex.check_event(item("command_execution", "item.completed", command="dir", aggregated_output="C:/.mms/x"),
+                             both) == "shell output reached .mms"
     # the server's own call, and what it returned, say whatever they say
-    served = item("mcp_tool_call", "item.completed", server="mm", tool="find", arguments={"note": ".multimem"},
-                  result={"content": [{"type": "text", "text": "C:/Users/dan/.multimem/index.db"}]})
+    served = item("mcp_tool_call", "item.completed", server="mm", tool="find", arguments={"note": ".mms"},
+                  result={"content": [{"type": "text", "text": "C:/Users/dan/.mms/index.db"}]})
     assert codex.check_event(served, both) is None
     assert "held for approval" in codex.check_event(item("mcp_tool_call", "item.completed", server="mm", tool="find",
                                                           error={"message": "requires approval"}), both)
@@ -534,7 +534,7 @@ def test_claudes_stream_is_read_from_a_process_and_a_setup_problem_an_escape_or_
     monkeypatch.setattr(claude, "claude_command", lambda: stand_in([in_files, says("ANSWER: 47"), finished()]))
     out = claude.ask_claude(spec_of("files", tmp_path, prompt="q", run_dir=tmp_path / "run2b", deny=deny))
     probe = stand_in.probe()
-    assert out["problem"] is None and probe["env"]["MULTIMEM_HOME"] == str(work / "no-mm-home")
+    assert out["problem"] is None and probe["env"]["MMS_HOME"] == str(work / "no-mm-home")
     assert probe["env"]["PATH"].split(os.pathsep)[0] == str(bin_dir) and "ANTHROPIC_API_KEY" not in probe["env"]
     git_folders = tuple(str(fake_git / sub) for sub in ("cmd", "bin", "usr/bin"))
     assert probe["env"]["PATH"] == common.shell_path(bin_dir, git_folders)
@@ -564,7 +564,7 @@ def test_claudes_stream_is_read_from_a_process_and_a_setup_problem_an_escape_or_
     out = claude.ask_claude(spec_of("mm+files", tmp_path, prompt="q", run_dir=tmp_path / "run6", deny=deny))
     probe = stand_in.probe()
     assert out["problem"] is None and answer_of(out["final"]) == "47" and [t["tool"] for t in out["tools"]] == ["find"]
-    assert probe["env"]["MULTIMEM_HOME"] == str(work / "no-mm-home") and probe["env"]["PATH"] == common.shell_path(bin_dir, git_folders)
+    assert probe["env"]["MMS_HOME"] == str(work / "no-mm-home") and probe["env"]["PATH"] == common.shell_path(bin_dir, git_folders)
     assert (tmp_path / "run6" / "mcp.json").is_file() and "--mcp-config" in out["argv"] and "--add-dir" in out["argv"]
 
 
@@ -587,18 +587,18 @@ def test_codexs_files_arm_has_its_shell_and_no_mm_and_the_mm_arm_is_pinned_to_it
     assert "sandbox_mode=read-only" not in settings and "include_environment_context=false" not in settings
     assert argv[argv.index("-C") + 1] == str(work) and argv[-2:] == ["--", "-"]
 
-    # the shell sees ffmpeg's folder and the system's, and a MULTIMEM_HOME that does not exist: no mm, no .venv
+    # the shell sees ffmpeg's folder and the system's, and a MMS_HOME that does not exist: no mm, no .venv
     bin_dir = tmp_path / "bin"
     argv = codex.argv_of(["codex.CMD"], "m", "high", spec_of("files", tmp_path))
     codex.check_argv(argv, ["codex.CMD"])  # a .cmd shim reads none of it as syntax
     policy = dict(s.split("=", 1) for s in settings_of(argv) if s.startswith("shell_environment_policy.set."))
-    assert list(policy) == ["shell_environment_policy.set.PATH", "shell_environment_policy.set.MULTIMEM_HOME"]
+    assert list(policy) == ["shell_environment_policy.set.PATH", "shell_environment_policy.set.MMS_HOME"]
     shell_path = policy["shell_environment_policy.set.PATH"]
     assert shell_path.startswith("'") and shell_path.endswith("'")
     assert os.name != "nt" or ("\\" in shell_path and "/" not in shell_path), "a Windows PATH keeps its backslashes"
     assert shell_path.strip("'").split(os.pathsep) == [str(bin_dir), *common.system_path()]
     assert not any(".venv" in folder for folder in shell_path.split(os.pathsep))
-    assert policy["shell_environment_policy.set.MULTIMEM_HOME"] == f"'{str(work / 'no-mm-home').replace(chr(92), '/')}'"
+    assert policy["shell_environment_policy.set.MMS_HOME"] == f"'{str(work / 'no-mm-home').replace(chr(92), '/')}'"
     assert not (work / "no-mm-home").exists()
     assert common.shell_path(None) == os.pathsep.join(common.system_path()), "no bin_dir: the system's folders alone"
 
@@ -609,7 +609,7 @@ def test_codexs_files_arm_has_its_shell_and_no_mm_and_the_mm_arm_is_pinned_to_it
     assert "'--tools','ask,find,look,label'" in next(a for a in settings_of(argv) if a.startswith("mcp_servers.mm.args="))
     assert "sandbox_mode=read-only" in settings_of(argv) and set(disabled_of(argv)) == set(codex.DISABLED)
     assert argv[argv.index("-C") + 1] == str(work)
-    unpinned = served_of(McpServer("mm", sys.executable, ("-m", "multimem.cli", "--home", str(home)), {}, ("ask",)))
+    unpinned = served_of(McpServer("mm", sys.executable, ("-m", "mms.cli", "--home", str(home)), {}, ("ask",)))
     argv = codex.argv_of(["codex"], "m", "high", spec_of("mm", tmp_path, served=unpinned))
     assert not any(".env." in s for s in settings_of(argv)), "a server given no environment is pinned to nothing"
     with pytest.raises(codex.CodexMissing, match="tools"):
@@ -935,11 +935,11 @@ def test_the_arm_names_in_the_messages_are_blind_files_the_servers_name_and_both
     assert "listing's tools" in codex.check_event({"type": "item.started", "item": {"type": "file_change"}}, spec_of("mm", served=other))
 
 
-NEUTRAL = re.compile(r"\bmm\b|multimem", re.I)
+NEUTRAL = re.compile(r"\bmm\b|\bmms\b", re.I)
 AGENTS = Path(__file__).parents[1] / "mmsb" / "core" / "agents"
 
 
-def test_no_agent_module_names_mm_or_imports_multimem_or_an_old_root_module():
+def test_no_agent_module_names_mm_or_imports_mms_or_an_old_root_module():
     """Tools and instructions come from `Served`, so the agents name no system. (The old root modules stay until U8; nothing
     new may import them.)"""
     for file in sorted(AGENTS.glob("*.py")):
@@ -948,23 +948,23 @@ def test_no_agent_module_names_mm_or_imports_multimem_or_an_old_root_module():
         tree = ast.parse(file.read_text(encoding="utf-8"))
         imported = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         imported |= {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module}
-        assert not imported & {"multimem", "claude_run", "codex_run", "bench", "egolife", "haystack", "shortcuts"}, file.name
+        assert not imported & {"mms", "claude_run", "codex_run", "bench", "egolife", "haystack", "shortcuts"}, file.name
 
 
-def test_the_agents_import_without_multimem_or_the_old_root_modules_in_a_process_that_refuses_them():
+def test_the_agents_import_without_mms_or_the_old_root_modules_in_a_process_that_refuses_them():
     """A `sys.meta_path` blocker, because the editable install would make `import claude_run` work: a slip would go unnoticed."""
     code = textwrap.dedent("""
         import importlib.abc, sys
 
         class Refuse(importlib.abc.MetaPathFinder):
             def find_spec(self, name, path=None, target=None):
-                if name.split(".")[0] in {"multimem", "claude_run", "codex_run", "bench", "egolife", "haystack", "haystack_media",
+                if name.split(".")[0] in {"mms", "claude_run", "codex_run", "bench", "egolife", "haystack", "haystack_media",
                                           "shortcuts", "grade", "conftest", "day", "fake_decider"}:
                     raise ImportError(f"refused: {name}")
 
         sys.meta_path.insert(0, Refuse())
         import mmsb.core.agents.spec, mmsb.core.agents.common, mmsb.core.agents.claude, mmsb.core.agents.codex
-        assert "multimem" not in sys.modules and "claude_run" not in sys.modules
+        assert "mms" not in sys.modules and "claude_run" not in sys.modules
         print("imported")
     """)
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=Path(__file__).parents[1])
@@ -977,7 +977,7 @@ def opens_world(tmp_path: Path) -> tuple[Path, Path, Path, tuple[str, ...]]:
     """A run folder (denied), the home of a system inside it and the `looks` folder of the home, which the system hands the agent."""
     run = tmp_path / "run"
     home = run / "homes" / "claude-d1-3B"
-    return run, home, home / "looks", (lower(run), ".multimem")
+    return run, home, home / "looks", (lower(run), ".mms")
 
 
 def test_the_own_tools_may_open_a_folder_the_system_handed_them_and_nothing_else_of_the_run_folder_for_claude(tmp_path):

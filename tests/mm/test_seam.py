@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 import seam  # noqa: E402

@@ -1,13 +1,13 @@
 # MMSB: the plan to production readiness
 
 Agreed with Dan on 5 November 2026, then re-planned the same day: MMSB is a standalone benchmark of realistic media, not
-Multimem's benchmark separated out. Built on 6 November 2026, through both review gates and the real-agent test; the changes
+MultimediaSearch's benchmark separated out. Built on 6 November 2026, through both review gates and the real-agent test; the changes
 from this plan made while building are marked "As built". DESIGN.md section 5.7 says what each scenario is now.
 
 ## The goal
 
 MMSB measures how well an AI agent finds things in a real pile of media: long videos, lots of pictures, a long audio file, many
-short sound files. Today the code runs without Multimem, but everything it can run came from Multimem's work: V7 (the synthetic
+short sound files. Today the code runs without MultimediaSearch, but everything it can run came from MultimediaSearch's work: V7 (the synthetic
 week mm was tuned on), V8 (EgoLife, run through mm), and mm as the only search system. None of the realistic piles has a
 scenario, though their media is on disk in `D:\bench-data\sources\`.
 

@@ -1,13 +1,14 @@
-"""Oracle 3 (plan 7.3) for the mm cells of both agents, and the skill tests of Multimem's test_agents.py (and test_codex.py) that read the
+"""Oracle 3 (plan 7.3) for the mm cells of both agents, and the skill tests of MultimediaSearch's test_agents.py (and test_codex.py) that read the
 installed skill: what `Mm.serve` gives the agents, and the exec they build from it, is the exec the old code built.
 
 The expected values are not the new code's: they are the goldens that `capture_exec.py` wrote from the old claude_run.py and codex_run.py
 (argv, environment, instructions, settings, mcp.json, catalog; tests/oracles/recorded/exec) and the 48 recorded pilot mm execs
 (tests/oracles/recorded/pilot-s1/execs.json and its instruction texts). The one intended difference, plan 7.3 difference 3, is the skill:
-five of its lines changed in Multimem between the pilot and the commit the goldens were made at (41 characters). It is an exact line map, so
-that a skill that changes again fails here, saying which lines.
+five of its lines changed in MultimediaSearch between the pilot and the commit the goldens were made at (41 characters). It is an exact line map, so
+that a skill that changes again fails here, saying which lines. The other difference is the skill's own: the lines it gained in facd716
+(`SKILL_CHANGES` of tests/golden_names.py, with the renames), read into the goldens by `golden_text`, so that nothing else is looser.
 
-Ported from tests/test_agents.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, for what reads the installed skill:
+Ported from tests/test_agents.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, for what reads the installed skill:
 - test_claudes_command_lines_give_each_arm_its_tools_and_nothing_of_the_owners: the last lines, that the notes of every model fit the line;
 - test_claudes_environment_drops_the_api_key_and_the_instructions_hold_the_skill_and_the_notes: the instructions' half;
 - test_codexs_instructions_hold_the_models_notes_and_the_files_arms_line_alone: the mm half.
@@ -26,15 +27,16 @@ from unittest import mock
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes
 from agent_spec import spec_of
 from capture_exec import PLACEHOLDERS, placer, plant_git, planted_environment
+from golden_names import golden_bytes, golden_json, golden_text
 from model_folders import model_folder
 from test_exec import CLAUDE_BOTH_ARGV, CLAUDE_SETTINGS, MODELS, files_now, pilot_execs, read, recorded_text
 
-from multimem import decider
+from mms import decider
 
 from mmsb.core.agents import claude, codex, common
 from mmsb.core.contract import Case, Served
@@ -47,7 +49,7 @@ EXEC, PILOT = RECORDED / "exec", RECORDED / "pilot-s1"
 D3 = decider.known("d3-edge")[1]  # notes d3.md
 windows_only = pytest.mark.skipif(os.name != "nt", reason="the goldens are what the old code builds on Windows (backslashes, Git)")
 SKILL_TEXT = SKILL.read_text(encoding="utf-8")
-# plan 7.3, difference 3: the five lines of the skill and the notes of d1-3B that Multimem changed since the pilot ("nervelet simulator" became
+# plan 7.3, difference 3: the five lines of the skill and the notes of d1-3B that MultimediaSearch changed since the pilot ("nervelet simulator" became
 # "robot simulator", and "this machine" the developer's), as the pilot recorded them and as they are now. Each is in the recorded instructions once.
 DRIFT = {
     'they are: "Lines of the nervelet simulator\'s log; height_m is in metres." With a picture or a sound it is the only text':
@@ -88,7 +90,7 @@ def instructions_of(served: Served, agent: str) -> str:
 @pytest.mark.parametrize("agent", ("claude", "codex"))
 def test_the_instructions_the_system_serves_are_the_goldens_the_old_code_wrote(agent, opened, tmp_path):
     served = opened.serve(case_in(tmp_path))
-    assert instructions_of(served, agent) == read(EXEC / f"{agent}-mm" / "instructions.md")
+    assert instructions_of(served, agent) == golden_text(EXEC / f"{agent}-mm" / "instructions.md")
     assert (served.base_line, served.holder, served.server.name, served.server.tools) == (BASE, "mm", "mm", ("ask", "find", "look", "label"))
     assert served.parts[0] == SKILL_TEXT and served.parts[1] == notes_text("d1_3b.md") and len(served.parts) == 2
 
@@ -143,15 +145,15 @@ def test_the_exec_the_old_code_built_for_the_mm_cell_is_the_one_built_from_what_
             argv = codex.prepare(spec, "gpt-6.1-terra", "medium", MODELS, ["<codex>"])
             env = common.path_with(spec.bin_dir)
     place = placer({**paths, "PYTHON": sys.executable, "GIT": git})
-    assert place(argv) == json.loads(read(golden / "argv.json"))
-    assert dict(sorted(place(env).items())) == json.loads(read(golden / "env.json"))
+    assert place(argv) == golden_json(golden / "argv.json")
+    assert dict(sorted(place(env).items())) == golden_json(golden / "env.json")
     made = {p.name for p in paths["RUN"].iterdir()}
     assert made == {p.name for p in golden.iterdir()} - {"argv.json", "env.json"}, "the same files, and no other"
     for name in sorted(made):
         if name == "mcp.json":
-            assert place(json.loads(read(paths["RUN"] / name))) == json.loads(read(golden / name))
+            assert place(json.loads(read(paths["RUN"] / name))) == golden_json(golden / name)
         else:
-            assert (paths["RUN"] / name).read_bytes() == (golden / name).read_bytes(), name
+            assert (paths["RUN"] / name).read_bytes() == golden_bytes(golden / name), name
 
 
 @windows_only
@@ -176,19 +178,19 @@ def test_with_the_agents_own_tools_the_files_line_comes_first_and_the_server_is_
         else:
             argv = codex.prepare(spec, "gpt-6.1-terra", "medium", MODELS, ["<codex>"])
     place = placer({**paths, "PYTHON": sys.executable, "GIT": git})
-    plain = (EXEC / f"{agent}-files" / "instructions.md").read_text(encoding="utf-8")
+    plain = golden_text(EXEC / f"{agent}-files" / "instructions.md")
     plain = files_now(plain) if agent == "claude" else plain
-    assert read(paths["RUN"] / "instructions.md") == plain + "\n\n" + read(EXEC / f"{agent}-mm" / "instructions.md")
+    assert read(paths["RUN"] / "instructions.md") == plain + "\n\n" + golden_text(EXEC / f"{agent}-mm" / "instructions.md")
     if agent == "claude":
         assert place(argv) == [*CLAUDE_BOTH_ARGV, "--add-dir", "<HOME>\\looks"], "and the folder of the pictures `look` makes, which the system handed it (G1's F4)"
         assert read(paths["RUN"] / "settings.json") == CLAUDE_SETTINGS
-        assert place(json.loads(read(paths["RUN"] / "mcp.json"))) == json.loads(read(EXEC / "claude-mm" / "mcp.json"))
-        expected_env = {**json.loads(read(EXEC / "claude-files" / "env.json")), "CUDA_VISIBLE_DEVICES": "-1"}
+        assert place(json.loads(read(paths["RUN"] / "mcp.json"))) == golden_json(EXEC / "claude-mm" / "mcp.json")
+        expected_env = {**golden_json(EXEC / "claude-files" / "env.json"), "CUDA_VISIBLE_DEVICES": "-1"}
         assert dict(sorted(place(env).items())) == dict(sorted(expected_env.items())), "the files cell's environment, which the own tools pick, and no CUDA device"
     else:
         assert "mcp_servers.mm.command='<PYTHON>'" in place(argv) and "mcp_servers.mm.required=true" in place(argv)
         settings = [place(argv)[i + 1] for i, a in enumerate(argv) if a == "-c"]
-        nowhere = settings.index("shell_environment_policy.set.MULTIMEM_HOME='<WORK>/no-mm-home'")
+        nowhere = settings.index("shell_environment_policy.set.MMS_HOME='<WORK>/no-mm-home'")
         assert settings[nowhere + 1] == "shell_environment_policy.set.CUDA_VISIBLE_DEVICES='-1'", "the shell's, after the others"
 
 

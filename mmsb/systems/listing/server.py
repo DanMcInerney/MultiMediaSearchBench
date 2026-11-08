@@ -1,7 +1,7 @@
 """The listing's MCP server over stdio (DESIGN 3.2): a dump's files as their metadata and nothing of their content. It reads one file,
 `listing.jsonl`, that `Listing.ingest` wrote, and is given no path to the dump, so it cannot open a recording; it imports the SDK and the
 standard library only, and starts as a script (`python server.py --listing FILE [--until EPOCH]`), so the file that runs is the file you
-read. Written on the pattern of Multimem's `adapter.py`.
+read. Written on the pattern of MultimediaSearch's `adapter.py`.
 
 A row of the listing is `{path, source, size, mtime}` and, when the file says so, `exif` (a picture's tags, by their names) and `container`
 (`format, duration, width, height, fps, codec, creation_time, sample_rate`). `mtime` is epoch seconds in the file and an ISO 8601 time in the

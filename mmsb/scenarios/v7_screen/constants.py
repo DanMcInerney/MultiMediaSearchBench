@@ -1,7 +1,7 @@
-"""Constants and small functions that V7 shares with Multimem's tests and reader, copied so that V7 builds without Multimem:
+"""Constants and small functions that V7 shares with MultimediaSearch's tests and reader, copied so that V7 builds without MultimediaSearch:
 `RATE` and `font` (tests/day.py), the fake decider's `SHADE_TOL`, `PITCH_*`, `shade_share` and `pitch_share` (tests/fake_decider.py),
-and the values of the reader's `PROFILE` that the writer's checks and the tests use (src/multimem/reader.py). Copied at Multimem
-fe0ece5. The needles are made to be told by these, so if Multimem's change the week is no longer what its decider sees: tests/mm
+and the values of the reader's `PROFILE` that the writer's checks and the tests use (src/mms/reader.py). Copied at fe0ece5,
+when MultimediaSearch was called Multimem (src/multimem/). The needles are made to be told by these, so if the originals change the week is no longer what its decider sees: tests/mm
 asserts that they are equal."""
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ def pitch_share(samples: np.ndarray, rate: int, hz: float) -> float:
     return float(energy[near].sum() / total)
 
 
-# the values of the reader's PROFILE (src/multimem/reader.py at fe0ece5) that the writer's checks and the tests use
+# the values of the reader's PROFILE (src/mms/reader.py, src/multimem/reader.py at fe0ece5) that the writer's checks and the tests use
 PROFILE = {
     "every_s": 1.0,      # video: one frame per this many seconds
     "audio_s": 5.0,      # audio: the length of a window, and ...

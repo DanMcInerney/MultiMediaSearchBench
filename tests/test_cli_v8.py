@@ -1,4 +1,4 @@
-"""The command line over EgoLife (V8): ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4) the tests of what its command
+"""The command line over EgoLife (V8): ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4) the tests of what its command
 line did (`test_a_dry_run_names_the_files_folder_and_makes_nothing`, `test_the_commands_say_what_they_will_run_and_report_writes_its_files`,
 `test_the_estimate_prices_a_blind_exec_at_its_own_figure`), and new: `mmsb build` of a download, and the finding of U6's notes, that the
 agents with their own tools must not read the whole dump. Over the fake download of tests/v8_fake.py and the stand-in system of

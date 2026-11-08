@@ -1,5 +1,5 @@
 """The slow half of the neutrality check (plan 7.6; tests/test_neutral.py runs it): run by the python of a fresh environment made with no extra
-and no group (`uv sync --frozen --no-default-groups`), so Multimem is not installed (and pytest is not either). It builds the tiny week of V7
+and no group (`uv sync --frozen --no-default-groups`), so MultimediaSearch is not installed (and pytest is not either). It builds the tiny week of V7
 with the command, runs the shortcut probe, runs a `files` cell with a stand-in agent, writes a report, and sees that a configuration of the
 system that needs the extra is refused with the extra's name.
 
@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-assert importlib.util.find_spec("multimem") is None, "multimem is installed in the environment this smoke test is for"
+assert importlib.util.find_spec("mms") is None, "mms is installed in the environment this smoke test is for"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # tests/: the stand-in agent
 
@@ -57,8 +57,8 @@ def main(folder: Path) -> dict:
     with contextlib.redirect_stderr(refused):
         assert cli.main(["run", str(run), "--agents", "claude", "--configs", "mm", "--dry-run"]) == 1
     assert "mm needs the mm extra: uv sync --extra mm" in refused.getvalue(), refused.getvalue()
-    assert set(systems.infos()) >= {"files", "mm"} and systems.isolation().deny_package_roots == ("multimem",)
-    return {"multimem": None, "probe": meta["probe"]["status"], "questions": len(tiny_questions()), "results": len(results),
+    assert set(systems.infos()) >= {"files", "mm"} and systems.isolation().deny_package_roots == ("mms",)
+    return {"mms": None, "probe": meta["probe"]["status"], "questions": len(tiny_questions()), "results": len(results),
             "report_runs": len(figures["runs"]), "refused": refused.getvalue().strip().splitlines()[-1]}
 
 

@@ -1,7 +1,7 @@
 """The world the tests of the command line run in (tests/test_cli.py, test_cli_build.py, test_cli_v8.py): a registry folder of systems with
 a stand-in system `stub` beside the real `files` (and the real system.toml of the others), and a scenario `toy` that is V7's plan, prompts
 and views over a dump of three small files, written in a second instead of a week's media in half a minute. Nothing here starts a process
-or imports multimem.
+or imports mms.
 
 `toy` is a module with the names of a `Scenario`, as the real ones are; `use` puts it in the scenario registry for a test. Its probe
 returns what a test sets (`PROBE`) and notes how it was called (`PROBED`), as the old tests' stand-in for `shortcuts.run` did."""

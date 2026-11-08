@@ -1,4 +1,4 @@
-"""Oracle 1b: a sample of the V7 pilot's files, written with no Multimem and compared with the files the recorded pilot wrote. 43 files:
+"""Oracle 1b: a sample of the V7 pilot's files, written with no MultimediaSearch and compared with the files the recorded pilot wrote. 43 files:
 the rule is `random.Random(7)`, then in this order `sample(files of the kind, n)` for screen 12, photo 12, porch 6, mic 4, note 4, clip 3
 and config 2. Each is written by `write_file` (which checks it as it makes it) and must have the recorded size, mtime and sha256: the
 same bytes, which holds only with the libraries pyproject pins. About 10 s. Run with `-m slow`.

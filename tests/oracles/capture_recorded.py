@@ -38,7 +38,7 @@ REPLAY = (("codex", "mm-d1-3B", "records-log-count-1"), ("codex", "mm-d1-3B", "v
           ("claude", "mm-d1-3B", "text-config-asof-1"), ("claude", "mm-d1-3B", "records-log-count-1"),
           ("claude", "files", "records-log-count-1"), ("claude", "files", "text-config-asof-1"))
 INIT_KEYS = ("tools", "mcp_servers", "plugins", "apiKeySource", "permissionMode", "slash_commands", "skills")
-MCP_HEAD, MCP_TAIL = ["-m", "multimem.cli", "--home"], ["mcp", "--tools", "ask,find,look,label"]  # mm's home is between them
+MCP_HEAD, MCP_TAIL = ["-m", "multimem.cli", "--home"], ["mcp", "--tools", "ask,find,look,label"]  # mm's home is between them; as the pilot recorded it
 
 
 def dump(obj) -> str:

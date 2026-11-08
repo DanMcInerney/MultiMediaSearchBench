@@ -1,4 +1,4 @@
-"""Ported from tests/test_bench.py of Multimem at fe0ece5 (plan 7.4), `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`
+"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4), `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`
 (test_bench.py:933-971): which questions a configuration is asked, the pilot and the controls. `family` and `arm_jobs` are the mm
 system's and are tests/mm's (U7). `model` is the configuration and `About.reads` is `Description.reads`; the expected sets are written
 from the questions' own modalities, and the controls' rule is the source's: a needle of text, one of records and an absent one, each with

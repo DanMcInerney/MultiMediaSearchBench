@@ -1,6 +1,6 @@
-"""mm and the working clock (plan 6.5, 8.2, decision D3; written for this repository, U14): Multimem keeps no per-job wait, so neither of mm's sessions
+"""mm and the working clock (plan 6.5, 8.2, decision D3; written for this repository, U14): MultimediaSearch keeps no per-job wait, so neither of mm's sessions
 can say how long a case queued for the GPU, and the clock runs on the wall. That is exact at one exec at a time and wrong at several, so the core
-refuses several on the working clock (`mmsb run`, before any agent starts) and `mmsb clock-check` refuses mm altogether until Multimem reports the
+refuses several on the working clock (`mmsb run`, before any agent starts) and `mmsb clock-check` refuses mm altogether until MultimediaSearch reports the
 queue. Over the real system, the tiny week's real store and the fake decider; no agent, no model and no daemon of the owner's.
 
 mm needs the GPU, so it runs one exec at a time unless `--gpu-jobs` asks for more (core/atonce.py): the defaults are never refused, `--gpu-jobs 2`
@@ -17,7 +17,7 @@ from datetime import datetime
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import MM, Opened, context  # noqa: E402

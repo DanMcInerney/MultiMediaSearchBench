@@ -33,8 +33,8 @@ TEXT_ASK = "Does the text talk about "  # how a speech question's oracle starts 
 PEOPLE = ("Alice", "Choiszt", "Jake", "Katrina", "Lucia", "Nicous", "Shure", "Tasha", "Violet")  # who the transcript names
 ORACLES = Path(__file__).with_name("oracles.json")
 ORACLE_VERSION = 1
-# the words mm's ask refuses in a question (src/multimem/scripts/ask.py at fe0ece5: TIME_WORDS, JOINED): rules 3 and 5 of ORACLE_RULES.
-# tests/mm asserts that they are still Multimem's.
+# the words mms's ask refuses in a question (src/mms/scripts/ask.py; src/multimem/scripts/ask.py at fe0ece5: TIME_WORDS, JOINED): rules 3 and 5 of ORACLE_RULES.
+# tests/mm asserts that they are still MultimediaSearch's.
 TIME_WORDS = re.compile(
     r"\b(yesterday|today|tonight|tomorrow|this (morning|afternoon|evening|week|month)|last (night|week|month|year)|"
     r"(on )?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)|at \d{1,2}(:\d\d)?\s?(am|pm)?|\d{1,2}\s?(am|pm)|"
@@ -91,7 +91,7 @@ def local(days: Sequence[date], t: float) -> float:
 
 
 def iso_of(days: Sequence[date], t: float) -> str:
-    """Plain time `t` as a local ISO time to the millisecond, with no zone (mm reads it as local)."""
+    """Plain time `t` as a local ISO time to the millisecond, with no zone (mms reads it as local)."""
     day, ms = divmod(round(t * 1000), DAY_S * 1000)
     return (datetime.combine(day_date(days, day), datetime.min.time()) + timedelta(milliseconds=ms)).isoformat(timespec="milliseconds")
 
@@ -103,7 +103,7 @@ def clip_path(days: Sequence[date], c: Clip) -> str:
 
 
 def clip_end(days: Sequence[date], c: Clip) -> float:
-    """A clip's end as mm stores it: the local epoch it is remembered at, plus its length (the same sum, so H compares exactly)."""
+    """A clip's end as mms stores it: the local epoch it is remembered at, plus its length (the same sum, so H compares exactly)."""
     return local(days, c.t0) + c.length
 
 

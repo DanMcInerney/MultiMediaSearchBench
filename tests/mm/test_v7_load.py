@@ -1,5 +1,5 @@
-"""Ported from tests/test_haystack.py and tests/test_haystack_media.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in those files' orders: the tests of
-the haystack that need Multimem's reader or a daemon (the rest are tests/test_v7_plan.py and tests/test_v7_media.py). The tiny week is built
+"""Ported from tests/test_haystack.py and tests/test_haystack_media.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in those files' orders: the tests of
+the haystack that need MultimediaSearch's reader or a daemon (the rest are tests/test_v7_plan.py and tests/test_v7_media.py). The tiny week is built
 once by the scenario (V7.build, about 35 s) and ingested once by the system (`Mm.ingest`, conftest's `week` and `store`), and each test that
 asks a daemon asks one over a copy of that store. What changed, by plan 4.6 and 7.4:
 - `haystack.load` is `Mm.ingest`; a phone file that is not at its own time is a `misdated` entry of the report, no longer an AssertionError
@@ -19,14 +19,14 @@ from types import SimpleNamespace
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import span  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from multimem import decider, media, reader  # noqa: E402
-from multimem.store import Store  # noqa: E402
+from mms import decider, media, reader  # noqa: E402
+from mms.store import Store  # noqa: E402
 
 from mmsb.core.config import Config  # noqa: E402
 from mmsb.core.contract import Dump  # noqa: E402
@@ -314,7 +314,7 @@ def test_tiny_is_ingested_in_8_seconds(store):
 
 
 def test_a_phones_photo_and_clip_carry_the_time_mm_reads_from_them(week):
-    """`media.recorded`, the time Multimem takes a file at when it is given none, is the plan's time for a photo (EXIF) and a clip (creation_time)."""
+    """`media.recorded`, the time MultimediaSearch takes a file at when it is given none, is the plan's time for a photo (EXIF) and a clip (creation_time)."""
     _, dump, _ = week
     phone = [e for e in dump.entries if e.kind in ("photo", "clip")]
     assert {e.kind for e in phone} == {"photo", "clip"}

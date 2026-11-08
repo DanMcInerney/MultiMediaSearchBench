@@ -45,7 +45,7 @@ import numpy as np
 from corpus import text_pdf
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-from multimem.config import ffmpeg_exe
+from mms.config import ffmpeg_exe
 
 RATE = 16000
 LOG_SOURCE = "server"

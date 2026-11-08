@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 import seam  # noqa: E402
@@ -28,7 +28,7 @@ from stub_system import right  # noqa: E402
 from test_mm_arm import asks, by_qid, go, result  # noqa: E402
 from test_seam import git  # noqa: E402, F401
 
-from multimem import decider_d1  # noqa: E402
+from mms import decider_d1  # noqa: E402
 
 from mmsb.core.agents import claude, codex  # noqa: E402
 from mmsb.core.config import Config  # noqa: E402

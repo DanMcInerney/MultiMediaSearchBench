@@ -12,7 +12,7 @@ import types
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from cache_world import stamps_of  # noqa: E402

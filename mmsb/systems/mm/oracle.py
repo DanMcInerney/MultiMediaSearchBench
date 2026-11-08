@@ -8,7 +8,7 @@ from __future__ import annotations
 import time
 from collections.abc import Collection
 
-from multimem import config
+from mms import config
 
 from mmsb.core.contract import Dump, Moment, RetrievalQuery, RetrievalResult
 
