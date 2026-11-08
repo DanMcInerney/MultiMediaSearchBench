@@ -283,7 +283,7 @@ def test_a_recipe_with_other_keys_or_days_or_another_zone_or_no_download_is_refu
     with pytest.raises(ValueError, match="has the keys clips, days, per_age, scale, seed, source, speech, utc_offset, not clips, days, per_age"):
         V8.plan_of({k: v for k, v in recipe.items() if k != "scale"})
     elsewhere = "+0100" if recipe["utc_offset"] != "+0100" else "+0200"
-    with pytest.raises(ValueError, match=rf"the UTC offset of its days is {re.escape(elsewhere)}, here it is {recipe['utc_offset']}: .*another run"):
+    with pytest.raises(ValueError, match=rf"the UTC offset of its days is {re.escape(elsewhere)}, here it is {re.escape(recipe['utc_offset'])}: .*another run"):
         V8.plan_of({**recipe, "utc_offset": elsewhere})
     with pytest.raises(ValueError, match="consecutive, oldest first"):
         V8.plan_of({**recipe, "days": ["2026-10-30", "2026-10-29"]})
