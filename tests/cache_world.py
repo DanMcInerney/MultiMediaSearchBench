@@ -10,8 +10,8 @@ from pathlib import Path
 
 from stub_system import tiny_questions
 
-from mmmb.core.contract import Description, Dump, IngestReport, LogSource, ManifestEntry, Refusal
-from mmmb.core.scenario import dump_key
+from mmsb.core.contract import Description, Dump, IngestReport, LogSource, ManifestEntry, Refusal
+from mmsb.core.scenario import dump_key
 
 RECIPE = {"scale": "tiny", "seed": 1, "days": ["2026-10-30", "2026-10-31"], "utc_offsets": ["-0400", "-0400", "-0400"]}
 FILES = {"notes/a.md": "a note", "screen/s.mkv": "a screen", "logs/web.jsonl": "{}"}

@@ -6,8 +6,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.contract import Isolation, McpServer, Served
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.contract import Isolation, McpServer, Served
 
 # what the system.toml of the system with a private home declare (plan 4.2); the recorded env.json files are the check of these
 ISOLATION = Isolation(env_drop_prefixes=("MULTIMEM_",), deny_words=(".multimem/", '.multimem"', ".multimem ", ".multimem'"),

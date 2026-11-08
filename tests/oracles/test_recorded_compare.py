@@ -1,4 +1,4 @@
-"""`mmmb compare` and `discriminating` on the recorded pilot (plan 6.1, 8.1, decision D1). The recorded pilot's 110 results, converted once
+"""`mmsb compare` and `discriminating` on the recorded pilot (plan 6.1, 8.1, decision D1). The recorded pilot's 110 results, converted once
 (recorded/pilot-s1/converted), are the run to compare with itself, with a copy that has flips planted, and to pick the discriminating cases
 of; the expected values are the recorded files' own and D1's: recorded/pilot-s1/report.json (written by the old code on 4 November 2026, its
 `b` and `c` and its per-question appendix) and D1's counts of correct answers (Claude files 23, Claude mm 22, Codex files 27, Codex mm 23).
@@ -15,12 +15,12 @@ from pathlib import Path
 import pytest
 from v7_recorded import needs_the_recorded_zone
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.compare import BAND, compare_cells, compare_runs, render_comparison
-from mmmb.core.config import Config
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.select import discriminating, separate
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.compare import BAND, compare_cells, compare_runs, render_comparison
+from mmsb.core.config import Config
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.select import discriminating, separate
 
 needs_the_recorded_zone()
 

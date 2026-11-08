@@ -1,5 +1,0 @@
-[system]
-name = "files"
-class = "mmmb.systems.files.system:Files"
-license = "none"
-horizon = "view"

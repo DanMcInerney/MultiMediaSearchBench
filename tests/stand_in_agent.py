@@ -17,14 +17,14 @@ from pathlib import Path
 
 from agent_spec import nothing_queued
 
-from mmmb import systems
-from mmmb.core.agents import claude, codex
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.config import Config
-from mmmb.core.contract import Case, Dump, Session
-from mmmb.core.question import Question
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import case_of, reads_of
+from mmsb import systems
+from mmsb.core.agents import claude, codex
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.config import Config
+from mmsb.core.contract import Case, Dump, Session
+from mmsb.core.question import Question
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import case_of, reads_of
 
 # stdlib only: it runs as the agent's command. argv: this script, the plan (a JSON file), then the arguments the agent is given.
 HEAD = r'''

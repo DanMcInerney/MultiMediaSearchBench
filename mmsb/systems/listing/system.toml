@@ -1,0 +1,5 @@
+[system]
+name = "listing"
+class = "mmsb.systems.listing.system:Listing"
+license = "none"
+horizon = "cut"

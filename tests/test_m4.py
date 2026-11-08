@@ -1,6 +1,6 @@
 """M4, the sound samples, from its real source on disk: the tiny folder built (clips numbered, copied with their samples alone and their
 times), every answer derived again here by a plain reader of the label files (never the scenario's), the grader taking each truth and
-refusing planted wrong answers, the leak probe, and `mmmb build`, `run` and `report` over it with a stand-in agent. Skips, and says so,
+refusing planted wrong answers, the leak probe, and `mmsb build`, `run` and `report` over it with a stand-in agent. Skips, and says so,
 without the source."""
 
 from __future__ import annotations
@@ -20,13 +20,13 @@ import pytest
 from agent_spec import clocked
 from cli_world import world  # noqa: F401
 
-from mmmb import scenarios
-from mmmb.core import fs, grade
-from mmmb.core.agents import claude
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.scenarios.m4_samples.questions import CLASSES, NEAR
-from mmmb.scenarios.m4_samples.source import SOURCE, clip_file, clip_sizes
+from mmsb import scenarios
+from mmsb.core import fs, grade
+from mmsb.core.agents import claude
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.scenarios.m4_samples.questions import CLASSES, NEAR
+from mmsb.scenarios.m4_samples.source import SOURCE, clip_file, clip_sizes
 
 if not (SOURCE / "labels" / "eval.csv").is_file():
     pytest.skip(f"the FSD50K source is not at {SOURCE}, so M4 is not built", allow_module_level=True)
@@ -283,7 +283,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = M4.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:fsd50k" in deny and "in:freesound" in deny and "in:m4_samples" in deny and "in:from mmmb" in deny
+    assert "bench-data" in deny and "in:fsd50k" in deny and "in:freesound" in deny and "in:m4_samples" in deny and "in:from mmsb" in deny
 
 
 def test_the_grader_takes_each_truth_and_refuses_the_planted_wrong_answers(tiny):
@@ -333,7 +333,7 @@ def test_build_run_and_report_over_the_tiny_folder(world, capsys):  # noqa: F811
     assert prompt.startswith("It is now Friday 1 May 2026, 09:00. The files of my folder of sound clips are in ")
     assert find.question in prompt and "<the names of the files, as in rec_00042.wav, separated by commas>" in prompt
     capsys.readouterr()
-    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
+    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMSB report")
     figures = fs.read_json(folder / "report.json")
     (section,) = figures["scenarios"]
     files, listing = section["cells"]["claude"]["files"], section["cells"]["claude"]["listing"]

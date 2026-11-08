@@ -22,13 +22,14 @@ from stub_system import run_of as stub_run_of
 from stub_system import tiny_questions
 from test_report import FAKE, FILES, right, run_of, shape, stub_out, stub_results
 
-from mmmb.core import fs, render, report
-from mmmb.core.agents.common import result_jsons
-from mmmb.core.config import Config, parse_config
-from mmmb.core.contract import SessionContext
-from mmmb.core.record import record
-from mmmb.core.runner import Agent, note_configs, run_agents
-from mmmb.systems.listing.system import Listing
+from mmsb.core import fs, render, report
+from mmsb.core.agents.common import result_jsons
+from mmsb.core.config import Config, parse_config
+from mmsb.core.contract import SessionContext
+from mmsb.core.record import record
+from mmsb.core.runfolder import COMMIT_KEY
+from mmsb.core.runner import Agent, note_configs, run_agents
+from mmsb.systems.listing.system import Listing
 
 pytestmark = pytest.mark.xdist_group("listing-run")
 LISTING = Config("listing", "listing", None, False)
@@ -69,7 +70,7 @@ def test_the_listing_configuration_runs_every_question_through_the_runner_and_th
     noted = json.loads((run.folder / "systems.json").read_text(encoding="utf-8"))["listing"]
     assert noted["asked"] == ALL and noted["readable"] == ALL and noted["description"]["leak_filter"] is True and noted["description"]["horizon"] == "cut"
     assert noted["description"] == {**dataclasses.asdict(Listing().describe(None)), "reads": ALL}
-    fs.write_json(run.folder / "run.json", {"mmmb_commit": "abc"})
+    fs.write_json(run.folder / "run.json", {COMMIT_KEY: "abc"})
     figures = report.numbers([run])
     assert figures["agents"] == {} and figures["frame"]["tested"] == "tested", "the listing is not compared with the control"
     found = figures["answerable_from_metadata"]

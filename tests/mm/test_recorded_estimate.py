@@ -23,11 +23,11 @@ from v8_recorded import zone_skip as ego_zone_skip
 
 from multimem import decider
 
-from mmmb.core.contract import Dump
-from mmmb.core.question import load_questions
-from mmmb.scenarios.v8_egolife.manifest import TRANSCRIPT, entries_of
-from mmmb.systems.mm.estimate import ASK_SHARE, HEAVY_S, estimate_s, table_of, windows_in
-from mmmb.systems.mm.system import serve_record
+from mmsb.core.contract import Dump
+from mmsb.core.question import load_questions
+from mmsb.scenarios.v8_egolife.manifest import TRANSCRIPT, entries_of
+from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, estimate_s, table_of, windows_in
+from mmsb.systems.mm.system import serve_record
 
 D13 = decider.known("d1-3B")[1]
 TIMEOUT_S = 900.0  # both recorded runs

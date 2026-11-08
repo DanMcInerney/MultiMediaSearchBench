@@ -3,8 +3,8 @@
 fake decider. What moved, by the plan's 4.5 and 4.6, and what the expectations are:
 - the arm is the configuration `mm/fake` (the system's tools) and `mm/fake+files` (and the agent's own); the `built` run is `fakes.run_of`;
   `bench.run_arm` is `run_config` over an opened session; `bench.Exec` is a `SessionSpec`; `arm` and `model` are `config`, `system`, `variant`;
-- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmmb.systems.mm.home`, `jobs`), `gpu_estimate` is `Session.estimate`;
-- the ask-job half of `work_of` is `mmmb.systems.mm.audit.work_of`, which `Session.audit` merges over the core's `work`;
+- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmsb.systems.mm.home`, `jobs`), `gpu_estimate` is `Session.estimate`;
+- the ask-job half of `work_of` is `mmsb.systems.mm.audit.work_of`, which `Session.audit` merges over the core's `work`;
 - the oracle's level rules (5 sightings for a `last` question, 50 for a count, `oldest_first` left out of a `last` one) are the question writer's and
   tests/test_v7_questions.py's; here the query they make is what the ask passes.
 Not ported, with reasons: `test_remove_tree_removes_a_junction...` (the core's, tests/test_fs.py); the report, run-folder, stop, resume, files-arm
@@ -39,22 +39,23 @@ from stub_system import right  # noqa: E402
 
 from multimem import config, decider  # noqa: E402
 
-from mmmb import systems  # noqa: E402
-from mmmb.core import fs, render, report, retrieval  # noqa: E402
-from mmmb.core.agents.common import scrubbed  # noqa: E402
-from mmmb.core.clock import WALL  # noqa: E402
-from mmmb.core.contract import Case, RetrievalQuery  # noqa: E402
-from mmmb.core.record import Halt  # noqa: E402
-from mmmb.core.runner import Agent, run_agents, run_config  # noqa: E402
-from mmmb.systems.mm import estimate, models, system  # noqa: E402
-from mmmb.systems.mm.audit import work_of  # noqa: E402
-from mmmb.systems.mm.daemon import Api, Daemon  # noqa: E402
-from mmmb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
-from mmmb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
-from mmmb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
-from mmmb.systems.mm.models import Model, needs_gpu  # noqa: E402
-from mmmb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa: E402
-from mmmb.systems.mm.system import MmSession, serve_record  # noqa: E402
+from mmsb import systems  # noqa: E402
+from mmsb.core import fs, render, report, retrieval  # noqa: E402
+from mmsb.core.agents.common import scrubbed  # noqa: E402
+from mmsb.core.clock import WALL  # noqa: E402
+from mmsb.core.contract import Case, RetrievalQuery  # noqa: E402
+from mmsb.core.record import Halt  # noqa: E402
+from mmsb.core.runfolder import COMMIT_KEY  # noqa: E402
+from mmsb.core.runner import Agent, run_agents, run_config  # noqa: E402
+from mmsb.systems.mm import estimate, models, system  # noqa: E402
+from mmsb.systems.mm.audit import work_of  # noqa: E402
+from mmsb.systems.mm.daemon import Api, Daemon  # noqa: E402
+from mmsb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
+from mmsb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
+from mmsb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
+from mmsb.systems.mm.models import Model, needs_gpu  # noqa: E402
+from mmsb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa: E402
+from mmsb.systems.mm.system import MmSession, serve_record  # noqa: E402
 
 AS_OF = ("notes", "config")  # the sources whose files are versions (the dump's text)
 pytestmark = pytest.mark.xdist_group("mm-arm")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
@@ -280,7 +281,7 @@ def test_the_decider_tier_scores_the_fake_questions(week, store, tiny, tmp_path,
     assert {"part", "day", "week"} <= {q["level"] for q in asked} and any(q.get("last") for q in asked) and any(q["absent"] for q in asked)
     assert any(q["fake"]["check"] == "count" for q in asked)
     run = run_of(tmp_path, recipe, questions, dump, [FILES, S])
-    fs.write_json(run.folder / "run.json", {"mmmb_commit": "abc123", "probe": {"status": "passed", "failures": []}})  # (what the report reads of a run)
+    fs.write_json(run.folder / "run.json", {COMMIT_KEY: "abc123", "probe": {"status": "passed", "failures": []}})  # (what the report reads of a run)
     fs.write_json(run.folder / "systems.json", {"mm/fake": {"system": "mm", "variant": "fake", "dir": "mm-fake", "readable": sorted(MM.describe("fake").reads),
                                                        "asked": sorted(MM.describe("fake").reads)}})
     mine = [q for q in questions if q.qid in {a["qid"] for a in asked}]

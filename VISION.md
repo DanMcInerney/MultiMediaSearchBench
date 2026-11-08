@@ -1,15 +1,15 @@
-# MultiMediaMemoryBench: vision
+# MultiMediaSearchBench: vision
 
-Start here. This file says what MMMB is for and what it must stay true to. How it is built is in [DESIGN.md](DESIGN.md).
+Start here. This file says what MMSB is for and what it must stay true to. How it is built is in [DESIGN.md](DESIGN.md).
 
 ## The goal
 
-**MMMB tells people how well an AI agent can find things in their own large piles of video, pictures and sound, and which
+**MMSB tells people how well an AI agent can find things in their own large piles of video, pictures and sound, and which
 search tools make it better, judged on the media people really keep and the questions they really ask.**
 
 People keep footage from security cameras, phones, dashcams, meetings, labs and field recorders, and they rarely look at
 it again, because finding one moment in it takes hours. An agent that can be told "find when the parcel was taken" or
-"find the voice memo where I said the gate code" changes that. MMMB measures how close agents and their tools are to doing
+"find the voice memo where I said the gate code" changes that. MMSB measures how close agents and their tools are to doing
 it well.
 
 ## What the goal asks for
@@ -26,7 +26,7 @@ it well.
    - and mixes of these.
 
    Speech and sound count as much as pictures, even where today's tools are weak at them.
-3. **Neutral.** Any agent and any search system can be measured, and none is favoured. MMMB belongs to no product. The
+3. **Neutral.** Any agent and any search system can be measured, and none is favoured. MMSB belongs to no product. The
    agent working alone with the files is always the baseline.
 4. **Right means shown to be right.** An answer counts only when it points to where in the media the answer is. Every
    answer is known in advance and checked by fixed rules, not by another model's opinion.

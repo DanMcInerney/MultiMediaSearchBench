@@ -180,7 +180,7 @@ def main() -> int:
         sys.exit("the goldens are what the old code builds on Windows")
     if out.exists():
         sys.exit(f"{out} exists: a golden is not regenerated to make a test pass; remove it on purpose to capture again")
-    old = Path(tempfile.mkdtemp(prefix="mmmb-old-"))
+    old = Path(tempfile.mkdtemp(prefix="mmsb-old-"))
     old_code(old)
     modules = import_old_modules(old)
     _, claude_run, codex_run, _ = modules
@@ -189,7 +189,7 @@ def main() -> int:
     notes = next(a.notes for a in decider.known_abouts() if a.name == MODEL)
     models = json.loads(MODELS.read_text(encoding="utf-8"))
     files: dict[str, str] = {}
-    with tempfile.TemporaryDirectory(prefix="mmmb-capture-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="mmsb-capture-") as tmp:
         git = Path(tmp) / "git"
         plant_git(git)
         planted = planted_environment(git)

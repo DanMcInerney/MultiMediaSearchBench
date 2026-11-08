@@ -1,6 +1,6 @@
 """Stand-in agents that do what the real ones do with their settings (core/agents/claude.py, codex.py): the result says the model they were
 given, as `agent_model` becomes in the record, and Codex's says its effort too (Claude's result holds none), each with the agent's default
-where `mmmb` asked for none. Over `stub_system.Stub`, which answers; nothing here starts a process."""
+where `mmsb` asked for none. Over `stub_system.Stub`, which answers; nothing here starts a process."""
 
 from __future__ import annotations
 
@@ -13,10 +13,10 @@ import pytest
 from cli_world import CLEAN, build_args
 from stub_system import Stub, StubSystem
 
-from mmmb import cli
-from mmmb.core.agents import claude
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.runner import Agent
+from mmsb import cli
+from mmsb.core.agents import claude
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.runner import Agent
 
 DEFAULT_MODEL = {"claude": "claude-default", "codex": "codex-default"}
 DEFAULT_EFFORT = "high"  # Codex's, as `ask_codex` returns it when none was asked for
@@ -41,7 +41,7 @@ def agents_of(stub: Stub):
 
 def record_toy(root: Path, *extra: str) -> Path:
     """The toy run built in `root` (seed 7, tiny, the configurations files and stub/all) and run by both stand-in agents with `extra` arguments
-    of `mmmb run`, in the `line` format the stub answers in: the folder of the run, as a recorded run to repeat or compare with."""
+    of `mmsb run`, in the `line` format the stub answers in: the folder of the run, as a recorded run to repeat or compare with."""
     with pytest.MonkeyPatch.context() as patch:
         ffmpeg = root / "ffmpeg-source.exe"
         ffmpeg.write_bytes(b"x")

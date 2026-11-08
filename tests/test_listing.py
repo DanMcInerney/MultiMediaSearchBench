@@ -26,12 +26,12 @@ from PIL import ExifTags, Image
 from PIL.TiffImagePlugin import IFDRational
 from test_neutral import modules_walked
 
-from mmmb import scenarios, systems
-from mmmb.core.config import parse_config
-from mmmb.core.contract import Dump, ManifestEntry
-from mmmb.systems.listing import read as reading
-from mmmb.systems.listing import server, system
-from mmmb.systems.listing.system import Listing, ListingSession
+from mmsb import scenarios, systems
+from mmsb.core.config import parse_config
+from mmsb.core.contract import Dump, ManifestEntry
+from mmsb.systems.listing import read as reading
+from mmsb.systems.listing import server, system
+from mmsb.systems.listing.system import Listing, ListingSession
 
 pytestmark = pytest.mark.xdist_group("listing")
 MODALITIES = frozenset({"image", "video", "audio", "text", "records"})
@@ -216,7 +216,7 @@ def test_the_server_imports_nothing_that_could_open_a_recording_and_starts_with_
     """It is given the listing file and no path to the dump: with the picture and media libraries and this package refused to its process it
     answers all the same."""
     dump, listing = week
-    forbidden = {"PIL", "av", "numpy", "imageio_ffmpeg", "mmmb", "multimem"}
+    forbidden = {"PIL", "av", "numpy", "imageio_ffmpeg", "mmsb", "multimem"}
     tree = ast.parse(Path(server.__file__).read_text(encoding="utf-8"))
     imported = {(n.module or "").split(".")[0] if isinstance(n, ast.ImportFrom) else a.name.split(".")[0]
                 for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom)) for a in getattr(n, "names", [None])}
@@ -411,4 +411,4 @@ def test_describe_says_what_the_system_is_and_its_hashes_cover_the_tools_and_the
 
 def test_the_fast_neutrality_check_walks_the_listing_with_multimem_refused():
     seen = modules_walked()
-    assert {"mmmb.systems.listing", "mmmb.systems.listing.system", "mmmb.systems.listing.server", "mmmb.systems.listing.read"} <= set(seen)
+    assert {"mmsb.systems.listing", "mmsb.systems.listing.system", "mmsb.systems.listing.server", "mmsb.systems.listing.read"} <= set(seen)

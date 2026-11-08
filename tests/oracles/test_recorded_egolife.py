@@ -22,12 +22,12 @@ import convert_recorded
 import pytest
 from v8_recorded import CONVERTED, RECORDED, REPORT, V8, download_skip, zone_skip
 
-from mmmb import scenarios
-from mmmb.core import fs, grade, report
-from mmmb.core.config import Config
-from mmmb.core.contract import McpServer, Served
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.scenario import Access
+from mmsb import scenarios
+from mmsb.core import fs, grade, report
+from mmsb.core.config import Config
+from mmsb.core.contract import McpServer, Served
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.scenario import Access
 
 NAME = "20261103-0257-egolife-s1"  # the run's folder name is in the report, so the converted run is copied to a folder of that name
 RENAMES = {"control": "files", "tested": "mm", "tested_control": "mm_files", "control_blind": "files_blind", "tested_blind": "mm_blind",
@@ -194,16 +194,16 @@ class Blocker:
 
 sys.meta_path.insert(0, Blocker())
 import importlib, pkgutil
-import mmmb.scenarios.v8_egolife as package
+import mmsb.scenarios.v8_egolife as package
 for module in pkgutil.iter_modules(package.__path__):
-    importlib.import_module("mmmb.scenarios.v8_egolife." + module.name)
+    importlib.import_module("mmsb.scenarios.v8_egolife." + module.name)
 import json
 from datetime import date
 from pathlib import Path
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.config import Config
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.config import Config
+from mmsb.core.runfolder import RunFolder
 
 folder = Path(sys.argv[1])
 meta = fs.read_json(folder / "run.json")

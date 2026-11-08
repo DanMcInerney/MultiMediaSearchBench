@@ -23,16 +23,16 @@ from agent_spec import clocked, spec_of
 from stub_system import FILES, STUB, Stub, StubSession, StubSystem, tiny_questions
 from test_runner import go, result, world  # noqa: F401
 
-from mmmb.core import clock as clocks
-from mmmb.core import fs
-from mmmb.core.agents import claude, codex
-from mmmb.core.agents.common import wait_for
-from mmmb.core.clock import CLOCKS, DEFAULT_CLOCK, FIELDS, WALL, WORKING, WorkingClock, budget_s, check_queue, unreported
-from mmmb.core.contract import Case
-from mmmb.core.record import record
-from mmmb.core.runfolder import is_done
-from mmmb.core.runner import Agent
-from mmmb.core.schedule import Pools, SideBySide
+from mmsb.core import clock as clocks
+from mmsb.core import fs
+from mmsb.core.agents import claude, codex
+from mmsb.core.agents.common import wait_for
+from mmsb.core.clock import CLOCKS, DEFAULT_CLOCK, FIELDS, WALL, WORKING, WorkingClock, budget_s, check_queue, unreported
+from mmsb.core.contract import Case
+from mmsb.core.record import record
+from mmsb.core.runfolder import is_done
+from mmsb.core.runner import Agent
+from mmsb.core.schedule import Pools, SideBySide
 
 pytestmark = pytest.mark.xdist_group("runner")
 RECORDED = fs.read_json(Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "converted" / "results" / "claude" / "files" / "audio-mic-alarm-3.json")
@@ -174,7 +174,7 @@ class Passing:
 
 def test_the_loop_waits_a_second_at_most_and_never_past_the_time_that_is_left_and_kills_a_process_that_outlives_the_clock(monkeypatch):
     killed = []
-    monkeypatch.setattr("mmmb.core.agents.common.kill_tree", lambda process: killed.append(setattr(process, "killed", True)))
+    monkeypatch.setattr("mmsb.core.agents.common.kill_tree", lambda process: killed.append(setattr(process, "killed", True)))
     moving = Moving(queue=None)
     process = Passing(moving)
     assert wait_for(process, moving.clock(2.5, 7.5)) == "timeout: no answer in 2.5 s"

@@ -1,4 +1,4 @@
-"""`mmmb run --side-by-side` (plan 6.4, D5: off unless asked): the flag, what a dry run prints of it, and a run that has it, over the scenario
+"""`mmsb run --side-by-side` (plan 6.4, D5: off unless asked): the flag, what a dry run prints of it, and a run that has it, over the scenario
 `toy` and the stand-in system of tests/cli_world.py, with the fixtures of tests/test_cli.py. Written for this repository (U13).
 
 The expected values are the plan's words (the flag is off by default; the run says it is on; the same set of results as without it; a dry run
@@ -15,8 +15,8 @@ from cli_world import world  # noqa: F401
 from stub_system import Stub, tiny_questions
 from test_cli import argv, built, no_agents_installed, w  # noqa: F401
 
-from mmmb import cli
-from mmmb.core import fs
+from mmsb import cli
+from mmsb.core import fs
 
 pytestmark = pytest.mark.xdist_group("cli")
 QUESTIONS = tiny_questions()

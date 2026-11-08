@@ -1,4 +1,4 @@
-"""New tests for mmmb/scenarios/v7_screen/frames.py and constants.py: the small copies of what Multimem's reader and its fake decider do
+"""New tests for mmsb/scenarios/v7_screen/frames.py and constants.py: the small copies of what Multimem's reader and its fake decider do
 to a file or a picture, which V7 uses so that it needs neither. Expected values are laws of the functions (a picture is never scaled
 up, a tone has its own pitch, a plain colour is all of its own shade) and files written here with known frames and sound. That the copies
 agree with Multimem's, byte for byte, is tests/mm's: it needs Multimem."""
@@ -11,10 +11,10 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from mmmb.scenarios.v7_screen.constants import PITCH_BAND, PROFILE, RATE, SHADE_TOL, font, pitch_share, shade_share
-from mmmb.scenarios.v7_screen.frames import audio_span, decode_frames, fit, frame_times
-from mmmb.scenarios.v7_screen.media_common import _write_video
-from mmmb.scenarios.v7_screen.media_sound import write_mic
+from mmsb.scenarios.v7_screen.constants import PITCH_BAND, PROFILE, RATE, SHADE_TOL, font, pitch_share, shade_share
+from mmsb.scenarios.v7_screen.frames import audio_span, decode_frames, fit, frame_times
+from mmsb.scenarios.v7_screen.media_common import _write_video
+from mmsb.scenarios.v7_screen.media_sound import write_mic
 
 
 def test_a_picture_is_scaled_to_the_budget_with_its_aspect_never_up_and_not_at_all_with_none():

@@ -1,11 +1,11 @@
-# MultiMediaMemoryBench (MMMB)
+# MultiMediaSearchBench (MMSB)
 
-**MMMB tells people how well an AI agent can find things in their own large piles of video, pictures and sound, and which
+**MMSB tells people how well an AI agent can find things in their own large piles of video, pictures and sound, and which
 search tools make it better, judged on the media people really keep and the questions they really ask.**
 
 People keep footage from security cameras, phones, dashcams, meetings, labs and field recorders, and they rarely look at it
 again, because finding one moment in it takes hours. An agent that can be told "find when the parcel was taken" can change
-that. MMMB measures how close agents and their tools are to doing it well.
+that. MMSB measures how close agents and their tools are to doing it well.
 
 - **Neutral.** Any agent and any search system can be measured. The agent working alone with the files is always the baseline.
 - **Right means shown to be right.** An answer counts as grounded when it points to where in the media the answer is. Every
@@ -14,7 +14,7 @@ that. MMMB measures how close agents and their tools are to doing it well.
 - **Cost is part of the result:** time, tokens and dollars, the local GPU seconds, and the wait before a pile can be searched.
 - **Honest numbers.** Results say how sure they are, and small differences are called unproven.
 
-[VISION.md](VISION.md) says what MMMB is for. [DESIGN.md](DESIGN.md) says how it is built and what is measured.
+[VISION.md](VISION.md) says what MMSB is for. [DESIGN.md](DESIGN.md) says how it is built and what is measured.
 [TESTING.md](TESTING.md) says how the build is checked and what has not been run. [MEDIA.md](MEDIA.md) says where the
 media for the scenarios comes from.
 
@@ -85,14 +85,14 @@ uv sync --extra mm                   # also Multimem, for the mm system
 uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's real decision model
 ```
 
-- The four scenarios read their sources from the folder `MMMB_SOURCES` names, else `D:\bench-data\sources\`. It holds one
+- The four scenarios read their sources from the folder `MMSB_SOURCES` names, else `D:\bench-data\sources\`. It holds one
   folder per source: `meva`, `caltech-camera-traps`, `sins`, `fsd50k` ([MEDIA.md](MEDIA.md) says where each comes from). A
   build reads them and never writes there; it copies what it needs. Agents are refused any command or output that names the
   sources folder (or its parent, when it is called `sources`), so give it a name of 6 or more letters that no tool prints,
-  such as `mmmb-sources`.
+  such as `mmsb-sources`.
 - The files the V1, I3 and M4 builds read (16.7 GB, unchanged copies) are the Hugging Face dataset
   [DanMcInerney/mmmb-sources](https://huggingface.co/datasets/DanMcInerney/mmmb-sources), private for now:
-  `hf download DanMcInerney/mmmb-sources --repo-type dataset --local-dir D:/mmmb-sources`, then set `MMMB_SOURCES` to that
+  `hf download DanMcInerney/mmmb-sources --repo-type dataset --local-dir D:/mmsb-sources`, then set `MMSB_SOURCES` to that
   folder. A pile built from it is the same as one built here, file for file. SINS (A1) is not in it, because its licence
   forbids passing it on: download it from Zenodo as [MEDIA.md](MEDIA.md) says.
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
@@ -104,15 +104,15 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
 ## Run it
 
 ```
-uv run mmmb build --scenario i3_trailcam --scale standard --configs files,listing
-uv run mmmb run <run> --agents claude,codex --configs files,listing --dry-run
-uv run mmmb run <run> --agents claude,codex --configs files,listing
-uv run mmmb report <run>
+uv run mmsb build --scenario i3_trailcam --scale standard --configs files,listing
+uv run mmsb run <run> --agents claude,codex --configs files,listing --dry-run
+uv run mmsb run <run> --agents claude,codex --configs files,listing
+uv run mmsb report <run>
 ```
 
 - `build` copies the scenario's files into a dump with their recording times, writes its questions, ingests the dump into the
   stores of the systems among `--configs` (default `files`), and runs the leak probe. It prints the run folder,
-  `D:\mmmb-runs\<date>-i3-standard-s1`; `<run>` is that folder, or its name. `--scenario` is `v1_security`, `i3_trailcam`,
+  `D:\mmsb-runs\<date>-i3-standard-s1`; `<run>` is that folder, or its name. `--scenario` is `v1_security`, `i3_trailcam`,
   `a1_home_audio` or `m4_samples` (or the extras `v7_screen`, `v8_egolife`); `--seed N` draws other questions from the same
   pile. A full-size dump is built in minutes and is found again by the next build of the same recipe.
 - `--scale tiny` is a few files of the same pile and 6-8 questions, built in seconds: a smoke run, as in TESTING.md.
@@ -125,7 +125,7 @@ uv run mmmb report <run>
   `listing` answered (leaks, left out of every other figure), and each other configuration beside `files`. Several runs of one
   real scenario (other seeds) are pooled; runs of several scenarios get a table over all of them. `run` continues a run that
   stopped.
-- `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmmb ingest` command to
+- `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmsb ingest` command to
   make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`. mm runs one exec at a time, because
   it needs the GPU and the laptop's driver crashed under three at once. `--gpu-jobs 2` asks for more, and until Multimem reports
   its queue the working clock refuses it (`--clock wall` lets it through, with a warning).
@@ -134,14 +134,14 @@ Commands, each with `--help`:
 
 | Command | Does |
 | --- | --- |
-| `mmmb build` | writes a scenario's dump and questions (or finds them cached), ingests the systems named, probes for shortcuts |
-| `mmmb ingest RUN` | ingests the dump into the stores of more systems |
-| `mmmb run RUN` | the execs of Claude and Codex over the questions; resumes; `--dry-run` prices it |
-| `mmmb retrieve RUN` | each system asked for the needles with no agent (the GPU, alone) |
-| `mmmb report RUN [RUN ...]` | figures and Markdown; runs of one real scenario (or of V7) are pooled, V8's are reported one at a time, and runs of several scenarios get a table over all |
-| `mmmb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
-| `mmmb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
-| `mmmb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until Multimem reports its queue) |
+| `mmsb build` | writes a scenario's dump and questions (or finds them cached), ingests the systems named, probes for shortcuts |
+| `mmsb ingest RUN` | ingests the dump into the stores of more systems |
+| `mmsb run RUN` | the execs of Claude and Codex over the questions; resumes; `--dry-run` prices it |
+| `mmsb retrieve RUN` | each system asked for the needles with no agent (the GPU, alone) |
+| `mmsb report RUN [RUN ...]` | figures and Markdown; runs of one real scenario (or of V7) are pooled, V8's are reported one at a time, and runs of several scenarios get a table over all |
+| `mmsb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
+| `mmsb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
+| `mmsb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until Multimem reports its queue) |
 
 ## Systems and configurations
 
@@ -164,12 +164,12 @@ video, text and records; `mm+files` is asked them all.
 
 | Path | What |
 | --- | --- |
-| `mmmb/core/` | the runner, the agents (`agents/`), grading, the reports (`summary.py` for the real scenarios); knows no system |
-| `mmmb/systems/` | `files/`, `listing/`, `mm/`, each with a `system.toml` |
-| `mmmb/scenarios/` | `realdump/` (the builder the real scenarios share), `v1_security/`, `i3_trailcam/`, `a1_home_audio/`, `m4_samples/`; the extras `v7_screen/`, `v8_egolife/` |
+| `mmsb/core/` | the runner, the agents (`agents/`), grading, the reports (`summary.py` for the real scenarios); knows no system |
+| `mmsb/systems/` | `files/`, `listing/`, `mm/`, each with a `system.toml` |
+| `mmsb/scenarios/` | `realdump/` (the builder the real scenarios share), `v1_security/`, `i3_trailcam/`, `a1_home_audio/`, `m4_samples/`; the extras `v7_screen/`, `v8_egolife/` |
 | `tests/` | the tests; `tests/oracles/recorded/` holds the recorded pilot and EgoLife runs they are held to |
 | `results/` | published reports: [the baseline](results/2026-11-06-baseline/) (6 November 2026), [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
-| `D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (change them with `--out`, `--temp`, `--cache`; keep them on one drive) |
+| `D:\mmsb-runs`, `D:\mmsb-data`, `D:\mmsb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (change them with `--out`, `--temp`, `--cache`; keep them on one drive) |
 
 The published pilot asked 24 questions about 3 synthetic days of mm and of the files alone. With mm, Codex was right on 23 of 24
 against 22 without it, and Claude on 22 against 18, with fewer tokens; the gains are not yet significant. Read it in its own
@@ -185,3 +185,7 @@ uv run pytest
 runs the fast tests (about 1,000; about 8 minutes on this laptop, at 4 workers) with no agent, no GPU and no network.
 Without the `mm` extra the tests in `tests/mm` skip, and say so in the summary. [TESTING.md](TESTING.md) has the markers, the
 oracles, and the commands for the slow ones.
+
+## Licence
+
+MIT: see [LICENSE](LICENSE).

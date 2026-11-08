@@ -1,6 +1,6 @@
 """Setup of the tests of the mm system (tests/mm): copied from tests/conftest.py of Multimem at fe0ece5 are the two autouse fixtures that keep a test
 off the network and off a real `uv` (`no_hugging_face`, `no_real_uv`), and the names the tests use for the daemon (`Daemon`, `Api`, `write_config`,
-`wait_for` are the system's own, mmmb/systems/mm/daemon.py); `FAKE`, the fake decider, is tests/mm/fakes.py's.
+`wait_for` are the system's own, mmsb/systems/mm/daemon.py); `FAKE`, the fake decider, is tests/mm/fakes.py's.
 
 Every test module here starts with `pytest.importorskip("multimem")`, which tests/conftest.py counts and says so in its summary when the mm extra
 is not installed (and `--require-mm` makes a failure). This file is read before they are, so it needs nothing of the extra at import: what it
@@ -22,7 +22,7 @@ sys.path.append(str(Path(__file__).parent.parent / "oracles"))  # the helpers of
 
 if importlib.util.find_spec("multimem") is not None:
     from fakes import FAKE  # noqa: F401
-    from mmmb.systems.mm.daemon import Api, Daemon, wait_for, write_config  # noqa: F401
+    from mmsb.systems.mm.daemon import Api, Daemon, wait_for, write_config  # noqa: F401
 
 
 @pytest.fixture(autouse=True)
@@ -44,7 +44,7 @@ def no_real_uv(monkeypatch):
 @pytest.fixture(autouse=True)
 def daemons_only_over_the_tests_own_folders(monkeypatch, tmp_path_factory):
     """Refuses to start a daemon over any folder that is not under pytest's base temp folder (the owner's `~/.multimem` never is)."""
-    from mmmb.systems.mm.daemon import Daemon
+    from mmsb.systems.mm.daemon import Daemon
 
     base = os.path.normcase(os.path.abspath(tmp_path_factory.getbasetemp().parent))
     start = Daemon.start

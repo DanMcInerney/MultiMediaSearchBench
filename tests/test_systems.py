@@ -1,4 +1,4 @@
-"""New tests for mmmb/systems (the registry and the `files` system): the registry reads every system.toml as TOML and imports a system only
+"""New tests for mmsb/systems (the registry and the `files` system): the registry reads every system.toml as TOML and imports a system only
 when it is asked for, so the core knows the isolation of mm with mm absent; a system whose extra is missing is refused with the message
 the plan gives (4.2) and no fallback.
 
@@ -15,9 +15,9 @@ from pathlib import Path
 import pytest
 from agent_spec import ISOLATION
 
-from mmmb import systems
-from mmmb.core.config import parse_config
-from mmmb.core.contract import Description, Dump, PlainSession, SessionContext
+from mmsb import systems
+from mmsb.core.config import parse_config
+from mmsb.core.contract import Description, Dump, PlainSession, SessionContext
 
 ROOT = Path(__file__).parents[1]
 GOOD = """\
@@ -40,9 +40,9 @@ def test_the_registry_reads_the_toml_files_there_are_and_a_folder_with_none_is_n
     assert set(found) >= {"files", "listing", "mm"}
     mm, files, listing = found["mm"], found["files"], found["listing"]
     assert (listing.cls, listing.extra, listing.default_variant, listing.horizon, listing.isolation.deny_words) == (
-        "mmmb.systems.listing.system:Listing", None, None, "cut", ())  # a system of its own that keeps nothing on the machine: no isolation to declare
-    assert (mm.cls, mm.extra, mm.default_variant, mm.horizon) == ("mmmb.systems.mm.system:Mm", "mm", "d1-3B", "cut")
-    assert (files.cls, files.extra, files.default_variant, files.horizon) == ("mmmb.systems.files.system:Files", None, None, "view")
+        "mmsb.systems.listing.system:Listing", None, None, "cut", ())  # a system of its own that keeps nothing on the machine: no isolation to declare
+    assert (mm.cls, mm.extra, mm.default_variant, mm.horizon) == ("mmsb.systems.mm.system:Mm", "mm", "d1-3B", "cut")
+    assert (files.cls, files.extra, files.default_variant, files.horizon) == ("mmsb.systems.files.system:Files", None, None, "view")
     assert systems.defaults() == {"files": None, "mm": "d1-3B"} | {k: v for k, v in systems.defaults().items() if k not in ("files", "mm")}
     # a configuration parsed with them: `mm` is `mm/d1-3B`, and `files` has no variants
     assert parse_config("mm", systems.defaults()).name == "mm/d1-3B" and parse_config("mm+files", systems.defaults()).dir == "mm-d1-3B+files"
@@ -138,8 +138,8 @@ def test_the_mm_system_is_refused_with_the_extra_to_install_when_multimem_is_abs
 
     if importlib.util.find_spec("multimem") is not None:
         pytest.skip("multimem is installed here: the mm extra is not missing")
-    if not (ROOT / "mmmb" / "systems" / "mm" / "system.py").exists():
-        pytest.skip("mmmb/systems/mm/system.py is U7's and is not here yet, so importing mm fails for want of the module, not of the extra")
+    if not (ROOT / "mmsb" / "systems" / "mm" / "system.py").exists():
+        pytest.skip("mmsb/systems/mm/system.py is U7's and is not here yet, so importing mm fails for want of the module, not of the extra")
     with pytest.raises(systems.ExtraMissing) as error:
         systems.load("mm")
     assert str(error.value) == "mm needs the mm extra: uv sync --extra mm"
@@ -174,13 +174,13 @@ def test_the_runner_and_the_registry_import_with_multimem_and_the_old_root_modul
                     raise ImportError(f"blocked: {name}")
 
         sys.meta_path.insert(0, Blocker())
-        for name in ("mmmb.systems", "mmmb.systems.files.system", "mmmb.core.gpu", "mmmb.core.record", "mmmb.core.schedule",
-                     "mmmb.core.select", "mmmb.core.costing", "mmmb.core.runfolder", "mmmb.core.runner"):
+        for name in ("mmsb.systems", "mmsb.systems.files.system", "mmsb.core.gpu", "mmsb.core.record", "mmsb.core.schedule",
+                     "mmsb.core.select", "mmsb.core.costing", "mmsb.core.runfolder", "mmsb.core.runner"):
             importlib.import_module(name)
-        from mmmb import systems
+        from mmsb import systems
         assert systems.isolation().deny_package_roots == ("multimem",)
         assert type(systems.load("files")).__name__ == "Files"
-        from mmmb.core.runner import real_agents
+        from mmsb.core.runner import real_agents
         assert set(real_agents()) == {"claude", "codex"}
         assert not BLOCKED & {m.split(".")[0] for m in sys.modules}, BLOCKED & set(sys.modules)
         print("ok")
@@ -196,8 +196,8 @@ def test_no_file_of_the_runner_imports_an_old_root_module_or_multimem_or_names_a
 
     old = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts", "multimem"}
     core = ["runner", "record", "schedule", "select", "costing", "gpu"]
-    for file in [*(ROOT / "mmmb" / "core" / f"{n}.py" for n in core), ROOT / "mmmb" / "systems" / "__init__.py",
-                 ROOT / "mmmb" / "systems" / "files" / "system.py"]:
+    for file in [*(ROOT / "mmsb" / "core" / f"{n}.py" for n in core), ROOT / "mmsb" / "systems" / "__init__.py",
+                 ROOT / "mmsb" / "systems" / "files" / "system.py"]:
         for node in ast.walk(ast.parse(file.read_text(encoding="utf-8"))):
             names = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
             assert not [n for n in names if n.split(".")[0] in old], (file.name, names)

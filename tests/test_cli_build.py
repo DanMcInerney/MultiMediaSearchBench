@@ -1,4 +1,4 @@
-"""New tests for `mmmb build` and `mmmb ingest` (mmmb/cli.py, mmmb/core/build.py) and the run.json writer (`RunFolder.write`). Over the scenario
+"""New tests for `mmsb build` and `mmsb ingest` (mmsb/cli.py, mmsb/core/build.py) and the run.json writer (`RunFolder.write`). Over the scenario
 `toy` (V7's plan, a dump of three files) and the stand-in system `stub`, unless a test says it builds the real week. Ported from
 tests/test_bench.py of Multimem at fe0ece5 (plan 7.4): `test_a_probe_that_fails_or_is_skipped_is_recorded_and_a_build_that_fails_it_exits_1`
 and `test_the_probe_runs_over_the_written_and_loaded_week_with_the_files_arms_ffmpeg_and_is_recorded`; its `bench.build` is the command. The
@@ -26,23 +26,23 @@ from cli_world import CLEAN, DAYS, SCALE, SEED, build_args, built_run, world  # 
 from stub_system import FILES as FILES_CONFIG
 from stub_system import STUB, Stub, StubSystem, tiny_questions
 
-from mmmb import scenarios
-from mmmb.core import fs, paths
-from mmmb.core.build import ensure_data, read_dump, store_of
-from mmmb.core.cache import INGESTED, report_of
-from mmmb.core.config import Config
-from mmmb.core.contract import IngestReport, Refusal
-from mmmb.core.probe import probe_of
-from mmmb.core.question import load_questions
-from mmmb.core.runfolder import RunFolder, commit_of
-from mmmb.core.scenario import ProbeOutcome, dump_key
-from mmmb.scenarios import v7_screen as v7
+from mmsb import scenarios
+from mmsb.core import fs, paths
+from mmsb.core.build import ensure_data, read_dump, store_of
+from mmsb.core.cache import INGESTED, report_of
+from mmsb.core.config import Config
+from mmsb.core.contract import IngestReport, Refusal
+from mmsb.core.probe import probe_of
+from mmsb.core.question import load_questions
+from mmsb.core.runfolder import COMMIT_KEY, RunFolder, commit_of
+from mmsb.core.scenario import ProbeOutcome, dump_key
+from mmsb.scenarios import v7_screen as v7
 
 pytestmark = pytest.mark.xdist_group("cli")
 FIRST = tiny_questions()[0].qid
 RECIPE = v7.recipe(scale=SCALE, seed=SEED, days=DAYS.split(","))
 RUN_KEYS = {"scenario", "generator", "recipe", "dump_key", "seed", "scale", "days", "data", "temp", "cache", "tag", "timeout_s", "plan", "files",
-            "question_hash", "configs", "probe", "created", "mmmb_commit", "build_s"}
+            "question_hash", "configs", "probe", "created", COMMIT_KEY, "build_s"}
 
 
 def test_a_build_writes_the_dump_frozen_the_questions_the_stores_and_run_json_last(world, capsys):
@@ -50,7 +50,7 @@ def test_a_build_writes_the_dump_frozen_the_questions_the_stores_and_run_json_la
     assert capsys.readouterr().out.splitlines()[-1] == str(run.folder), "the command prints the run's folder"
     meta = json.loads((run.folder / "run.json").read_text(encoding="utf-8"))
     assert set(meta) == RUN_KEYS
-    assert isinstance(meta["build_s"], float) and meta["build_s"] >= 0, "the seconds the build took, which `mmmb run --dry-run` quotes"
+    assert isinstance(meta["build_s"], float) and meta["build_s"] >= 0, "the seconds the build took, which `mmsb run --dry-run` quotes"
     assert re.fullmatch(r"\d{8}-\d{4}-v7-tiny-s7", run.name), "the minute, the scenario's code, the scale and the seed"
     assert (meta["scenario"], meta["generator"], meta["seed"], meta["scale"], meta["days"], meta["timeout_s"]) == (
         "toy", v7.generator, 7, "tiny", DAYS.split(","), 900.0)
@@ -58,7 +58,7 @@ def test_a_build_writes_the_dump_frozen_the_questions_the_stores_and_run_json_la
     assert meta["data"] == str(world.temp / f"mmb-{meta['dump_key'][:10]}-data") and meta["temp"] == str(world.temp) and meta["cache"] == str(world.cache)
     assert (meta["plan"], meta["files"]) == v7.hashes(RECIPE), "the hashes of the plan the recipe makes: what `open` compares"
     assert meta["question_hash"] == hashlib.sha256((run.folder / "questions.jsonl").read_bytes()).hexdigest()
-    assert meta["dump_key"] == dump_key("toy", RECIPE, v7.generator) and meta["mmmb_commit"] == commit_of()
+    assert meta["dump_key"] == dump_key("toy", RECIPE, v7.generator) and meta[COMMIT_KEY] == commit_of()
     assert meta["configs"] == [{"name": "files", "system": "files", "variant": None, "own_tools": True},
                                {"name": "stub/all", "system": "stub", "variant": "all", "own_tools": False}]
     assert meta["probe"] == {"status": "passed", "failures": []} and re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d", meta["created"])
@@ -117,7 +117,7 @@ def test_a_build_that_cannot_be_made_is_an_error_before_anything_is_written_or_a
     assert not world.out.exists() and not world.temp.exists(), "nothing was written"
     assert world.main(*build_args(world, 1)) == 0
     capsys.readouterr()
-    world.patch.setattr("mmmb.core.build.name_of", lambda scenario, recipe: next(world.out.iterdir()).name)
+    world.patch.setattr("mmsb.core.build.name_of", lambda scenario, recipe: next(world.out.iterdir()).name)
     assert world.main(*build_args(world, 1)) == 1 and "exists: a run is one a minute" in capsys.readouterr().err
 
 
@@ -176,7 +176,7 @@ def test_a_run_over_a_store_that_was_misdated_is_refused_whatever_made_it(world,
         assert "stub stored 2 files at a time other than their own" in err and "phone/IMG_0002.jpg" in err, argv
     assert stub.execs == [] and not oracle.kinds("open") and not oracle.kinds("preview"), "refused before any session"
     # the configuration that does not use the store is not refused for it
-    world.patch.setattr("mmmb.core.agents.claude.check_login", lambda: None)
+    world.patch.setattr("mmsb.core.agents.claude.check_login", lambda: None)
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", "--only", FIRST,
                       agents=cli_world.agents_of(stub)) == 0 and stub.qids() == [FIRST]
 
@@ -199,7 +199,7 @@ def test_ingest_makes_the_store_of_a_configuration_added_later_and_refuses_it_wh
 def test_a_store_whose_ingest_did_not_finish_is_an_error_and_a_missing_one_says_how_to_make_it(world, capsys):
     run = built_run(world, 1, "files")
     assert world.main("run", str(run.folder), "--configs", "files,stub", "--dry-run") == 1
-    assert f"stub has no store in {run.folder}: mmmb ingest {run.name} --configs stub" in capsys.readouterr().err
+    assert f"stub has no store in {run.folder}: mmsb ingest {run.name} --configs stub" in capsys.readouterr().err
     store_of(run.folder, "stub").mkdir(parents=True)
     assert world.main("ingest", str(run.folder), "--configs", "stub") == 1
     assert "holds an ingest that did not finish" in capsys.readouterr().err and world.system.kinds("ingest") == []
@@ -260,7 +260,7 @@ def test_data_written_again_that_is_not_the_dump_the_stores_were_made_from_is_an
 def test_the_run_command_writes_a_lost_data_folder_again_before_it_runs(world, capsys):
     run = built_run(world)
     stub = Stub()
-    world.patch.setattr("mmmb.core.agents.claude.check_login", lambda: None)
+    world.patch.setattr("mmsb.core.agents.claude.check_login", lambda: None)
     fs.remove_tree(run.data)  # the temp folder was cleaned
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", "--only", FIRST, agents=cli_world.agents_of(stub)) == 0
     assert "writing it again from the recipe" in capsys.readouterr().out and (run.data / "notes" / "a.md").is_file() and stub.qids() == [FIRST]
@@ -309,14 +309,14 @@ def test_a_store_keeps_the_hash_of_the_system_that_made_it_and_a_run_over_a_stor
         assert "Build a new run" in err and f"remove {store_of(run.folder, 'stub')} and ingest again" in err, argv
     assert stub.execs == [] and not oracle.kinds("open") and not oracle.kinds("preview") and not oracle.kinds("ingest"), "refused before any session"
     # the configuration that does not use the store is not refused for it, and the system as it was is not refused at all
-    world.patch.setattr("mmmb.core.agents.claude.check_login", lambda: None)
+    world.patch.setattr("mmsb.core.agents.claude.check_login", lambda: None)
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", "--only", FIRST, agents=cli_world.agents_of(stub)) == 0
     cli_world.use(world.patch, StubSystem(report=CLEAN))
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "stub", "--only", FIRST, agents=cli_world.agents_of(stub)) == 0
 
 
 def test_a_variant_that_needs_another_store_than_the_others_of_its_system_is_refused():
-    from mmmb.core.build import store_hashes
+    from mmsb.core.build import store_hashes
 
     @dataclass
     class Variants(StubSystem):
@@ -361,7 +361,7 @@ def test_a_build_into_a_temp_folder_that_holds_more_than_runs_is_refused_before_
 def test_outside_a_git_checkout_a_build_records_the_installed_version_and_one_that_cannot_say_what_it_is_made_by_fails_first(world, capsys, monkeypatch):
     monkeypatch.setattr(paths, "ROOT", world.root)  # no .git here
     run = built_run(world, 1, "files")
-    assert fs.read_json(run.folder / "run.json")["mmmb_commit"] == importlib.metadata.version("mmmb") == commit_of()
+    assert fs.read_json(run.folder / "run.json")[COMMIT_KEY] == importlib.metadata.version("mmsb") == commit_of()
 
     def missing(name):
         raise importlib.metadata.PackageNotFoundError(name)

@@ -1,4 +1,4 @@
-"""The listing's rule for a file's time (mmmb/systems/listing/read.py `misdated_reason`) held to the recorded V7 pilot, whose files the generator set to
+"""The listing's rule for a file's time (mmsb/systems/listing/read.py `misdated_reason`) held to the recorded V7 pilot, whose files the generator set to
 the times they hold: all 1,575 entries of its recorded manifest are at their time, and the tolerance of one second is what separates them from a dump
 whose times are the download's. The entries are the plan's `t`, and the times are the mtimes the pilot's own data folder had (`data-manifest.json`),
 both from the files in tests/oracles/recorded/pilot-s1, with no data folder and no ingest. Its plan is local time, so this skips outside the pilot's zone."""
@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from v7_recorded import MANIFEST, V7, needs_the_recorded_zone, recipe
 
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.systems.listing.read import TIME_TOL_S, misdated_reason
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.systems.listing.read import TIME_TOL_S, misdated_reason
 
 needs_the_recorded_zone()
 ENTRIES = entries_of(V7.plan_of(recipe()), lambda path: (MANIFEST[path][0], MANIFEST[path][1], "0" * 64))

@@ -1,7 +1,7 @@
 """V1, the security cameras, from its real source on disk (MEVA): the tiny dump built (the first ten minutes of three cameras, each as one MP4
 joined from its clips by stream copy, with names, times, lengths, frames and metadata checked), every answer derived again here by a plain
 reader of the label files (never the scenario's), the grader taking each truth and refusing planted wrong answers, the leak probe, and
-`mmmb build`, `run` and `report` over it with a stand-in agent. Skips, and says so, without the source."""
+`mmsb build`, `run` and `report` over it with a stand-in agent. Skips, and says so, without the source."""
 
 from __future__ import annotations
 
@@ -24,16 +24,16 @@ import pytest
 from agent_spec import clocked
 from cli_world import world  # noqa: F401
 
-from mmmb import scenarios
-from mmmb.core import fs, grade
-from mmmb.core.agents import claude
-from mmmb.core.contract import ManifestEntry
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.scenarios import realdump
-from mmmb.scenarios.v1_security import source as v1_source
-from mmmb.scenarios.v1_security.questions import questions_of
-from mmmb.scenarios.v1_security.source import LABELS, SOURCE, Event, read_acts
+from mmsb import scenarios
+from mmsb.core import fs, grade
+from mmsb.core.agents import claude
+from mmsb.core.contract import ManifestEntry
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.scenarios import realdump
+from mmsb.scenarios.v1_security import source as v1_source
+from mmsb.scenarios.v1_security.questions import questions_of
+from mmsb.scenarios.v1_security.source import LABELS, SOURCE, Event, read_acts
 
 if not (SOURCE / LABELS / "kitware" / "status.csv").is_file() or not (SOURCE / "video" / "2018-03-12" / "10").is_dir():
     pytest.skip(f"the MEVA source is not at {SOURCE}, so V1 is not built", allow_module_level=True)
@@ -440,7 +440,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = V1.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:/meva" in deny and "in:kitware" in deny and "in:v1_security" in deny and "in:from mmmb" in deny
+    assert "bench-data" in deny and "in:/meva" in deny and "in:kitware" in deny and "in:v1_security" in deny and "in:from mmsb" in deny
 
 
 class Spy:
@@ -479,7 +479,7 @@ def test_build_run_and_report_over_the_tiny_dump(world, capsys):  # noqa: F811
     assert first.question in prompt and "<the date and time, as YYYY-MM-DD HH:MM:SS>" in prompt
     assert "school" not in prompt and "hospital" not in prompt and "meva" not in prompt.casefold()
     capsys.readouterr()
-    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
+    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMSB report")
     figures = fs.read_json(folder / "report.json")
     (section,) = figures["scenarios"]
     files, listing = section["cells"]["claude"]["files"], section["cells"]["claude"]["listing"]

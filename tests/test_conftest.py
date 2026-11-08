@@ -78,8 +78,8 @@ GUARD = """
 """
 
 
-MMMB_GUARD = """
-    from mmmb.core import paths
+MMSB_GUARD = """
+    from mmsb.core import paths
 
 
     def test_a_write_to_the_cache_is_refused():
@@ -228,10 +228,10 @@ def test_a_test_may_read_the_owners_folders_and_may_not_change_them(tmp_path):
 
 
 def test_a_test_may_read_the_folders_of_runs_dumps_and_cache_and_may_not_change_them(tmp_path):
-    from mmmb.core import paths
+    from mmsb.core import paths
 
     before = [folder.exists() for folder in (paths.CACHE, paths.TEMP, paths.RUNS)]
-    done = pytest_in(project(tmp_path / "p", {"test_guard.py": MMMB_GUARD}))
+    done = pytest_in(project(tmp_path / "p", {"test_guard.py": MMSB_GUARD}))
     found = outcomes(done)
     refused = {"test_a_write_to_the_cache_is_refused", "test_a_write_to_the_temp_folder_is_refused",
                "test_a_swallowed_write_to_the_runs_folder_still_fails_the_test"}

@@ -18,9 +18,9 @@ import convert_recorded
 import pytest
 from v7_recorded import needs_the_recorded_zone
 
-from mmmb import scenarios
-from mmmb.core import fs, grade, render, report
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs, grade, render, report
+from mmsb.core.runfolder import RunFolder
 
 needs_the_recorded_zone()
 
@@ -165,9 +165,9 @@ class Blocker:
 
 sys.meta_path.insert(0, Blocker())
 from pathlib import Path
-from mmmb import scenarios
-from mmmb.core import fs, render, report
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import fs, render, report
+from mmsb.core.runfolder import RunFolder
 
 run = RunFolder.open(Path(sys.argv[1]), scenarios.get)
 fs.write_text(Path(sys.argv[2]), render.markdown(report.numbers([run])))

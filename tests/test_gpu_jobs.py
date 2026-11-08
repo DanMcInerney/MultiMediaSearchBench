@@ -18,11 +18,11 @@ import pytest
 from cli_world import agents_of, built_run, world  # noqa: F401
 from stub_system import Stub, StubSession, StubSystem, tiny_questions
 
-from mmmb import cli
-from mmmb.core import fs, gpu
-from mmmb.core.agents import claude
-from mmmb.core.atonce import GPU_JOBS, JOBS, asked, execs_at_once, flag_of, gpu_warning
-from mmmb.core.contract import Case
+from mmsb import cli
+from mmsb.core import fs, gpu
+from mmsb.core.agents import claude
+from mmsb.core.atonce import GPU_JOBS, JOBS, asked, execs_at_once, flag_of, gpu_warning
+from mmsb.core.contract import Case
 
 pytestmark = pytest.mark.xdist_group("cli")
 QUESTIONS = tiny_questions()

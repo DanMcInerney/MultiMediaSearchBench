@@ -1,4 +1,4 @@
-"""`mmmb compare` and decision D1 (plan 9.3, core/compare.py): two runs of the same questions cell by cell, the flips by qid, the band of +-2 and
+"""`mmsb compare` and decision D1 (plan 9.3, core/compare.py): two runs of the same questions cell by cell, the flips by qid, the band of +-2 and
 McNemar. Over the toy scenario's 19 questions, run once by the stand-in agents of tests/echo_agent.py, whose answers are known without
 running anything: `files` (the agent's own tools only) is right for the 3 text and 3 records questions and the 3 absent ones about
 pictures, video and sound, 9 of 19, and `stub/all` is right for all 19, for each agent. The recorded pilot's own counts (Claude files 23, Claude
@@ -16,11 +16,11 @@ from cli_world import world  # noqa: F401
 from echo_agent import record_toy
 from stub_system import tiny_questions
 
-from mmmb import scenarios
-from mmmb.core import compare, fs
-from mmmb.core.compare import BAND, Cell, Comparison, compare_runs, render_comparison, settings_of
-from mmmb.core.config import Config
-from mmmb.core.runfolder import RunFolder
+from mmsb import scenarios
+from mmsb.core import compare, fs
+from mmsb.core.compare import BAND, Cell, Comparison, compare_runs, render_comparison, settings_of
+from mmsb.core.config import Config
+from mmsb.core.runfolder import RunFolder
 
 pytestmark = pytest.mark.xdist_group("cli")
 N = len(tiny_questions())

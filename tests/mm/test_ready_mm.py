@@ -1,4 +1,4 @@
-"""`Mm.check_ready` (mmmb/systems/mm/system.py, the contract's `System.check_ready`): a run of `files,mm/d1-3B` on a machine without torch used to run
+"""`Mm.check_ready` (mmsb/systems/mm/system.py, the contract's `System.check_ready`): a run of `files,mm/d1-3B` on a machine without torch used to run
 the `files` cells and then fail at `open`; the CLI now asks every configuration's system before any agent starts (tests/test_ready.py), and this
 is mm's answer, with the real `not_ready` of Multimem over a models folder of a test's own and this environment, which has no torch (the mm-gpu
 group is not installed). Nothing is started or loaded."""
@@ -14,9 +14,9 @@ pytest.importorskip("multimem")
 from fakes import FAKE  # noqa: E402
 from model_folders import model_folder  # noqa: E402
 
-from mmmb.cli import Registry  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb.cli import Registry  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 D1 = Config("mm/d1-3B", "mm", "d1-3B", False)
 

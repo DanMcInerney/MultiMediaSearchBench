@@ -17,10 +17,10 @@ from pathlib import Path
 import pytest
 from v8_recorded import CONVERTED, META, RECIPE, REPORT, RUN, V8, download_skip, zone_skip
 
-from mmmb.core.question import load_questions
-from mmmb.scenarios.v8_egolife.choose import AGE_NAMES
-from mmmb.scenarios.v8_egolife.manifest import entries_of, transcript_path
-from mmmb.scenarios.v8_egolife.questions import questions_of
+from mmsb.core.question import load_questions
+from mmsb.scenarios.v8_egolife.choose import AGE_NAMES
+from mmsb.scenarios.v8_egolife.manifest import entries_of, transcript_path
+from mmsb.scenarios.v8_egolife.questions import questions_of
 
 if reason := download_skip() or zone_skip():
     pytest.skip(reason, allow_module_level=True)

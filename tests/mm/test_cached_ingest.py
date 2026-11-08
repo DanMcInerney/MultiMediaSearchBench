@@ -17,13 +17,13 @@ pytest.importorskip("multimem")
 import fakes  # noqa: E402
 from cache_world import stamps_of  # noqa: E402
 
-from mmmb.core import fs  # noqa: E402
-from mmmb.core.build import build_run, read_dump, store_of  # noqa: E402
-from mmmb.core.cache import INGESTED, dump_folder  # noqa: E402
-from mmmb.core.runfolder import RunFolder  # noqa: E402
-from mmmb.core.scenario import dump_key  # noqa: E402
-from mmmb.systems.mm.daemon import Api  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb.core import fs  # noqa: E402
+from mmsb.core.build import build_run, read_dump, store_of  # noqa: E402
+from mmsb.core.cache import INGESTED, dump_folder  # noqa: E402
+from mmsb.core.runfolder import RunFolder  # noqa: E402
+from mmsb.core.scenario import dump_key  # noqa: E402
+from mmsb.systems.mm.daemon import Api  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("v7-mm")
 

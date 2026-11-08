@@ -1,4 +1,4 @@
-"""New tests for mmmb/core/probe.py: the shortcut probe in a run. The probe itself is the scenario's (tests/test_v7_probe.py and
+"""New tests for mmsb/core/probe.py: the shortcut probe in a run. The probe itself is the scenario's (tests/test_v7_probe.py and
 tests/test_v7_scenario.py); here a stand-in scenario says what it is asked and what it found. Expected values are the sentences of the
 replaced `probe_line` of bench.py (the wording a run's report and commands print) and what run.json records."""
 
@@ -10,11 +10,11 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import fs
-from mmmb.core.contract import Dump
-from mmmb.core.probe import probe_line, probe_of, run_probe
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.scenario import ProbeOutcome
+from mmsb.core import fs
+from mmsb.core.contract import Dump
+from mmsb.core.probe import probe_line, probe_of, run_probe
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.scenario import ProbeOutcome
 
 
 class Probing:

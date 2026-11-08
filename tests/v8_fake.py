@@ -17,14 +17,14 @@ import imageio_ffmpeg
 import pytest
 from stub_system import STUB
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.config import Config
-from mmmb.core.contract import Dump
-from mmmb.core.question import write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.scenarios.v8_egolife import plan as plans
-from mmmb.scenarios.v8_egolife import source as src
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.config import Config
+from mmsb.core.contract import Dump
+from mmsb.core.question import write_questions
+from mmsb.core.runfolder import COMMIT_KEY, RunFolder
+from mmsb.scenarios.v8_egolife import plan as plans
+from mmsb.scenarios.v8_egolife import source as src
 
 V8 = scenarios.get("v8_egolife")
 DAYS = (date(2026, 10, 29), date(2026, 10, 30))
@@ -224,7 +224,7 @@ def write_run(folder: Path, recipe: dict, questions, dump: Dump, temp: Path, tag
         "scenario": "v8_egolife", "generator": V8.generator, "recipe": recipe, "seed": 1, "scale": "egolife", "days": recipe["days"],
         "data": str(dump.root), "temp": str(temp), "tag": tag, "timeout_s": 900.0, "plan": plan_h, "files": files_h,
         "question_hash": fs.sha256_of(folder / "questions.jsonl"), "configs": [dataclasses.asdict(c) for c in configs],
-        "probe": {"status": "none"}, "mmmb_commit": "abc1234", "decode_s": 0.024, "pools": V8.pool_counts(recipe)})
+        "probe": {"status": "none"}, COMMIT_KEY: "abc1234", "decode_s": 0.024, "pools": V8.pool_counts(recipe)})
     return RunFolder.open(folder, scenarios.get)
 
 

@@ -9,8 +9,8 @@ from datetime import date
 
 import pytest
 
-from mmmb.core import grade
-from mmmb.core.question import Grade
+from mmsb.core import grade
+from mmsb.core.question import Grade
 
 # -- the grader's date --------------------------------------------------------------------------------------------------
 

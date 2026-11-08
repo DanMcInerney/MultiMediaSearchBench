@@ -26,15 +26,15 @@ import pytest
 from agent_spec import NO_ISOLATION, clocked
 from stub_system import FILES, STUB, Stub, StubSystem, run_of, tiny_questions
 
-from mmmb import systems
-from mmmb.core import fs, gpu, paths
-from mmmb.core.agents import claude, codex
-from mmmb.core.agents.common import result_json, result_jsons
-from mmmb.core.config import Config
-from mmmb.core.contract import PlainSession
-from mmmb.core.record import ERRORS_STOP, STOP_AT, Halt, record, stop_reason, work_of
-from mmmb.core.runfolder import JOBS_MAX, RunFolder, commit_of, is_done, load_result, now_text
-from mmmb.core.runner import AGENTS, Agent, real_agents, run_agents, run_config
+from mmsb import systems
+from mmsb.core import fs, gpu, paths
+from mmsb.core.agents import claude, codex
+from mmsb.core.agents.common import result_json, result_jsons
+from mmsb.core.config import Config
+from mmsb.core.contract import PlainSession
+from mmsb.core.record import ERRORS_STOP, STOP_AT, Halt, record, stop_reason, work_of
+from mmsb.core.runfolder import JOBS_MAX, RunFolder, commit_of, is_done, load_result, now_text
+from mmsb.core.runner import AGENTS, Agent, real_agents, run_agents, run_config
 
 pytestmark = pytest.mark.xdist_group("runner")
 N = len(tiny_questions())
@@ -236,9 +236,9 @@ def test_the_folders_of_an_agent_with_its_own_tools_may_not_hold_a_word_it_is_re
     run = world.run
     run.check_paths(NO_ISOLATION)
     # the runs folder is matched as a path part: a folder named like its start is not it
-    dataclasses.replace(run, data=tmp_path / "mmmb-runs-extra" / "data").check_paths(NO_ISOLATION)
-    with pytest.raises(ValueError, match="mmmb-runs"):
-        dataclasses.replace(run, data=tmp_path / "mmmb-runs" / "data").check_paths(NO_ISOLATION)
+    dataclasses.replace(run, data=tmp_path / "mmsb-runs-extra" / "data").check_paths(NO_ISOLATION)
+    with pytest.raises(ValueError, match="mmsb-runs"):
+        dataclasses.replace(run, data=tmp_path / "mmsb-runs" / "data").check_paths(NO_ISOLATION)
     with pytest.raises(ValueError, match=r"\.codex"):
         dataclasses.replace(run, data=tmp_path / ".codex" / "data").check_paths(NO_ISOLATION)
     held = dataclasses.replace(run, data=tmp_path / "x.multimem" / "data")
@@ -701,13 +701,13 @@ def test_a_result_is_done_unless_its_problem_did_not_test_the_question_and_the_h
 
 def previewing(world):
     """What `previewer` gives `show_agents`: the preview session of each configuration's system (the real `files`, the world's stub)."""
-    from mmmb.core.dryrun import previewer
+    from mmsb.core.dryrun import previewer
 
     return previewer(world.run, {"files": systems.load("files"), "stub": world.system}, lambda system: world.root, world.dump)
 
 
 def test_a_run_prints_what_it_will_run_and_about_how_long_that_takes(world, capsys):
-    from mmmb.core.costing import BLIND_MIN, EXEC_MIN, estimate, show_agents
+    from mmsb.core.costing import BLIND_MIN, EXEC_MIN, estimate, show_agents
 
     descriptions = {FILES: systems.load("files").describe(None), STUB: world.system.describe("all"), BLIND: None}
     go(world, {"claude": Agent(Stub())}, [FILES], jobs=2)
@@ -830,7 +830,7 @@ def test_a_session_that_cannot_be_closed_after_an_error_does_not_take_the_errors
 
 
 def test_the_estimate_counts_a_configuration_at_the_execs_its_system_allows_at_once_and_says_so(world, capsys):
-    from mmmb.core.costing import show_agents
+    from mmsb.core.costing import show_agents
 
     limited = types.SimpleNamespace(**{**vars(world), "system": StubSystem(job_limit=1)})
     descriptions = {FILES: systems.load("files").describe(None), STUB: limited.system.describe("all")}
@@ -844,11 +844,11 @@ def test_the_estimate_counts_a_configuration_at_the_execs_its_system_allows_at_o
 
 def test_outside_a_git_checkout_the_commit_a_run_is_made_by_is_the_installed_version_and_when_that_cannot_be_said_it_fails(tmp_path, monkeypatch):
     monkeypatch.setattr(paths, "ROOT", tmp_path)  # a copy with no .git: installed, or unpacked
-    assert commit_of() == importlib.metadata.version("mmmb")
+    assert commit_of() == importlib.metadata.version("mmsb")
 
     def missing(name):
         raise importlib.metadata.PackageNotFoundError(name)
 
     monkeypatch.setattr(importlib.metadata, "version", missing)
-    with pytest.raises(RuntimeError, match="is not a git checkout and mmmb is not installed"):
+    with pytest.raises(RuntimeError, match="is not a git checkout and mmsb is not installed"):
         commit_of()

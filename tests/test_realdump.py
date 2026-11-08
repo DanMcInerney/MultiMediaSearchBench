@@ -11,12 +11,12 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core.contract import Served
-from mmmb.core.question import Span
-from mmmb.core.runfolder import IN_ONLY
-from mmmb.core.scenario import Access
-from mmmb.scenarios import realdump
-from mmmb.scenarios.realdump import File
+from mmsb.core.contract import Served
+from mmsb.core.question import Span
+from mmsb.core.runfolder import IN_ONLY
+from mmsb.core.scenario import Access
+from mmsb.scenarios import realdump
+from mmsb.scenarios.realdump import File
 
 JPEG = b"\xff\xd8" + b"\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + b"\xff\xda\x00\x08\x01\x01\x00\x00\x3f\x00deer!" + b"\xff\xd9"
 
@@ -102,14 +102,14 @@ def test_the_prompt_says_the_time_how_the_files_are_reached_and_the_answer_shape
 
 def test_the_deny_words_hold_the_code_and_the_source_names_in_commands_and_the_source_folder_everywhere():
     words = realdump.deny_words("i9_thing", ("caltech",), ("bench-data",))
-    assert set(words) == {IN_ONLY + w for w in ("i9_thing", "realdump", "from mmmb", "import mmmb", "caltech")} | {"bench-data"}
+    assert set(words) == {IN_ONLY + w for w in ("i9_thing", "realdump", "from mmsb", "import mmsb", "caltech")} | {"bench-data"}
 
 
 def test_the_sources_folder_is_set_by_its_variable_and_is_denied_by_its_name(monkeypatch):
     monkeypatch.delenv(realdump.SOURCES_ENV, raising=False)
     assert realdump.sources_root() == Path(r"D:\bench-data\sources") and realdump.source_word() == "bench-data"
-    monkeypatch.setenv(realdump.SOURCES_ENV, "/srv/MMMB-Media")
-    assert realdump.sources_root() == Path("/srv/MMMB-Media") and realdump.source_word() == "mmmb-media"
+    monkeypatch.setenv(realdump.SOURCES_ENV, "/srv/MMSB-Media")
+    assert realdump.sources_root() == Path("/srv/MMSB-Media") and realdump.source_word() == "mmsb-media"
     assert realdump.source_word(Path("/srv/clips-store/sources")) == "clips-store", "a folder named `sources` is told by its parent"
     with pytest.raises(ValueError, match="ordinary output"):
         realdump.source_word(Path("/data/sources"))
@@ -156,7 +156,7 @@ def test_no_deny_word_of_a_real_scenario_is_in_ordinary_code(name, tmp_path):
     """Gate 2: "sins" is in `isinstance`, "meva" in `timevalue`; an agent's own script must not end its exec as an escape."""
     import importlib
 
-    from mmmb.core.agents.common import reached
-    words = tuple(w.lower() for w in importlib.import_module(f"mmmb.scenarios.{name}").deny_words((), tmp_path, "k"))
+    from mmsb.core.agents.common import reached
+    words = tuple(w.lower() for w in importlib.import_module(f"mmsb.scenarios.{name}").deny_words((), tmp_path, "k"))
     assert reached({"command": SOME_CODE}, words) is None
     assert reached({"command": r"dir D:\bench-data\sources"}, words) == "bench-data"

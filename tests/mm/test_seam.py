@@ -23,12 +23,12 @@ import seam  # noqa: E402
 from fakes import S, S_FILES, Opened, run_of  # noqa: E402
 from test_mm_arm import by_qid  # noqa: E402
 
-from mmmb.core.agents import claude  # noqa: E402
-from mmmb.core.agents.common import result_jsons  # noqa: E402
-from mmmb.core import grade  # noqa: E402
-from mmmb.core.answer import answer_of, parse_final  # noqa: E402
-from mmmb.core.grounded import ground, resolve  # noqa: E402
-from mmmb.systems.mm.home import exec_project  # noqa: E402
+from mmsb.core.agents import claude  # noqa: E402
+from mmsb.core.agents.common import result_jsons  # noqa: E402
+from mmsb.core import grade  # noqa: E402
+from mmsb.core.answer import answer_of, parse_final  # noqa: E402
+from mmsb.core.grounded import ground, resolve  # noqa: E402
+from mmsb.systems.mm.home import exec_project  # noqa: E402
 
 TOOLS = {"ask", "find", "look", "label"}
 pytestmark = pytest.mark.xdist_group("mm-arm")

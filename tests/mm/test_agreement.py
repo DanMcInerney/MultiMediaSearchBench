@@ -26,13 +26,13 @@ from multimem import media, reader
 from multimem.config import ffmpeg_exe as multimems_ffmpeg
 from multimem.scripts import ask as ask_script
 
-from mmmb.core import render
-from mmmb.scenarios.v7_screen import constants, frames, media_common
-from mmmb.scenarios.v8_egolife import plan as v8_plan
-from mmmb.scenarios.v8_egolife import source as v8_source
-from mmmb.systems.mm import estimate
+from mmsb.core import render
+from mmsb.scenarios.v7_screen import constants, frames, media_common
+from mmsb.scenarios.v8_egolife import plan as v8_plan
+from mmsb.scenarios.v8_egolife import source as v8_source
+from mmsb.systems.mm import estimate
 
-v8_report = importlib.import_module("mmmb.scenarios.v8_egolife.report")  # (the package's own `report` is a function)
+v8_report = importlib.import_module("mmsb.scenarios.v8_egolife.report")  # (the package's own `report` is a function)
 
 
 def first_of(dump, kind: str, count: int = 1):

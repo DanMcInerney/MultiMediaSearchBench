@@ -1,8 +1,10 @@
 [project]
-name = "mmmb"
+name = "mmsb"
 version = "0.1.0"
-description = "MultiMediaMemoryBench: how well a memory system for agents answers questions about recorded screen, sound, cameras, files and logs"
+description = "MultiMediaSearchBench: how well a memory system for agents answers questions about recorded screen, sound, cameras, files and logs"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 # The bytes of the generated V7 week depend on these four: they are pinned to what the recorded pilot was written with.
 dependencies = [
@@ -17,7 +19,7 @@ dependencies = [
 mm = ["multimem"]
 
 [project.scripts]
-mmmb = "mmmb.cli:main"
+mmsb = "mmsb.cli:main"
 
 [dependency-groups]
 dev = [
@@ -52,7 +54,7 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-root = ""
-module-name = "mmmb"
+module-name = "mmsb"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,7 +1,7 @@
-"""New tests for the answer format as a run keeps it (mmmb/core/runner.py `answer_format_of`, `mmmb run --answer-format`; DESIGN 6.2, plan 5.4):
+"""New tests for the answer format as a run keeps it (mmsb/core/runner.py `answer_format_of`, `mmsb run --answer-format`; DESIGN 6.2, plan 5.4):
 a run not asked for a format is asked in json and keeps it in run.json; one asked for `line` gets the recorded prompt and no field but
 the format in its results; a run that has results is refused the other format whatever the command; a run recorded before the format was kept
-is a `line` run. Expected values are the plan's rules and the prompts' words, over the toy run `mmmb build` makes (tests/test_cli.py)."""
+is a `line` run. Expected values are the plan's rules and the prompts' words, over the toy run `mmsb build` makes (tests/test_cli.py)."""
 
 from __future__ import annotations
 
@@ -13,13 +13,13 @@ from pathlib import Path
 import pytest
 from cli_world import world  # noqa: F401
 from stub_system import FILES, Stub
-from test_cli import QUESTIONS, argv, built, result, w  # noqa: F401  (a copy of the toy run `mmmb build` makes, with no results)
+from test_cli import QUESTIONS, argv, built, result, w  # noqa: F401  (a copy of the toy run `mmsb build` makes, with no results)
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.question import write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent, answer_format_of
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.question import write_questions
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent, answer_format_of
 
 
 # -- the command line: a run keeps its format ----------------------------------------------------------------------------------------------
