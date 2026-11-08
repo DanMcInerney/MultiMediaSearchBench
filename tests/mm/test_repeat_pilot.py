@@ -1,4 +1,4 @@
-"""`mmsb repeat` of the recorded pilot, through the real registry and the real `Mm` (plan 8.1): the dry run that Dan reads before the 3-hour re-run
+"""`mmsb repeat` of the recorded pilot, through the real registry and the real `Mm` (plan 8.1): the dry run that the maintainer reads before the 3-hour re-run
 prints the 110 execs with the recorded agents, models, efforts and configurations, and starts and makes nothing; it counts the `files` cells at
 `--jobs` and the `mm` cells at `--gpu-jobs` (1 unless asked), which is how the pilot ran, and the wall time it prints is what those counts give; and
 a repeat on a machine where mm cannot run (no torch) is refused before it builds, not after. The expected values are the recorded results' own, read here from their

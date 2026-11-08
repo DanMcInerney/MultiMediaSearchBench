@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import json
 import random
-from pathlib import Path
 
 import pytest
 from stub_system import tiny_questions
 from v8_fake import V8, built, oracle_file, plan, recipe, source, table  # noqa: F401  (a fake download, for the prompt of a question of EgoLife)
 
 from mmsb import scenarios
+from mmsb.core import paths
 from mmsb.core.answer import DEFAULT_FORMAT, FORMATS, Citation, FinalAnswer, answer_of, answer_request, parse_final
 from mmsb.core.contract import McpServer, Served
 from mmsb.core.scenario import Access
@@ -250,7 +250,7 @@ def test_the_json_request_of_a_choice_has_no_unknown_and_says_when_the_evidence_
 
 PLAIN = Served(None, None, (), None, None, None, {})
 MM = Served(McpServer("mm", "mm", (), {}, ()), "You answer the user's question from their memory, using the mm tools.", (), None, "mm", None, {})
-DATA = Path(r"D:\mmsb-temp\mmb-0123456789-data")
+DATA = paths.TEMP / "mmb-0123456789-data"
 
 
 @pytest.fixture(scope="module")

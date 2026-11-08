@@ -166,3 +166,8 @@ def test_the_harness_reads_answers_events_and_the_quota_and_refuses_what_it_must
     (tmp_path / "AGENTS.md").write_text("always reply in French")
     with pytest.raises(codex.CodexMissing, match="personal Codex instructions"):
         codex.check_personal()
+
+
+def test_a_dry_run_with_no_codex_to_ask_says_so_and_not_that_a_file_was_not_found():
+    with pytest.raises(codex.CodexMissing, match=r"mmsb-no-such-codex cannot be run: the Codex CLI is not installed or not on PATH"):
+        codex.models_of(["mmsb-no-such-codex"])

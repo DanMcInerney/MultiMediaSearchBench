@@ -30,6 +30,7 @@ LABELS = "labels/caltech_camera_traps.json.zip"
 MEMBER = "caltech_images_20210113.json"
 IMAGES = "images"
 LOCATION = "23"
+CARD_DAYS = ("2013-09-10", "2014-02-28")  # the card: all of the location's photos taken from the first of these days to the last (4,256)
 EMPTY = "empty"
 TWELVE = 12  # the hour the dataset writes for the hour after midnight (and for noon)
 FOOT = (686, 16, 700, 28)  # in a photo (2,048 px wide), the box of its strip holding the right foot of the A of an hour 12's "AM" (not a P's)
@@ -45,28 +46,40 @@ class Photo:
     twelve: bool = False  # the dataset wrote its hour as 12: noon, or the hour after midnight (`wall` is that hour told, by `told`)
 
 
+def card_images(data: dict) -> list[dict]:
+    """The images of the dataset's labels (`data`, the JSON) that are on the card: location 23's, taken from the first to the last of
+    CARD_DAYS."""
+    return [i for i in data["images"] if str(i["location"]) == LOCATION and CARD_DAYS[0] <= i["date_captured"][:10] <= CARD_DAYS[1]]
+
+
 @functools.lru_cache(maxsize=2)
 def read_labels(source: str) -> tuple[tuple[Photo, ...], tuple[str, ...]]:
-    """The photos of location 23 that are in `source`'s images folder, in the order the dataset's clock gives (then by name), and every
-    label name of the dataset. A photo with other than one label is refused."""
+    """The photos of the card (`card_images`), in the order the dataset's clock gives (then by name), and every label name of the
+    dataset, whether the photos are on disk or not (`check_photos` asks that of those a scenario uses). A photo with other than one
+    label is refused."""
     with zipfile.ZipFile(Path(source) / LABELS) as z:
         data = json.loads(z.read(MEMBER))
     names = {c["id"]: c["name"] for c in data["categories"]}
     labels: dict[str, list[str]] = {}
     for a in data["annotations"]:
         labels.setdefault(a["image_id"], []).append(names[a["category_id"]])
-    have = set(os.listdir(Path(source) / IMAGES))
     photos = []
-    for image in data["images"]:
-        if str(image["location"]) == LOCATION and image["file_name"] in have:
-            found = labels.get(image["id"], [])
-            if len(found) != 1:
-                raise ValueError(f"{image['file_name']} has {len(found)} labels: a photo of I3 has one")
-            wall = datetime.fromisoformat(image["date_captured"])
-            photos.append(Photo(image["file_name"], wall, found[0], wall.hour == TWELVE))
-    if not photos:
-        raise FileNotFoundError(f"no photo of location {LOCATION} is in {Path(source) / IMAGES}")
+    for image in card_images(data):
+        found = labels.get(image["id"], [])
+        if len(found) != 1:
+            raise ValueError(f"{image['file_name']} has {len(found)} labels: a photo of I3 has one")
+        wall = datetime.fromisoformat(image["date_captured"])
+        photos.append(Photo(image["file_name"], wall, found[0], wall.hour == TWELVE))
     return tuple(sorted(photos, key=lambda p: (p.wall, p.file))), tuple(sorted(set(names.values())))
+
+
+def check_photos(source: str, photos: Sequence[Photo]) -> None:
+    """Refuses `photos` when any is not in `source`'s images folder: a card of fewer photos than the labels give is another card, and
+    its questions would be drawn from what happens to be there."""
+    have = set(os.listdir(Path(source) / IMAGES))
+    if lacking := [p.file for p in photos if p.file not in have]:
+        raise FileNotFoundError(f"{len(lacking)} of the {len(photos)} photos this card needs are not in {Path(source) / IMAGES} (the first is "
+                                f"{lacking[0]}): `mmsb fetch --scenario i3_trailcam` gets them")
 
 
 @functools.cache

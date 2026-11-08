@@ -23,8 +23,11 @@ from mmsb.core.scenario import Access, ProbeOutcome, dump_key
 from mmsb.scenarios import realdump
 from mmsb.scenarios.i3_trailcam.questions import CODE, SOURCE_NAME, questions_of
 from mmsb.scenarios.i3_trailcam.source import (
+    CARD_DAYS,
     IMAGES,
     SOURCE,
+    Photo,
+    check_photos,
     read_labels,
     told,
     with_exif,
@@ -35,7 +38,7 @@ name = "i3_trailcam"
 code = CODE
 generator = 2  # bumped when the scenario makes something other than before
 
-SCALES = {"tiny": ("2013-12-16", "2013-12-22"), "standard": ("2013-09-10", "2014-02-28")}  # the days of the card at each scale
+SCALES = {"tiny": ("2013-12-16", "2013-12-22"), "standard": CARD_DAYS}  # the days of the card at each scale
 RECIPE_KEYS = {"source", "scale", "seed", "days", "utc_offsets"}
 FOLDER = "DCIM/100RECNX"
 WHAT = "the memory card of my trail camera"
@@ -53,6 +56,14 @@ def recipe(*, scale: str = "tiny", seed: int, source: Path | str = SOURCE) -> di
     return {"source": str(source), "scale": scale, "seed": seed, "days": days, "utc_offsets": realdump.utc_offsets(days)}
 
 
+def chosen_of(source: str, photos: Sequence[Photo], first: str, last: str) -> list[Photo]:
+    """The photos of `photos` taken from the day `first` to the day `last` (ISO), which must all be in `source`: the standard card is all
+    4,256 of them, the tiny card a week of them, and a card of fewer is another card."""
+    chosen = [p for p in photos if first <= p.wall.date().isoformat() <= last]
+    check_photos(source, chosen)
+    return chosen
+
+
 def plan_of(recipe: Mapping[str, object]) -> tuple[tuple[File, ...], tuple[Question, ...]]:
     """The files and questions a recipe makes; refused when its keys are not `recipe`'s, or it was made in another time zone."""
     if set(recipe) != RECIPE_KEYS:
@@ -60,7 +71,7 @@ def plan_of(recipe: Mapping[str, object]) -> tuple[tuple[File, ...], tuple[Quest
     realdump.check_offsets(recipe)
     photos, names = read_labels(str(recipe["source"]))
     first, last = recipe["days"][0], recipe["days"][-1]
-    card = told(str(recipe["source"]), [p for p in photos if first <= p.wall.date().isoformat() <= last])
+    card = told(str(recipe["source"]), chosen_of(str(recipe["source"]), photos, first, last))
     files = tuple(File(f"{FOLDER}/IMG_{n:04d}.JPG", SOURCE_NAME, realdump.local_t(p.wall), "photo", "image",
                        {"src": f"{IMAGES}/{p.file}", "taken": p.wall.isoformat()}, own_time=True) for n, p in enumerate(card, 1))
     return files, questions_of(card, [f.path for f in files], names, str(recipe["scale"]), int(recipe["seed"]), realdump.local_t)

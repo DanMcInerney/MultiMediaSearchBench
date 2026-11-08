@@ -17,7 +17,7 @@ from agent_spec import server_of
 from test_runfolder import DENY, MM_ISOLATION, between, check_against, posix, run_of, sentinels  # noqa: F401
 from v8_fake import DAYS, V8, built, clip_ends, line_at, lines_by, oracle_file, plan, recipe, source, table, view_files  # noqa: F401
 
-from mmsb.core import fs
+from mmsb.core import fs, paths
 from mmsb.core.agents.common import command_outputs, reached
 from mmsb.core.contract import Served
 from mmsb.core.runfolder import IN_ONLY, RunFolder
@@ -107,7 +107,7 @@ def test_the_deny_words_of_v8_are_the_old_ones_but_for_the_new_folders_and_three
 
 def test_the_deny_list_keeps_an_agent_off_the_other_slots_and_the_download_and_not_off_its_own_view(built, tmp_path):
     dump, _ = built
-    run = RunFolder(tmp_path / "run", 1, "egolife", DAYS, dump.root, tmp_path / "temp", "t8", 900.0, V8, ())
+    run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, dump.root, tmp_path / "temp", "t8", 900.0, V8, ())
     deny = run.deny(run.slot(0), MM_ISOLATION)
     own, other = view_dir(run.temp, "t8", 0), view_dir(run.temp, "t8", 1)
 
@@ -136,7 +136,7 @@ PLAIN = Served(None, None, (), None, None, None, {})
 
 def test_a_prompt_for_a_system_and_the_files_together_has_both_sentences_and_a_prompt_for_another_format_or_a_holderless_server_is_refused(built):
     q = next(q for q in built[1] if q.qid == "ego-001")
-    data = Path(r"D:\mmsb-temp\mmb-0123456789-d0")
+    data = paths.TEMP / "mmb-0123456789-d0"
     held = Served(server_of(Path("home"), Path("work")), "base", (), None, "mm", None, {})
     got = V8.prompt(q, Access(True, data, held, "line"))
     assert got == (
@@ -157,7 +157,7 @@ def test_a_prompt_for_a_system_and_the_files_together_has_both_sentences_and_a_p
 
 
 def test_a_transcript_line_that_a_files_exec_could_not_print_is_refused_at_build(plan, recipe, tmp_path, monkeypatch):
-    run = RunFolder(tmp_path / "run", 1, "egolife", DAYS, tmp_path / "data", tmp_path / "temp", "t8", 900.0, V8, ())
+    run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, tmp_path / "data", tmp_path / "temp", "t8", 900.0, V8, ())
     deny = run.deny(run.slot(0), MM_ISOLATION)
     plans.check_transcript(plan.logs, deny)
     line = {"start": "2026-10-29T11:09:47.100", "end": "2026-10-29T11:09:50.766", "speaker": "Jake", "zh": "", "en": "x"}

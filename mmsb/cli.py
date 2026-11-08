@@ -2,6 +2,7 @@
 any scenario and any system). Argument parsing and the order of the steps; what each step does is below it (core/build.py, core/dryrun.py,
 core/runner.py, core/retrieval.py, the scenario's `report`).
 
+    mmsb fetch    --scenario NAME|all [--sources DIR --workers N]    the files the real scenarios read, from where they are published
     mmsb build    --scenario NAME [--scale S --seed N --days D,D --source DIR ...] [--out DIR --temp DIR --cache DIR --configs A,B --no-probe]
     mmsb ingest   RUN [--configs A,B]                       the stores of the systems (build makes those of its --configs)
     mmsb run      RUN [--agents claude,codex --configs A,B --jobs N --gpu-jobs N --side-by-side --subset all|pilot --controls CONFIG --only QID,.. --timeout S
@@ -35,7 +36,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from mmsb import scenarios, systems
+from mmsb import fetch, scenarios, systems
 from mmsb.arguments import DEFAULT_SEED, OPTIONS, csv, parser_of
 from mmsb.core import fs, gpu, paths, render, report, summary
 from mmsb.core.agents import claude
@@ -168,6 +169,13 @@ def earlier(run: RunFolder) -> list[Path]:
 
 
 # -- the commands -----------------------------------------------------------------------------------------------------------------
+
+def fetch_command(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    if args.workers < 1:
+        parser.error(f"--workers is 1 or more, not {args.workers}")
+    fetch.fetch(args.scenario, args.sources, fetch.Fetcher(workers=args.workers))
+    return 0
+
 
 def build_command(args: argparse.Namespace, parser: argparse.ArgumentParser, registry: Registry) -> int:
     scenario = scenarios.get(args.scenario)
@@ -403,6 +411,8 @@ def main(argv: list[str] | None = None, *, agents: Callable[[], Mapping[str, Age
     args = parser.parse_args(argv)
     try:
         match args.command:
+            case "fetch":
+                return fetch_command(args, parser)
             case "build":
                 return build_command(args, parser, registry)
             case "ingest":

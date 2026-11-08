@@ -1,4 +1,4 @@
-"""What the scenarios made from real recordings share (PLAN.md): a dump that is copies of a source's files under the names a real device
+"""What the scenarios made from real recordings share: a dump that is copies of a source's files under the names a real device
 or folder would give them, each file's time set to when it was recorded; its manifest; the questions' common fields and their split; the
 prompt; the words no command may hold; a leak probe; and the summary report. Each such scenario is then a reader of its source and
 labels, a writer of its files and its question templates; it imports this and no other scenario.
@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
-from mmsb.core import fs
+from mmsb.core import fs, paths
 from mmsb.core.answer import answer_request
 from mmsb.core.contract import Dump, ManifestEntry
 from mmsb.core.grade import asked
@@ -34,7 +34,6 @@ CODE_WORDS = ("realdump", "from mmsb", "import mmsb")  # code that reaches a sce
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 SOURCES_ENV = "MMSB_SOURCES"  # the folder that holds the sources, one folder per source (`meva`, `sins`, ...)
-DEFAULT_SOURCES = Path(r"D:\bench-data\sources")
 SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and would refuse innocent commands
 # The rule an agent with its own tools is held to, said: in the first baseline Codex hunted the disk for Python (C:\Users, Program
 # Files, AppData), its output named the owner's agent setup, and the exec ended as an escape, wrong by a rule it was never told.
@@ -44,14 +43,15 @@ LIMIT = "You have {:g} seconds: if you have not answered by then, you are stoppe
 
 
 def sources_root() -> Path:
-    """Where the sources are: `MMSB_SOURCES`, else D:\\bench-data\\sources. A source's folder in it is named by its id in
-    media/sources.jsonl."""
-    return Path(os.environ.get(SOURCES_ENV) or DEFAULT_SOURCES)
+    """Where the sources are: `MMSB_SOURCES`, else `mmsb-sources` in the MMSB home (`paths.HOME`). A source's folder in it is named by
+    its id in media/sources.jsonl, and `mmsb fetch` fills it."""
+    return Path(os.environ.get(SOURCES_ENV) or paths.HOME / "mmsb-sources")
 
 
 def source_word(root: Path | None = None) -> str:
     """The word no command of an agent, nor what it prints, may hold: the name of the folder the sources are in, or of its parent when
-    that folder is named `sources` (so `bench-data` for the default). Refused when it is too short or too common to tell a reach."""
+    that folder is named `sources` (so `bench-data` for `D:\\bench-data\\sources`). Refused when it is too short or too common to tell a
+    reach."""
     root = sources_root() if root is None else Path(root)
     word = (root.parent.name if root.name.lower() == "sources" else root.name).lower()
     if len(word) < SHORTEST_WORD:

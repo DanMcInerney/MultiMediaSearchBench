@@ -113,6 +113,12 @@ def frames_of(path: Path) -> int:
         return video.frames
 
 
+def wanted(name: str) -> re.Match | None:
+    """The match of `name` against CLIP when it is a clip of one of CAMERAS that begins from FIRST until LAST, else None."""
+    m = CLIP.fullmatch(name.removesuffix(".avi"))
+    return m if name.endswith(".avi") and m and m[9] in CAMERAS and FIRST <= datetime.fromisoformat(f"{m[1]}T{m[2]}:{m[3]}:{m[4]}") < LAST else None
+
+
 @functools.lru_cache(maxsize=2)
 def read_clips(source: str) -> tuple[Clip, ...]:
     """The clips of the three cameras that begin from 10:00 until 11:15, by camera (cam1 to cam3) and time. A clip with no label file, or
@@ -121,12 +127,9 @@ def read_clips(source: str) -> tuple[Clip, ...]:
     found = []
     for hour in sorted(os.listdir(root / VIDEO)):
         for name in sorted(os.listdir(root / VIDEO / hour)):
-            m = CLIP.fullmatch(name.removesuffix(".avi"))
-            if name.endswith(".avi") and m and m[9] in CAMERAS:
-                a = datetime.fromisoformat(f"{m[1]}T{m[2]}:{m[3]}:{m[4]}")
-                if FIRST <= a < LAST:
-                    found.append((CAMERAS[m[9]], a, datetime.fromisoformat(f"{m[1]}T{m[5]}:{m[6]}:{m[7]}"), name.removesuffix(".r13.avi"),
-                                  f"{VIDEO}/{hour}/{name}", hour))
+            if m := wanted(name):
+                found.append((CAMERAS[m[9]], datetime.fromisoformat(f"{m[1]}T{m[2]}:{m[3]}:{m[4]}"),
+                              datetime.fromisoformat(f"{m[1]}T{m[5]}:{m[6]}:{m[7]}"), name.removesuffix(".r13.avi"), f"{VIDEO}/{hour}/{name}", hour))
     if not found:
         raise FileNotFoundError(f"no clip of {', '.join(CAMERAS)} between {FIRST} and {LAST} is in {root / VIDEO}")
     clips = []

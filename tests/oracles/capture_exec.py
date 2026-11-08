@@ -7,11 +7,12 @@ into a temporary folder). No CLI is started and nothing is asked. `claude_run.pr
 which has what the old modules import, from the repo root:
 
     set PYTHONDONTWRITEBYTECODE=1
-    C:\\Users\\danhm\\tools\\Multimem\\.venv\\Scripts\\python.exe tests\\oracles\\capture_exec.py
+    set MMS_CHECKOUT=<the search tool's checkout>
+    %MMS_CHECKOUT%\\.venv\\Scripts\\python.exe tests\\oracles\\capture_exec.py
 
 It was run once, when the tool was called Multimem (package `multimem`, command `mm`, commit fe0ece5), and recorded/exec
 holds what it wrote. The tool is now MultimediaSearch (`mms`) and this script names it so, as the tests that import its helpers (`placer`,
-`plant_git`, `planted_environment`) need; the tool's checkout is still the folder `Multimem`. Run again it would capture the renamed tool, with
+`plant_git`, `planted_environment`) need; the tool's checkout may still be in a folder called `Multimem`. Run again it would capture the renamed tool, with
 the old modules' old names, so it is not run again: tests/golden_names.py maps the recording's names to the tool's present ones.
 
 The old modules were written to live in the tool's benchmarks/ folder and find the skill relative to their own file, so here they
@@ -51,7 +52,6 @@ from pathlib import Path
 from unittest import mock
 
 REPO = Path(__file__).resolve().parents[2]
-MMS_CHECKOUT = Path(r"C:\Users\danhm\tools\Multimem")  # the checkout of the search tool; its folder keeps the old name
 OLD_COMMIT = "bb498a6"  # the commit that holds the old modules
 OLD_MODULES = ("bench.py", "claude_run.py", "codex_run.py", "egolife.py", "haystack.py", "grade.py")
 OLD_FILES = (*OLD_MODULES, "haystack_media.py", "shortcuts.py", "egolife_oracles.json")  # (what they import of each other, and their data)
@@ -106,6 +106,13 @@ def dump(obj) -> str:
     return json.dumps(obj, indent=1, ensure_ascii=False) + "\n"
 
 
+def mms_checkout() -> Path:
+    """The checkout of the search tool (its folder may keep the old name), which `MMS_CHECKOUT` names."""
+    if not (named := os.environ.get("MMS_CHECKOUT")):
+        raise SystemExit("set MMS_CHECKOUT to the checkout of the search tool, which the old modules' tests folder and skill are read from")
+    return Path(named)
+
+
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -132,13 +139,13 @@ def old_code(folder: Path) -> None:
 def import_old_modules(old: Path):
     """The old modules (in `old`), with MultimediaSearch's tests folder on the path (haystack and bench import its day, fake_decider and
     conftest) and the skill's place pointed at MultimediaSearch's."""
-    sys.path[:0] = [str(old), str(MMS_CHECKOUT / "tests")]
+    sys.path[:0] = [str(old), str(mms_checkout() / "tests")]
     import bench
     import claude_run
     import codex_run
     import egolife
 
-    skill = MMS_CHECKOUT / "src" / "mms" / "skills" / "mms-questions" / "SKILL.md"
+    skill = mms_checkout() / "src" / "mms" / "skills" / "mms-questions" / "SKILL.md"
     codex_run.SKILL, codex_run.NOTES_DIR = skill, skill.parent / "models"
     codex_run.NOTES = codex_run.NOTES_DIR / "d1.md"
     claude_run.SKILL = skill
@@ -222,7 +229,7 @@ def main() -> int:
         skill = codex_run.SKILL
         from mms import adapter
 
-        meta = {"repo_commit": git_head(REPO), "old_commit": git_head_of(OLD_COMMIT), "multimem_commit": git_head(MMS_CHECKOUT),
+        meta = {"repo_commit": git_head(REPO), "old_commit": git_head_of(OLD_COMMIT), "multimem_commit": git_head(mms_checkout()),
                 "python": sys.version.split()[0], "model": MODEL, "notes": notes, "claude": CLAUDE, "codex": CODEX,
                 "old_modules": {n: sha256(old_source(n)) for n in OLD_MODULES},
                 "read": {"SKILL.md": sha256(skill.read_bytes()), notes: sha256((codex_run.NOTES_DIR / notes).read_bytes()),

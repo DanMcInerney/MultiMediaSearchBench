@@ -92,7 +92,7 @@ def run_of(root: Path, recipe: dict, questions: Sequence[Question], dump: Dump, 
            timeout_s: float = 900.0) -> RunFolder:
     """A run folder in `root` for the questions of the tiny week: the question file, the manifest of the dump (the data must not change),
     and a folder for the temp files of the run."""
-    folder, temp = root / "run", root / "temp"
+    folder, temp = root / "runs" / "run", root / "temp"
     folder.mkdir(parents=True, exist_ok=True)
     write_questions(folder / "questions.jsonl", questions)
     fs.write_json(folder / "data-manifest.json", fs.stats_of(dump.root))

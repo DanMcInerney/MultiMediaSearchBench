@@ -65,8 +65,8 @@ def w(world, built, tmp_path):  # noqa: F811
     def skip(where, names):
         return [n for n in names if n in ("results", "execs", "dry-run", "homes", "systems.json") or n.startswith("report.")]
 
-    shutil.copytree(built, tmp_path / "run", ignore=skip)
-    world.run = RunFolder.open(tmp_path / "run", scenarios.get)
+    shutil.copytree(built, tmp_path / "runs" / "run", ignore=skip)
+    world.run = RunFolder.open(tmp_path / "runs" / "run", scenarios.get)
     world.patch.setattr(claude, "check_login", lambda: None)
     return world
 

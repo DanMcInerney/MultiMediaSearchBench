@@ -238,7 +238,7 @@ def run_of(root: Path, configs=(FILES, STUB), scenario=None, questions=None, tag
     from mmsb import scenarios
 
     questions = tuple(questions or tiny_questions())
-    folder, temp = root / "run", root / "temp"
+    folder, temp = root / "runs" / "run", root / "temp"
     data = temp / f"mmb-{tag}-data"
     for rel, text in (("notes/a.md", "a note"), ("screen/s.mkv", "a screen"), ("logs/web.jsonl", "{}")):
         (data / rel).parent.mkdir(parents=True, exist_ok=True)

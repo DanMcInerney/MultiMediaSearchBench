@@ -149,7 +149,7 @@ def test_describe_and_preview_need_the_facts_of_a_model_and_not_that_it_can_run_
     with pytest.raises(ValueError) as lacking:
         here.open(store, dump, context(homes, variant="d1-3B"))
     message = str(lacking.value)
-    assert message.startswith("d1-3B: its env is not ready: torch is not installed") and message.endswith("run `uv sync --group mm-gpu`"), message
+    assert message.startswith("d1-3B: its env is not ready: torch is not installed") and message.endswith("run `uv sync --extra mm --group mm-gpu`"), message
     assert "group d1" not in message and "mms's project" not in message and not homes.exists()
 
 
@@ -162,8 +162,8 @@ def test_a_dry_run_of_the_command_prints_the_exec_of_a_model_this_environment_ca
 
     recipe, dump, questions = week
     config = Config("mm/d1-3B", "mm", "d1-3B", False)
-    folder, temp = tmp_path / "run", tmp_path / "temp"
-    folder.mkdir()
+    folder, temp = tmp_path / "runs" / "run", tmp_path / "temp"
+    folder.mkdir(parents=True)
     write_questions(folder / "questions.jsonl", questions)
     fs.write_json(folder / "data-manifest.json", fs.stats_of(dump.root))
     write_dump(folder, dump)

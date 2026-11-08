@@ -126,8 +126,8 @@ def ran(tmp_path_factory, built, recipe):
     ffmpeg.write_bytes(b"x")
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(imageio_ffmpeg, "get_ffmpeg_exe", lambda: str(ffmpeg))
-        folder = root / "run"
-        folder.mkdir()
+        folder = root / "runs" / "run"
+        folder.mkdir(parents=True)
         run = write_run(folder, recipe, questions, dump, root / "temp")
         fs.write_json(run.manifest, fs.stats_of(dump.root))
         stub = Ego(questions, pause=0.3)
@@ -311,7 +311,7 @@ def test_the_report_text_has_its_tables(ran):
 
 
 def test_a_run_with_no_results_reports_none(ran, tmp_path):
-    folder = tmp_path / "run"
+    folder = tmp_path / "runs" / "run"
     shutil.copytree(ran.run.folder, folder, ignore=lambda where, names: [n for n in names if n in ("results", "execs", "data-manifest.json")])
     figures, text = V8.report([dataclasses.replace(ran.run, folder=folder)])
     assert figures["agents"] == {} and figures["retrieval"] == {} and figures["totals"]["results"] == 0
@@ -319,7 +319,7 @@ def test_a_run_with_no_results_reports_none(ran, tmp_path):
 
 
 def test_the_report_reads_a_run_with_no_video_question_paired(ran, tmp_path, made_up_ffmpeg):
-    folder = tmp_path / "run"
+    folder = tmp_path / "runs" / "run"
     shutil.copytree(ran.run.folder, folder, ignore=lambda where, names: [n for n in names if n in ("results", "execs", "data-manifest.json")])
     run = dataclasses.replace(ran.run, folder=folder, data=ran.dump.root, temp=tmp_path / "temp")
     fs.write_json(run.manifest, fs.stats_of(ran.dump.root))
@@ -339,8 +339,8 @@ def test_the_result_of_a_files_exec_whose_output_showed_a_recording_past_the_hor
     dump, questions = built
     codex = [{"type": "item.completed", "item": {"type": "command_execution", "command": "Get-Content x",
                                                  "aggregated_output": json.dumps(line_at(plan, True))}}]
-    folder = tmp_path / "run"
-    folder.mkdir()
+    folder = tmp_path / "runs" / "run"
+    folder.mkdir(parents=True)
     run = write_run(folder, recipe, questions, dump, tmp_path / "temp")
     fs.write_json(run.manifest, fs.stats_of(dump.root))
     run_over(run, dump, Ego(questions, events=codex), [BLIND, FILES], jobs=1, only=["ego-001"])

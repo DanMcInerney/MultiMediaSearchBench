@@ -7,12 +7,14 @@ variant `all` reads everything and allows as many execs at once as are asked."""
 
 from __future__ import annotations
 
+import importlib
+import os
 import re
 import types
 
 import cli_world
 import pytest
-from cli_world import build_args, world  # noqa: F401
+from cli_world import DAYS, SCALE, SEED, build_args, world  # noqa: F401
 from stub_system import Stub, StubSystem, tiny_questions
 
 from mmsb import scenarios
@@ -133,6 +135,26 @@ def no_agents_installed(patch) -> None:
     patch.setattr(dryrun, "shutil", types.SimpleNamespace(which=lambda name: None))
     patch.setattr(codex, "models_of", lambda command: {"models": [
         {"slug": codex.model(), "supported_reasoning_levels": [{"effort": codex.effort()}, {"effort": "medium"}]}]})
+
+
+def test_a_build_and_a_dry_run_work_in_the_default_folders_of_a_mmsb_home_that_is_set(world, tmp_path, capsys):
+    """`MMSB_HOME` is read when `paths` is imported, so it is read again here; the run is found by its bare name in the home's runs folder."""
+    home = tmp_path / "home"
+    no_agents_installed(world.patch)
+    saved = dict(vars(paths))
+    try:
+        with pytest.MonkeyPatch.context() as env:
+            env.setenv("MMSB_HOME", str(home))
+            importlib.reload(paths)
+            assert paths.RUNS == home / "mmsb-runs" and paths.TEMP == home / "mmsb-data" and paths.CACHE == home / "mmsb-cache"
+            assert world.main("build", "--scenario", "toy", "--scale", SCALE, "--seed", str(SEED), "--days", DAYS, "--configs", "files") == 0
+            (name,) = os.listdir(home / "mmsb-runs")
+            assert any((home / "mmsb-data").glob("mmb-*-data")) and (home / "mmsb-cache" / "dumps").is_dir()
+            capsys.readouterr()
+            assert world.main("run", name, "--agents", "claude", "--configs", "files", "--dry-run") == 0
+            assert "nothing was run" in capsys.readouterr().out
+    finally:
+        vars(paths).update(saved)  # (not a reload: the session's HOME is a throwaway one, so a reload would not give the folders the suite imported)
 
 
 def test_a_dry_run_says_what_the_run_costs_from_the_medians_of_earlier_runs_calls_no_agent_and_leaves_only_its_own_exec_folder(world, tmp_path, capsys):

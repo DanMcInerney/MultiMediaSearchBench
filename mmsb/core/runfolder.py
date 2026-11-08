@@ -192,7 +192,8 @@ class RunFolder:
 
     def deny(self, own: Path | None, isolation: Isolation, reads: Path | None = None, off_gpu: bool = False) -> tuple[str, ...]:
         """What no tool input of an agent with its own tools may hold, lower case with forward slashes: this run's folder (and the one it was
-        branched from, `parent`), the folders of other runs (the runs and cache folders, the results and temp folder of the runs recorded before MMSB, and the tests' folder
+        branched from, `parent`), the folders of other runs (the folder this run is in, so the runs beside it whatever `--out` was, the
+        runs and cache folders, the results and temp folder of the runs recorded before MMSB, and the tests' folder
         unless this run is in it), the checkouts of this repository (a worktree's main checkout too), the owner's agent setup, the
         `isolation` of the systems, the scenario's words, the working slots other than `own` (all of them when None), and the dump
         when the agent reads another folder (`reads`, from `Scenario.view`; None: the dump itself), by absolute path, by name (a
@@ -209,9 +210,11 @@ class RunFolder:
         elsewhere = [paths.RUNS, paths.CACHE, *cached, *paths.EARLIER]
         tests = not any(folder.is_relative_to(paths.TESTS) for folder in (self.folder, self.temp))  # the tests' own runs are in it
         named = [f"/{folder.name}{after}" for folder in (*elsewhere, *([paths.TESTS] if tests else [])) for after in ENDS]
+        parent = self.folder.resolve().parent  # (whole, so that a relative `--out` is not a bare word such as `runs`)
+        beside = [parent] if parent != parent.parent else []  # (not a drive's root: that is every folder)
         checkouts = [str(c) for c in paths.checkouts()]
         roots = [str(root) for name in isolation.deny_package_roots if (root := package_root(name)) is not None]
-        words = (str(self.folder), *map(str, [self.parent] if self.parent is not None else []), str(paths.RUNS), str(paths.CACHE), *map(str, cached), checkouts[0], ".claude", ".codex", *named, *checkouts[1:],
+        words = (str(self.folder), *map(str, [self.parent] if self.parent is not None else []), *map(str, beside), str(paths.RUNS), str(paths.CACHE), *map(str, cached), checkouts[0], ".claude", ".codex", *named, *checkouts[1:],
                  *([str(paths.TESTS)] if tests else []), *isolation.deny_words, *roots,
                  *self.scenario.deny_words(others, self.temp, self.tag), *slots, *(OFF_GPU_DENY if off_gpu else ()))
         return tuple(dict.fromkeys(re.sub(r"[\\/]+", "/", w.lower()) for w in words))

@@ -1,7 +1,7 @@
 [project]
 name = "mmsb"
 version = "0.1.0"
-description = "MultiMediaSearchBench: how well a memory system for agents answers questions about recorded screen, sound, cameras, files and logs"
+description = "MultiMediaSearchBench: how well AI agents, alone or with a search system, find things in the video, pictures and sound people keep"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -13,10 +13,12 @@ dependencies = [
     "pillow==13.0.0",
     "imageio-ffmpeg==0.7.0",
     "mcp>=2.2,<3",
+    "anyio>=4.5",
 ]
 
 [project.optional-dependencies]
-mm = ["mms"]
+# MultimediaSearch, at the commit whose default model is d1-Omni-2B (the commit uv.lock pins as well)
+mm = ["mms @ git+https://github.com/DanMcInerney/MultimediaSearch@7237e41c1677b32aee8189aac782c43d1324260d"]
 
 [project.scripts]
 mmsb = "mmsb.cli:main"
@@ -38,7 +40,6 @@ mm-gpu = [
 default-groups = ["dev"]
 
 [tool.uv.sources]
-mms = { git = "https://github.com/DanMcInerney/MultimediaSearch", rev = "66db8910302bb3ff976a7cda3c3091080fe3b5df" }
 torch = { index = "pytorch-cu128" }
 torchvision = { index = "pytorch-cu128" }
 

@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from mmsb.core import paths
 from mmsb.core.contract import Served
 from mmsb.core.question import Span
 from mmsb.core.runfolder import IN_ONLY
@@ -115,7 +116,8 @@ def test_the_deny_words_hold_the_code_and_the_source_names_in_commands_and_the_s
 
 def test_the_sources_folder_is_set_by_its_variable_and_is_denied_by_its_name(monkeypatch):
     monkeypatch.delenv(realdump.SOURCES_ENV, raising=False)
-    assert realdump.sources_root() == Path(r"D:\bench-data\sources") and realdump.source_word() == "bench-data"
+    assert realdump.sources_root() == paths.HOME / "mmsb-sources" and realdump.source_word() == "mmsb-sources"
+    assert realdump.source_word(Path("D:/bench-data/sources")) == "bench-data", "the maintainer's"
     monkeypatch.setenv(realdump.SOURCES_ENV, "/srv/MMSB-Media")
     assert realdump.sources_root() == Path("/srv/MMSB-Media") and realdump.source_word() == "mmsb-media"
     assert realdump.source_word(Path("/srv/clips-store/sources")) == "clips-store", "a folder named `sources` is told by its parent"
@@ -167,4 +169,4 @@ def test_no_deny_word_of_a_real_scenario_is_in_ordinary_code(name, tmp_path):
     from mmsb.core.agents.common import reached
     words = tuple(w.lower() for w in importlib.import_module(f"mmsb.scenarios.{name}").deny_words((), tmp_path, "k"))
     assert reached({"command": SOME_CODE}, words) is None
-    assert reached({"command": r"dir D:\bench-data\sources"}, words) == "bench-data"
+    assert reached({"command": f"dir {realdump.sources_root()}"}, words) == realdump.source_word()

@@ -29,7 +29,7 @@ from mmsb.core.cache import (BUILT_NOW, FOUND, INGESTED, PROBE, QUESTIONS, REWRI
                              clone_store, report_of, store_state)
 from mmsb.core.config import Config, describe_configs
 from mmsb.core.contract import Description, Dump, IngestReport, LogSource, ManifestEntry, System
-from mmsb.core.paths import check_volume
+from mmsb.core.paths import check_apart, check_volume
 from mmsb.core.probe import run_probe
 from mmsb.core.runfolder import RunFolder, check_temp, commit_of
 from mmsb.core.scenario import Scenario
@@ -172,6 +172,7 @@ def build_run(scenario: Scenario, options: Mapping[str, object], out: Path, temp
     loaded, descriptions = describe_configs(configs, load)  # a system whose extra is missing fails here, before anything is written
     check_temp(Path(temp))
     check_volume(Path(out), Path(temp), Path(cache))  # a store is copied into the run with hard links
+    check_apart(Path(out), Path(temp))  # `RunFolder.deny` refuses the agents the folder a run is in: not the one their data is in
     commit_of()  # a build that cannot say what it was made by fails now, not after the dump is written
     recipe = scenario.recipe(**options)
     scenario.hashes(recipe)  # a recipe whose plan cannot be made (a wrong number of days, a download that is not there) fails here

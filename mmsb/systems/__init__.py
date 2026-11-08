@@ -7,6 +7,7 @@ is asked for it, and a system whose extra is not installed is refused then, with
     name = "mm"                        # the folder's name
     class = "mmsb.systems.mm.system:Mm"
     extra = "mm"                       # the pyproject extra it needs; omit for none
+    group = "mm-gpu"                   # the pyproject dependency group it needs as well; omit for none
     license = "..."
     default_variant = "d1-3B"          # omit for a system without variants
     horizon = "cut"                    # or "view" (Description.horizon)
@@ -30,7 +31,7 @@ from pathlib import Path
 from mmsb.core.contract import Isolation, System
 
 HERE = Path(__file__).parent
-SYSTEM_KEYS = {"name", "class", "extra", "license", "default_variant", "horizon"}
+SYSTEM_KEYS = {"name", "class", "extra", "group", "license", "default_variant", "horizon"}
 ISOLATION_KEYS = {"env_drop_prefixes", "deny_words", "deny_package_roots", "env_nowhere"}
 HORIZONS = ("cut", "view")
 
@@ -44,6 +45,7 @@ class SystemInfo:
     name: str
     cls: str  # "module:Class"
     extra: str | None
+    group: str | None
     license: str
     default_variant: str | None
     horizon: str
@@ -79,7 +81,7 @@ def read(toml_file: Path) -> SystemInfo:
         if not all(isinstance(w, str) for ws in words.values() for w in ws) or not all(
                 isinstance(k, str) and isinstance(v, str) for k, v in nowhere.items()):
             raise ValueError("[isolation] holds lists of strings, and env_nowhere strings by string")
-        return SystemInfo(system["name"], system["class"], system.get("extra"), system["license"], system.get("default_variant"),
+        return SystemInfo(system["name"], system["class"], system.get("extra"), system.get("group"), system["license"], system.get("default_variant"),
                           system["horizon"], Isolation(env_nowhere=nowhere, **words))
     except KeyError as error:
         raise ValueError(f"{toml_file}: {error.args[0]} is missing") from None
@@ -119,5 +121,6 @@ def load(name: str, folder: Path = HERE) -> System:
         return getattr(importlib.import_module(module), cls)()
     except ModuleNotFoundError as error:
         if info.extra and error.name and error.name.split(".")[0] != module.split(".")[0]:
-            raise ExtraMissing(f"{name} needs the {info.extra} extra: uv sync --extra {info.extra}") from error
+            raise ExtraMissing(f"{name} needs the {info.extra} extra: uv sync --extra {info.extra}"
+                               + (f" --group {info.group}" if info.group else "")) from error
         raise
