@@ -62,6 +62,8 @@ seed 1, full size), 900 s an exec. Claude Code ran Haiku at `xhigh` effort, Code
   agent still leave the gap unproven.
 - **Codex ran out of time** on 7 of its 20 (all of M4, one count in A1, one absent in V1), its mean exec 615 s. Claude timed out
   once and hit its 60-turn cap twice. A full run should give more than 900 s (`--timeout`).
+- **The agents were not told the 900 s.** The prompt has said the limit since 8 November, so a later run is not like for like
+  with this one.
 - **Claude's line was fixed during the run.** Claude Code refuses a Bash command over 10,000 characters, and refuses a
   redirect: Claude took the refusals for ffmpeg itself being off and gave up on 2 of M4's 5. Its files line now says both. M4's
   Claude figure is a rerun with the length named; its I3, A1 and V1 ran with the old line.

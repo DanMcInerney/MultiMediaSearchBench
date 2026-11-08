@@ -26,6 +26,7 @@ class Access:
     data: Path | None  # the folder the agent reads the recordings in (`Scenario.view`)
     served: Served
     answer_format: AnswerFormat  # how the final message is asked to end (core/answer.py)
+    timeout_s: float | None = None  # the seconds the exec is held to, for the prompt to say (the real scenarios' do; V7's and V8's are the recorded ones)
 
 
 @dataclass(frozen=True)

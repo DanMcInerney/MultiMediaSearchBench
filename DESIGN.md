@@ -442,6 +442,10 @@ works in file offsets are graded alike.
   `mm`, `the files`, or `mm and these files`. V8 has no "unknown" clause, because its questions are multiple choice. The
   `S+files` sentence ("unknown when mm and these files do not hold it") was never recorded. The real agents have not seen
   the `json` request yet.
+- **The time limit.** Since 8 November 2026 the four real scenarios say the seconds the exec is held to (`--timeout`, as
+  `Access.timeout_s`) at the end of the paragraph before the question: "You have 900 seconds: if you have not answered by
+  then, you are stopped and the answer counts as wrong." V7's and V8's prompts do not, because they are held to the recorded
+  ones byte for byte.
 
 ### 6.3 Scores
 

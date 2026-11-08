@@ -92,7 +92,10 @@ def no_agents_installed(patch) -> None:
 def test_a_dry_run_writes_the_first_exec_of_each_agent_and_configuration_prints_their_command_lines_and_runs_nothing(w, capsys):
     run = w.run
     no_agents_installed(w.patch)
+    told, prompt = [], run.scenario.prompt
+    w.patch.setattr(run.scenario, "prompt", lambda q, access: told.append(access.timeout_s) or prompt(q, access))
     assert w.main(*argv(w, "--agents", "claude,codex", "--dry-run", "--timeout", "1200")) == 0
+    assert told and set(told) == {1200.0}, "the prompt is told the limit the command asks for"
     out = capsys.readouterr().out
     for text in ("--restricted", "--strict-mcp-config", "sandbox_mode=workspace-write", "nothing was run", "ANTHROPIC_API_KEY",
                  f"question {FIRST}", "environment:", "== claude files", "== claude stub-all", "== codex stub-all", "MMS_*"):

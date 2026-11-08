@@ -76,13 +76,13 @@ def test_a_question_that_is_absent_has_no_evidence_and_only_it():
                           grade=realdump.grade("absent"), evidence=[Span("a.jpg", 0, 0)], sources=("camera",), since=0, until=1, value=None)
 
 
-def prompt_of(own_tools: bool, server: bool, fmt: str = "json") -> str:
+def prompt_of(own_tools: bool, server: bool, fmt: str = "json", timeout_s: float | None = None) -> str:
     q = realdump.question(code="X", qid="q", now=datetime(2013, 12, 23, 9, 0).timestamp(), text="On how many days did a deer come?",
                           kind="count", template="count", modality="image", shape="<a number>", grade=realdump.grade("count", truth="2"),
                           evidence=[Span("a.jpg", 0, 0)], sources=("camera",), since=0, until=1, value="2")
     served = Served(types.SimpleNamespace(name="memo") if server else None, None, (), None, "memo" if server else None, None, {})
-    return realdump.prompt(q, Access(own_tools, Path("D:/data") if own_tools else None, served, fmt), "the memory card of my trail camera",
-                           "DCIM holds the photos.")
+    return realdump.prompt(q, Access(own_tools, Path("D:/data") if own_tools else None, served, fmt, timeout_s),
+                           "the memory card of my trail camera", "DCIM holds the photos.")
 
 
 def test_the_prompt_says_the_time_how_the_files_are_reached_and_the_answer_shape():
@@ -98,6 +98,14 @@ def test_the_prompt_says_the_time_how_the_files_are_reached_and_the_answer_shape
     assert "when memo and these files do not hold it" in both
     assert "You cannot see the memory card of my trail camera." in prompt_of(False, False)
     assert prompt_of(True, False, "line").endswith("End with one line ANSWER: <a number>, or ANSWER: unknown when the files do not hold it.")
+
+
+@pytest.mark.parametrize(("own_tools", "server"), [(True, False), (False, True), (True, True), (False, False)])
+def test_the_prompt_says_the_seconds_the_exec_is_held_to_before_the_question(own_tools, server):
+    setup, question, _ = prompt_of(own_tools, server, timeout_s=1200.0).split("\n\n")
+    assert setup.endswith(" You have 1200 seconds: if you have not answered by then, you are stopped and the answer counts as wrong.")
+    assert question == "On how many days did a deer come?"
+    assert "seconds:" not in prompt_of(own_tools, server), "an access that gives no limit says none"
 
 
 def test_the_deny_words_hold_the_code_and_the_source_names_in_commands_and_the_source_folder_everywhere():

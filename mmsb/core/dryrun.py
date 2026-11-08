@@ -170,7 +170,7 @@ def dry_run(run: RunFolder, names: Sequence[str], configs: Sequence[Config], des
             run_dir, work = run.folder / "dry-run" / name / config.dir / q.qid, run.slot(0)
             served = session.serve(dataclasses.replace(case_of(run, name, config, q, session), slot=0, work=work))
             data = run.scenario.view(q, 0, dump, run.temp, run.tag, False) if config.own_tools else None
-            text = run.scenario.prompt(q, Access(config.own_tools, data, served, answer_format))
+            text = run.scenario.prompt(q, Access(config.own_tools, data, served, answer_format, run.timeout_s))
             effort, model = (efforts or {}).get(name), (models or {}).get(name)
             off_gpu = agent_off_gpu(config.own_tools, descriptions[config], side_by_side)
             spec = SessionSpec(text, run_dir, work, config.own_tools, data, run.bin, served, run.deny(work, isolation, reads_of(data, dump), off_gpu),
