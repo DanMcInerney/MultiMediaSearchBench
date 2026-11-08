@@ -134,7 +134,7 @@ def run_config(run: RunFolder, name: str, agent: Agent, config: Config, descript
         data = run.scenario.view(q, case.slot, dump, run.temp, run.tag, True) if config.own_tools else None
         if config.own_tools and data is None:
             raise ValueError(f"{run.scenario.name} gave the tools of {config.name} no folder to read")
-        access = Access(config.own_tools, data, served, answer_format)
+        access = Access(config.own_tools, data, served, answer_format, run.timeout_s)
         prompt = run.scenario.prompt(q, access)
         queue = (lambda: session.queue_s(case)) if clock == WORKING else unreported
         spec = SessionSpec(prompt, case.run_dir, case.work, config.own_tools, data, run.bin, served,

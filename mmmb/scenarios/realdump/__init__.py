@@ -40,6 +40,7 @@ SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and w
 # Files, AppData), its output named the owner's agent setup, and the exec ended as an escape, wrong by a rule it was never told.
 STAY = ("Your tools and ffmpeg are all you have: nothing else on this computer is yours to use or look at, and a command that reaches "
         "outside the files' folder and your working folder ends your answer as wrong.")
+LIMIT = "You have {:g} seconds: if you have not answered by then, you are stopped and the answer counts as wrong."  # what `--timeout` holds an exec to
 
 
 def sources_root() -> Path:
@@ -184,7 +185,8 @@ def split(questions: Sequence[Question], seed: int) -> tuple[Question, ...]:
 
 def prompt(question: Question, access: Access, what: str, layout: str) -> str:
     """The prompt for `question` through `access`: the time, how the files are reached (`what` they are; their `layout`, for an agent
-    with its own tools), the question, and how to answer in the shape the question's `shape` tag gives."""
+    with its own tools), the seconds the exec is held to (when `access` gives them), the question, and how to answer in the shape the
+    question's `shape` tag gives."""
     t = datetime.fromisoformat(question.now)
     head = f"It is now {date_text(t.date())}, {t:%H:%M}."
     served, how = access.served, []
@@ -202,6 +204,8 @@ def prompt(question: Question, access: Access, what: str, layout: str) -> str:
     else:
         how.append(f"You cannot see {what}.")
         holder, plural = "what you know", False
+    if access.timeout_s is not None:
+        how.append(LIMIT.format(access.timeout_s))
     end = answer_request(access.answer_format, holder, str(question.tags["shape"]), plural)
     return f"{head} {' '.join(how)}\n\n{question.question}\n\n{end}"
 

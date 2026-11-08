@@ -574,7 +574,7 @@ class Marked:
 
     def prompt(self, question, access):
         SEAM.append(("prompt", question.qid))
-        return f"{'own' if access.own_tools else 'none'}|{access.data}|{access.served.holder}|{question.qid}"
+        return f"{'own' if access.own_tools else 'none'}|{access.data}|{access.served.holder}|{question.qid}|{access.timeout_s:g}"
 
     def after_exec(self, question, out, dump, access):
         SEAM.append(("after_exec", question.qid))
@@ -613,7 +613,7 @@ def test_each_configuration_is_given_what_the_scenarios_view_prompt_and_after_ex
         go(w, {"claude": Agent(agent)}, [config], jobs=1, run=run, only=[q.qid])
         spec = seen[-1]
         assert (spec.own_tools, spec.data) == (config.own_tools, data)
-        assert spec.prompt == f"{'own' if config.own_tools else 'none'}|{data}|{holder}|{q.qid}" and spec.work == run.slot(0)
+        assert spec.prompt == f"{'own' if config.own_tools else 'none'}|{data}|{holder}|{q.qid}|{run.timeout_s:g}" and spec.work == run.slot(0)
         assert spec.deny == run.deny(spec.work, NO_ISOLATION, spec.data) and "in:marked" in spec.deny
         hidden = "in:" + re.sub(r"[\\/]+", "/", str(run.data).lower())  # (U8: the folder cut from the dump is not the dump, so the dump is denied)
         assert (hidden in spec.deny) == config.own_tools, "the dump is hidden from the tools that read a folder cut from it, and from no other"

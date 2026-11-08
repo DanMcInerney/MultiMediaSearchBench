@@ -331,6 +331,7 @@ def test_build_run_and_report_over_the_tiny_card(world, capsys):  # noqa: F811
     prompt = spy.prompts["files", "first-skunk"]
     assert prompt.startswith("It is now Monday 23 December 2013, 09:00. The files of the memory card of my trail camera are in ")
     assert "When did my trail camera first photograph a skunk?" in prompt and "<the date and time, as YYYY-MM-DD HH:MM>" in prompt
+    assert "You have 900 seconds: " in prompt
     capsys.readouterr()
     assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
     figures = fs.read_json(folder / "report.json")
