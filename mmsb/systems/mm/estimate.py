@@ -5,7 +5,7 @@ are counted from the dump when it is ingested (`table_of`, kept as store/windows
 
 A file's windows, by what the dump says of it:
 - a video with a `length` (a camera's clip: one frame in each second it plays): the seconds of its overlap with the range, rounded up, as
-  Multimem's own index estimate counts a video;
+  MultimediaSearch's own index estimate counts a video;
 - a video without one (a screen records only what changes): the seconds of the clock that hold a frame in the range, from the frames the
   reader's own demux finds, as the reader takes the first frame of each second;
 - a picture: one, at its time; a sound: its windows (`audio_s` every `audio_hop_s`), as many as start in the range, which counts the quiet
@@ -24,9 +24,9 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import av
-from multimem import media, reader
-from multimem.decider import About
-from multimem.scripts import ask as ask_script
+from mms import media, reader
+from mms.decider import About
+from mms.scripts import ask as ask_script
 
 from mmsb.core.contract import Dump, ManifestEntry
 from mmsb.core.question import Question
@@ -36,13 +36,13 @@ from mmsb.systems.mm.models import Model
 SLOW_S = 0.15  # a model that takes more seconds a window runs one exec at a time: parallel execs share its GPU queue
 HEAVY_S = 300.0  # an mm exec that may need more GPU seconds than this runs alone on the GPU
 ASK_SHARE = 0.75  # the share of an exec's time its ask can have: the agent's own turns take the rest, so an ask estimated past it cannot finish
-LARGE_PX = 1280 * 720  # pictures of more pixels take the reader longer to decode than mm assumes (`ask.DECODE_S`): measured at ingest
+LARGE_PX = 1280 * 720  # pictures of more pixels take the reader longer to decode than mms assumes (`ask.DECODE_S`): measured at ingest
 VERSION = 1  # of windows.json
 COST_KINDS = ("video", "audio", "text", "records")  # what window_s prices; a picture costs as a video window does
 
 
 def window_s(about: About, kind: str = "video") -> float:
-    """What mm estimates one window of `kind` costs this model at the reader's default profile (`ask.window_seconds`)."""
+    """What mms estimates one window of `kind` costs this model at the reader's default profile (`ask.window_seconds`)."""
     return ask_script.window_seconds(kind, reader.profile_of(None, about), about)
 
 
@@ -73,7 +73,7 @@ def picture_px(path: Path) -> int:
 
 
 def audio_seconds(path: Path) -> float:
-    """How long the sound at `path` plays, as Multimem's index counts it (from its first audio stream's packets)."""
+    """How long the sound at `path` plays, as MultimediaSearch's index counts it (from its first audio stream's packets)."""
     length = media.duration(path, sound=True)
     if length is None:
         raise ValueError(f"{path} has no sound to count windows of")

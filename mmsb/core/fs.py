@@ -1,5 +1,5 @@
 """Files and folders: JSON that is written whole or not at all, deletion that works on Windows for read-only files and links, and
-the frozen data folder with its manifest (moved from bench.py of the Multimem repo, fe0ece5)."""
+the frozen data folder with its manifest (moved from bench.py of the MultimediaSearch repo, fe0ece5)."""
 
 from __future__ import annotations
 

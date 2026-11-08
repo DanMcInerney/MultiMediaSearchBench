@@ -1,5 +1,5 @@
-"""The folders of models that a backend of Multimem claims, with the few files its `claims` reads and an empty model.safetensors (never real weights),
-for the tests of `Mm.ready_model`: `model_folder` and its tables, moved unchanged from tests/conftest.py of Multimem at fe0ece5."""
+"""The folders of models that a backend of MultimediaSearch claims, with the few files its `claims` reads and an empty model.safetensors (never real weights),
+for the tests of `Mm.ready_model`: `model_folder` and its tables, moved unchanged from tests/conftest.py of MultimediaSearch at fe0ece5."""
 
 import json
 from pathlib import Path

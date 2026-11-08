@@ -1,7 +1,7 @@
-"""Ported from tests/test_bench_rules.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order: the six tests of the fake decider's
+"""Ported from tests/test_bench_rules.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the six tests of the fake decider's
 `shade:R,G,B` (the other thirteen are the grader's, tests/test_grade.py). The rules the benchmark's harder haystack leans on, pinned with no agent and
 no daemon: a part of a frame in one shade is found after JPEG and video coding, and not found in a shade 60 away. They are tests/mm's because the
-fake decider is Multimem's (tests/mm/fake_decider.py, copied) and imports its facts (`multimem.decider_d1.ABOUT`). Moved by script, unchanged."""
+fake decider is MultimediaSearch's (tests/mm/fake_decider.py, copied) and imports its facts (`mms.decider_d1.ABOUT`). Moved by script, unchanged."""
 
 from __future__ import annotations
 
@@ -10,14 +10,14 @@ import io
 import numpy as np
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import av  # noqa: E402
 import day  # noqa: E402
 import fake_decider  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from multimem.decider_d1 import ABOUT  # noqa: E402
+from mms.decider_d1 import ABOUT  # noqa: E402
 
 
 SIZE = (640, 360)  # what the reader hands a decider for a screen or a porch camera

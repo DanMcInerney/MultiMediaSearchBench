@@ -36,7 +36,7 @@ import time
 
 import numpy as np
 
-from multimem.decider_d1 import ABOUT
+from mms.decider_d1 import ABOUT
 
 home = None  # set by the loader
 loaded = False  # whether a `load:<s>` word has slept yet

@@ -1,6 +1,6 @@
 """New tests for the V7 scenario as the runner sees it (mmsb/scenarios/__init__.py and v7_screen/__init__.py, prompt.py): the recipe and
 the time zone it records, the hashes, a week built and measured, the prompts as the pilot recorded them, the words an agent may not
-reach, and the scenario run with Multimem and the old modules blocked.
+reach, and the scenario run with MultimediaSearch and the old modules blocked.
 
 Expected values are the recipe's definition, an independent read of the machine's time zone, the files a build left on disk, the pilot's
 recorded prompts (tests/oracles/recorded/pilot-s1/execs.json), and the golden deny words of the old code (tests/oracles/recorded/exec)."""
@@ -235,9 +235,9 @@ def test_the_probe_of_a_built_week_passes_and_reports_in_the_run_folder_and_neve
         V7.probe(recipe, broken, tmp_path / "run", ffmpeg, 7)
 
 
-# -- Multimem absent ---------------------------------------------------------------------------------------------------------------
+# -- MultimediaSearch absent ---------------------------------------------------------------------------------------------------------------
 
-OLD_MODULES = ("multimem", "conftest", "day", "fake_decider", "haystack", "haystack_media", "shortcuts", "grade", "bench", "claude_run",
+OLD_MODULES = ("mms", "conftest", "day", "fake_decider", "haystack", "haystack_media", "shortcuts", "grade", "bench", "claude_run",
                "codex_run", "egolife")
 BLOCKED = f"""
 import sys
@@ -258,8 +258,8 @@ print(len(names), *v7.hashes(v7.recipe(scale="tiny", seed=3, days={DAYS!r})))
 """
 
 
-def test_v7_imports_and_plans_with_multimem_and_the_old_modules_blocked():
-    """The blocker refuses `multimem` and the tests' own `conftest`, `day`, `fake_decider`, and the old root modules, which the editable
+def test_v7_imports_and_plans_with_mms_and_the_old_modules_blocked():
+    """The blocker refuses `mms` and the tests' own `conftest`, `day`, `fake_decider`, and the old root modules, which the editable
     install would otherwise let `import haystack` find without a word."""
     done = subprocess.run([sys.executable, "-c", BLOCKED], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stderr[-1500:]
@@ -267,7 +267,7 @@ def test_v7_imports_and_plans_with_multimem_and_the_old_modules_blocked():
     assert int(count) >= 14 and (plan, files) == V7.hashes(V7.recipe(scale="tiny", seed=3, days=DAYS)), "and the hashes are those of this process"
 
 
-def test_no_module_of_the_scenario_names_the_old_modules_or_multimem():
+def test_no_module_of_the_scenario_names_the_old_modules_or_mms():
     root = Path(__file__).resolve().parents[1] / "mmsb"
     checked = [*(root / "scenarios").rglob("*.py"), root / "core" / "probe.py"]
     for path in checked:

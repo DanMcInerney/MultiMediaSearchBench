@@ -1,6 +1,6 @@
-"""The frames and the sound of a written file as Multimem's reader hands them to a decider: small PyAV copies of `fit`, `_times`,
-`_decode` and `_span` of src/multimem/reader.py at fe0ece5 (`frame_times`, `decode_frames` and `audio_span` here, so that no caller's
-local `times` hides one), so that the writer checks a file as d1 would read it without importing Multimem. tests/mm runs both on the
+"""The frames and the sound of a written file as MultimediaSearch's reader hands them to a decider: small PyAV copies of `fit`, `_times`,
+`_decode` and `_span` of src/mms/reader.py (src/multimem/reader.py at fe0ece5, before the rename) (`frame_times`, `decode_frames` and `audio_span` here, so that no caller's
+local `times` hides one), so that the writer checks a file as d1 would read it without importing MultimediaSearch. tests/mm runs both on the
 same files and asserts that they agree."""
 
 from __future__ import annotations

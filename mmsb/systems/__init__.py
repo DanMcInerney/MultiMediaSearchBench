@@ -12,12 +12,12 @@ is asked for it, and a system whose extra is not installed is refused then, with
     horizon = "cut"                    # or "view" (Description.horizon)
 
     [isolation]                        # applied to every agent shell that has its own tools, whichever system is being run
-    env_drop_prefixes = ["MULTIMEM_"]
-    deny_words = [".multimem"]
-    deny_package_roots = ["multimem"]
+    env_drop_prefixes = ["MMS_"]
+    deny_words = [".mms"]
+    deny_package_roots = ["mms"]
 
     [isolation.env_nowhere]            # variable -> a folder in the working folder that is never made
-    MULTIMEM_HOME = "no-mm-home"
+    MMS_HOME = "no-mm-home"
 """
 
 from __future__ import annotations

@@ -153,7 +153,7 @@ def test_the_checked_in_conversion_is_what_the_converter_writes_from_the_recorde
 
 NEUTRAL = """
 import sys
-BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "multimem", "conftest", "day",
+BLOCKED = {"bench", "haystack", "haystack_media", "shortcuts", "claude_run", "codex_run", "egolife", "grade", "mms", "conftest", "day",
            "fake_decider"}
 
 
@@ -175,7 +175,7 @@ assert not BLOCKED & set(sys.modules), BLOCKED & set(sys.modules)
 """
 
 
-def test_the_report_of_the_converted_pilot_is_the_same_with_the_old_modules_and_multimem_refused(run, tmp_path):
+def test_the_report_of_the_converted_pilot_is_the_same_with_the_old_modules_and_mms_refused(run, tmp_path):
     import subprocess
     import sys
 

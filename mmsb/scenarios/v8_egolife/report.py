@@ -28,7 +28,7 @@ from mmsb.core.stats import median, wilson
 from mmsb.scenarios.v8_egolife.choose import AGE_NAMES
 from mmsb.scenarios.v8_egolife.source import CATEGORIES
 
-# what mm assumes a glasses window costs to decode (Multimem's ask script: DECODE_S), which the recorded Markdown quotes beside the
+# what mms assumes a glasses window costs to decode (MultimediaSearch's ask script: DECODE_S), which the recorded Markdown quotes beside the
 # measured figure; tests/mm asserts that the two agree
 ASSUMED_DECODE_S = 0.010
 

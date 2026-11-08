@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: the run loop of V8 with a
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: the run loop of V8 with a
 stub agent and the report, over the fake download of tests/v8_fake.py. The tests of the scenario's data, build, views and deny words are
 tests/test_v8.py. What moved, by the plan's 3.4, 4.5 and 5.2:
 - the mm arm is the configuration `stub/all` of a stand-in system (tests/stub_system.py), as in tests/test_runner.py; its words in the

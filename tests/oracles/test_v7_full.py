@@ -1,4 +1,4 @@
-"""Oracle 1c: the V7 pilot's whole week built with no Multimem, and compared with the recorded pilot's. All 1,575 files (1,572 and 3 logs)
+"""Oracle 1c: the V7 pilot's whole week built with no MultimediaSearch, and compared with the recorded pilot's. All 1,575 files (1,572 and 3 logs)
 have the size, mtime and sha256 the pilot's had; the shortcut probe over the build passes, as the pilot's did, and writes the
 `shortcuts.json` and `shortcuts.md` the pilot's did, but for the seconds it took.
 

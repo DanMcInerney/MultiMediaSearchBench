@@ -1,4 +1,4 @@
-"""Ported from tests/test_bench.py and tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4): what the command line did, now
+"""Ported from tests/test_bench.py and tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): what the command line did, now
 `mmsb` over any scenario and system, over the scenario `toy` (V7's plan, a dump of three files) and the stand-in system `stub` of
 tests/cli_world.py. What moved, by the plan's 3.2 and 8:
 - `bench.main` is `cli.main`, `agents` is `run`, `decider` is `retrieve`, `--models` is `--configs`, `show_decider` and the system's lines of
@@ -95,7 +95,7 @@ def test_a_dry_run_writes_the_first_exec_of_each_agent_and_configuration_prints_
     assert w.main(*argv(w, "--agents", "claude,codex", "--dry-run", "--timeout", "1200")) == 0
     out = capsys.readouterr().out
     for text in ("--restricted", "--strict-mcp-config", "sandbox_mode=workspace-write", "nothing was run", "ANTHROPIC_API_KEY",
-                 f"question {FIRST}", "environment:", "== claude files", "== claude stub-all", "== codex stub-all", "MULTIMEM_*"):
+                 f"question {FIRST}", "environment:", "== claude files", "== claude stub-all", "== codex stub-all", "MMS_*"):
         assert text in out, text
     for agent in ("claude", "codex"):
         for folder in ("files", "stub-all"):

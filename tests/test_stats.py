@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_bench.py at fe0ece5 (the statistics parts of test_the_difference_gets_newcombes_interval_...,
+"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5 (the statistics parts of test_the_difference_gets_newcombes_interval_...,
 test_the_report_counts_as_it_should and test_claudes_tokens_count_the_cache_...), with `bench.` now `stats.`. The tests marked new
 are not from there: the cells of the two recorded reports, which the old code computed, and laws every input obeys."""
 

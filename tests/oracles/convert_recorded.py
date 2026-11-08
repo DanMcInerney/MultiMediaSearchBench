@@ -14,7 +14,7 @@ It writes, in DIR (refused if it exists: a golden is not regenerated to make a t
                                               system, variant and folder, what its system reads (`readable`) and what it was `asked`
     run.json                                  what `RunFolder.open` needs (the recipe, the hashes, the configurations) and the run's
                                               probe and creation time; `mm_commit` is `COMMIT_KEY` (the benchmark then lived in
-                                              Multimem's repository, so it was the same commit); `timeout_s` is the 900 s the old code
+                                              MultimediaSearch's repository, so it was the same commit); `timeout_s` is the 900 s the old code
                                               had for every run, which the results' `timeout: no answer in 900 s` show; `agents`
                                               has each agent's model and effort, from its results, for `mmsb repeat`
 The expected report (report.json, report.md) is the recorded pair one folder up.

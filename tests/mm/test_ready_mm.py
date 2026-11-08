@@ -1,6 +1,6 @@
 """`Mm.check_ready` (mmsb/systems/mm/system.py, the contract's `System.check_ready`): a run of `files,mm/d1-3B` on a machine without torch used to run
 the `files` cells and then fail at `open`; the CLI now asks every configuration's system before any agent starts (tests/test_ready.py), and this
-is mm's answer, with the real `not_ready` of Multimem over a models folder of a test's own and this environment, which has no torch (the mm-gpu
+is mm's answer, with the real `not_ready` of MultimediaSearch over a models folder of a test's own and this environment, which has no torch (the mm-gpu
 group is not installed). Nothing is started or loaded."""
 
 from __future__ import annotations
@@ -9,7 +9,7 @@ import importlib.util
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 from fakes import FAKE  # noqa: E402
 from model_folders import model_folder  # noqa: E402
@@ -33,11 +33,11 @@ def test_mm_is_not_ready_for_a_model_that_is_not_downloaded_or_whose_environment
     mm = Mm(models_dir=weights)
     with pytest.raises(ValueError, match=r"d1-3B: its env is not ready: torch is not installed.*uv sync --group mm-gpu"):
         mm.check_ready("d1-3B")
-    with pytest.raises(ValueError, match="d1-3B: not downloaded: mm model use d1-3B"):
+    with pytest.raises(ValueError, match="d1-3B: not downloaded: mms model use d1-3B"):
         Mm(models_dir=tmp_path / "empty").check_ready("d1-3B")
     with pytest.raises(ValueError, match="mm has variants"):
         mm.check_ready(None)
-    with pytest.raises(ValueError, match="nonsense: not a model mm knows"):
+    with pytest.raises(ValueError, match="nonsense: not a model mms knows"):
         mm.check_ready("nonsense")
     # what `describe` and `preview` need is the model's facts, which they have whether or not it can run
     assert mm.describe("d1-3B").needs_gpu

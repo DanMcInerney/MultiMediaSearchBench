@@ -1,4 +1,4 @@
-"""The mm system (DESIGN 3): Multimem's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
+"""The mm system (DESIGN 3): MultimediaSearch's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
 `open`); `MmSession` is what `run_config` calls for a run of one (agent, variant): it owns a copy of the ingested store and the daemon
 over it, serves each case its server, skill and notes, holds cases back by the rules of the old `run_arm` (`admits`, `max_jobs`) and takes
 an exec's state out of the home when it ends (`reset`).
@@ -30,8 +30,8 @@ from collections.abc import Mapping, Sequence
 from importlib import resources
 from pathlib import Path
 
-from multimem.adapter import INSTRUCTIONS
-from multimem.project import MARKER
+from mms.adapter import INSTRUCTIONS
+from mms.project import MARKER
 
 from mmsb.core import fs
 from mmsb.core.contract import (BEYOND_TIMEOUT, EXCLUSIVE, GPU_ESTIMATE_S, Case, Description, Dump, IngestReport, McpServer, PlainSession,
@@ -54,10 +54,10 @@ SERVER = "mm"  # the MCP server's name in the agents: `mcp__mm__ask`
 LOOKS = "looks"  # the folder of a home where `look` writes the pictures and sounds it shows: the agent with its own tools may open them
 TOOLS = ("ask", "find", "look", "label")  # the only mm tools the agents are offered: none that reads the disk
 CLOCK_NOTE = "mm's clock reads a later date than now: give since and until as dates and times, not as ages or \"now\"."
-CLOCK_LATE_S = 3600.0  # mm's clock is the machine's: a case whose `now` is more than this earlier needs the note
+CLOCK_LATE_S = 3600.0  # mms's clock is the machine's: a case whose `now` is more than this earlier needs the note
 INGEST_VERSION = 1  # bumped when ingest stores something other than before
-SKILL = resources.files("multimem") / "skills" / "multimem-questions" / "SKILL.md"
-NOTES_DIR = resources.files("multimem") / "skills" / "multimem-questions" / "models"
+SKILL = resources.files("mms") / "skills" / "mms-questions" / "SKILL.md"
+NOTES_DIR = resources.files("mms") / "skills" / "mms-questions" / "models"
 
 
 def notes_text(notes: str) -> str:
@@ -67,13 +67,22 @@ def notes_text(notes: str) -> str:
     return (NOTES_DIR / notes).read_text(encoding="utf-8")
 
 
+def installed_version() -> str:
+    """What `mms` was installed as: the short commit when uv installed it from git (the `mms = { git = ... }` source of pyproject.toml, which
+    the installed metadata records in `direct_url.json`: the version alone, 0.1.0, would not tell two commits apart), else its version."""
+    dist = importlib.metadata.distribution("mms")
+    direct = json.loads(dist.read_text("direct_url.json") or "{}")
+    commit = direct.get("vcs_info", {}).get("commit_id")
+    return commit[:7] if commit else dist.version
+
+
 @functools.cache
 def version_of() -> str:
-    """Multimem's short commit, `+dirty` when tracked files differ from it, when it is a checkout (read only: git is told not to touch
-    the index); else the version it was installed as."""
-    root = package_root("multimem")
+    """MultimediaSearch's short commit, `+dirty` when tracked files differ from it, when it is a checkout (read only: git is told not to touch
+    the index); else what it was installed as (`installed_version`)."""
+    root = package_root("mms")
     if root is None or not (root / ".git").exists():
-        return importlib.metadata.version("multimem")
+        return installed_version()
 
     def git(*args: str) -> str:
         return subprocess.run(["git", "--no-optional-locks", "-C", str(root), *args], capture_output=True, text=True, check=True).stdout.strip()
@@ -126,7 +135,7 @@ def jobs_of(model: Model, cases: Sequence[Case], requested: int) -> int:
 def served_of(home: Path, parts: tuple[str, ...], case: Case, context: SessionContext, busy_at_start: int | None) -> Served:
     """The server over `home`, its instructions and the fields added to the result of the exec of `case`: all that `serve` gives that
     needs no daemon."""
-    args = ("-m", "multimem.cli", "--home", str(home), "mcp", "--tools", ",".join(TOOLS))
+    args = ("-m", "mms.cli", "--home", str(home), "mcp", "--tools", ",".join(TOOLS))
     server = McpServer(SERVER, sys.executable, args, {"CLAUDE_PROJECT_DIR": str(case.work)}, TOOLS)
     clock = CLOCK_NOTE if context.wall() - case.now > CLOCK_LATE_S else None
     return Served(server, BASE, parts, INSTRUCTIONS, SERVER, clock, serve_record(case.estimate_s, context.timeout_s, busy_at_start),
@@ -134,7 +143,7 @@ def served_of(home: Path, parts: tuple[str, ...], case: Case, context: SessionCo
 
 
 class Mm:
-    """Multimem as a system. `models` are variants this instance knows besides the ones in the models folder (a test's fake decider);
+    """MultimediaSearch as a system. `models` are variants this instance knows besides the ones in the models folder (a test's fake decider);
     a variant it does not know is looked for in `models_dir`, where it must be ready to run."""
 
     def __init__(self, models: Mapping[str, Model] | None = None, models_dir: Path = MODELS_DIR) -> None:
@@ -215,8 +224,8 @@ class Mm:
 
 
 class NoQueue(PlainSession):
-    """What both of mm's sessions share: Multimem keeps no per-job wait, so they cannot say how long a case queued for the GPU (decision
-    D3, a change in Multimem). The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
+    """What both of mm's sessions share: MultimediaSearch keeps no per-job wait, so they cannot say how long a case queued for the GPU (decision
+    D3, a change in MultimediaSearch). The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
 
     def queue_s(self, case: Case) -> float | None:
         return None

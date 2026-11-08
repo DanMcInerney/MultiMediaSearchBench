@@ -134,7 +134,7 @@ def check_sounds(f: File, samples: np.ndarray) -> None:
 
 def exif_of(t: float) -> Image.Exif:
     """The EXIF of a phone's photo taken at `t` (local epoch): DateTimeOriginal as the wall clock then, and OffsetTimeOriginal, the local
-    offset at that moment (`+01:00`), as a phone writes them. Both are what `mm remember` reads a picture's time from."""
+    offset at that moment (`+01:00`), as a phone writes them. Both are what `mms remember` reads a picture's time from."""
     when = datetime.fromtimestamp(t)
     zone = when.astimezone().strftime("%z")
     exif = Image.Exif()

@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_haystack.py at fe0ece5 (24 of its 31 tests; the other 7 are tests/mm's or the select tests).
+"""Ported from MultimediaSearch tests/test_haystack.py at fe0ece5 (24 of its 31 tests; the other 7 are tests/mm's or the select tests).
 
 The 7 left out start a daemon, use `load`, `windows_in` or the real reader, or ask which model reads what. Its graders are the core's now.
 

@@ -1,4 +1,4 @@
-"""Ported from Multimem tests/test_shortcuts.py at fe0ece5 (all 31 tests).
+"""Ported from MultimediaSearch tests/test_shortcuts.py at fe0ece5 (all 31 tests).
 
 The shortcut probe (`shortcuts.py`): on a small haystack of its own, written with the `media_*` writers into a temporary
 folder, it finds the shortcuts that single a needle out (a colour filter, frame differencing, a band filter, the file's size) and

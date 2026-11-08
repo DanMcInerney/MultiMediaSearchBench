@@ -1,6 +1,6 @@
 """What the tests of the cache (tests/test_cache.py) build over: a scenario of three small files that counts its builds, can be told to block
 half way (for a second process to meet it) or to fail, and a system that counts its ingests. Nothing here starts an agent or imports
-multimem; the scenario is a module-like object with the names core/cache.py reads (`name`, `generator`, `build`)."""
+mms; the scenario is a module-like object with the names core/cache.py reads (`name`, `generator`, `build`)."""
 
 from __future__ import annotations
 

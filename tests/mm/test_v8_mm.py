@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 3: the tests of V8 that need the mm system,
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 3: the tests of V8 that need the mm system,
 over the fake EgoLife download of tests/v8_fake.py (a two-day download with tiny clips; the rest of V8's tests are tests/test_v8*.py) and a daemon with the
 fake decider. What moved, by the plan's 3.4, 4.5, 4.6 and 5.2: the arm `mm` is the configuration `mm/fake`; `egolife.set_horizon`, `audit`, `check_snapshot`
 and `HorizonLeak` are the system's (`mmsb.systems.mm`); the decider tier is `Session.oracle` through the core's `run_retrieval`; `bench.run_agents` is the
@@ -21,13 +21,13 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import MM, S, Probe, home_of, made_up_ffmpeg  # noqa: E402
 from v8_fake import (BLIND, FILES, SHADE, V8, WORD, built, clip_ends, ep, lines_by, oracle_file, plan, recipe, source, table, write_run)  # noqa: E402,F401
 
-from multimem import config  # noqa: E402
+from mms import config  # noqa: E402
 
 from mmsb import systems  # noqa: E402
 from mmsb.core import fs, retrieval  # noqa: E402
@@ -305,11 +305,11 @@ def test_the_audit_counts_recordings_past_the_horizon_in_asks_finds_and_looks(bu
     assert audit([ask_], h, None) == {"after_horizon": 0, "asks": 1, "asks_past_horizon": 0}, "a time at H is not past it"
     late = call("ask", {"job": "j2", "sightings": [{"t0": iso(h + 5), "t1": iso(h + 6)}], "candidates": [{"t": iso(h + 9)}]}, question="q")
     assert audit([late, call("ask", {"job": "j2"}, job="j2")], h, None) == {"after_horizon": 3, "asks": 1, "asks_past_horizon": 1}
-    # an ask with `questions` counts; one mm refused (no job in its result) does not, whatever its until says
+    # an ask with `questions` counts; one mms refused (no job in its result) does not, whatever its until says
     several = call("ask", {"job": "j3"}, questions={"a": {}, "b": {}}, until="2026-10-30T21:30:00")
     refused = {"tool": "ask", "arguments": {"question": "q", "until": "yesterday morning"}, "result": "bad_request: until is a time"}
     assert audit([refused, several], h, None) == {"after_horizon": 0, "asks": 1, "asks_past_horizon": 1}
-    # a find's rows, but not the labels the agent made itself (mm dates them by its clock, days later than the question)
+    # a find's rows, but not the labels the agent made itself (mms dates them by its clock, days later than the question)
     found = call("find", {"results": [{"type": "item", "t0": iso(h - 1), "t1": iso(h + 1)}, {"type": "record", "t0": iso(h + 30), "t1": None},
                                       {"type": "label", "t0": iso(h + 40), "t1": iso(h + 41)}]})
     assert audit([found], h, None)["after_horizon"] == 2
@@ -372,7 +372,7 @@ def test_the_estimate_is_the_decider_ask_at_the_cost_of_a_window_here(built, dec
     assert 0 < decided[1]["ego-001"]["windows"] <= windows, "and the ask with the gate reads no more: these still clips join their frames"
     speech = by["ego-008"]
     assert opened.estimate(speech.scope.sources, speech.cost_ranges) == pytest.approx(window_s(about, "records")), "a record window"
-    assert opened.table["decode_s"] == {}, "these clips are 64x64: the reader's decode is what mm assumes, and none is added"
+    assert opened.table["decode_s"] == {}, "these clips are 64x64: the reader's decode is what mms assumes, and none is added"
 
 
 def test_the_decode_of_a_window_is_measured_over_the_first_a_middle_and_the_last_clip(built):

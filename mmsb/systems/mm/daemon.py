@@ -1,8 +1,8 @@
-"""The daemon of an mm home, as the benchmark starts and calls it (moved from the fixtures of tests/conftest.py of Multimem at fe0ece5,
-which the old bench.py imported): `Daemon` runs `mm start` in a process of its own over a home, `Api` calls it, `write_config` writes
-the home's config and approves the sources in it as `mm approve` does, and `wait_for` polls. A daemon is always over the home it is
-given: its process gets MULTIMEM_HOME set to it, and its API is on a port the operating system picks and writes to the home's
-`daemon.json`. Nothing here reads or writes ~/.multimem, and no code of this repository stops or calls a daemon it did not start."""
+"""The daemon of an mms home, as the benchmark starts and calls it (moved from the fixtures of tests/conftest.py of MultimediaSearch at fe0ece5,
+which the old bench.py imported): `Daemon` runs `mms start` in a process of its own over a home, `Api` calls it, `write_config` writes
+the home's config and approves the sources in it as `mms approve` does, and `wait_for` polls. A daemon is always over the home it is
+given: its process gets MMS_HOME set to it, and its API is on a port the operating system picks and writes to the home's
+`daemon.json`. Nothing here reads or writes ~/.mms, and no code of this repository stops or calls a daemon it did not start."""
 
 from __future__ import annotations
 
@@ -14,22 +14,22 @@ import sys
 import time
 from pathlib import Path
 
-from multimem import config as configuration
-from multimem import consent
+from mms import config as configuration
+from mms import consent
 
 
 def env(home: Path) -> dict:
-    out = dict(os.environ, MULTIMEM_HOME=str(home), PYTHONUTF8="1", HF_HUB_OFFLINE="1")  # the daemon never downloads
+    out = dict(os.environ, MMS_HOME=str(home), PYTHONUTF8="1", HF_HUB_OFFLINE="1")  # the daemon never downloads
     out.pop("PYTHONPATH", None)
     return out
 
 
-def mm(home: Path, *args: str, check: bool = True, timeout: float = 120, cwd: Path | None = None) -> subprocess.CompletedProcess:
+def mms(home: Path, *args: str, check: bool = True, timeout: float = 120, cwd: Path | None = None) -> subprocess.CompletedProcess:
     """Run the CLI as the agent would, in its own process, in `cwd` (the home, which is in no project, unless given)."""
-    done = subprocess.run([sys.executable, "-m", "multimem.cli", *args], env=env(home), capture_output=True,
+    done = subprocess.run([sys.executable, "-m", "mms.cli", *args], env=env(home), capture_output=True,
                           text=True, encoding="utf-8", timeout=timeout, cwd=cwd or home)
     if check and done.returncode != 0:
-        raise AssertionError(f"mm {' '.join(args)} exited {done.returncode}\n{done.stdout}\n{done.stderr}")
+        raise AssertionError(f"mms {' '.join(args)} exited {done.returncode}\n{done.stdout}\n{done.stderr}")
     return done
 
 
@@ -78,7 +78,7 @@ class Api:
 
 
 class Daemon:
-    """`mm start` in its own process; `stop()` asks it to stop with `mm stop` and waits."""
+    """`mms start` in its own process; `stop()` asks it to stop with `mms stop` and waits."""
 
     def __init__(self, home: Path):
         self.home = home
@@ -88,7 +88,7 @@ class Daemon:
 
     def start(self, ready: bool = True) -> "Daemon":
         self._out = open(self.log, "ab")
-        self.process = subprocess.Popen([sys.executable, "-m", "multimem.cli", "start"], env=env(self.home),
+        self.process = subprocess.Popen([sys.executable, "-m", "mms.cli", "start"], env=env(self.home),
                                         stdout=self._out, stderr=subprocess.STDOUT)
         if ready:
             self.wait_ready()
@@ -107,7 +107,7 @@ class Daemon:
     def stop(self, timeout: float = 30) -> int:
         if self.process is None or self.process.poll() is not None:
             return self.process.returncode if self.process else 0
-        mm(self.home, "stop", check=False)
+        mms(self.home, "stop", check=False)
         try:
             self.process.wait(timeout)
         except subprocess.TimeoutExpired:
@@ -126,9 +126,9 @@ class Daemon:
 
 
 def write_config(home: Path, text: str, approve: bool = True) -> None:
-    """Write `multimem.toml`, and approve every source in it that needs it (as `mm approve` does once the owner has
+    """Write `mms.toml`, and approve every source in it that needs it (as `mms approve` does once the owner has
     typed the name), unless told not to."""
-    (home / "multimem.toml").write_text(text, encoding="utf-8")
+    (home / "mms.toml").write_text(text, encoding="utf-8")
     if approve:
         for name, source in configuration.load(home).sources.items():
             if source.what() is not None:

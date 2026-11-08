@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("multimem")
+pytest.importorskip("mms")
 
 from v7_recorded import needs_the_recorded_zone  # noqa: E402
 

@@ -1,6 +1,6 @@
 """The fake EgoLife download of the V8 tests and the fixtures they share (tests/test_v8.py, tests/test_v8_run.py): a two-day download (tiny
 clips made with ffmpeg, SRT files with the real file's oddities, a QA file of about twenty items; copied from tests/test_egolife.py of
-Multimem at fe0ece5), the recipe, plan and dump made from it, and the run folder a build writes. A test module imports the fixtures it
+MultimediaSearch at fe0ece5), the recipe, plan and dump made from it, and the run folder a build writes. A test module imports the fixtures it
 uses; `oracle_file` is autouse, so a module that imports it plans with this file's oracles instead of the 50 the recorded run chose."""
 
 from __future__ import annotations

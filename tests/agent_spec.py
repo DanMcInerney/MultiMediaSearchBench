@@ -1,5 +1,5 @@
 """SessionSpecs for the tests of the agents: the four modes of an exec (blind, files, a server, a server and files) with a server and
-instructions shaped like the ones recorded, built by hand. Nothing here imports multimem or starts a process."""
+instructions shaped like the ones recorded, built by hand. Nothing here imports mms or starts a process."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from mmsb.core.agents.spec import SessionSpec
 from mmsb.core.contract import Isolation, McpServer, Served
 
 # what the system.toml of the system with a private home declare (plan 4.2); the recorded env.json files are the check of these
-ISOLATION = Isolation(env_drop_prefixes=("MULTIMEM_",), deny_words=(".multimem/", '.multimem"', ".multimem ", ".multimem'"),
-                      deny_package_roots=("multimem",), env_nowhere={"MULTIMEM_HOME": "no-mm-home"})
+ISOLATION = Isolation(env_drop_prefixes=("MMS_",), deny_words=(".mms/", '.mms"', ".mms ", ".mms'"),
+                      deny_package_roots=("mms",), env_nowhere={"MMS_HOME": "no-mm-home"})
 NO_ISOLATION = Isolation(env_drop_prefixes=(), deny_words=(), deny_package_roots=(), env_nowhere={})
 TOOLS = ("ask", "find", "look", "label")
 BASE_LINE = "You answer the user's question from their memory, using the mm tools."
@@ -33,7 +33,7 @@ def clocked(spec: SessionSpec, seconds: float) -> dict:
 
 def server_of(home: Path, work: Path, name: str = "mm", tools: tuple[str, ...] = TOOLS) -> McpServer:
     """The server as recorded in the pilot's mcp.json: this interpreter running a module with a home, in the project of `work`."""
-    args = ("-m", "multimem.cli", "--home", str(home), "mcp", "--tools", ",".join(tools))
+    args = ("-m", "mms.cli", "--home", str(home), "mcp", "--tools", ",".join(tools))
     return McpServer(name=name, command=sys.executable, args=args, env={"CLAUDE_PROJECT_DIR": str(work)}, tools=tools)
 
 

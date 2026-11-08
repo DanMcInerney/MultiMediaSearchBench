@@ -1,7 +1,7 @@
 """The phone's pictures that the files are made of: a wall or hedge photo, the card and stamp of a phone clip, and the portrait clip a
 phone makes (frames coded sideways and a display matrix, which a player turns upright). `photo_image` draws a photo spec and
 `photo_needle` says which needle a photo is. Moved from haystack.py of the repository at bb498a6 and, for `portrait_video` and its
-helpers, from tests/day.py of Multimem at fe0ece5."""
+helpers, from tests/day.py of MultimediaSearch at fe0ece5."""
 
 from __future__ import annotations
 

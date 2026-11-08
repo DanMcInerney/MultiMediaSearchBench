@@ -1,5 +1,5 @@
 """A stand-in system, session and agent for the tests of the runner (plan 7.4: neutral loop tests use a `StubSystem` built from recorded
-fields), and the folders of a run they run in. Nothing here starts a process or imports multimem.
+fields), and the folders of a run they run in. Nothing here starts a process or imports mms.
 
 What the stub system copies from the recorded runs is the shape of what a real session adds to a result (the fields `gpu_estimate_s`,
 `exclusive`, `beyond_timeout`, `busy_at_start`, `left`, `cancelled`, `unended`, `orphans`, `settle_s` of the pilot's results), and from the

@@ -13,6 +13,7 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+from golden_names import golden_json
 from test_question import BASE, file_of
 
 from mmsb.core import fs, paths
@@ -23,13 +24,13 @@ from mmsb.core.question import load_questions, write_questions
 from mmsb.core.runfolder import IN_ONLY, JOBS_MAX, RunFolder, check_temp, package_root
 
 RECORDED = Path(__file__).parent / "oracles" / "recorded"
-DENY = {name: json.loads((RECORDED / "exec" / f"deny-{name}.json").read_text(encoding="utf-8")) for name in ("v7", "v8")}
+DENY = {name: golden_json(RECORDED / "exec" / f"deny-{name}.json") for name in ("v7", "v8")}  # with the renames of tests/golden_names.py: `.mms`
 PILOT = json.loads((RECORDED / "pilot-s1" / "run.json").read_text(encoding="utf-8"))
 RECIPE = {"scale": "pilot", "seed": 1}  # what the stub scenario is built from; its hashes are the recorded pilot's
 SENTINEL = DENY["v7"]["inputs"]  # D:\__RUN__, D:\__TEMP__, D:\__OUT__, D:\__ROOT__, tag TAG
 CACHE = r"D:\__CACHE__"  # the golden has no cache folder: the old code had none
 NO_ISOLATION = Isolation((), (), (), {})
-MM_ISOLATION = Isolation(("MULTIMEM_",), (".multimem",), (), {"MULTIMEM_HOME": "no-mm-home"})
+MM_ISOLATION = Isolation(("MMS_",), (".mms",), (), {"MMS_HOME": "no-mm-home"})
 DEFAULTS = {"files": None, "mm": "d1-3B"}
 # the old DENY_WORDS' path part for the old out folder, which G1's F1 keeps, and the same rule for the sentinel runs and cache folders, for the
 # results and the temp folder of the runs recorded before MMSB, and for the tests' folder
@@ -125,8 +126,8 @@ def test_the_isolation_given_adds_its_words_and_the_agents_setup_is_denied_whate
     scenario = StubScenario()
     with_mm = run_of(scenario).deny(None, MM_ISOLATION)
     without = run_of(scenario).deny(None, NO_ISOLATION)
-    assert set(with_mm) - set(without) == {".multimem"} and set(without) <= set(with_mm)
-    assert ".claude" in without and ".codex" in without and ".multimem" not in without
+    assert set(with_mm) - set(without) == {".mms"} and set(without) <= set(with_mm)
+    assert ".claude" in without and ".codex" in without and ".mms" not in without
 
 
 def test_every_word_is_lower_case_with_forward_slashes_and_only_the_other_slots_are_denied_by_name(sentinels):

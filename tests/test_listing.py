@@ -216,7 +216,7 @@ def test_the_server_imports_nothing_that_could_open_a_recording_and_starts_with_
     """It is given the listing file and no path to the dump: with the picture and media libraries and this package refused to its process it
     answers all the same."""
     dump, listing = week
-    forbidden = {"PIL", "av", "numpy", "imageio_ffmpeg", "mmsb", "multimem"}
+    forbidden = {"PIL", "av", "numpy", "imageio_ffmpeg", "mmsb", "mms"}
     tree = ast.parse(Path(server.__file__).read_text(encoding="utf-8"))
     imported = {(n.module or "").split(".")[0] if isinstance(n, ast.ImportFrom) else a.name.split(".")[0]
                 for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom)) for a in getattr(n, "names", [None])}
@@ -409,6 +409,6 @@ def test_describe_says_what_the_system_is_and_its_hashes_cover_the_tools_and_the
         assert other.store_hash != d.store_hash and other.config_hash != d.config_hash, name
 
 
-def test_the_fast_neutrality_check_walks_the_listing_with_multimem_refused():
+def test_the_fast_neutrality_check_walks_the_listing_with_mms_refused():
     seen = modules_walked()
     assert {"mmsb.systems.listing", "mmsb.systems.listing.system", "mmsb.systems.listing.server", "mmsb.systems.listing.read"} <= set(seen)

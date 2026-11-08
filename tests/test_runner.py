@@ -1,4 +1,4 @@
-"""Ported from tests/test_bench.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order: the benchmark's run loop with a stub
+"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the benchmark's run loop with a stub
 agent, over a stand-in system (tests/stub_system.py) instead of a tiny week loaded into a daemon. What moved, by the plan's 3.2 and 4.5:
 - `arm` is the configuration (`files`, `stub/all`: a system with variants, standing for the old mm arm of a fake decider), `Exec` is the
   `SessionSpec` the agent gets, `Run` is `RunFolder` with a scenario, and the mm-only steps (home, daemon, scrub) are the stub session's;
@@ -241,10 +241,10 @@ def test_the_folders_of_an_agent_with_its_own_tools_may_not_hold_a_word_it_is_re
         dataclasses.replace(run, data=tmp_path / "mmsb-runs" / "data").check_paths(NO_ISOLATION)
     with pytest.raises(ValueError, match=r"\.codex"):
         dataclasses.replace(run, data=tmp_path / ".codex" / "data").check_paths(NO_ISOLATION)
-    held = dataclasses.replace(run, data=tmp_path / "x.multimem" / "data")
+    held = dataclasses.replace(run, data=tmp_path / "x.mms" / "data")
     held.check_paths(NO_ISOLATION)
-    with pytest.raises(ValueError, match=r"\.multimem"):
-        held.check_paths(dataclasses.replace(NO_ISOLATION, deny_words=(".multimem",)))
+    with pytest.raises(ValueError, match=r"\.mms"):
+        held.check_paths(dataclasses.replace(NO_ISOLATION, deny_words=(".mms",)))
 
 
 def test_a_timeout_a_cap_and_an_escape_are_wrong_answers_that_are_done(world):

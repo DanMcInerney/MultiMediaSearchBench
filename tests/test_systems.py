@@ -133,11 +133,11 @@ def test_a_system_whose_extra_is_not_installed_is_refused_with_the_extra_to_inst
         systems.load("mine", folder)  # a missing part of the system's own package is a fault of the system, not of the environment
 
 
-def test_the_mm_system_is_refused_with_the_extra_to_install_when_multimem_is_absent():
+def test_the_mm_system_is_refused_with_the_extra_to_install_when_mms_is_absent():
     import importlib.util
 
-    if importlib.util.find_spec("multimem") is not None:
-        pytest.skip("multimem is installed here: the mm extra is not missing")
+    if importlib.util.find_spec("mms") is not None:
+        pytest.skip("mms is installed here: the mm extra is not missing")
     if not (ROOT / "mmsb" / "systems" / "mm" / "system.py").exists():
         pytest.skip("mmsb/systems/mm/system.py is U7's and is not here yet, so importing mm fails for want of the module, not of the extra")
     with pytest.raises(systems.ExtraMissing) as error:
@@ -160,13 +160,13 @@ def test_the_files_system_has_nothing_to_ingest_or_serve_and_reads_every_modalit
     assert isinstance(session, PlainSession)
 
 
-def test_the_runner_and_the_registry_import_with_multimem_and_the_old_root_modules_refused():
+def test_the_runner_and_the_registry_import_with_mms_and_the_old_root_modules_refused():
     """A process whose import system refuses the old root modules (which the editable install would let through unnoticed) and
-    multimem, the tests' helpers and the fake decider: the new code must not reach for any of them."""
+    mms, the tests' helpers and the fake decider: the new code must not reach for any of them."""
     code = textwrap.dedent("""\
         import importlib, sys
         BLOCKED = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts",
-                   "multimem", "conftest", "day", "fake_decider"}
+                   "mms", "conftest", "day", "fake_decider"}
 
         class Blocker:
             def find_spec(self, name, path=None, target=None):
@@ -178,7 +178,7 @@ def test_the_runner_and_the_registry_import_with_multimem_and_the_old_root_modul
                      "mmsb.core.select", "mmsb.core.costing", "mmsb.core.runfolder", "mmsb.core.runner"):
             importlib.import_module(name)
         from mmsb import systems
-        assert systems.isolation().deny_package_roots == ("multimem",)
+        assert systems.isolation().deny_package_roots == ("mms",)
         assert type(systems.load("files")).__name__ == "Files"
         from mmsb.core.runner import real_agents
         assert set(real_agents()) == {"claude", "codex"}
@@ -191,10 +191,10 @@ def test_the_runner_and_the_registry_import_with_multimem_and_the_old_root_modul
     assert done.returncode == 0 and done.stdout.strip() == "ok", done.stderr[-1500:]
 
 
-def test_no_file_of_the_runner_imports_an_old_root_module_or_multimem_or_names_a_system():
+def test_no_file_of_the_runner_imports_an_old_root_module_or_mms_or_names_a_system():
     import ast
 
-    old = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts", "multimem"}
+    old = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts", "mms"}
     core = ["runner", "record", "schedule", "select", "costing", "gpu"]
     for file in [*(ROOT / "mmsb" / "core" / f"{n}.py" for n in core), ROOT / "mmsb" / "systems" / "__init__.py",
                  ROOT / "mmsb" / "systems" / "files" / "system.py"]:

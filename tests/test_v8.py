@@ -1,4 +1,4 @@
-"""Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order: V8, EgoLifeQA without Multimem, over a
+"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: V8, EgoLifeQA without MultimediaSearch, over a
 two-day fake download (tests/v8_fake.py) that is read, selected from, planned and built into a dump with its questions. What an agent with its
 own tools reads is tests/test_v8_view.py, the run loop and the report tests/test_v8_run.py. No real agent or model runs, and no daemon: the
 old `built` fixture started one to load a snapshot, and is the dump (`built`) and the run over it (`ran` in test_v8_run.py) here.

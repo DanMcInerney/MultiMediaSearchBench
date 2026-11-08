@@ -33,13 +33,13 @@ the source's own labels.
 About a quarter of each scenario's questions are about things that never happened, and about 30% are `dev`.
 
 - **Systems:** `files` (the agent alone with the files and its own tools: the baseline), `listing` (file names, sizes, times
-  and metadata only: the floor and the leak check), and any plug-in search system. `mm` (Multimem's local model) is one,
+  and metadata only: the floor and the leak check), and any plug-in search system. `mm` (MultimediaSearch, `mms`, with a local model) is one,
   optional.
 - **Agents:** Claude Code and Codex, locked down.
 - **Checked with real agents:** a tiny run of `i3_trailcam` with Claude and Codex in `files` and `listing` (TESTING.md), and
   the baseline below: 5 questions of each scenario.
 - **Extras:** V7, the synthetic week of a screen, phone, door camera, microphone and logs that mm was tuned on, and V8,
-  EgoLifeQA over the EgoLife smart-glasses video. Both came from Multimem's work and stay as they were.
+  EgoLifeQA over the EgoLife smart-glasses video. Both came from the work on MultimediaSearch (then called Multimem) and stay as they were.
 - **Not done:** full runs of the four scenarios with real agents (paid), and everything that needs the GPU (DESIGN.md
   section 12).
 
@@ -77,11 +77,11 @@ The four reports are in [results/2026-11-06-baseline](results/2026-11-06-baselin
 
 Needs Python 3.12 and [uv](https://docs.astral.sh/uv/). A real run also needs the Claude Code and Codex CLIs signed in (the
 runs use your plans' quota), Git for Windows (Claude's shell tool needs it), and, for the `mm` system, an NVIDIA GPU with
-Multimem's model installed.
+MultimediaSearch's model installed.
 
 ```
 uv sync                              # the core, the scenarios, the files and listing systems, and pytest
-uv sync --extra mm                   # also Multimem, for the mm system
+uv sync --extra mm                   # also MultimediaSearch (`mms`), for the mm system
 uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's real decision model
 ```
 
@@ -96,9 +96,10 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
   folder. A pile built from it is the same as one built here, file for file. SINS (A1) is not in it, because its licence
   forbids passing it on: download it from Zenodo as [MEDIA.md](MEDIA.md) says.
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
-- The `mm` extra is a path to Multimem's checkout (`C:/Users/danhm/tools/Multimem` in `pyproject.toml`), because Multimem
-  has no git remote. On a machine without it, set `UV_FROZEN=1`: `uv sync` and `uv run` then install from `uv.lock`
-  without looking for Multimem, which they otherwise fail to find even when the extra is not asked for.
+- The `mm` system runs MultimediaSearch (`mms`, [github.com/DanMcInerney/MultimediaSearch](https://github.com/DanMcInerney/MultimediaSearch)).
+  The `mm` extra installs it from there, at the commit `pyproject.toml` and `uv.lock` pin, so `uv sync --extra mm` needs the
+  network and no checkout of it. The benchmark's own name for the system stays `mm`: configurations like `mm+files`, folders like
+  `mm-d1-3B`.
 - The libraries that write the V7 week are pinned, because its bytes depend on them. ffmpeg comes with `imageio-ffmpeg`.
 
 ## Run it
@@ -127,7 +128,7 @@ uv run mmsb report <run>
   stopped.
 - `run` never ingests: a configuration whose system has no store in the run is refused, with the `mmsb ingest` command to
   make it. To use mm: `uv sync --extra mm`, then `--configs files,mm` on `build` and on `run`. mm runs one exec at a time, because
-  it needs the GPU and the laptop's driver crashed under three at once. `--gpu-jobs 2` asks for more, and until Multimem reports
+  it needs the GPU and the laptop's driver crashed under three at once. `--gpu-jobs 2` asks for more, and until MultimediaSearch reports
   its queue the working clock refuses it (`--clock wall` lets it through, with a warning).
 
 Commands, each with `--help`:
@@ -141,7 +142,7 @@ Commands, each with `--help`:
 | `mmsb report RUN [RUN ...]` | figures and Markdown; runs of one real scenario (or of V7) are pooled, V8's are reported one at a time, and runs of several scenarios get a table over all |
 | `mmsb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
 | `mmsb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
-| `mmsb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until Multimem reports its queue) |
+| `mmsb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet; for mm it needs `--gpu-jobs 2` or more and is refused until MultimediaSearch reports its queue) |
 
 ## Systems and configurations
 
