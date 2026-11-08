@@ -18,11 +18,11 @@ import fakes  # noqa: E402
 from fakes import FAKE_MODEL, Opened, context  # noqa: E402
 from test_mm_arm import NoDaemon, labels_left  # noqa: E402
 
-from mmmb.core.contract import Case  # noqa: E402
-from mmmb.systems.mm.daemon import Api  # noqa: E402
-from mmmb.systems.mm.estimate import HEAVY_S  # noqa: E402
-from mmmb.systems.mm.home import exec_project  # noqa: E402
-from mmmb.systems.mm.system import MmSession  # noqa: E402
+from mmsb.core.contract import Case  # noqa: E402
+from mmsb.systems.mm.daemon import Api  # noqa: E402
+from mmsb.systems.mm.estimate import HEAVY_S  # noqa: E402
+from mmsb.systems.mm.home import exec_project  # noqa: E402
+from mmsb.systems.mm.system import MmSession  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 

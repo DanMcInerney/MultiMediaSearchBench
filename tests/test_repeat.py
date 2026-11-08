@@ -1,4 +1,4 @@
-"""`mmmb repeat` (core/repeat.py, plan 8.1): a recorded run again, its recipe built into a new run and the same agents run at the same models and
+"""`mmsb repeat` (core/repeat.py, plan 8.1): a recorded run again, its recipe built into a new run and the same agents run at the same models and
 efforts over the same configurations and questions, then the command to compare the two. Over the toy scenario and the stand-in agents of
 tests/echo_agent.py, which return the model and the effort (Codex's) they were given as the real agents do, so that a repeat that loses a
 setting shows in the results as it would in a real run. The recorded pilot's own repeat (110 execs) is tests/oracles/test_recorded_repeat.py's."""
@@ -15,12 +15,12 @@ from cli_world import CLEAN, world  # noqa: F401
 from echo_agent import agents_of, record_toy
 from stub_system import Stub, StubSystem, tiny_questions
 
-from mmmb import cli, scenarios
-from mmmb.core import fs, gpu, repeat
-from mmmb.core.agents import claude
-from mmmb.core.compare import compare_runs
-from mmmb.core.report import results_of
-from mmmb.core.runfolder import RunFolder
+from mmsb import cli, scenarios
+from mmsb.core import fs, gpu, repeat
+from mmsb.core.agents import claude
+from mmsb.core.compare import compare_runs
+from mmsb.core.report import results_of
+from mmsb.core.runfolder import RunFolder
 
 pytestmark = pytest.mark.xdist_group("cli")
 N = len(tiny_questions())
@@ -100,7 +100,7 @@ def test_a_repeat_builds_the_recipe_runs_the_same_agents_at_their_models_and_eff
     assert fs.read_json(new.folder / "run.json")["answer_format"] == "line"
     assert [c.name for c in new.configs] == ["files", "stub/all"]
     assert out.rstrip().endswith(f"repeated recorded as {new.name}; compare them, and read every flip:\n"
-                                 f"  mmmb compare {w.recorded.folder} {new.folder}")
+                                 f"  mmsb compare {w.recorded.folder} {new.folder}")
     c = compare_runs(w.recorded, new)
     assert c.refused == [] and all(not x.flips and x.inside for x in c.cells), "the stub answers the same, and the settings are the same"
 
@@ -129,7 +129,7 @@ def test_a_recorded_run_that_a_run_now_would_ask_other_questions_of_is_refused_a
     w.recorded.result_path("claude", next(c for c in w.recorded.configs if c.name == "files"), gone).unlink()
     assert w.main(*args_of(w, "--dry-run"), agents=agents_of(Stub())) == 1
     assert f"recorded asked claude files {N - 1} questions, and a run now asks it {N} (a difference of 1, the first {gone})" in capsys.readouterr().err
-    # no agents noted: it was not run to the end by `mmmb run`
+    # no agents noted: it was not run to the end by `mmsb run`
     meta = fs.read_json(folder / "run.json")
     fs.write_json(folder / "run.json", {k: v for k, v in meta.items() if k != "agents"})
     assert w.main(*args_of(w, "--dry-run")) == 1 and "records no agents in its run.json" in capsys.readouterr().err

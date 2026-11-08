@@ -1,4 +1,4 @@
-"""New tests for the final answer (mmmb/core/answer.py, DESIGN 6.2, plan 5.4): the `line` format is the recorded `answer_of`, the `json`
+"""New tests for the final answer (mmsb/core/answer.py, DESIGN 6.2, plan 5.4): the `line` format is the recorded `answer_of`, the `json`
 format is the last complete JSON object of the message with a string `answer` and a list `evidence` of citations, and the sentences the
 prompts end with ask for them. Expected values are written by hand from the rules in the module's text and the plan, or are what a test
 plants: a message built from known parts is read back as those parts (a law over many generated messages), a hostile message has the
@@ -16,10 +16,10 @@ import pytest
 from stub_system import tiny_questions
 from v8_fake import V8, built, oracle_file, plan, recipe, source, table  # noqa: F401  (a fake download, for the prompt of a question of EgoLife)
 
-from mmmb import scenarios
-from mmmb.core.answer import DEFAULT_FORMAT, FORMATS, Citation, FinalAnswer, answer_of, answer_request, parse_final
-from mmmb.core.contract import McpServer, Served
-from mmmb.core.scenario import Access
+from mmsb import scenarios
+from mmsb.core.answer import DEFAULT_FORMAT, FORMATS, Citation, FinalAnswer, answer_of, answer_request, parse_final
+from mmsb.core.contract import McpServer, Served
+from mmsb.core.scenario import Access
 
 V7 = scenarios.get("v7_screen")
 
@@ -250,7 +250,7 @@ def test_the_json_request_of_a_choice_has_no_unknown_and_says_when_the_evidence_
 
 PLAIN = Served(None, None, (), None, None, None, {})
 MM = Served(McpServer("mm", "mm", (), {}, ()), "You answer the user's question from their memory, using the mm tools.", (), None, "mm", None, {})
-DATA = Path(r"D:\mmmb-temp\mmb-0123456789-data")
+DATA = Path(r"D:\mmsb-temp\mmb-0123456789-data")
 
 
 @pytest.fixture(scope="module")

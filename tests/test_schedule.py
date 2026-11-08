@@ -18,10 +18,10 @@ from pathlib import Path
 import pytest
 from stub_system import StubSystem
 
-from mmmb.core.contract import Case
-from mmmb.core.record import Halt
-from mmmb.core.runfolder import JOBS_MAX
-from mmmb.core.schedule import (Beside, Expected, Gate, Line, Pools, Span, Task, Timeline, agent_off_gpu, keeps_time_order, run_beside,
+from mmsb.core.contract import Case
+from mmsb.core.record import Halt
+from mmsb.core.runfolder import JOBS_MAX
+from mmsb.core.schedule import (Beside, Expected, Gate, Line, Pools, Span, Task, Timeline, agent_off_gpu, keeps_time_order, run_beside,
                                 simulate, start_order)
 
 WAIT = 10.0  # seconds a test waits for something that must happen (a failure, not a slow machine, when it does not)

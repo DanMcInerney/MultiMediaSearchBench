@@ -1,8 +1,8 @@
 """Ported from tests/test_bench.py and tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4): what the command line did, now
-`mmmb` over any scenario and system, over the scenario `toy` (V7's plan, a dump of three files) and the stand-in system `stub` of
+`mmsb` over any scenario and system, over the scenario `toy` (V7's plan, a dump of three files) and the stand-in system `stub` of
 tests/cli_world.py. What moved, by the plan's 3.2 and 8:
 - `bench.main` is `cli.main`, `agents` is `run`, `decider` is `retrieve`, `--models` is `--configs`, `show_decider` and the system's lines of
-  `show_agents` are told from a system's `preview` (mmmb/core/dryrun.py), `set_timeout` is `RunFolder.with_timeout`, and the build and the
+  `show_agents` are told from a system's `preview` (mmsb/core/dryrun.py), `set_timeout` is `RunFolder.with_timeout`, and the build and the
   ingest have their own tests (tests/test_cli_build.py);
 - the intended differences of an expectation: the arms are configurations (`files`, `stub/all`), a run's estimate counts every configuration
   at `--jobs` (the old "mm at 1 job" is the system's to lower, and a line of its own says so), the words "ask" and "mm" of the limits line are
@@ -28,14 +28,14 @@ from agent_spec import spec_of
 from cli_world import CLEAN, build_args, world  # noqa: F401
 from stub_system import Stub, StubSystem, tiny_questions
 
-from mmmb import cli, scenarios
-from mmmb.core import dryrun, fs, paths, report
-from mmmb.core.agents import claude, codex
-from mmmb.core.atonce import JOBS
-from mmmb.core.costing import EXEC_MIN
-from mmmb.core.runfolder import JOBS_MAX, RunFolder
-from mmmb.core.runner import AGENTS, TIMEOUT_S, Agent
-from mmmb.core.select import pilot_questions
+from mmsb import cli, scenarios
+from mmsb.core import dryrun, fs, paths, report
+from mmsb.core.agents import claude, codex
+from mmsb.core.atonce import JOBS
+from mmsb.core.costing import EXEC_MIN
+from mmsb.core.runfolder import JOBS_MAX, RunFolder
+from mmsb.core.runner import AGENTS, TIMEOUT_S, Agent
+from mmsb.core.select import pilot_questions
 
 pytestmark = pytest.mark.xdist_group("cli")
 QUESTIONS = tiny_questions()
@@ -46,7 +46,7 @@ HEAVY = next(q for q in QUESTIONS if q.tags["template"] == "screen-error" and q.
 
 @pytest.fixture(scope="module")
 def built(tmp_path_factory) -> Path:
-    """The toy run `mmmb build` makes with the files and the stand-in system's configurations, built once for the module."""
+    """The toy run `mmsb build` makes with the files and the stand-in system's configurations, built once for the module."""
     root = tmp_path_factory.mktemp("cli")
     with pytest.MonkeyPatch.context() as patch:
         ffmpeg = root / "ffmpeg-source.exe"
@@ -250,7 +250,7 @@ def test_a_report_of_a_run_the_old_bench_made_says_what_it_is(w, tmp_path, capsy
     shutil.copy2(Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "run.json", old / "run.json")  # as bench.py wrote it: no scenario
     assert w.main("report", str(old)) == 1
     err = capsys.readouterr().err
-    assert f"error: {old} was made before mmmb (its run.json names no scenario): mmmb reads only the runs it built" in err and "Traceback" not in err
+    assert f"error: {old} was made before mmsb (its run.json names no scenario): mmsb reads only the runs it built" in err and "Traceback" not in err
 
 
 # -- probes ------------------------------------------------------------------------------------------------------------------------

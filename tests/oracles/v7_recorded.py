@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from mmmb import scenarios
+from mmsb import scenarios
 
 RECORDED = Path(__file__).parent / "recorded" / "pilot-s1"
 META = json.loads((RECORDED / "run.json").read_text(encoding="utf-8"))  # plan, files, probe, seed, scale, days

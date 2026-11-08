@@ -1,5 +1,0 @@
-[system]
-name = "listing"
-class = "mmmb.systems.listing.system:Listing"
-license = "none"
-horizon = "cut"

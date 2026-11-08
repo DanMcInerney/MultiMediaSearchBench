@@ -1,12 +1,12 @@
 """New tests (plan 7.6, oracle neutrality): the core, the scenarios and the systems but mm run with no Multimem. Three checks.
 
 - A process whose import system refuses `multimem`, the tests' helpers `conftest`, `day` and `fake_decider` (and the old root modules, which
-  the editable install would let through unnoticed) imports every module under `mmmb.core`, `mmmb.scenarios` and each system but mm (found
-  by walking the packages, so `mmmb.systems.listing` is in it once it exists), reads mm's system.toml, and sees opening `mm` give "needs
+  the editable install would let through unnoticed) imports every module under `mmsb.core`, `mmsb.scenarios` and each system but mm (found
+  by walking the packages, so `mmsb.systems.listing` is in it once it exists), reads mm's system.toml, and sees opening `mm` give "needs
   the mm extra". Fast: every run.
-- A scan of the source for an import of multimem outside mmmb/systems/mm and tests/mm. The scan is of the syntax, not the text: a docstring
+- A scan of the source for an import of multimem outside mmsb/systems/mm and tests/mm. The scan is of the syntax, not the text: a docstring
   that speaks of Multimem is not an import.
-- A scan of mmmb/core and mmmb/scenarios for a system by name: an import of mmmb.systems.<name> (the registry, `mmmb.systems` itself, stays) and
+- A scan of mmsb/core and mmsb/scenarios for a system by name: an import of mmsb.systems.<name> (the registry, `mmsb.systems` itself, stays) and
   a string equal to the name of a system that has a system.toml (`config.system == "mm"`). The few strings that are a system's name and not the
   system are listed with their reason (EXEMPT); the scan finds each of them there and nowhere else.
 - Slow (`-m slow`): a fresh environment made with `uv sync --frozen --no-default-groups`, in which tests/oracles/neutral_smoke.py builds the
@@ -29,28 +29,28 @@ from pathlib import Path
 
 import pytest
 
-from mmmb import systems
-from mmmb.core import fs, paths
+from mmsb import systems
+from mmsb.core import fs, paths
 
 ROOT = Path(__file__).parents[1]
-MM_PLACES = ("mmmb/systems/mm", "tests/mm")  # where an import of multimem is the point
+MM_PLACES = ("mmsb/systems/mm", "tests/mm")  # where an import of multimem is the point
 # the files outside them that import it, and why: a guarded import for the mm cells of a replay when the extra is installed, and a capture
 # tool that records what Multimem's own skill and instructions held, run in Multimem's venv
 ALLOWED = {"tests/replay.py": "the replay of an mm exec, behind `mm_installed()`", "tests/oracles/capture_exec.py": "a capture tool, run once"}
 
-# (file, string) of mmmb/core and mmmb/scenarios that is the name of a system and not the system, and why. Words the recorded reports fix are here.
+# (file, string) of mmsb/core and mmsb/scenarios that is the name of a system and not the system, and why. Words the recorded reports fix are here.
 EXEMPT = {
-    ("mmmb/core/agents/spec.py", "files"): "an exec with the agent's own tools alone is called the files arm in the checks' messages",
-    ("mmmb/core/config.py", "files"): "the configuration `files` is the agent's own tools: part of the vocabulary of configurations (DESIGN 4)",
-    ("mmmb/core/report.py", "files"): "the control the recorded report compares with is called files",
-    ("mmmb/core/runfolder.py", "files"): "run.json's `files` is the hash of the scenario's files, not a system",
-    ("mmmb/core/scenario.py", "files"): "the body of the dump key names the scenario's files",
-    ("mmmb/scenarios/v8_egolife/report.py", "files"): "the control the recorded EgoLife report compares with is called files",
-    ("mmmb/scenarios/v7_screen/media_common.py", "mm"): "PIL's text anchor (middle, middle)",
-    ("mmmb/scenarios/v7_screen/media_screen.py", "mm"): "PIL's text anchor (middle, middle)",
-    ("mmmb/scenarios/v7_screen/pictures.py", "mm"): "PIL's text anchor (middle, middle)",
+    ("mmsb/core/agents/spec.py", "files"): "an exec with the agent's own tools alone is called the files arm in the checks' messages",
+    ("mmsb/core/config.py", "files"): "the configuration `files` is the agent's own tools: part of the vocabulary of configurations (DESIGN 4)",
+    ("mmsb/core/report.py", "files"): "the control the recorded report compares with is called files",
+    ("mmsb/core/runfolder.py", "files"): "run.json's `files` is the hash of the scenario's files, not a system",
+    ("mmsb/core/scenario.py", "files"): "the body of the dump key names the scenario's files",
+    ("mmsb/scenarios/v8_egolife/report.py", "files"): "the control the recorded EgoLife report compares with is called files",
+    ("mmsb/scenarios/v7_screen/media_common.py", "mm"): "PIL's text anchor (middle, middle)",
+    ("mmsb/scenarios/v7_screen/media_screen.py", "mm"): "PIL's text anchor (middle, middle)",
+    ("mmsb/scenarios/v7_screen/pictures.py", "mm"): "PIL's text anchor (middle, middle)",
 }
-PLACES = ("mmmb/core", "mmmb/scenarios")  # where no system is named
+PLACES = ("mmsb/core", "mmsb/scenarios")  # where no system is named
 
 WALK = textwrap.dedent("""\
     import importlib, pkgutil, sys
@@ -65,13 +65,13 @@ WALK = textwrap.dedent("""\
                 raise ModuleNotFoundError(f"No module named {name!r}", name=name)
 
     sys.meta_path.insert(0, Blocker())
-    import mmmb
-    from mmmb import systems
+    import mmsb
+    from mmsb import systems
 
     folder = Path(systems.__file__).parent
-    packages = ["mmmb.core", "mmmb.scenarios", *(f"mmmb.systems.{p.name}" for p in sorted(folder.iterdir())
+    packages = ["mmsb.core", "mmsb.scenarios", *(f"mmsb.systems.{p.name}" for p in sorted(folder.iterdir())
                                                   if (p / "__init__.py").exists() and p.name != "mm")]
-    seen = ["mmmb", "mmmb.cli", "mmmb.systems"]
+    seen = ["mmsb", "mmsb.cli", "mmsb.systems"]
     for name in seen:
         importlib.import_module(name)
     for name in packages:
@@ -104,21 +104,21 @@ def modules_walked() -> list[str]:
 
 def test_every_module_of_the_core_the_scenarios_and_the_systems_but_mm_imports_with_multimem_refused_and_mm_says_what_it_needs():
     seen = modules_walked()
-    for name in ("mmmb.cli", "mmmb.core.runner", "mmmb.core.build", "mmmb.core.dryrun", "mmmb.core.agents.claude", "mmmb.core.agents.codex",
-                 "mmmb.scenarios.v7_screen.week", "mmmb.scenarios.v7_screen.shortcuts", "mmmb.scenarios.v8_egolife.report",
-                 "mmmb.systems.files.system"):
+    for name in ("mmsb.cli", "mmsb.core.runner", "mmsb.core.build", "mmsb.core.dryrun", "mmsb.core.agents.claude", "mmsb.core.agents.codex",
+                 "mmsb.scenarios.v7_screen.week", "mmsb.scenarios.v7_screen.shortcuts", "mmsb.scenarios.v8_egolife.report",
+                 "mmsb.systems.files.system"):
         assert name in seen, name
-    assert not [m for m in seen if m.startswith("mmmb.systems.mm")], "mm is not walked: it is the one place multimem is imported"
-    systems_dir = ROOT / "mmmb" / "systems"
+    assert not [m for m in seen if m.startswith("mmsb.systems.mm")], "mm is not walked: it is the one place multimem is imported"
+    systems_dir = ROOT / "mmsb" / "systems"
     for package in (p for p in systems_dir.iterdir() if (p / "__init__.py").exists() and p.name != "mm"):
-        assert f"mmmb.systems.{package.name}" in seen, f"{package.name} is a system, so it is walked"
+        assert f"mmsb.systems.{package.name}" in seen, f"{package.name} is a system, so it is walked"
     assert len(seen) > 60
 
 
 def multimem_imports(root: Path, places=MM_PLACES, allowed=ALLOWED) -> list[str]:
-    """The imports of multimem in the python files under `root`'s mmmb and tests folders, except in `places` and `allowed`: `file:line`."""
+    """The imports of multimem in the python files under `root`'s mmsb and tests folders, except in `places` and `allowed`: `file:line`."""
     found = []
-    for file in sorted(p for folder in ("mmmb", "tests") if (root / folder).is_dir() for p in (root / folder).rglob("*.py")):
+    for file in sorted(p for folder in ("mmsb", "tests") if (root / folder).is_dir() for p in (root / folder).rglob("*.py")):
         rel = file.relative_to(root).as_posix()
         if any(rel.startswith(place + "/") for place in places) or rel in allowed:
             continue
@@ -136,22 +136,22 @@ def test_nothing_imports_multimem_outside_mm_and_its_tests():
 
 
 def test_the_scan_finds_an_import_in_a_function_a_from_import_and_a_dotted_one_and_not_a_word_in_a_docstring(tmp_path):
-    (tmp_path / "mmmb" / "core").mkdir(parents=True)
-    (tmp_path / "mmmb" / "systems" / "mm").mkdir(parents=True)
+    (tmp_path / "mmsb" / "core").mkdir(parents=True)
+    (tmp_path / "mmsb" / "systems" / "mm").mkdir(parents=True)
     (tmp_path / "tests" / "mm").mkdir(parents=True)
-    (tmp_path / "mmmb" / "core" / "plain.py").write_text('"""import multimem is how mm is reached; from multimem import x"""\nx = "import multimem"\n')
-    (tmp_path / "mmmb" / "core" / "lazy.py").write_text("def f():\n    import multimem\n")
-    (tmp_path / "mmmb" / "core" / "from_.py").write_text("from multimem.adapter import INSTRUCTIONS\n")
-    (tmp_path / "mmmb" / "core" / "dotted.py").write_text("import multimem.config as c\n")
+    (tmp_path / "mmsb" / "core" / "plain.py").write_text('"""import multimem is how mm is reached; from multimem import x"""\nx = "import multimem"\n')
+    (tmp_path / "mmsb" / "core" / "lazy.py").write_text("def f():\n    import multimem\n")
+    (tmp_path / "mmsb" / "core" / "from_.py").write_text("from multimem.adapter import INSTRUCTIONS\n")
+    (tmp_path / "mmsb" / "core" / "dotted.py").write_text("import multimem.config as c\n")
     (tmp_path / "tests" / "test_x.py").write_text("from multimem import decider\n")
-    (tmp_path / "mmmb" / "systems" / "mm" / "system.py").write_text("import multimem\n")
+    (tmp_path / "mmsb" / "systems" / "mm" / "system.py").write_text("import multimem\n")
     (tmp_path / "tests" / "mm" / "test_y.py").write_text("import multimem\n")
-    assert multimem_imports(tmp_path) == ["mmmb/core/dotted.py:1", "mmmb/core/from_.py:1", "mmmb/core/lazy.py:2", "tests/test_x.py:1"]
-    assert multimem_imports(tmp_path, allowed={"tests/test_x.py": "x"}) == ["mmmb/core/dotted.py:1", "mmmb/core/from_.py:1", "mmmb/core/lazy.py:2"]
+    assert multimem_imports(tmp_path) == ["mmsb/core/dotted.py:1", "mmsb/core/from_.py:1", "mmsb/core/lazy.py:2", "tests/test_x.py:1"]
+    assert multimem_imports(tmp_path, allowed={"tests/test_x.py": "x"}) == ["mmsb/core/dotted.py:1", "mmsb/core/from_.py:1", "mmsb/core/lazy.py:2"]
 
 
 def systems_named(root: Path, names, exempt=EXEMPT, places=PLACES) -> tuple[list[str], set]:
-    """`file:line: what` for each import of a system (`mmmb.systems.<name>`, `from mmmb.systems import <name>`) and each string equal to the
+    """`file:line: what` for each import of a system (`mmsb.systems.<name>`, `from mmsb.systems import <name>`) and each string equal to the
     name of a system, or naming a module of one, in the python files under `places` of `root` (docstrings and comments are not code), except the
     (file, string) of `exempt`; and the exemptions it met."""
     found, met = [], set()
@@ -163,18 +163,18 @@ def systems_named(root: Path, names, exempt=EXEMPT, places=PLACES) -> tuple[list
         for node in ast.walk(tree):
             what = None
             if isinstance(node, ast.Import):
-                what = next((f"imports {a.name}" for a in node.names for n in names if a.name.split(".")[:3] == ["mmmb", "systems", n]), None)
+                what = next((f"imports {a.name}" for a in node.names for n in names if a.name.split(".")[:3] == ["mmsb", "systems", n]), None)
             elif isinstance(node, ast.ImportFrom):
                 module = (node.module or "").split(".")
-                what = (f"imports from {node.module}" if module[:2] == ["mmmb", "systems"] and len(module) > 2 and module[2] in names else
-                        next((f"imports {a.name} from mmmb.systems" for a in node.names if module == ["mmmb", "systems"] and a.name in names), None))
+                what = (f"imports from {node.module}" if module[:2] == ["mmsb", "systems"] and len(module) > 2 and module[2] in names else
+                        next((f"imports {a.name} from mmsb.systems" for a in node.names if module == ["mmsb", "systems"] and a.name in names), None))
             elif isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in docstrings:
                 if node.value in names:
                     if (rel, node.value) in exempt:
                         met.add((rel, node.value))
                     else:
                         what = f"names the system {node.value!r}"
-                elif any(node.value == f"mmmb.systems.{n}" or node.value.startswith(f"mmmb.systems.{n}.") for n in names):
+                elif any(node.value == f"mmsb.systems.{n}" or node.value.startswith(f"mmsb.systems.{n}.") for n in names):
                     what = f"names the module {node.value!r}"
             if what:
                 found.append((rel, node.lineno, what))
@@ -190,29 +190,29 @@ def test_the_core_and_the_scenarios_name_no_system_and_import_none_of_them():
 
 
 def test_the_scan_finds_a_system_by_import_and_by_name_in_any_function_and_not_in_a_docstring_a_comment_or_the_registry(tmp_path):
-    core, scenario, other = tmp_path / "mmmb" / "core", tmp_path / "mmmb" / "scenarios" / "s", tmp_path / "mmmb" / "other"
+    core, scenario, other = tmp_path / "mmsb" / "core", tmp_path / "mmsb" / "scenarios" / "s", tmp_path / "mmsb" / "other"
     for folder in (core, scenario, other):
         folder.mkdir(parents=True)
-    (core / "fine.py").write_text('"""alpha is a system; import mmmb.systems.alpha"""\n'
-                                  "from mmmb import systems\nfrom mmmb.systems import load, isolation, defaults\n"
-                                  "x = 'alphabet'  # alpha\nimport mmmb.systemsx\ndef f():\n    'beta'\n    return systems.load(name)\n")
+    (core / "fine.py").write_text('"""alpha is a system; import mmsb.systems.alpha"""\n'
+                                  "from mmsb import systems\nfrom mmsb.systems import load, isolation, defaults\n"
+                                  "x = 'alphabet'  # alpha\nimport mmsb.systemsx\ndef f():\n    'beta'\n    return systems.load(name)\n")
     (core / "equal.py").write_text("def f(config):\n    return 1 if config.system == 'alpha' else 3\n")
-    (core / "lazy.py").write_text("def f():\n    from mmmb.systems.beta.jobs import WAIT\n    return WAIT\n")
-    (core / "dotted.py").write_text("import mmmb.systems.alpha.system as s\n")
-    (core / "package.py").write_text("from mmmb.systems import alpha\n")
-    (core / "by_string.py").write_text("import importlib\nm = importlib.import_module('mmmb.systems.beta.system')\nn = 'mmmb.systems.alpha'\n")
+    (core / "lazy.py").write_text("def f():\n    from mmsb.systems.beta.jobs import WAIT\n    return WAIT\n")
+    (core / "dotted.py").write_text("import mmsb.systems.alpha.system as s\n")
+    (core / "package.py").write_text("from mmsb.systems import alpha\n")
+    (core / "by_string.py").write_text("import importlib\nm = importlib.import_module('mmsb.systems.beta.system')\nn = 'mmsb.systems.alpha'\n")
     (core / "twice.py").write_text("a = 'beta'\nb = ['beta']\n")
-    (scenario / "deep.py").write_text("OK = {'alpha': 1}\nfrom mmmb.systems.beta import Beta\n")
-    (other / "outside.py").write_text("import mmmb.systems.alpha\nx = 'alpha'\n")
+    (scenario / "deep.py").write_text("OK = {'alpha': 1}\nfrom mmsb.systems.beta import Beta\n")
+    (other / "outside.py").write_text("import mmsb.systems.alpha\nx = 'alpha'\n")
     found, met = systems_named(tmp_path, {"alpha", "beta"}, exempt={})
-    assert found == ["mmmb/core/by_string.py:2: names the module 'mmmb.systems.beta.system'", "mmmb/core/by_string.py:3: names the module 'mmmb.systems.alpha'",
-                     "mmmb/core/dotted.py:1: imports mmmb.systems.alpha.system", "mmmb/core/equal.py:2: names the system 'alpha'",
-                     "mmmb/core/lazy.py:2: imports from mmmb.systems.beta.jobs", "mmmb/core/package.py:1: imports alpha from mmmb.systems",
-                     "mmmb/core/twice.py:1: names the system 'beta'", "mmmb/core/twice.py:2: names the system 'beta'",
-                     "mmmb/scenarios/s/deep.py:1: names the system 'alpha'", "mmmb/scenarios/s/deep.py:2: imports from mmmb.systems.beta"]
+    assert found == ["mmsb/core/by_string.py:2: names the module 'mmsb.systems.beta.system'", "mmsb/core/by_string.py:3: names the module 'mmsb.systems.alpha'",
+                     "mmsb/core/dotted.py:1: imports mmsb.systems.alpha.system", "mmsb/core/equal.py:2: names the system 'alpha'",
+                     "mmsb/core/lazy.py:2: imports from mmsb.systems.beta.jobs", "mmsb/core/package.py:1: imports alpha from mmsb.systems",
+                     "mmsb/core/twice.py:1: names the system 'beta'", "mmsb/core/twice.py:2: names the system 'beta'",
+                     "mmsb/scenarios/s/deep.py:1: names the system 'alpha'", "mmsb/scenarios/s/deep.py:2: imports from mmsb.systems.beta"]
     assert met == set()
-    found, met = systems_named(tmp_path, {"alpha", "beta"}, exempt={("mmmb/core/equal.py", "alpha"): "a reason"})
-    assert "mmmb/core/equal.py:2: names the system 'alpha'" not in found and met == {("mmmb/core/equal.py", "alpha")}
+    found, met = systems_named(tmp_path, {"alpha", "beta"}, exempt={("mmsb/core/equal.py", "alpha"): "a reason"})
+    assert "mmsb/core/equal.py:2: names the system 'alpha'" not in found and met == {("mmsb/core/equal.py", "alpha")}
 
 
 @pytest.mark.slow

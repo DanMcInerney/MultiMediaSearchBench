@@ -17,14 +17,14 @@ from agent_spec import server_of
 from test_runfolder import DENY, MM_ISOLATION, between, check_against, posix, run_of, sentinels  # noqa: F401
 from v8_fake import DAYS, V8, built, clip_ends, line_at, lines_by, oracle_file, plan, recipe, source, table, view_files  # noqa: F401
 
-from mmmb.core import fs
-from mmmb.core.agents.common import command_outputs, reached
-from mmmb.core.contract import Served
-from mmmb.core.runfolder import IN_ONLY, RunFolder
-from mmmb.core.scenario import Access
-from mmmb.scenarios.v8_egolife import plan as plans
-from mmmb.scenarios.v8_egolife import source as src
-from mmmb.scenarios.v8_egolife.view import files_view, release_views, seen_past_horizon, view_dir
+from mmsb.core import fs
+from mmsb.core.agents.common import command_outputs, reached
+from mmsb.core.contract import Served
+from mmsb.core.runfolder import IN_ONLY, RunFolder
+from mmsb.core.scenario import Access
+from mmsb.scenarios.v8_egolife import plan as plans
+from mmsb.scenarios.v8_egolife import source as src
+from mmsb.scenarios.v8_egolife.view import files_view, release_views, seen_past_horizon, view_dir
 
 pytestmark = pytest.mark.xdist_group("v8")
 
@@ -89,7 +89,7 @@ def test_a_view_that_cannot_be_removed_is_told_and_does_not_hide_the_error(tmp_p
 
 def test_the_deny_words_of_v8_are_the_old_ones_but_for_the_new_folders_and_three_that_name_the_new_package(sentinels):
     golden = DENY["v8"]["v8"]
-    new = tuple(IN_ONLY + word for word in ("v8_egolife", "from mmmb", "import mmmb"))
+    new = tuple(IN_ONLY + word for word in ("v8_egolife", "from mmsb", "import mmsb"))
     assert V8.OLD_WORDS == tuple(w.removeprefix(IN_ONLY) for w in between(golden["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0"))
     for own, key, next_slot in ((None, "none", "in:d:/__temp__/mmb-tag-w0"), (0, "slot0", "in:d:/__temp__/mmb-tag-w1")):
         old = between(golden[key], "/mm-bench'", next_slot)  # V7's eight words, which the old EgoRun.deny inherited
@@ -101,7 +101,7 @@ def test_the_deny_words_of_v8_are_the_old_ones_but_for_the_new_folders_and_three
         check_against(golden[key], tuple(w for w in got if w not in set(map(posix, new))), (*old, *extras))
         at = got.index("bench-data")
         assert got[at:at + len(extras)] == extras, "V8's own words, in the old order"
-    assert V8.deny_words([], Path("t"), "k") == (*(IN_ONLY + w for w in (*V8.OLD_WORDS, "v8_egolife", "from mmmb", "import mmmb")),
+    assert V8.deny_words([], Path("t"), "k") == (*(IN_ONLY + w for w in (*V8.OLD_WORDS, "v8_egolife", "from mmsb", "import mmsb")),
                                                  "bench-data", "a1_jake", "in:egolife"), "with no other slot, no folder of recordings"
 
 
@@ -136,7 +136,7 @@ PLAIN = Served(None, None, (), None, None, None, {})
 
 def test_a_prompt_for_a_system_and_the_files_together_has_both_sentences_and_a_prompt_for_another_format_or_a_holderless_server_is_refused(built):
     q = next(q for q in built[1] if q.qid == "ego-001")
-    data = Path(r"D:\mmmb-temp\mmb-0123456789-d0")
+    data = Path(r"D:\mmsb-temp\mmb-0123456789-d0")
     held = Served(server_of(Path("home"), Path("work")), "base", (), None, "mm", None, {})
     got = V8.prompt(q, Access(True, data, held, "line"))
     assert got == (

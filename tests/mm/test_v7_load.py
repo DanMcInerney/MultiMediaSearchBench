@@ -4,7 +4,7 @@ once by the scenario (V7.build, about 35 s) and ingested once by the system (`Mm
 asks a daemon asks one over a copy of that store. What changed, by plan 4.6 and 7.4:
 - `haystack.load` is `Mm.ingest`; a phone file that is not at its own time is a `misdated` entry of the report, no longer an AssertionError
   (test_ingest_reports_a_phone_file...);
-- `haystack.windows_in` is the table of windows (mmmb/systems/mm/estimate.py), counted from the files by the reader's own demux; the mic's count is
+- `haystack.windows_in` is the table of windows (mmsb/systems/mm/estimate.py), counted from the files by the reader's own demux; the mic's count is
   every window of the sound, so an upper bound (the old count used the plan's loud spans): its equality with what the reader reads is `<=` now;
 - the pilot week cut down for the `last` test is written by `write` and ingested by a dump of its files alone.
 Every other expectation is the source's."""
@@ -28,18 +28,18 @@ from PIL import Image  # noqa: E402
 from multimem import decider, media, reader  # noqa: E402
 from multimem.store import Store  # noqa: E402
 
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Dump  # noqa: E402
-from mmmb.core.select import config_questions  # noqa: E402
-from mmmb.scenarios.v7_screen.manifest import entries_of, measure_disk  # noqa: E402
-from mmmb.scenarios.v7_screen.media_screen import APPS, screen_frames, write_screen  # noqa: E402
-from mmmb.scenarios.v7_screen.plan import TOL_S, at, days_before  # noqa: E402
-from mmmb.scenarios.v7_screen.week import plan as make_plan  # noqa: E402
-from mmmb.scenarios.v7_screen.write import write  # noqa: E402
-from mmmb.systems.mm.estimate import audio_windows  # noqa: E402
-from mmmb.systems.mm.estimate import windows_in as table_windows  # noqa: E402
-from mmmb.systems.mm.models import Model  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Dump  # noqa: E402
+from mmsb.core.select import config_questions  # noqa: E402
+from mmsb.scenarios.v7_screen.manifest import entries_of, measure_disk  # noqa: E402
+from mmsb.scenarios.v7_screen.media_screen import APPS, screen_frames, write_screen  # noqa: E402
+from mmsb.scenarios.v7_screen.plan import TOL_S, at, days_before  # noqa: E402
+from mmsb.scenarios.v7_screen.week import plan as make_plan  # noqa: E402
+from mmsb.scenarios.v7_screen.write import write  # noqa: E402
+from mmsb.systems.mm.estimate import audio_windows  # noqa: E402
+from mmsb.systems.mm.estimate import windows_in as table_windows  # noqa: E402
+from mmsb.systems.mm.models import Model  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 DAYS_OF = [date(2026, 10, 30), date(2026, 10, 31)]
 LOAD_S = 8.0  # a tiny week is ingested in this many seconds (the old `load` took 8: the daemon starts, the files are remembered, the daemon stops)

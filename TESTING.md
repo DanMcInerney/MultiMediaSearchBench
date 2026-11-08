@@ -1,4 +1,4 @@
-# MMMB: testing
+# MMSB: testing
 
 How the build is checked, what it is held to, and what has not been run. The design is in [DESIGN.md](DESIGN.md). Dated
 notes are at the end, newest last; add to them whenever testing teaches something.
@@ -26,11 +26,11 @@ uv sync --frozen --no-default-groups # what the neutrality test makes: no extra,
   saving ended at 02:00 on 1 November 2026, so the UTC offsets at the midnights that start 1, 2 and 3 November and end the 3rd
   are -0400, -0500, -0500, -0500. Elsewhere those oracles skip, and say which offsets they need. Windows has no `tzset`, so a
   test cannot change zone itself.
-- **Everything on D:.** Set `TEMP` and `TMP` to `D:/mmmb-temp/tmp`, give pytest `--basetemp=D:/mmmb-temp/pytest-<name>`, and
-  `UV_CACHE_DIR=D:/mmmb-temp/uv-cache` for any uv call that could write its cache. C: swung between 1.8 GB and 23 GB free
+- **Everything on D:.** Set `TEMP` and `TMP` to `D:/mmsb-temp/tmp`, give pytest `--basetemp=D:/mmsb-temp/pytest-<name>`, and
+  `UV_CACHE_DIR=D:/mmsb-temp/uv-cache` for any uv call that could write its cache. C: swung between 1.8 GB and 23 GB free
   during the build because of other work on the machine. uv's cache is on C: and the environment on D:, so uv copies. A
   `TEMP` under `C:\Users\...\AppData` also fails V8's run tests, because "data", one of V8's deny words, is in "AppData".
-  In Git Bash: `export TEMP=D:/mmmb-temp/tmp TMP=D:/mmmb-temp/tmp TZ=America/New_York`.
+  In Git Bash: `export TEMP=D:/mmsb-temp/tmp TMP=D:/mmsb-temp/tmp TZ=America/New_York`.
 - **The sources of the real scenarios.** `tests/test_v1.py`, `test_i3.py`, `test_a1.py` and `test_m4.py` read
   `D:\bench-data\sources\{meva,caltech-camera-traps,sins,fsd50k}` and skip loudly when it is missing.
 - **Test names.** None of `tests/`, `tests/oracles/` and `tests/mm/` has an `__init__.py`, and the test files import their helpers as
@@ -47,7 +47,7 @@ These hold for every test and every check:
   (Multimem, 30 October 2026). The default is `-n 4`.
 - **Throwaway homes.** A session fixture points `HOME`, `USERPROFILE`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR` and `MULTIMEM_HOME` into
   a temporary folder. An audit hook fails a test that writes the real `~/.claude`, `~/.codex`, `~/.multimem`, or the folders
-  MMMB keeps its runs in (`D:\mmmb-runs`, `D:\mmmb-data`, `D:\mmmb-cache`), even when the code under test swallows the error. A
+  MMSB keeps its runs in (`D:\mmsb-runs`, `D:\mmsb-data`, `D:\mmsb-cache`), even when the code under test swallows the error. A
   test gives its commands an `--out`, `--temp` and `--cache` of its own. The same hook fails a test that starts a program named
   `claude` or `codex`, or any program inside those three folders (`subprocess`, `os.system`, `os.exec*`, `os.spawn*`, and the
   command a shell is given): a test that needs an agent puts a stand-in of another name in its place, and patches
@@ -88,7 +88,7 @@ neutrality check.
 | --- | --- | --- | --- |
 | 1a | V7: the plan hash and files hash equal `run.json`'s; its 1,572 files and 3 logs are the 1,575 of the recorded manifest, each with the recorded path and `mtime_ns` | `uv run pytest tests/oracles/test_v7_hashes.py` | about 2 s |
 | 1b | V7: 43 files written and compared by sha256, size and mtime. The rule: `random.Random(7)`, then in this order `sample(files of the kind, n)` for screen 12, photo 12, porch 6, mic 4, note 4, clip 3, config 2 | `uv run pytest -m slow tests/oracles/test_v7_sample.py` | 13 s (U13) |
-| 1c | V7: the whole pilot week, 1,575 files, by sha256, size and mtime; the shortcut probe passes and writes `shortcuts.json` and `.md` equal to the recorded ones but for the seconds | `uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=D:/mmmb-temp/oracle1c --v7-workers=4 -n 0` | about 6 min to write at 4 workers, 1,377 worker-seconds, and 84 s to probe; about 8 min at the recorded build's 3 workers |
+| 1c | V7: the whole pilot week, 1,575 files, by sha256, size and mtime; the shortcut probe passes and writes `shortcuts.json` and `.md` equal to the recorded ones but for the seconds | `uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=D:/mmsb-temp/oracle1c --v7-workers=4 -n 0` | about 6 min to write at 4 workers, 1,377 worker-seconds, and 84 s to probe; about 8 min at the recorded build's 3 workers |
 | 1 (V8) | V8: the plan and files hash equal the recorded run's; its 50 questions and its 2,592 clips and 3 transcript files are the recorded ones. Needs the download at `D:\bench-data\egolife`, and skips loudly without it. It builds no 41 GB view | `uv run pytest tests/oracles/test_v8_plan.py` (the clip table, about 1.5 min, is marked `slow`) | a few seconds |
 | 2 | The report: the 110 pilot results (converted once) give, through `report.numbers` and `render.markdown`, the recorded `report.json` (through a short `legacy_view`) and `report.md` byte for byte. A planted flip of one `passed` makes it fail and moves `b` and `c` by one. Recorded answers regraded through `Question.grade` equal the recorded verdicts, 110 of 110 | `uv run pytest tests/oracles/test_recorded_report.py` | about 3 s |
 | 2 (V8) | The same for EgoLife: 150 results and 50 retrieval records, regraded 150 of 150; the 150 recorded prompts are the expected V8 prompts. Needs no download and holds in any zone | `uv run pytest tests/oracles/test_recorded_egolife.py` | about 3 s |
@@ -143,7 +143,7 @@ neutrality check.
 
 | Tests | Check | Time |
 | --- | --- | --- |
-| `tests/test_v1.py`, `test_i3.py`, `test_a1.py`, `test_m4.py` | each builds its `tiny` dump from the real source: names, recording times (mtime and EXIF), the joined media's lengths, the metadata; derives every question's truth again with a plain reader of the label files of its own, at `tiny` and at `standard` (labels only, no build) and over several seeds; the grader takes each truth and refuses planted near misses (a day too many or too few, a time out of tolerance, `unknown` on a needle, a made-up answer to an absent question); the probe passes on the tiny dump; one `mmmb build`, `run` and `report` through the CLI with a stand-in agent | 8 to 20 s each on one worker |
+| `tests/test_v1.py`, `test_i3.py`, `test_a1.py`, `test_m4.py` | each builds its `tiny` dump from the real source: names, recording times (mtime and EXIF), the joined media's lengths, the metadata; derives every question's truth again with a plain reader of the label files of its own, at `tiny` and at `standard` (labels only, no build) and over several seeds; the grader takes each truth and refuses planted near misses (a day too many or too few, a time out of tolerance, `unknown` on a needle, a made-up answer to an absent question); the probe passes on the tiny dump; one `mmsb build`, `run` and `report` through the CLI with a stand-in agent | 8 to 20 s each on one worker |
 | `tests/test_realdump.py` | the shared builder: files written with their times, the probe (a label's phrase and its words, in a name or a metadata text), the seeded split, the prompt in each way of reaching the files, the deny words (and that none of the four scenarios' words is in ordinary code), the recipe's time zone | about 1 s |
 | `tests/test_set_rule.py` | the `set` rule (an exact set of dates or of file names, its F1 beside it) and the question file's `grade.items` | about 1 s |
 | `tests/test_summary.py` | the neutral report over runs written by hand: leaks out of every figure but the filter's, results to run again left out, each configuration beside the control, several scenarios pooled | about 1 s |
@@ -156,10 +156,10 @@ Run it after each update of the Claude or Codex CLI, and before a paid full run.
 Codex's quota, and takes about 5 minutes.
 
 ```
-uv run mmmb build --scenario i3_trailcam --scale tiny --configs files,listing --out D:/mmmb-temp/real/runs --temp D:/mmmb-temp/real/data --cache D:/mmmb-temp/real/cache
-uv run mmmb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2 --dry-run
-uv run mmmb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2
-uv run mmmb report <run>
+uv run mmsb build --scenario i3_trailcam --scale tiny --configs files,listing --out D:/mmsb-temp/real/runs --temp D:/mmsb-temp/real/data --cache D:/mmsb-temp/real/cache
+uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2 --dry-run
+uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2
+uv run mmsb report <run>
 ```
 
 Read each result's `answer`, `answer_error` and `grounded`, and the exec's `final.txt` for any that is not right: an
@@ -206,10 +206,10 @@ Each is asserted by a test, not ignored. The expected exec of a recorded run dif
 | 1 | The server command's python path | a new venv |
 | 2 | Run, home, slot and data paths | a new run; the goldens use placeholders |
 | 3 | 5 lines of mm's skill: "nervelet simulator" is "robot simulator", "this machine" is "the developer's machine", 41 characters in all | Multimem changed since the pilot. An exact line map in `tests/mm/test_exec_mm.py` fails, saying which lines, when the skill changes again |
-| 4 | `MM_CLAUDE_MODEL`, `MM_CLAUDE_EFFORT`, `MM_CODEX_MODEL`, `MM_CODEX_EFFORT` are `MMMB_*` | the names should not say mm |
+| 4 | `MM_CLAUDE_MODEL`, `MM_CLAUDE_EFFORT`, `MM_CODEX_MODEL`, `MM_CODEX_EFFORT` are `MMSB_*` | the names should not say mm |
 | 5 | V7's prompt stamp: the pilot used the real clock (4 November, 11:27 to 15:01), the new one a fixed `Question.now`, noon on the day after the last day. The test masks that first sentence for V7 only | DESIGN 6.1 wants a fixed now (C12) |
 | 6 | V7's `clock_note` when the wall clock is over an hour past `now`. V8 recorded it always, so V8 asserts it | the sentence is true then; mm's `searched.now` shows the real clock |
-| 7 | Deny words: `/mmmb-runs/`, `/mmmb-cache/` added; `/mm-bench/` stays, with `mm-bench-temp` and this repository's main checkout; module words added; `.multimem` comes from `system.toml` | the new layout; the old answers stay on the same disk (G1 F1) |
+| 7 | Deny words: `/mmsb-runs/`, `/mmsb-cache/` added; `/mm-bench/` stays, with `mm-bench-temp` and this repository's main checkout; module words added; `.multimem` comes from `system.toml` | the new layout; the old answers stay on the same disk (G1 F1) |
 | 8 | `timeout_s` is in every result, not only V8's | the core records it |
 | 9 | The `mm+files` cell has no golden: its argv, settings and instructions are written by hand from the design, and its `line` prompt ("unknown when mm and these files do not hold it") is pinned by a test of its literal text | it was never recorded |
 | 10 | A grader spec reads `rule` and `tol_s` where the old read `kind` and `tol_min`; a spec with no `date` key is no longer possible | the question file (DESIGN 6.1) |
@@ -231,7 +231,7 @@ What the files themselves and the unit notes say was left out:
 | `test_bench_rules`: a grader case with no `date` key | a `Grade` cannot lack one; the question loader refuses a line without it |
 | `test_agents`: two refusals about a missing home or working folder | the spec always has them |
 | `test_agents`, `test_codex`: `guidance="none"` | it went with the old recall CLI (`codex_run.main` and `prompt`), which nothing in this repository called |
-| `test_the_haystacks_open_refuses_a_run_of_another_dataset` | the `dataset` key of `run.json` and the two commands (`bench.py`, `egolife.py`) are gone; `mmmb` opens any run by its `scenario` |
+| `test_the_haystacks_open_refuses_a_run_of_another_dataset` | the `dataset` key of `run.json` and the two commands (`bench.py`, `egolife.py`) are gone; `mmsb` opens any run by its `scenario` |
 | `test_a_run_is_built_with_neutral_frozen_data` (V8) | a frozen dump is the cache's now, and `tests/test_cache.py` tests it |
 
 Moved, not dropped: the junction test to `tests/test_fs.py`; the lost-GPU test to `tests/test_runner.py` (it is a rule of the core,
@@ -251,7 +251,7 @@ Claude (Sonnet) and Codex answering the `json` request in `files` and through th
 two `--add-dir` folders under `--restricted` and refused a file outside them. No test could show, and nothing has yet:
 - real Claude and Codex with the `mm+files` prompt; real Claude with mm's `looks` folder itself as the second `--add-dir`;
 - a full run of any of the four real scenarios with real agents, and the time and cost of one;
-- `mmmb repeat` end to end, and the times of the dump build and the ingest in the new code (none recorded);
+- `mmsb repeat` end to end, and the times of the dump build and the ingest in the new code (none recorded);
 - a V8 build of the whole dump from `D:\bench-data\egolife` (its plan is checked; its dump is not), and the refusal of `listing`
   there, which is seen only over the fake download (the real clips' mtimes are the download's, 3 November, against 29 to 31 October);
 - the CLI end to end with the real mm and the GPU;
@@ -284,7 +284,7 @@ All offline, with Multimem's venv.
 | The old report code on the recorded runs | the pilot and EgoLife: 0 JSON differences, Markdown identical, about 3 s each, torch not imported. The repository's `results/*/report.json` is byte-equal to `D:\mm-bench`'s |
 | Regrading the recorded answers | `grade(q.grade, r.answer) and problem is None` equals the recorded `passed` in 110 of 110 pilot and 150 of 150 EgoLife results |
 | Argv | not recorded anywhere; captured from the old code |
-| Multimem's remote | none (`git remote -v` prints nothing), so `mmmb[mm]` is a path source |
+| Multimem's remote | none (`git remote -v` prints nothing), so `mmsb[mm]` is a path source |
 | Tooling | uv 0.9.10; `uv python list` shows 3.14, Multimem's venv has 3.12 |
 | Fixture sizes | the pilot's results 105,580 bytes and EgoLife's 308,923 (its decider records 175 KB): small enough to check in |
 | `mm` time arguments in the recorded runs | all 365 `since` and `until` are ISO; no relative ages; 2 `find` calls with no `until` |
@@ -313,7 +313,7 @@ and cost $19.00 at list for 50.3M tokens, about 173 minutes of wall time plus 11
   at `-n 2`; the slow neutrality test passed in a fresh environment); cached ingest; side-by-side scheduling (1,011 passed and 1
   skipped in 7:33). The dry run of the pilot repeat prints 110 execs, 13,044 session-seconds and 3,655 GPU-seconds, equal to the
   recorded ones.
-- **U14, the working-time clock.** `--clock` on `run` and `repeat`, `mmmb clock-check`, and one wait loop for both agents. 1,048
+- **U14, the working-time clock.** `--clock` on `run` and `repeat`, `mmsb clock-check`, and one wait loop for both agents. 1,048
   passed and 1 skipped in 484 s; the slow neutrality test passed in 55 s; 39 planted faults were all caught. No golden changed.
   Two of U14's own test runs called the real `claude auth status` (read only, in the tests' throwaway home) before the fixture
   patched `check_login`.
@@ -346,13 +346,13 @@ G2's review passed every oracle and found one blocker. The repair, in one pass, 
   `Mm.ready_model`), `test_conftest.py` and `conftest.py` (the guard).
 - **Result, run in US Eastern time with `--require-mm -n 4`:** 1,072 passed and 1 skipped in 489 s (8:09). The recorded-report, recorded-EgoLife, exec, goldens,
   replay oracles and the slow neutrality and V7 sample tests passed, unchanged. No golden or recorded file changed.
-- **24 faults were planted**, one at a time in the worktree and restored byte for byte (a hash of `mmmb/` and `tests/` was the
+- **24 faults were planted**, one at a time in the worktree and restored byte for byte (a hash of `mmsb/` and `tests/` was the
   same before and after), and all were caught: the rule ignoring `needs_gpu`; the runner, the dry runs, `show_repeat` and
   clock-check each asking `--jobs` of a GPU system; `run_argv` and `run_command` dropping `--gpu-jobs`; the refusal offering the
   wall clock or naming the wrong option; no warning; the listing reporting nothing misdated, a 3 s tolerance, a log held to a
   point; the half not naming its parent; two result keys changed in `contract.py` (the recorded report oracle caught both);
   `check_groundable` never raising or never called; three faults in the guard; the old wording of the questions. One planted fault
-  was left in `mmmb/cli.py` for a minute when the first run of the script was stopped by hand, and put back from its exact text.
+  was left in `mmsb/cli.py` for a minute when the first run of the script was stopped by hand, and put back from its exact text.
 - Other projects' pytest runs (rtb-fleet) were running on the laptop beside these runs, so the times above are slower than U14's.
 
 ### 2026-11-06: the real scenarios

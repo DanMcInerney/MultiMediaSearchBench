@@ -18,14 +18,14 @@ import imageio_ffmpeg
 import pytest
 from stub_system import Stub, StubSession, StubSystem
 
-from mmmb import cli, scenarios, systems
-from mmmb.core.contract import Description, Dump, IngestReport, RetrievalResult
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.core.scenario import ProbeOutcome, dump_key
-from mmmb.scenarios import v7_screen as v7
-from mmmb.scenarios.v7_screen.manifest import LOGS, entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
+from mmsb import cli, scenarios, systems
+from mmsb.core.contract import Description, Dump, IngestReport, RetrievalResult
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.core.scenario import ProbeOutcome, dump_key
+from mmsb.scenarios import v7_screen as v7
+from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
 
 DAYS = "2026-10-30,2026-10-31"
 SEED = 7
@@ -149,7 +149,7 @@ def build_args(w, seed: int = SEED, configs: str = "files,stub", *extra: str) ->
 
 
 def built_run(w, seed: int = SEED, configs: str = "files,stub", *extra: str) -> RunFolder:
-    """The run `mmmb build` makes in the world, opened."""
+    """The run `mmsb build` makes in the world, opened."""
     assert w.main(*build_args(w, seed, configs, *extra)) == 0
     (folder,) = [p for p in w.out.iterdir() if p.name.endswith(f"-s{seed}")]
     return RunFolder.open(folder, scenarios.get)

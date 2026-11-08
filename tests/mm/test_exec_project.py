@@ -9,9 +9,9 @@ import pytest
 
 pytest.importorskip("multimem")
 
-from mmmb import systems  # noqa: E402
-from mmmb.core.agents.common import reached  # noqa: E402
-from mmmb.systems.mm.home import PROJECT_PREFIX, exec_project  # noqa: E402
+from mmsb import systems  # noqa: E402
+from mmsb.core.agents.common import reached  # noqa: E402
+from mmsb.systems.mm.home import PROJECT_PREFIX, exec_project  # noqa: E402
 
 
 def test_an_execs_project_says_nothing_of_its_question():

@@ -19,15 +19,15 @@ from agent_spec import clocked
 from multimem import config as configuration
 from multimem import decider, decider_d1
 
-from mmmb import scenarios
-from mmmb.core import fs
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.config import Config
-from mmmb.core.contract import Dump, IngestReport, SessionContext
-from mmmb.core.question import Question, write_questions
-from mmmb.core.runfolder import RunFolder
-from mmmb.systems.mm.models import Model
-from mmmb.systems.mm.system import Mm, MmSession
+from mmsb import scenarios
+from mmsb.core import fs
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.config import Config
+from mmsb.core.contract import Dump, IngestReport, SessionContext
+from mmsb.core.question import Question, write_questions
+from mmsb.core.runfolder import RunFolder
+from mmsb.systems.mm.models import Model
+from mmsb.systems.mm.system import Mm, MmSession
 
 ROOT = Path(__file__).resolve().parent
 FAKE = f"python:{ROOT / 'fake_decider.py'}"

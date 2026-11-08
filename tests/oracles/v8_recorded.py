@@ -10,7 +10,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from mmmb import scenarios
+from mmsb import scenarios
 
 RECORDED = Path(__file__).parent / "recorded" / "egolife-s1"
 CONVERTED = RECORDED / "converted"

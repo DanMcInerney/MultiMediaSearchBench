@@ -18,15 +18,15 @@ import fakes  # noqa: E402
 from fakes import D13_MODEL, MM, Opened, context  # noqa: E402
 from model_folders import model_folder  # noqa: E402
 
-from mmmb import cli, scenarios  # noqa: E402
-from mmmb.core import fs  # noqa: E402
-from mmmb.core.build import INGESTED, write_dump  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Case, Description  # noqa: E402
-from mmmb.core.question import write_questions  # noqa: E402
-from mmmb.core.runfolder import RunFolder  # noqa: E402
-from mmmb.systems.mm import estimate, models, system  # noqa: E402
-from mmmb.systems.mm.system import Mm  # noqa: E402
+from mmsb import cli, scenarios  # noqa: E402
+from mmsb.core import fs  # noqa: E402
+from mmsb.core.build import INGESTED, write_dump  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Case, Description  # noqa: E402
+from mmsb.core.question import write_questions  # noqa: E402
+from mmsb.core.runfolder import RunFolder  # noqa: E402
+from mmsb.systems.mm import estimate, models, system  # noqa: E402
+from mmsb.systems.mm.system import Mm  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("mm-arm")
 
@@ -132,11 +132,11 @@ def test_describe_and_preview_need_the_facts_of_a_model_and_not_that_it_can_run_
 
 
 def test_a_dry_run_of_the_command_prints_the_exec_of_a_model_this_environment_cannot_run_and_starts_nothing(week, store, tmp_path, monkeypatch, capsys):
-    """`mmmb run RUN --dry-run --configs mm/d1-3B` with no torch installed (G1's F9), over the real system and the tiny week's real store."""
-    from mmmb.core import dryrun
-    from mmmb.core.agents import claude
-    from mmmb.systems.mm import home as mm_home
-    from mmmb.systems.mm.daemon import Daemon
+    """`mmsb run RUN --dry-run --configs mm/d1-3B` with no torch installed (G1's F9), over the real system and the tiny week's real store."""
+    from mmsb.core import dryrun
+    from mmsb.core.agents import claude
+    from mmsb.systems.mm import home as mm_home
+    from mmsb.systems.mm.daemon import Daemon
 
     recipe, dump, questions = week
     config = Config("mm/d1-3B", "mm", "d1-3B", False)

@@ -14,9 +14,9 @@ from datetime import datetime
 import pytest
 from v7_recorded import MANIFEST, META, SHA256, V7, needs_the_recorded_zone, recipe
 
-from mmmb.core.question import load_questions, write_questions
-from mmmb.scenarios.v7_screen.manifest import entries_of, log_path
-from mmmb.scenarios.v7_screen.questions import questions_of
+from mmsb.core.question import load_questions, write_questions
+from mmsb.scenarios.v7_screen.manifest import entries_of, log_path
+from mmsb.scenarios.v7_screen.questions import questions_of
 
 needs_the_recorded_zone()
 

@@ -23,13 +23,13 @@ import numpy as np
 import pytest
 from PIL import Image, ImageDraw
 
-from mmmb.scenarios.v7_screen import media_photo, shortcuts, week as v7_week
-from mmmb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, _write_video
-from mmmb.scenarios.v7_screen.media_porch import BOX, BOX_AREA, PORCH, PORCH_CRF, _stamp_text, porch_frame, write_porch
-from mmmb.scenarios.v7_screen.media_screen import DIALOG, screen_frames, write_screen
-from mmmb.scenarios.v7_screen.media_sound import ALARM_DUR, CHIME_DUR, DOORBELL_PAIRS, write_mic
-from mmmb.scenarios.v7_screen.plan import SCALES, VERSION, days_before
-from mmmb.scenarios.v7_screen.write import write
+from mmsb.scenarios.v7_screen import media_photo, shortcuts, week as v7_week
+from mmsb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, _write_video
+from mmsb.scenarios.v7_screen.media_porch import BOX, BOX_AREA, PORCH, PORCH_CRF, _stamp_text, porch_frame, write_porch
+from mmsb.scenarios.v7_screen.media_screen import DIALOG, screen_frames, write_screen
+from mmsb.scenarios.v7_screen.media_sound import ALARM_DUR, CHIME_DUR, DOORBELL_PAIRS, write_mic
+from mmsb.scenarios.v7_screen.plan import SCALES, VERSION, days_before
+from mmsb.scenarios.v7_screen.write import write
 
 NEEDLE, DISTRACTOR = NEEDLE_RGB, DISTRACTOR_RGB
 SHADE_ERROR = {"kind": "shade", "hue": "red", "rgb": list(NEEDLE["error"])}

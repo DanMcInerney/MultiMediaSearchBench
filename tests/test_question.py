@@ -1,4 +1,4 @@
-"""The question file (mmmb/core/question.py; plan 5.1, DESIGN 6.1). New tests; the expected results are what each test plants: a
+"""The question file (mmsb/core/question.py; plan 5.1, DESIGN 6.1). New tests; the expected results are what each test plants: a
 record written by hand that is valid, the same record with one fault, the rows a writer wrote and the reader must give back."""
 
 from __future__ import annotations
@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import grade
-from mmmb.core.question import Grade, Question, RetrievalSpec, Scope, Span, Truth, load_questions, write_questions
+from mmsb.core import grade
+from mmsb.core.question import Grade, Question, RetrievalSpec, Scope, Span, Truth, load_questions, write_questions
 
 # a valid line, written by hand (a V7 `count` question): every key the schema has, nothing else
 BASE = {

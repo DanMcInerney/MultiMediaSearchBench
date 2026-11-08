@@ -1,6 +1,6 @@
 """A1, the home recorder, from its real source on disk: the tiny hour built (one WAV of the minute files where their names put them, with
 its time), every answer derived again here by a plain reader of the label files (never the scenario's), the grader taking each truth and
-refusing planted wrong answers, the leak probe, and `mmmb build`, `run` and `report` over it with a stand-in agent. Skips, and says so,
+refusing planted wrong answers, the leak probe, and `mmsb build`, `run` and `report` over it with a stand-in agent. Skips, and says so,
 without the source."""
 
 from __future__ import annotations
@@ -20,14 +20,14 @@ import pytest
 from agent_spec import clocked
 from cli_world import world  # noqa: F401
 
-from mmmb import scenarios
-from mmmb.core import fs, grade
-from mmmb.core.agents import claude
-from mmmb.core.contract import ManifestEntry
-from mmmb.core.runfolder import RunFolder
-from mmmb.core.runner import Agent
-from mmmb.scenarios import realdump
-from mmmb.scenarios.a1_home_audio.source import SOURCE, write_wav
+from mmsb import scenarios
+from mmsb.core import fs, grade
+from mmsb.core.agents import claude
+from mmsb.core.contract import ManifestEntry
+from mmsb.core.runfolder import RunFolder
+from mmsb.core.runner import Agent
+from mmsb.scenarios import realdump
+from mmsb.scenarios.a1_home_audio.source import SOURCE, write_wav
 
 if not (SOURCE / "labels" / "living_labels.csv").is_file():
     pytest.skip(f"the SINS source is not at {SOURCE}, so A1 is not built", allow_module_level=True)
@@ -333,7 +333,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = A1.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:/sins" in deny and "in:a1_home_audio" in deny and "in:from mmmb" in deny
+    assert "bench-data" in deny and "in:/sins" in deny and "in:a1_home_audio" in deny and "in:from mmsb" in deny
 
 
 class Spy:
@@ -370,7 +370,7 @@ def test_build_run_and_report_over_the_tiny_hour(world, capsys):  # noqa: F811
     assert prompt.startswith("It is now Friday 3 February 2017, 09:00. The files of the voice recorder I left running in my living room are in ")
     assert asked.question in prompt and "<the time, as HH:MM:SS>" in prompt
     capsys.readouterr()
-    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMMB report")
+    assert world.main("report", str(folder)) == 0 and capsys.readouterr().out.startswith("# MMSB report")
     figures = fs.read_json(folder / "report.json")
     (section,) = figures["scenarios"]
     files, listing = section["cells"]["claude"]["files"], section["cells"]["claude"]["listing"]

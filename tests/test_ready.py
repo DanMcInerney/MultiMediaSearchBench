@@ -9,9 +9,9 @@ import pytest
 from cli_world import CLEAN, world  # noqa: F401
 from stub_system import Stub, StubSystem, tiny_questions
 
-from mmmb.core import fs
-from mmmb.core.agents import claude
-from mmmb.core.runner import Agent
+from mmsb.core import fs
+from mmsb.core.agents import claude
+from mmsb.core.runner import Agent
 
 pytestmark = pytest.mark.xdist_group("cli")
 FIRST = tiny_questions()[0].qid

@@ -36,11 +36,11 @@ from test_exec import CLAUDE_BOTH_ARGV, CLAUDE_SETTINGS, MODELS, files_now, pilo
 
 from multimem import decider
 
-from mmmb.core.agents import claude, codex, common
-from mmmb.core.contract import Case, Served
-from mmmb.core.schedule import agent_off_gpu
-from mmmb.systems.mm.models import Model
-from mmmb.systems.mm.system import BASE, CLOCK_NOTE, NOTES_DIR, SKILL, Mm, notes_text
+from mmsb.core.agents import claude, codex, common
+from mmsb.core.contract import Case, Served
+from mmsb.core.schedule import agent_off_gpu
+from mmsb.systems.mm.models import Model
+from mmsb.systems.mm.system import BASE, CLOCK_NOTE, NOTES_DIR, SKILL, Mm, notes_text
 
 RECORDED = Path(__file__).parent.parent / "oracles" / "recorded"
 EXEC, PILOT = RECORDED / "exec", RECORDED / "pilot-s1"

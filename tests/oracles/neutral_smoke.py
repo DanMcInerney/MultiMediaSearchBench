@@ -23,9 +23,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # tests/: the stan
 
 from stub_system import Stub, tiny_questions  # noqa: E402
 
-from mmmb import cli, systems  # noqa: E402
-from mmmb.core.agents import claude  # noqa: E402
-from mmmb.core.runner import Agent  # noqa: E402
+from mmsb import cli, systems  # noqa: E402
+from mmsb.core.agents import claude  # noqa: E402
+from mmsb.core.runner import Agent  # noqa: E402
 
 DAYS = "2026-10-30,2026-10-31"
 SEED = 7

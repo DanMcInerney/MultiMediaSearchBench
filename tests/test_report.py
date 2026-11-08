@@ -16,16 +16,16 @@ from pathlib import Path
 
 import pytest
 
-from mmmb import scenarios
-from mmmb.core import fs, grade, render, report, retrieval, select, stats
-from mmmb.core.config import Config, parse_config
-from mmmb.core.contract import Moment, RetrievalQuery, RetrievalResult
-from mmmb.core.question import Grade, Question, RetrievalSpec, Scope, Truth, write_questions
-from mmmb.core.record import record
-from mmmb.core.runfolder import RunFolder, is_done
-from mmmb.scenarios.v7_screen.manifest import entries_of
-from mmmb.scenarios.v7_screen.questions import questions_of
-from mmmb.scenarios.v7_screen.week import plan as make_plan
+from mmsb import scenarios
+from mmsb.core import fs, grade, render, report, retrieval, select, stats
+from mmsb.core.config import Config, parse_config
+from mmsb.core.contract import Moment, RetrievalQuery, RetrievalResult
+from mmsb.core.question import Grade, Question, RetrievalSpec, Scope, Truth, write_questions
+from mmsb.core.record import record
+from mmsb.core.runfolder import COMMIT_KEY, RunFolder, is_done
+from mmsb.scenarios.v7_screen.manifest import entries_of
+from mmsb.scenarios.v7_screen.questions import questions_of
+from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 DAYS = [date(2026, 10, 30), date(2026, 10, 31)]
 DEFAULTS = {"files": None, "mm": "d1-3B"}
@@ -49,7 +49,7 @@ def run_of(root: Path, questions, *, seed: int = 7, configs=(FILES, FAKE), asked
     run.json."""
     root.mkdir(parents=True)
     write_questions(root / "questions.jsonl", questions)
-    fs.write_json(root / "run.json", {"mmmb_commit": "abc123", **({"probe": probe} if probe else {})})
+    fs.write_json(root / "run.json", {COMMIT_KEY: "abc123", **({"probe": probe} if probe else {})})
     fs.write_json(root / "systems.json", {c.name: {"system": c.system, "variant": c.variant, "dir": c.dir, "readable": ALL,
                                                    "asked": (asked or {}).get(c.name, ALL)}
                                           for c in configs if c.system not in (None, "files")})

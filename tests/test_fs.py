@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import fs
+from mmsb.core import fs
 
 
 @pytest.mark.skipif(os.name != "nt", reason="a directory junction is a Windows link")

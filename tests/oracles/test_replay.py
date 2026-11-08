@@ -28,12 +28,12 @@ from replay import (CELLS, MM_FIELDS, RECORDED_RUN, ReplaySystem, Replayer, Sour
 from test_exec import pilot_execs, recorded_text, served_from
 from v7_recorded import zone_skip
 
-from mmmb import systems
-from mmmb.core import gpu
-from mmmb.core.config import Config
-from mmmb.core.contract import Served
-from mmmb.core.runfolder import is_done
-from mmmb.core.runner import Agent, run_agents
+from mmsb import systems
+from mmsb.core import gpu
+from mmsb.core.config import Config
+from mmsb.core.contract import Served
+from mmsb.core.runfolder import is_done
+from mmsb.core.runner import Agent, run_agents
 
 FILES = Config("files", "files", None, True)
 MM = Config("mm/d1-3B", "mm", "d1-3B", False)

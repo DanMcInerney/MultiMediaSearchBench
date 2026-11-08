@@ -1,0 +1,5 @@
+[system]
+name = "files"
+class = "mmsb.systems.files.system:Files"
+license = "none"
+horizon = "view"

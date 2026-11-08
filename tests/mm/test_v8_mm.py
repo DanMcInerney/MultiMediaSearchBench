@@ -1,7 +1,7 @@
 """Ported from tests/test_egolife.py of Multimem at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 3: the tests of V8 that need the mm system,
 over the fake EgoLife download of tests/v8_fake.py (a two-day download with tiny clips; the rest of V8's tests are tests/test_v8*.py) and a daemon with the
 fake decider. What moved, by the plan's 3.4, 4.5, 4.6 and 5.2: the arm `mm` is the configuration `mm/fake`; `egolife.set_horizon`, `audit`, `check_snapshot`
-and `HorizonLeak` are the system's (`mmmb.systems.mm`); the decider tier is `Session.oracle` through the core's `run_retrieval`; `bench.run_agents` is the
+and `HorizonLeak` are the system's (`mmsb.systems.mm`); the decider tier is `Session.oracle` through the core's `run_retrieval`; `bench.run_agents` is the
 core's over a stand-in agent.
 The changes of an expectation, each from the plan or from a listed difference:
 - the decider tier's record is the union record of the core (plan 5.2: `config`, `system` and `variant` for `model`, and V7's fields besides V8's);
@@ -29,18 +29,18 @@ from v8_fake import (BLIND, FILES, SHADE, V8, WORD, built, clip_ends, ep, lines_
 
 from multimem import config  # noqa: E402
 
-from mmmb import systems  # noqa: E402
-from mmmb.core import fs, retrieval  # noqa: E402
-from mmmb.core.contract import Case  # noqa: E402
-from mmmb.core.question import load_questions  # noqa: E402
-from mmmb.core.runner import Agent, run_agents  # noqa: E402
-from mmmb.core.scenario import Access  # noqa: E402
-from mmmb.scenarios.v8_egolife.report import decider_figures, decider_lines  # noqa: E402
-from mmmb.systems.mm.audit import HorizonLeak, audit  # noqa: E402
-from mmmb.systems.mm.daemon import Api  # noqa: E402
-from mmmb.systems.mm.estimate import decode_of, window_s  # noqa: E402
-from mmmb.systems.mm.home import exec_project, set_horizon  # noqa: E402
-from mmmb.systems.mm.oracle import ask  # noqa: E402
+from mmsb import systems  # noqa: E402
+from mmsb.core import fs, retrieval  # noqa: E402
+from mmsb.core.contract import Case  # noqa: E402
+from mmsb.core.question import load_questions  # noqa: E402
+from mmsb.core.runner import Agent, run_agents  # noqa: E402
+from mmsb.core.scenario import Access  # noqa: E402
+from mmsb.scenarios.v8_egolife.report import decider_figures, decider_lines  # noqa: E402
+from mmsb.systems.mm.audit import HorizonLeak, audit  # noqa: E402
+from mmsb.systems.mm.daemon import Api  # noqa: E402
+from mmsb.systems.mm.estimate import decode_of, window_s  # noqa: E402
+from mmsb.systems.mm.home import exec_project, set_horizon  # noqa: E402
+from mmsb.systems.mm.oracle import ask  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("v8")
 

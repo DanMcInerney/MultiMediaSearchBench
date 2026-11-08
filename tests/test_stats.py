@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import stats
+from mmsb.core import stats
 
 RECORDED = Path(__file__).parent / "oracles" / "recorded"
 

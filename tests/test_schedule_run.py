@@ -20,12 +20,12 @@ import pytest
 from stub_system import FILES, STUB, Stub, StubSession, StubSystem, tiny_questions
 from test_runner import NARROW, go, result, world  # noqa: F401
 
-from mmmb.core import fs, gpu
-from mmmb.core.agents import claude, codex
-from mmmb.core.config import Config
-from mmmb.core.record import Halt
-from mmmb.core.runner import Agent, cells_in_order
-from mmmb.core.schedule import Expected, Pools, SideBySide
+from mmsb.core import fs, gpu
+from mmsb.core.agents import claude, codex
+from mmsb.core.config import Config
+from mmsb.core.record import Halt
+from mmsb.core.runner import Agent, cells_in_order
+from mmsb.core.schedule import Expected, Pools, SideBySide
 
 pytestmark = pytest.mark.xdist_group("runner")
 WAIT = 10.0

@@ -25,9 +25,9 @@ from mcp import Client
 from mcp.client.stdio import StdioServerParameters
 from PIL import ExifTags, Image
 
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.contract import Case, Dump, ManifestEntry
-from mmmb.systems.listing.system import Listing, ListingSession
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.contract import Case, Dump, ManifestEntry
+from mmsb.systems.listing.system import Listing, ListingSession
 
 SECRET = "ZEBRAQUARTZ"
 T, KIND, SHA = 424242.5, "KINDWORD", "ab" * 32  # what the manifest says and no file does (T: a time that no row says, for a test that plants it)

@@ -9,7 +9,7 @@ A server with the agent's own tools has no golden: its expected argv, settings a
 section 4.4, and its environment is the files cell's by the rule that the own tools pick it.
 
 Intended differences (plan 7.3, each asserted somewhere, none ignored): the skill's five drifted lines (test_goldens.py), the
-`MM_*` variables renamed `MMMB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
+`MM_*` variables renamed `MMSB_*` (test_agents.py), the prompt (not an agent's), the deny words (RunFolder's), and the redirects
 and longest command Claude's files line names (here, `files_now`)."""
 
 from __future__ import annotations
@@ -26,9 +26,9 @@ import pytest
 from agent_spec import BASE_LINE, server_of, spec_of
 from capture_exec import PLACEHOLDERS, placer, plant_git, planted_environment
 
-from mmmb.core.agents import claude, codex, common
-from mmmb.core.answer import answer_of
-from mmmb.core.contract import Served
+from mmsb.core.agents import claude, codex, common
+from mmsb.core.answer import answer_of
+from mmsb.core.contract import Served
 
 RECORDED = Path(__file__).with_name("recorded")
 EXEC, PILOT = RECORDED / "exec", RECORDED / "pilot-s1"

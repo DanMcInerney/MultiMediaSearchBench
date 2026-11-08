@@ -1,4 +1,4 @@
-# MultiMediaMemoryBench: media sources
+# MultiMediaSearchBench: media sources
 
 Status: found and partly downloaded on 4 November 2026. Every scenario in [DESIGN.md](DESIGN.md) section 5 now has
 real media to start from, except the private ones (X1, X2). 79.4 GB of starter media is on disk in
@@ -120,7 +120,7 @@ copied into the dump, never written to:
    or a third party's name; and GPS is stripped from anything that leaves this machine.
 10. **Publishing and licences.** SINS's record says CC BY 4.0, but its licence PDF says academic use only, with no
     transfer to third parties; APSAA forbids redistribution; several YouTube and Internet Archive items state no
-    licence. Under Dan's decision they are used on this machine. If MMMB publishes dumps, these must stay out of the
+    licence. Under Dan's decision they are used on this machine. If MMSB publishes dumps, these must stay out of the
     published ones.
 
 ## How this was done

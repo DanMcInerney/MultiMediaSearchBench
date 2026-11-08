@@ -1,12 +1,12 @@
-# MMMB: the plan to production readiness
+# MMSB: the plan to production readiness
 
-Agreed with Dan on 5 November 2026, then re-planned the same day: MMMB is a standalone benchmark of realistic media, not
+Agreed with Dan on 5 November 2026, then re-planned the same day: MMSB is a standalone benchmark of realistic media, not
 Multimem's benchmark separated out. Built on 6 November 2026, through both review gates and the real-agent test; the changes
 from this plan made while building are marked "As built". DESIGN.md section 5.7 says what each scenario is now.
 
 ## The goal
 
-MMMB measures how well an AI agent finds things in a real pile of media: long videos, lots of pictures, a long audio file, many
+MMSB measures how well an AI agent finds things in a real pile of media: long videos, lots of pictures, a long audio file, many
 short sound files. Today the code runs without Multimem, but everything it can run came from Multimem's work: V7 (the synthetic
 week mm was tuned on), V8 (EgoLife, run through mm), and mm as the only search system. None of the realistic piles has a
 scenario, though their media is on disk in `D:\bench-data\sources\`.
@@ -60,7 +60,7 @@ Defaults taken, each easy to change later:
 
 ## What gets built
 
-1. **A shared builder for real dumps** (`mmmb/scenarios/realdump/`), so the four scenarios stay small: copying and naming files
+1. **A shared builder for real dumps** (`mmsb/scenarios/realdump/`), so the four scenarios stay small: copying and naming files
    with their times, the manifest, a simple shortcut probe (no file name or metadata field carries a label, and needle files are
    not singled out by size), the prompt, the view, the deny words. Each scenario is then a reader of its source and labels plus
    question templates. *As built:* the probe does not check sizes: they are the recordings' own (on the trail camera an animal's
@@ -73,7 +73,7 @@ Defaults taken, each easy to change later:
    per correct answer, the questions `listing` answered (leaks), and, when a system is in the run, its paired comparison with
    `files`. V7's report moves into `v7_screen` unchanged, so it still matches the recorded pilot byte for byte. *As built:* the
    neutral report is `core/summary.py`, and V7's stays where it was (`core/report.py`, `core/render.py`): `compare`, `repeat`,
-   the dry run and many tests read it there. `mmmb report` gives a scenario's own report for its runs (the summary for the real
+   the dry run and many tests read it there. `mmsb report` gives a scenario's own report for its runs (the summary for the real
    scenarios) and the summary for runs of several scenarios.
 
 ## How it is checked

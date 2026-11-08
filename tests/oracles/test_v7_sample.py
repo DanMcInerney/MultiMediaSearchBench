@@ -14,8 +14,8 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from v7_recorded import MANIFEST, SHA256, V7, needs_the_recorded_zone, recipe
 
-from mmmb.core import fs
-from mmmb.scenarios.v7_screen.write import write_file
+from mmsb.core import fs
+from mmsb.scenarios.v7_screen.write import write_file
 
 pytestmark = [pytest.mark.slow, pytest.mark.xdist_group("v7-sample")]
 needs_the_recorded_zone()

@@ -1,4 +1,4 @@
-"""`mmmb clock-check` and the `--clock` option of `mmmb run` (plan 8.2, 6.5, DESIGN 8.4; written for this repository, U14), through `main`, over the stand-in system of tests/stub_system.py and stand-in
+"""`mmsb clock-check` and the `--clock` option of `mmsb run` (plan 8.2, 6.5, DESIGN 8.4; written for this repository, U14), through `main`, over the stand-in system of tests/stub_system.py and stand-in
 agents: the cases are drawn from those the system serves beside another, each is asked alone and then queued, in two folders under the run, and the answers,
 tokens and charged seconds are printed side by side. It refuses before any agent starts when the system cannot report its queue (decision D3) or would
 not run the cases beside each other, and it asks the system whether it is ready first. Over mm itself: tests/mm/test_clock_mm.py.
@@ -14,10 +14,10 @@ from agent_spec import clocked
 from cli_world import agents_of, built_run, world  # noqa: F401
 from stub_system import Stub, peak, tiny_questions
 
-from mmmb.core import fs, gpu
-from mmmb.core.agents import claude
-from mmmb.core.agents.common import reached
-from mmmb.core.runfolder import is_done, load_result
+from mmsb.core import fs, gpu
+from mmsb.core.agents import claude
+from mmsb.core.agents.common import reached
+from mmsb.core.runfolder import is_done, load_result
 
 QUESTIONS = tiny_questions()
 BASE_S = 2.0
@@ -33,7 +33,7 @@ class Takes(Stub):
 
 @pytest.fixture
 def run(world):  # noqa: F811
-    """The built run of the toy week, asked in the `line` format that the stand-in answers in (as `mmmb run --answer-format line` would have kept
+    """The built run of the toy week, asked in the `line` format that the stand-in answers in (as `mmsb run --answer-format line` would have kept
     in its run.json); Claude's login is not asked of the real CLI, and is counted (`world.logins`)."""
     world.logins = []
     world.patch.setattr(claude, "check_login", lambda: world.logins.append(1))
@@ -210,7 +210,7 @@ def test_a_session_with_no_queue_at_all_is_a_session_whose_queue_is_nothing(worl
     assert "0.0 s waited in the queue" in out and "claude stub/all" not in out and world.logins == [], "no Claude: no login asked"
 
 
-# -- the --clock option of `mmmb run` ----------------------------------------------------------------------------------------------------
+# -- the --clock option of `mmsb run` ----------------------------------------------------------------------------------------------------
 
 def test_the_run_command_refuses_several_execs_on_the_working_clock_for_a_system_that_cannot_say_its_queue_before_any_agent_and_a_dry_run_says_so_too(
         world, run, capsys):

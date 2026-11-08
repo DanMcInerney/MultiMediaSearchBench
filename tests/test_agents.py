@@ -26,10 +26,10 @@ from pathlib import Path
 import pytest
 from agent_spec import BASE_LINE, ISOLATION, NO_ISOLATION, served_of, server_of, spec_of
 
-from mmmb.core.agents import claude, codex, common
-from mmmb.core.agents.spec import SessionSpec
-from mmmb.core.answer import answer_of
-from mmmb.core.contract import McpServer, Served
+from mmsb.core.agents import claude, codex, common
+from mmsb.core.agents.spec import SessionSpec
+from mmsb.core.answer import answer_of
+from mmsb.core.contract import McpServer, Served
 
 CONTEXT_FULL = ("Codex ran out of room in the model's context window. Start a new thread or clear earlier history before "
                 "retrying.")  # as codex.exe words it
@@ -915,11 +915,11 @@ def test_a_blind_exec_is_read_from_a_process_and_a_tool_event_ends_it_as_escaped
 def test_an_agent_is_a_function_of_a_session_spec_and_the_model_and_effort_default_to_the_agents_own(monkeypatch):
     for ask in (claude.ask_claude, codex.ask_codex):
         assert list(inspect.signature(ask).parameters) == ["spec"]
-    for var in ("MMMB_CLAUDE_MODEL", "MMMB_CLAUDE_EFFORT", "MMMB_CODEX_MODEL", "MMMB_CODEX_EFFORT"):
+    for var in ("MMSB_CLAUDE_MODEL", "MMSB_CLAUDE_EFFORT", "MMSB_CODEX_MODEL", "MMSB_CODEX_EFFORT"):
         monkeypatch.delenv(var, raising=False)
     assert (claude.model(), claude.effort(), codex.model(), codex.effort()) == ("sonnet", "high", "gpt-6.1-terra", "high")
-    monkeypatch.setenv("MMMB_CLAUDE_MODEL", "opus")
-    monkeypatch.setenv("MMMB_CODEX_EFFORT", "medium")
+    monkeypatch.setenv("MMSB_CLAUDE_MODEL", "opus")
+    monkeypatch.setenv("MMSB_CODEX_EFFORT", "medium")
     assert claude.model() == "opus" and codex.effort() == "medium"
     monkeypatch.setenv("MM_CLAUDE_MODEL", "old-name")
     assert claude.model() == "opus", "the old names mean nothing"
@@ -936,7 +936,7 @@ def test_the_arm_names_in_the_messages_are_blind_files_the_servers_name_and_both
 
 
 NEUTRAL = re.compile(r"\bmm\b|multimem", re.I)
-AGENTS = Path(__file__).parents[1] / "mmmb" / "core" / "agents"
+AGENTS = Path(__file__).parents[1] / "mmsb" / "core" / "agents"
 
 
 def test_no_agent_module_names_mm_or_imports_multimem_or_an_old_root_module():
@@ -963,7 +963,7 @@ def test_the_agents_import_without_multimem_or_the_old_root_modules_in_a_process
                     raise ImportError(f"refused: {name}")
 
         sys.meta_path.insert(0, Refuse())
-        import mmmb.core.agents.spec, mmmb.core.agents.common, mmmb.core.agents.claude, mmmb.core.agents.codex
+        import mmsb.core.agents.spec, mmsb.core.agents.common, mmsb.core.agents.claude, mmsb.core.agents.codex
         assert "multimem" not in sys.modules and "claude_run" not in sys.modules
         print("imported")
     """)
@@ -1066,7 +1066,7 @@ def test_the_own_tools_may_open_a_folder_the_system_handed_them_and_nothing_else
 
 def test_the_effort_asked_for_is_on_the_command_line_of_both_agents_and_without_one_each_has_its_own_default(tmp_path, monkeypatch, stand_in, fake_git):
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "codex-home"))
-    for variable in ("MMMB_CODEX_EFFORT", "MMMB_CLAUDE_EFFORT"):
+    for variable in ("MMSB_CODEX_EFFORT", "MMSB_CLAUDE_EFFORT"):
         monkeypatch.delenv(variable, raising=False)
     levels = [{"effort": e} for e in ("high", "medium", "low")]
     monkeypatch.setattr(codex, "models_of", lambda command: {"models": [{"slug": "gpt-test", "supported_reasoning_levels": levels}]})
@@ -1077,7 +1077,7 @@ def test_the_effort_asked_for_is_on_the_command_line_of_both_agents_and_without_
         out = codex.ask_codex(spec_of("blind", tmp_path, run_dir=tmp_path / f"codex{n}", model="gpt-test", effort=asked))
         assert out["problem"] is None and out["effort"] == got
         assert f"model_reasoning_effort={got}" in settings_of(out["argv"]) and sum(s.startswith("model_reasoning_effort=") for s in settings_of(out["argv"])) == 1
-    monkeypatch.setenv("MMMB_CODEX_EFFORT", "low")
+    monkeypatch.setenv("MMSB_CODEX_EFFORT", "low")
     out = codex.ask_codex(spec_of("blind", tmp_path, run_dir=tmp_path / "codex-env", model="gpt-test"))
     assert "model_reasoning_effort=low" in settings_of(out["argv"]), "the agent's own default is the environment's"
 
@@ -1085,6 +1085,6 @@ def test_the_effort_asked_for_is_on_the_command_line_of_both_agents_and_without_
     for n, (asked, got) in enumerate((("medium", "medium"), ("low", "low"), (None, "high"))):
         out = claude.ask_claude(spec_of("mm", tmp_path, run_dir=tmp_path / f"claude{n}", effort=asked))
         assert out["problem"] is None and after(out["argv"], "--effort") == [got]
-    monkeypatch.setenv("MMMB_CLAUDE_EFFORT", "low")
+    monkeypatch.setenv("MMSB_CLAUDE_EFFORT", "low")
     out = claude.ask_claude(spec_of("mm", tmp_path, run_dir=tmp_path / "claude-env"))
     assert after(out["argv"], "--effort") == ["low"], "the agent's own default is the environment's"

@@ -8,9 +8,9 @@ import json
 
 import pytest
 
-from mmmb.core import grade
-from mmmb.core.question import Grade, Span, load_questions, write_questions
-from mmmb.scenarios import realdump
+from mmsb.core import grade
+from mmsb.core.question import Grade, Span, load_questions, write_questions
+from mmsb.scenarios import realdump
 
 
 def of(items, ignore=()) -> Grade:

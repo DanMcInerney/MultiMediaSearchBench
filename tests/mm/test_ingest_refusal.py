@@ -1,5 +1,5 @@
 """New tests for the finding of U7's notes, over the real mm system: `Mm.ingest` reports a file it stored at a time other than its own as
-`misdated`, and a run is refused for it, by name, through the core (mmmb/core/build.py, which names no system); a file it refuses is in the report with
+`misdated`, and a run is refused for it, by name, through the core (mmsb/core/build.py, which names no system); a file it refuses is in the report with
 its reason (G1's F7). The neutral half, with a stand-in
 system, is tests/test_cli_build.py; this is the same route with the real `ingest` of the system that can make the report (the fake decider: no
 model is loaded, and ingest loads none)."""
@@ -17,12 +17,12 @@ pytest.importorskip("multimem")
 import fakes  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from mmmb.core import fs  # noqa: E402
-from mmmb.core.build import Misdated, check_stores, ingest_stores, store_of  # noqa: E402
-from mmmb.core.cache import INGESTED, report_of  # noqa: E402
-from mmmb.core.config import Config  # noqa: E402
-from mmmb.core.contract import Dump  # noqa: E402
-from mmmb.systems.mm.load import remember  # noqa: E402
+from mmsb.core import fs  # noqa: E402
+from mmsb.core.build import Misdated, check_stores, ingest_stores, store_of  # noqa: E402
+from mmsb.core.cache import INGESTED, report_of  # noqa: E402
+from mmsb.core.config import Config  # noqa: E402
+from mmsb.core.contract import Dump  # noqa: E402
+from mmsb.systems.mm.load import remember  # noqa: E402
 
 CONFIG = Config("mm/fake", "mm", "fake", False)
 

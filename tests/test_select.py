@@ -13,9 +13,9 @@ import math
 import pytest
 from stub_system import FILES, STUB, StubSystem, run_of, tiny_questions
 
-from mmmb.core import fs
-from mmmb.core.config import Config
-from mmmb.core.select import (CONTROL_TYPES, MEDIA, MODALITIES, SUBSETS, Selection, Separation, asked_modalities, canaries_of, config_questions,
+from mmsb.core import fs
+from mmsb.core.config import Config
+from mmsb.core.select import (CONTROL_TYPES, MEDIA, MODALITIES, SUBSETS, Selection, Separation, asked_modalities, canaries_of, config_questions,
                               discriminating, pick_controls, pilot_questions, select, selected, separate, stratified)
 
 SYSTEM = StubSystem()

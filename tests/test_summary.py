@@ -10,12 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from mmmb.core import fs, stats, summary
-from mmmb.core.config import parse_config
-from mmmb.core.question import Span, write_questions
-from mmmb.core.record import record
-from mmmb.core.runfolder import RunFolder
-from mmmb.scenarios import realdump
+from mmsb.core import fs, stats, summary
+from mmsb.core.config import parse_config
+from mmsb.core.question import Span, write_questions
+from mmsb.core.record import record
+from mmsb.core.runfolder import COMMIT_KEY, RunFolder
+from mmsb.scenarios import realdump
 
 DEFAULTS = {"files": None, "listing": None, "stub": "all"}
 FILES, LISTING, STUB = (parse_config(c, DEFAULTS) for c in ("files", "listing", "stub"))
@@ -43,7 +43,7 @@ RIGHT = {"count-1": "3", "count-2": "5", "days-1": "2013-12-16 and 2013-12-18", 
 def run_of(root: Path, scenario, seed: int = 1, configs=(FILES, LISTING, STUB)) -> RunFolder:
     root.mkdir(parents=True)
     write_questions(root / "questions.jsonl", questions())
-    fs.write_json(root / "run.json", {"mmmb_commit": "abc123", "probe": {"status": "passed", "failures": []}})
+    fs.write_json(root / "run.json", {COMMIT_KEY: "abc123", "probe": {"status": "passed", "failures": []}})
     fs.write_json(root / "systems.json", {"listing": {"system": "listing", "description": {"leak_filter": True}},
                                           "stub": {"system": "stub", "description": {"leak_filter": False}}})
     return RunFolder(root, seed, "tiny", (date(2013, 12, 16),), root / "data", root, "tag", 900.0, scenario, tuple(configs))
@@ -98,7 +98,7 @@ def test_each_other_configuration_is_set_beside_the_control_on_the_questions_bot
 
 def test_the_markdown_says_what_the_figures_hold(run):
     text = summary.markdown(summary.numbers([run]))
-    assert text.startswith("# MMMB report\n")
+    assert text.startswith("# MMSB report\n")
     assert "| claude | files | 2/4 (50%) |" in text and "| claude | listing (leak check) | 3/6 (50%) |" in text
     assert "- count-1 (a): claude" in text and "To run again (left out): claude files 1." in text
     assert "| claude | stub/all vs files | 4 | +50 pts" in text and "not shown" in text

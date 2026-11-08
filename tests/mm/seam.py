@@ -15,10 +15,10 @@ from pathlib import Path
 
 import stand_in_agent
 
-from mmmb.core.config import Config
-from mmmb.core.contract import Dump, Session
-from mmmb.core.question import Question
-from mmmb.core.runfolder import RunFolder
+from mmsb.core.config import Config
+from mmsb.core.contract import Dump, Session
+from mmsb.core.question import Question
+from mmsb.core.runfolder import RunFolder
 
 # what the stand-in does of mm's server (tests/stand_in_agent.py has the rest): find, ask until it ends, look at the first sighting, and with its own tools open the picture
 MIDDLE = r'''
