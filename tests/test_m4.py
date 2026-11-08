@@ -25,6 +25,7 @@ from mmsb.core import fs, grade
 from mmsb.core.agents import claude
 from mmsb.core.runfolder import RunFolder
 from mmsb.core.runner import Agent
+from mmsb.scenarios import realdump
 from mmsb.scenarios.m4_samples.questions import CLASSES, NEAR
 from mmsb.scenarios.m4_samples.source import SOURCE, clip_file, clip_sizes
 
@@ -283,7 +284,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = M4.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:fsd50k" in deny and "in:freesound" in deny and "in:m4_samples" in deny and "in:from mmsb" in deny
+    assert realdump.source_word() in deny and "in:fsd50k" in deny and "in:freesound" in deny and "in:m4_samples" in deny and "in:from mmsb" in deny
 
 
 def test_the_grader_takes_each_truth_and_refuses_the_planted_wrong_answers(tiny):

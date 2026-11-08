@@ -14,9 +14,9 @@ uv sync --extra mm                   # also MultimediaSearch (`mms`), from GitHu
 uv sync --frozen --no-default-groups # what the neutrality test makes: no extra, no pytest
 ```
 
-- **`--frozen`** uses `uv.lock` as it is and never locks again. The `mm` extra is `mms`, MultimediaSearch, a git source pinned to
-  one commit (`mms = { git = "https://github.com/DanMcInerney/MultimediaSearch", rev = ... }` in `pyproject.toml`); uv fetches it
-  from GitHub to lock and to install it, and locking needs the network for that. The lock holds torch
+- **`--frozen`** uses `uv.lock` as it is and never locks again. The `mm` extra is `mms`, MultimediaSearch, a direct reference to one
+  commit (`mms @ git+https://github.com/DanMcInerney/MultimediaSearch@<commit>` in `pyproject.toml`); uv fetches it from GitHub to
+  lock and to install it, and locking needs the network for that. The lock holds torch
   2.11.0+cu128, torchvision 0.26.0+cu128 and transformers 5.21.0 for the `mm-gpu` group, which P0 did not install.
 - **`uv sync` is exact:** it removes an extra you did not ask for. `uv run` does not. When several agents share the
   environment, run `.venv\Scripts\python.exe -m pytest`, so `uv run` does not sync it under them.
@@ -27,13 +27,17 @@ uv sync --frozen --no-default-groups # what the neutrality test makes: no extra,
   saving ended at 02:00 on 1 November 2026, so the UTC offsets at the midnights that start 1, 2 and 3 November and end the 3rd
   are -0400, -0500, -0500, -0500. Elsewhere those oracles skip, and say which offsets they need. Windows has no `tzset`, so a
   test cannot change zone itself.
-- **Everything on D:.** Set `TEMP` and `TMP` to `D:/mmsb-temp/tmp`, give pytest `--basetemp=D:/mmsb-temp/pytest-<name>`, and
-  `UV_CACHE_DIR=D:/mmsb-temp/uv-cache` for any uv call that could write its cache. C: swung between 1.8 GB and 23 GB free
-  during the build because of other work on the machine. uv's cache is on C: and the environment on D:, so uv copies. A
-  `TEMP` under `C:\Users\...\AppData` also fails V8's run tests, because "data", one of V8's deny words, is in "AppData".
-  In Git Bash: `export TEMP=D:/mmsb-temp/tmp TMP=D:/mmsb-temp/tmp TZ=America/New_York`.
+- **Where the files go.** Everything MMSB makes is under `MMSB_HOME` (default your home folder): `mmsb-runs`, `mmsb-data`,
+  `mmsb-cache`, `mmsb-temp` (`paths.TESTS`: where the tests put theirs) and, for the runs recorded before MMSB, `mm-bench` and
+  `mm-bench-temp`. The sources are in `MMSB_SOURCES` (default `<home>/mmsb-sources`). The tests' own runs and folders are
+  pytest's `tmp_path`s, in the system temp folder unless you move them: to keep a suite's files off a crowded system drive, set
+  `TEMP` and `TMP` to `<home>/mmsb-temp/tmp`, give pytest `--basetemp=<home>/mmsb-temp/pytest-<name>`, and `UV_CACHE_DIR=<home>/mmsb-temp/uv-cache`
+  for any uv call that could write its cache (uv copies when its cache and the environment are on two drives). The maintainer's
+  machine runs the suite with `MMSB_HOME=D:\` and `MMSB_SOURCES=D:\bench-data\sources`, and the D: paths below are those. In Git Bash:
+  `export MMSB_HOME=D:/ MMSB_SOURCES=D:/bench-data/sources TEMP=D:/mmsb-temp/tmp TMP=D:/mmsb-temp/tmp TZ=America/New_York`.
 - **The sources of the real scenarios.** `tests/test_v1.py`, `test_i3.py`, `test_a1.py` and `test_m4.py` read
-  `D:\bench-data\sources\{meva,caltech-camera-traps,sins,fsd50k}` and skip loudly when it is missing.
+  `<MMSB_SOURCES>/{meva,caltech-camera-traps,sins,fsd50k}` and skip loudly when it is missing; `uv run mmsb fetch --scenario all`
+  fills it. `tests/test_fetch.py` needs none of it: it runs `mmsb fetch` against a local HTTP server.
 - **Test names.** None of `tests/`, `tests/oracles/` and `tests/mm/` has an `__init__.py`, and the test files import their helpers as
   siblings, so a test file's name must be unique across the three. That is why oracle 1a is `test_v7_hashes.py` and oracle 2 is
   `test_recorded_report.py`: `tests/test_v7_plan.py` and `tests/test_report.py` have the other names.
@@ -48,12 +52,12 @@ These hold for every test and every check:
   (MultimediaSearch, then called Multimem, 30 October 2026). The default is `-n 4`.
 - **Throwaway homes.** A session fixture points `HOME`, `USERPROFILE`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR` and `MMS_HOME` into
   a temporary folder. An audit hook fails a test that writes the real `~/.claude`, `~/.codex`, `~/.mms`, or the folders
-  MMSB keeps its runs in (`D:\mmsb-runs`, `D:\mmsb-data`, `D:\mmsb-cache`), even when the code under test swallows the error. A
+  MMSB keeps its runs in (`paths.RUNS`, `paths.TEMP`, `paths.CACHE`), even when the code under test swallows the error. A
   test gives its commands an `--out`, `--temp` and `--cache` of its own. The same hook fails a test that starts a program named
   `claude` or `codex`, or any program inside those three folders (`subprocess`, `os.system`, `os.exec*`, `os.spawn*`, and the
   command a shell is given): a test that needs an agent puts a stand-in of another name in its place, and patches
   `claude.check_login`.
-- **Read only:** the recorded runs in `D:\mm-bench` and `D:\mm-bench-temp`, MultimediaSearch's own folders, and `D:\bench-data`.
+- **Read only:** the recorded runs in `<home>\mm-bench` and `<home>\mm-bench-temp`, MultimediaSearch's own folders, and the sources.
 - **mm tests** start MultimediaSearch's daemon only with throwaway homes and the `python:` fake decider, never with a real model.
 
 ## 3. Markers and how to run
@@ -89,7 +93,7 @@ neutrality check.
 | --- | --- | --- | --- |
 | 1a | V7: the plan hash and files hash equal `run.json`'s; its 1,572 files and 3 logs are the 1,575 of the recorded manifest, each with the recorded path and `mtime_ns` | `uv run pytest tests/oracles/test_v7_hashes.py` | about 2 s |
 | 1b | V7: 43 files written and compared by sha256, size and mtime. The rule: `random.Random(7)`, then in this order `sample(files of the kind, n)` for screen 12, photo 12, porch 6, mic 4, note 4, clip 3, config 2 | `uv run pytest -m slow tests/oracles/test_v7_sample.py` | 13 s (U13) |
-| 1c | V7: the whole pilot week, 1,575 files, by sha256, size and mtime; the shortcut probe passes and writes `shortcuts.json` and `.md` equal to the recorded ones but for the seconds | `uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=D:/mmsb-temp/oracle1c --v7-workers=4 -n 0` | about 6 min to write at 4 workers, 1,377 worker-seconds, and 84 s to probe; about 8 min at the recorded build's 3 workers |
+| 1c | V7: the whole pilot week, 1,575 files, by sha256, size and mtime; the shortcut probe passes and writes `shortcuts.json` and `.md` equal to the recorded ones but for the seconds | `uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=<home>/mmsb-temp/oracle1c --v7-workers=4 -n 0` | about 6 min to write at 4 workers, 1,377 worker-seconds, and 84 s to probe; about 8 min at the recorded build's 3 workers |
 | 1 (V8) | V8: the plan and files hash equal the recorded run's; its 50 questions and its 2,592 clips and 3 transcript files are the recorded ones. Needs the download at `D:\bench-data\egolife`, and skips loudly without it. It builds no 41 GB view | `uv run pytest tests/oracles/test_v8_plan.py` (the clip table, about 1.5 min, is marked `slow`) | a few seconds |
 | 2 | The report: the 110 pilot results (converted once) give, through `report.numbers` and `render.markdown`, the recorded `report.json` (through a short `legacy_view`) and `report.md` byte for byte. A planted flip of one `passed` makes it fail and moves `b` and `c` by one. Recorded answers regraded through `Question.grade` equal the recorded verdicts, 110 of 110 | `uv run pytest tests/oracles/test_recorded_report.py` | about 3 s |
 | 2 (V8) | The same for EgoLife: 150 results and 50 retrieval records, regraded 150 of 150; the 150 recorded prompts are the expected V8 prompts. Needs no download and holds in any zone | `uv run pytest tests/oracles/test_recorded_egolife.py` | about 3 s |
@@ -157,7 +161,7 @@ Run it after each update of the Claude or Codex CLI, and before a paid full run.
 Codex's quota, and takes about 5 minutes.
 
 ```
-uv run mmsb build --scenario i3_trailcam --scale tiny --configs files,listing --out D:/mmsb-temp/real/runs --temp D:/mmsb-temp/real/data --cache D:/mmsb-temp/real/cache
+uv run mmsb build --scenario i3_trailcam --scale tiny --configs files,listing --out <home>/mmsb-temp/real/runs --temp <home>/mmsb-temp/real/data --cache <home>/mmsb-temp/real/cache
 uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2 --dry-run
 uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2
 uv run mmsb report <run>
@@ -167,7 +171,7 @@ Read each result's `answer`, `answer_error` and `grounded`, and the exec's `fina
 `answer_error` on a right answer is a fault of the reader, not of the agent. The `listing` cells should be right only on the
 absent question. Section 9 has what the first one showed.
 
-**What waits for Dan** (the pilot re-run, the first `mm+files` run, the clock check) is in DESIGN.md section 12.2, with its
+**What waits for the maintainer** (the pilot re-run, the first `mm+files` run, the clock check) is in DESIGN.md section 12.2, with its
 commands and costs.
 
 ## 5. The goldens
@@ -184,7 +188,7 @@ is wrong, delete it on purpose and say why in the log below.
 | Script | Wrote | Run |
 | --- | --- | --- |
 | `tests/oracles/capture_recorded.py` | `pilot-s1/`: byte copies of `run.json`, `data-manifest.json`, `shortcuts.json`, `shortcuts.md`, `report.json`, `report.md`; `sha256.json` (the sha256 of all 1,575 files of the data folder, hashed in one process); `execs.json` (what each of the 110 execs wrote before it ran); `instructions/<sha>.md`; `replay/` (8 small execs, 2 for each cell); `egolife-s1/{run.json,report.json,report.md}`; `recorded.json` | `uv run python tests\oracles\capture_recorded.py [--pilot RUN] [--egolife RUN] [--out recorded]` |
-| `tests/oracles/capture_exec.py` | `exec/`: argv, environment, instructions, settings, `mcp.json` and catalog for Claude and Codex in the blind, files and mm modes, and `deny-v7.json`, `deny-v8.json`; `capture.json` says where it came from | `C:\Users\danhm\tools\Multimem\.venv\Scripts\python.exe tests\oracles\capture_exec.py`, with the old modules read by `git show bb498a6:<file>`. No CLI is started and nothing is asked. Run once, with the tool as `multimem`; not run again after the rename (section 6, difference 15) |
+| `tests/oracles/capture_exec.py` | `exec/`: argv, environment, instructions, settings, `mcp.json` and catalog for Claude and Codex in the blind, files and mm modes, and `deny-v7.json`, `deny-v8.json`; `capture.json` says where it came from | `%MMS_CHECKOUT%\.venv\Scripts\python.exe tests\oracles\capture_exec.py` (`MMS_CHECKOUT` is the search tool's checkout), with the old modules read by `git show bb498a6:<file>`. No CLI is started and nothing is asked. Run once, with the tool as `multimem`; not run again after the rename (section 6, difference 15) |
 | `tests/oracles/convert_recorded.py` | `pilot-s1/converted/` and `egolife-s1/converted/`: the results in the new format (`arm`, `model` become `config`, `system`, `variant`; nothing else changes), `questions.jsonl` from the new writers, `systems.json`, `run.json`; and `egolife-s1/prompts.json` | `uv run python tests\oracles\convert_recorded.py [pilot\|egolife\|egolife-prompts] [--run RUN] [--out DIR]`, in US Eastern time |
 
 - **Why the exec goldens are captured and not read.** No recorded run holds an argv. Exec folders hold instructions, prompt,
@@ -362,7 +366,7 @@ G2's review passed every oracle and found one blocker. The repair, in one pass, 
 
 ### 2026-11-06: the real scenarios
 
-Built to PLAN.md: the shared builder, the `set` rule, the neutral report and four scenarios, in two units, each gated by one
+The plan was: the shared builder, the `set` rule, the neutral report and four scenarios, in two units, each gated by one
 independent review and at most one repair pass.
 - **Gate 1** (the builder, the rule, the report and I3, before three makers copied them) found ten faults, repaired in one
   pass: among them, an answer could not repeat the question's own numbers, the probe passed a file it could not read, and a

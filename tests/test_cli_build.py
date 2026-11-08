@@ -81,6 +81,16 @@ def test_a_build_writes_the_dump_frozen_the_questions_the_stores_and_run_json_la
     assert call["stores"] == ["files", "stub"] and call["data"] and not call["run_json"], "after the data and the stores, before run.json"
 
 
+def test_a_build_whose_out_holds_its_temp_is_refused_before_anything_is_written(world, tmp_path, capsys):
+    """`RunFolder.deny` refuses the agents the folder a run is in: with `--temp` inside it, that is their own data. Said at the build."""
+    argv = build_args(world)
+    argv[argv.index("--out") + 1], argv[argv.index("--temp") + 1] = str(tmp_path / "work"), str(tmp_path / "work" / "data")
+    assert world.main(*argv) == 1
+    err = capsys.readouterr().err
+    assert "holds --temp" in err and "Give --out a folder of its own" in err
+    assert not (tmp_path / "work").exists(), "refused before the dump or the run folder was made"
+
+
 def test_a_probe_that_fails_or_is_skipped_is_recorded_and_a_build_that_fails_it_exits_1(world, capsys):
     failures = ("video-screen-error-1 (part, screen): 3 states in scope, 250 needed", "audio-mic-alarm-2 (week, mic): 2 sounds in scope, 30 needed")
     # passed (seed 1), failed (seed 2: the run is kept, complete and flagged), skipped (seed 3: the probe is not called)

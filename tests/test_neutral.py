@@ -88,7 +88,7 @@ WALK = textwrap.dedent("""\
     try:
         systems.load("mm")
     except systems.ExtraMissing as error:
-        assert str(error) == "mm needs the mm extra: uv sync --extra mm", str(error)
+        assert str(error) == "mm needs the mm extra: uv sync --extra mm --group mm-gpu", str(error)
     else:
         raise AssertionError("mm opened with mms refused")
     assert type(systems.load("files")).__name__ == "Files"
@@ -242,7 +242,7 @@ def test_the_core_runs_in_a_fresh_environment_that_has_no_mms(tmp_path_factory):
         summary = json.loads(lines[-1])
         assert last == "neutral smoke ok" and summary["mms"] is None and summary["probe"] == "passed"
         assert summary["results"] == summary["questions"] == 19 and summary["report_runs"] == 1
-        assert summary["refused"].endswith("mm needs the mm extra: uv sync --extra mm")
+        assert summary["refused"].endswith("mm needs the mm extra: uv sync --extra mm --group mm-gpu")
         assert fs.read_json(next((work / "runs").iterdir()) / "run.json")["configs"] == [
             {"name": "files", "system": "files", "variant": None, "own_tools": True}]
     finally:

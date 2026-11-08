@@ -101,10 +101,10 @@ def w(world, built, tmp_path):  # noqa: F811
     def skip(where, names):
         return [n for n in names if n in ("results", "execs", "dry-run", "homes", "systems.json") or n.startswith("report.")]
 
-    shutil.copytree(built.folder, tmp_path / "run", ignore=skip)
+    shutil.copytree(built.folder, tmp_path / "runs" / "run", ignore=skip)
     world.patch.setattr(claude, "check_login", lambda: None)
     cli_world.use(world.patch, CutSystem(report=MEASURED, rules=False))
-    world.run = RunFolder.open(tmp_path / "run", scenarios.get)
+    world.run = RunFolder.open(tmp_path / "runs" / "run", scenarios.get)
     world.registry_folder = built.registry
     world.spy = Spy(world.run.questions())
     return world

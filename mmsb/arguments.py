@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from mmsb import scenarios
+from mmsb import fetch, scenarios
 from mmsb.core import paths
 from mmsb.core.answer import DEFAULT_FORMAT, FORMATS
 from mmsb.core.atonce import GPU_JOBS, JOBS
@@ -15,6 +15,7 @@ from mmsb.core.clockcheck import CASES
 from mmsb.core.runfolder import JOBS_MAX
 from mmsb.core.runner import AGENTS, TIMEOUT_S
 from mmsb.core.select import SUBSETS
+from mmsb.scenarios.realdump import sources_root
 
 OPTIONS = ("scale", "seed", "days", "source", "per_age", "speech")  # what a scenario's recipe may be given; `build` passes those it takes
 DEFAULT_SEED = 1
@@ -28,9 +29,15 @@ def csv(text: str) -> list[str]:
 
 
 def parser_of() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="mmsb", description="MultiMediaSearchBench: how well a memory system for agents answers "
-                                                              "questions about recordings, against the agent's own tools.")
+    parser = argparse.ArgumentParser(prog="mmsb", description="MultiMediaSearchBench: how well an AI agent, alone or with a search system, "
+                                                              "finds things in recordings.")
     sub = parser.add_subparsers(dest="command", required=True)
+    fetched = sub.add_parser("fetch", help="download the sources the real scenarios read (no account needed) into the sources folder")
+    fetched.add_argument("--scenario", action="append", required=True, choices=(*fetch.SCENARIOS, "all"),
+                         help="the scenario whose source to fetch (repeat for more, or `all`)")
+    fetched.add_argument("--sources", type=Path, default=sources_root(), help=f"where this fetch writes, one folder per source (default MMSB_SOURCES, else {sources_root()}); a build reads "
+                         "MMSB_SOURCES, so set it to the same folder")
+    fetched.add_argument("--workers", type=int, default=fetch.WORKERS, help=f"requests at once (default {fetch.WORKERS})")
     build = sub.add_parser("build", help="write a scenario's recordings, its questions and the stores, and probe for shortcuts")
     build.add_argument("--scenario", required=True, choices=tuple(scenarios.REGISTRY))
     build.add_argument("--scale", help="the scenario's scale (v7_screen: tiny, pilot, ...)")

@@ -138,8 +138,8 @@ def decided(built, recipe, v8store, tmp_path_factory):
     """Every question asked of the fake decider by the retrieval tier: the run folder and the records by qid."""
     dump, questions = built
     root = tmp_path_factory.mktemp("decided")
-    (root / "run").mkdir()
-    run = write_run(root / "run", recipe, questions, dump, root / "temp", configs=(BLIND, FILES, S))
+    (root / "runs" / "run").mkdir(parents=True)
+    run = write_run(root / "runs" / "run", recipe, questions, dump, root / "temp", configs=(BLIND, FILES, S))
     with fakes.Opened(v8store, dump, run.folder / "homes") as session:
         retrieval.run_retrieval(run, S, session, questions, warm_s=0.5)
     return run, {q.qid: fs.read_json(run.folder / "results" / "retrieval" / "mm-fake" / f"{q.qid}.json") for q in questions}
@@ -228,11 +228,11 @@ def ran(built, recipe, v8store, tmp_path_factory):
     horizon cuts the whole home)."""
     dump, questions = built
     root = tmp_path_factory.mktemp("ran")
-    (root / "run").mkdir()
+    (root / "runs" / "run").mkdir(parents=True)
     during, tools = mm_ask()
     with pytest.MonkeyPatch.context() as patch:
         made_up_ffmpeg(patch, root)
-        run = write_run(root / "run", recipe, questions, dump, root / "temp", configs=(S,))
+        run = write_run(root / "runs" / "run", recipe, questions, dump, root / "temp", configs=(S,))
         fs.write_json(run.manifest, fs.stats_of(dump.root))
         probe = Probe(questions, pause=0.3, during=during, tools=tools, answer=lambda spec, q: q.grade.truth if q.qid in RIGHT else "A" if q.grade.truth != "A" else "B")
         go(run, dump, v8store, probe, (S,))
@@ -271,8 +271,8 @@ def test_the_system_runs_one_at_a_time(ran):
 
 def test_a_leak_into_a_result_ends_the_command_and_leaves_the_question_to_run_again(built, recipe, v8store, tmp_path):
     dump, questions = built
-    (tmp_path / "run").mkdir()
-    run = write_run(tmp_path / "run", recipe, questions, dump, tmp_path / "temp", configs=(BLIND, FILES, S))
+    (tmp_path / "runs" / "run").mkdir(parents=True)
+    run = write_run(tmp_path / "runs" / "run", recipe, questions, dump, tmp_path / "temp", configs=(BLIND, FILES, S))
     fs.write_json(run.manifest, fs.stats_of(dump.root))
     during, tools = mm_ask(leak="ego-018")
     with pytest.MonkeyPatch.context() as patch:

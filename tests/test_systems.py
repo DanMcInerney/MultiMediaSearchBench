@@ -41,7 +41,7 @@ def test_the_registry_reads_the_toml_files_there_are_and_a_folder_with_none_is_n
     mm, files, listing = found["mm"], found["files"], found["listing"]
     assert (listing.cls, listing.extra, listing.default_variant, listing.horizon, listing.isolation.deny_words) == (
         "mmsb.systems.listing.system:Listing", None, None, "cut", ())  # a system of its own that keeps nothing on the machine: no isolation to declare
-    assert (mm.cls, mm.extra, mm.default_variant, mm.horizon) == ("mmsb.systems.mm.system:Mm", "mm", "d1-3B", "cut")
+    assert (mm.cls, mm.extra, mm.group, mm.default_variant, mm.horizon) == ("mmsb.systems.mm.system:Mm", "mm", "mm-gpu", "d1-3B", "cut")
     assert (files.cls, files.extra, files.default_variant, files.horizon) == ("mmsb.systems.files.system:Files", None, None, "view")
     assert systems.defaults() == {"files": None, "mm": "d1-3B"} | {k: v for k, v in systems.defaults().items() if k not in ("files", "mm")}
     # a configuration parsed with them: `mm` is `mm/d1-3B`, and `files` has no variants
@@ -142,7 +142,7 @@ def test_the_mm_system_is_refused_with_the_extra_to_install_when_mms_is_absent()
         pytest.skip("mmsb/systems/mm/system.py is U7's and is not here yet, so importing mm fails for want of the module, not of the extra")
     with pytest.raises(systems.ExtraMissing) as error:
         systems.load("mm")
-    assert str(error.value) == "mm needs the mm extra: uv sync --extra mm"
+    assert str(error.value) == "mm needs the mm extra: uv sync --extra mm --group mm-gpu"
 
 
 def test_the_files_system_has_nothing_to_ingest_or_serve_and_reads_every_modality(tmp_path):
@@ -187,7 +187,7 @@ def test_the_runner_and_the_registry_import_with_mms_and_the_old_root_modules_re
         """)
     done = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True, cwd=ROOT,
                           env={"PYTHONPATH": str(ROOT), "SYSTEMROOT": __import__("os").environ.get("SYSTEMROOT", ""),
-                              "PYTHONDONTWRITEBYTECODE": "1"})
+                              "MMSB_HOME": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"})  # (a home to put the folders in: there is none in this environment)
     assert done.returncode == 0 and done.stdout.strip() == "ok", done.stderr[-1500:]
 
 

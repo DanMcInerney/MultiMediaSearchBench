@@ -24,6 +24,7 @@ from mmsb.core import fs, grade
 from mmsb.core.agents import claude
 from mmsb.core.runfolder import RunFolder
 from mmsb.core.runner import Agent
+from mmsb.scenarios import realdump
 from mmsb.scenarios.i3_trailcam.questions import questions_of
 from mmsb.scenarios.i3_trailcam.source import SOURCE, Photo
 
@@ -296,7 +297,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = I3.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:caltech" in deny and "in:i3_trailcam" in deny and "in:from mmsb" in deny
+    assert realdump.source_word() in deny and "in:caltech" in deny and "in:i3_trailcam" in deny and "in:from mmsb" in deny
 
 
 class Spy:

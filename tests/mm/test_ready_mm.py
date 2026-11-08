@@ -31,7 +31,7 @@ def test_mm_is_not_ready_for_a_model_that_is_not_downloaded_or_whose_environment
     weights = tmp_path / "models"
     model_folder(weights, "d1-3B")
     mm = Mm(models_dir=weights)
-    with pytest.raises(ValueError, match=r"d1-3B: its env is not ready: torch is not installed.*uv sync --group mm-gpu"):
+    with pytest.raises(ValueError, match=r"d1-3B: its env is not ready: torch is not installed.*uv sync --extra mm --group mm-gpu"):
         mm.check_ready("d1-3B")
     with pytest.raises(ValueError, match="d1-3B: not downloaded: mms model use d1-3B"):
         Mm(models_dir=tmp_path / "empty").check_ready("d1-3B")

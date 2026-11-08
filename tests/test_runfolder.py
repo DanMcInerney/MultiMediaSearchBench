@@ -38,7 +38,7 @@ OLD_OUT_WORDS = ("/mm-bench/", '/mm-bench"', "/mm-bench ", "/mm-bench'")
 NEW_RUNS_WORDS = ("/__out__/", '/__out__"', "/__out__ ", "/__out__'")
 NEW_CACHE_WORDS = ("/__cache__/", '/__cache__"', "/__cache__ ", "/__cache__'")
 EARLIER_TEMP_WORDS = ("/mm-bench-temp/", '/mm-bench-temp"', "/mm-bench-temp ", "/mm-bench-temp'")
-TESTS_WORDS = ("d:/mmsb-temp", "/mmsb-temp/", '/mmsb-temp"', "/mmsb-temp ", "/mmsb-temp'")
+TESTS_WORDS = (str(paths.TESTS).lower().replace("\\", "/"), "/mmsb-temp/", '/mmsb-temp"', "/mmsb-temp ", "/mmsb-temp'")
 
 
 class StubScenario:
@@ -167,13 +167,13 @@ def test_a_package_installed_in_site_packages_denies_its_own_folder_and_not_the_
 
 # -- the answers elsewhere on the disk (G1's F1) ---------------------------------------------------------------------------------
 
-REAL_RUN = Path(r"D:\mmsb-runs\20261201-0000-v7-pilot-s1")
+REAL_RUN = paths.RUNS / "20261201-0000-v7-pilot-s1"
 # where an agent with its own tools once could read a recorded or planted answer, each the way the review reached it
 ELSEWHERE = {
-    "a run of the tests": r"D:\mmsb-temp\pytest-coord\popen-gw0\pilot0\20261104-0314-pilot-s1\questions.jsonl",
-    "a recorded run, by a bash path": "cat /d/mm-bench/20261104-0314-pilot-s1/results/claude/files/text-config-asof-1.json",
-    "a recorded run's report": r"type D:\mm-bench\20261104-0314-pilot-s1\report.md",
-    "the temp folder of a recorded run": r"D:\mm-bench-temp\mmb-de178c4d7f-data\notes\a.md",
+    "a run of the tests": str(paths.TESTS / "pytest-coord" / "popen-gw0" / "pilot0" / "20261104-0314-pilot-s1" / "questions.jsonl"),
+    "a recorded run, by a bash path": f"cat {paths.EARLIER[0].as_posix()}/20261104-0314-pilot-s1/results/claude/files/text-config-asof-1.json",
+    "a recorded run's report": f"type {paths.EARLIER[0] / '20261104-0314-pilot-s1' / 'report.md'}",
+    "the temp folder of a recorded run": str(paths.EARLIER[1] / "mmb-de178c4d7f-data" / "notes" / "a.md"),
 }
 
 
@@ -189,14 +189,73 @@ def test_what_a_run_of_the_tests_or_a_recorded_run_holds_is_denied_to_a_run_that
 
 
 def test_the_temp_folder_a_run_uses_by_default_is_not_the_folder_the_tests_use_and_the_earlier_runs_words_keep_their_form():
-    assert paths.TEMP == Path(r"D:\mmsb-data") and not paths.TEMP.is_relative_to(paths.TESTS) and paths.TESTS == Path(r"D:\mmsb-temp")
+    assert paths.TEMP == paths.HOME / "mmsb-data" and not paths.TEMP.is_relative_to(paths.TESTS) and paths.TESTS == paths.HOME / "mmsb-temp"
     assert [p.name for p in paths.EARLIER] == ["mm-bench", "mm-bench-temp"]
     words = real_run().deny(None, NO_ISOLATION)
     assert {*OLD_OUT_WORDS, *EARLIER_TEMP_WORDS, *TESTS_WORDS} <= set(words)
 
 
+def paths_in(home: str | None, tmp_path: Path) -> dict[str, str]:
+    """The folders `mmsb.core.paths` names in a process that has `MMSB_HOME` set to `home` (unset when None)."""
+    env = {k: v for k, v in os.environ.items() if k != "MMSB_HOME"} | ({"MMSB_HOME": home} if home else {})
+    code = "import json; from mmsb.core import paths; print(json.dumps({k: str(v) for k, v in vars(paths).items() if k.isupper() and k != 'ROOT'}, default=str))"
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, cwd=tmp_path, check=True)
+    return json.loads(done.stdout)
+
+
+def test_every_folder_is_under_the_mmsb_home_which_is_the_users_home_unless_it_is_set(tmp_path):
+    home = tmp_path / "mine"
+    got = paths_in(str(home), tmp_path)
+    assert {k: Path(v) for k, v in got.items() if k != "EARLIER"} == {"HOME": home, "RUNS": home / "mmsb-runs", "TEMP": home / "mmsb-data",
+                                                                      "CACHE": home / "mmsb-cache", "TESTS": home / "mmsb-temp"}
+    assert paths_in(None, tmp_path)["HOME"] == str(Path.home()) and paths_in("", tmp_path)["HOME"] == str(Path.home())
+    check = subprocess.run([sys.executable, "-c", "from mmsb.core import paths; print(*map(str, paths.EARLIER))"], capture_output=True, text=True,
+                           env={**os.environ, "MMSB_HOME": str(home)}, check=True)
+    assert check.stdout.split() == [str(home / "mm-bench"), str(home / "mm-bench-temp")]
+
+
+def test_a_run_in_a_folder_of_its_own_denies_that_folder_so_the_runs_beside_it_are_out_of_reach(tmp_path):
+    mine = tmp_path / "my-runs"
+    beside = str(mine / "20261130-0000-v7-pilot-s1" / "questions.jsonl")
+    run = real_run(mine / "20261201-0000-v7-pilot-s1", tmp_path / "data")
+    assert reached(beside, run.deny(run.slot(0), MM_ISOLATION)) is not None, "a sibling of a run with a folder of its own"
+    assert reached(beside, real_run().deny(None, MM_ISOLATION)) is None, "the default runs folder is denied by name; this one is not in it"
+    assert reached(str(paths.RUNS / "20261130-0000-v7-pilot-s1" / "questions.jsonl"), real_run().deny(None, MM_ISOLATION)) is not None
+
+
+def test_a_relative_out_is_denied_whole_and_not_as_a_bare_word_that_ordinary_output_holds(tmp_path):
+    run = real_run(Path("relruns") / "20261201-0000-v7-pilot-s1", tmp_path / "data")
+    words = run.deny(None, NO_ISOLATION)
+    assert posix(Path("relruns").resolve()) in words and "relruns" not in words
+    assert reached("the camera relruns all night", words, output=True) is None
+    assert reached(str(Path("relruns").resolve() / "other-run" / "questions.jsonl"), words) is not None
+
+
+def test_an_out_that_holds_the_temp_folder_is_refused_and_one_that_does_not_is_not(tmp_path):
+    paths.check_apart(paths.RUNS, paths.TEMP)
+    paths.check_apart(tmp_path / "runs", tmp_path / "data")
+    for out in (tmp_path, paths.HOME, Path(tmp_path.anchor)):
+        with pytest.raises(ValueError, match=r"--out .* holds --temp .*Give --out a folder of its own"):
+            paths.check_apart(out, out / "mmsb-data" if out != tmp_path else tmp_path / "data")
+    with pytest.raises(ValueError, match="holds --temp"):
+        paths.check_apart(tmp_path / "x", tmp_path / "x")
+
+
+def test_a_run_straight_in_a_drive_root_does_not_deny_the_whole_drive(tmp_path):
+    root = Path(tmp_path.anchor)
+    words = real_run(root / "run", tmp_path / "data").deny(None, NO_ISOLATION)
+    assert posix(root) not in words and posix(root / "run") in words
+
+
+def test_a_checkout_whose_path_begins_like_the_data_folders_is_refused_before_a_run_and_not_met_as_an_escape_in_it(monkeypatch):
+    """With every folder under one home, a clone called `mmsb` beside `mmsb-data` holds the data folder's path as a prefix."""
+    monkeypatch.setattr(paths, "ROOT", paths.HOME / "mmsb")
+    with pytest.raises(ValueError, match=r"mmsb-data.*holds .*mmsb.*refuses to reach: build with --temp elsewhere"):
+        real_run().check_paths(NO_ISOLATION)
+
+
 def test_the_tests_folder_is_denied_unless_the_run_is_in_it_so_the_tests_still_run():
-    sibling = r"D:\mmsb-temp\pytest-coord\popen-gw0\pilot0\questions.jsonl"
+    sibling = str(paths.TESTS / "pytest-coord" / "popen-gw0" / "pilot0" / "questions.jsonl")
     assert reached(sibling, real_run().deny(None, NO_ISOLATION)) in TESTS_WORDS
     in_tests = paths.TESTS / "pytest-x" / "run"
     for run in (real_run(in_tests, paths.TESTS / "pytest-x" / "temp"), real_run(REAL_RUN, paths.TESTS / "pytest-x" / "temp"),
@@ -217,7 +276,7 @@ def test_a_run_started_from_a_worktree_cannot_read_the_recorded_answers_in_the_m
     git("commit", "-q", "--allow-empty", "-m", "x", cwd=main)
     git("worktree", "add", "-q", str(tree), cwd=main)
     answers = main / "tests" / "oracles" / "recorded" / "pilot-s1" / "converted" / "questions.jsonl"
-    run = real_run(tmp_path / "run", tmp_path / "temp")
+    run = real_run(tmp_path / "runs" / "run", tmp_path / "temp")
     monkeypatch.setattr(paths, "ROOT", tree)
     words = run.deny(None, NO_ISOLATION)
     assert reached(str(answers), words) == posix(main) and reached(str(tree / "mmsb" / "x.py"), words) == posix(tree)
@@ -231,7 +290,7 @@ def test_a_run_started_from_a_worktree_cannot_read_the_recorded_answers_in_the_m
 def test_a_temp_folder_that_holds_anything_but_the_folders_of_runs_is_refused_naming_it(tmp_path):
     temp = tmp_path / "temp"
     (temp / "mmb-abc-data").mkdir(parents=True)
-    run = real_run(tmp_path / "run", temp)
+    run = real_run(tmp_path / "runs" / "run", temp)
     run.check_paths(NO_ISOLATION)
     check_temp(tmp_path / "not-made-yet")
     (temp / "pytest-coord").mkdir()

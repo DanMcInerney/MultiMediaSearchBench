@@ -52,7 +52,8 @@ Six layers. Only the last knows any system.
 ```
 MultiMediaSearchBench/
   VISION.md  DESIGN.md  TESTING.md  README.md  MEDIA.md  pyproject.toml  uv.lock  .python-version
-  mmsb/cli.py       build, ingest, run, retrieve, report, compare, repeat, clock-check: the order of each command's steps
+  mmsb/cli.py       fetch, build, ingest, run, retrieve, report, compare, repeat, clock-check: the order of each command's steps
+  mmsb/fetch.py     fetch: the files the real scenarios read, from where each source is published (7.2)
   mmsb/arguments.py   the commands' names, options and defaults
   mmsb/core/        the neutral half; one module for each part of the runner
     contract.py config.py       the types a system and the runner exchange (3.1); a configuration's name (4)
@@ -70,20 +71,24 @@ MultiMediaSearchBench/
                     m4_samples/; the extras v7_screen/  v8_egolife/                     # recipe, builder, questions, prompts
   tests/            unit tests; oracles/ (the recorded goldens and the code that made them); mm/ (needs the mm extra)
   results/          <date>-<selection>/                                                 # published reports
-  media/            sources.jsonl (MEDIA.md)
+  media/            sources.jsonl (MEDIA.md): the sources the scenarios use
 ```
 
-Each system's dependencies are an optional extra of `pyproject.toml` (`mmsb[mm]`). The `mm` extra is `mms`, MultimediaSearch, a git source
-pinned to one commit (D4).
+Each system's dependencies are an optional extra of `pyproject.toml` (`mmsb[mm]`). The `mm` extra is `mms`, MultimediaSearch, a direct
+reference to its GitHub repository at one commit (D4).
 
-**Where things live (correction C4).** Downloads stay in `D:\bench-data`, fetched once (V8 reads `D:\bench-data\egolife`).
-A prepared dump cannot be there, because V8 denies that folder to its agents. A prepared dump is `D:\mmsb-data\mmb-<key10>-data`,
-read-only; its record and each system's store are in `D:\mmsb-cache`; a run's folder is in `D:\mmsb-runs`. The three are
-changed with `--temp`, `--cache` and `--out`. They must share a volume, because a store is copied into a run with hard
-links, and the commands refuse folders on two drives. `D:\mmsb-data` may hold only `mmb-*` folders (`check_temp`), because an
-agent with its own tools can list it. The tests keep theirs in `D:\mmsb-temp`. The runs recorded before MMSB (`D:\mm-bench`,
-`D:\mm-bench-temp`) hold the pilot's answers, so they are on every agent's deny list, as are this repository and its main
-checkout.
+**Where things live (correction C4).** Everything MMSB makes is under one home, `MMSB_HOME` (default: your home folder). The
+sources of the real scenarios are in `MMSB_SOURCES` (default `<home>/mmsb-sources`), one folder per source, filled by
+`mmsb fetch` and never written by a build. A prepared dump is `<home>/mmsb-data/mmb-<key10>-data`, read-only; its record and each
+system's store are in `<home>/mmsb-cache`; a run's folder is in `<home>/mmsb-runs`. The three are changed with `--temp`, `--cache`
+and `--out`. They must share a volume, because a store is copied into a run with hard links, and the commands refuse folders on two
+drives. `mmsb-data` may hold only `mmb-*` folders (`check_temp`), because an agent with its own tools can list it. The tests keep
+theirs in `<home>/mmsb-temp`. The runs recorded before MMSB (`<home>/mm-bench`, `<home>/mm-bench-temp`) hold the pilot's answers, so
+they are on every agent's deny list, as are this repository and its main checkout, and the folder a run is in, whatever `--out` was:
+an agent could otherwise read the questions of the runs beside its own. The maintainer's machine sets `MMSB_HOME=D:\` and
+`MMSB_SOURCES=D:\bench-data\sources`. On Windows, Codex's sandbox reads the data files through the permissions their folder gives
+them, and a folder under the user profile gives them to the user, SYSTEM and Administrators alone: see the README for where to put
+`MMSB_HOME` when Codex is one of the agents.
 
 **The neutrality check (as built, `tests/test_neutral.py`).** The core, the `files` and `listing` systems and every
 scenario install and run on a machine where MultimediaSearch has never been installed.
@@ -229,8 +234,9 @@ so it is a diagnostic only. The `S+files` prompt was never run by the pilot and 
 Each scenario is one dump and 15-40 questions about it. All its cases share the dump, so it is built, probed and ingested
 once per system. The questions mix the kinds in section 5.6. The tables give one example question each.
 
-[MEDIA.md](MEDIA.md) says where each scenario's media comes from, what is already downloaded, and what is still missing
-(4 November 2026). Licences are recorded there but are not a filter (section 11.3).
+[MEDIA.md](MEDIA.md) says where the media of the scenarios built comes from, under what licence, and what is taken from it.
+`mmsb fetch` downloads the sources from there (7.2). The tables below also hold ideas for scenarios not built, with the sources
+they might use; MEDIA.md lists only the sources in use.
 
 P0 built V7 and V8 only; V1, I3, A1 and M4 followed on 6 November (5.7). A scenario is a module under `mmsb/scenarios/` named
 so that it can be imported (C6): `v1_security` and `v7_screen`, not `V1-security`. Its questions keep the ID of the tables below (`Question.scenario` is `V7`, `V8`).
@@ -257,8 +263,8 @@ systems do not handle speech at all.
 
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
-| I1 | Phone camera roll | "Find the parking-level sign at the airport." "The receipt for the TV." | 10-30k photos over years: HEIC, bursts, WhatsApp copies without dates | small text, near-duplicates, wrong dates | ATM-Bench (one person's 3,759 photos, 1,013 questions in their voice by annotators); YFCC100M photostreams; DISBench (57 users, 122 verified queries); Dan's phone (private) | 1 |
-| I2 | Screenshots folder | "Find the screenshot with the wifi password." | 5k screenshots | they all look alike; needs reading | Android in the Wild and Rico screenshots; Dan's own (private) | 2 |
+| I1 | Phone camera roll | "Find the parking-level sign at the airport." "The receipt for the TV." | 10-30k photos over years: HEIC, bursts, WhatsApp copies without dates | small text, near-duplicates, wrong dates | ATM-Bench (one person's 3,759 photos, 1,013 questions in their voice by annotators); YFCC100M photostreams; DISBench (57 users, 122 verified queries); the maintainer's phone (private) | 1 |
+| I2 | Screenshots folder | "Find the screenshot with the wifi password." | 5k screenshots | they all look alike; needs reading | Android in the Wild and Rico screenshots; the maintainer's own (private) | 2 |
 | I3 | Trail camera SD card | "Which nights did deer come? Was there ever a bear?" | 20k triggers, 90% empty from wind | empty frames; night infrared; animals at the edge | Caltech Camera Traps (LILA BC) | 1 |
 | I4 | Home inspection or insurance | "Show me every photo of water damage in the basement." | 2k photos | subtle; must find all of them | one damaged home's phone photos, building-defect close-ups, listing photos | 3 |
 | I5 | Family archive scans | "Find grandma at the beach" (one reference photo attached) | 8k scanned prints, no dates | search by example; people age | one family's 1,376 scans (Internet Archive) with FG-NET's 82 people across ages | 3 |
@@ -269,7 +275,7 @@ systems do not handle speech at all.
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
 | A1 | Home while away | "Did the smoke alarm go off? When did the dog start barking?" | 24 h from a room microphone in one file (about 2.7 GB of mono 16 kHz WAV) | the TV plays alarms too; the dog barks at everything | a real home's ambience (SINS) with real events (FSD50K) mixed in at a set SNR | 1 |
-| A2 | Overnight recording | "Did I talk in my sleep? When did the baby cry?" | 8 h from a bedroom | mostly silence; faint events | a quiet-room recording with FSD50K events mixed in; or Dan's own | 2 |
+| A2 | Overnight recording | "Did I talk in my sleep? When did the baby cry?" | 8 h from a bedroom | mostly silence; faint events | a quiet-room recording with FSD50K events mixed in; or the maintainer's own | 2 |
 | A3 | Meeting or interview | "When did Bob agree to the price?" | a 3-hour meeting; 6 h of interview tapes | it is speech | AMI Meeting Corpus | 1 |
 | A4 | Field recorder | "When did the owl call? Find every frog chorus." | 3 nights outdoors | wind, rain, distant calls | three real nights of one BirdVox recorder, with owls and frogs mixed in from the annotated soundscapes and AnuraSet | 2 |
 | A5 | Car or machine | "When does the rattle start?" | a 2-hour drive; 24 h of a factory floor | a small change in constant noise | MIMII machine sounds (clips only: no long base found) | 3 |
@@ -278,8 +284,8 @@ systems do not handle speech at all.
 
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
-| M1 | Voice memos | "Find the memo where I said the gate code." "Where I hummed that melody." | 400 memos over 2 years, 10 s to 10 min, M4A | speech; dates only from the files | Dan's own (private); or a scripted set Dan records | 2 |
-| M2 | Messaging voice notes | "Find Mum's note with the lasagne recipe." | 1,000 Opus notes from a chat export | speech; meaningless names | a scripted set recorded by Dan or volunteers | 3 |
+| M1 | Voice memos | "Find the memo where I said the gate code." "Where I hummed that melody." | 400 memos over 2 years, 10 s to 10 min, M4A | speech; dates only from the files | the maintainer's own (private); or a scripted set the maintainer records | 2 |
+| M2 | Messaging voice notes | "Find Mum's note with the lasagne recipe." | 1,000 Opus notes from a chat export | speech; meaningless names | a scripted set recorded by the maintainer or volunteers | 3 |
 | M3 | Voicemails | "The voicemail from the dentist about rescheduling." | 300 calls | phone-quality sound | real business voicemails from litigation archives; FTC robocalls; answering-machine tapes | 3 |
 | M4 | Sample library | "Find a door creak." "Every snare with reverb." | 10k WAVs | find-all by sound, no speech | FSD50K clips | 1 |
 | M5 | Bat or bird recorder on a schedule | "Which recordings have owls in them?" | 3,000 one-minute files | many files, few hits | AnuraSet's real one-minute schedule files; or the bird soundscapes, cut on an AudioMoth-style schedule | 2 |
@@ -289,8 +295,8 @@ systems do not handle speech at all.
 
 | ID | Scenario | The user asks | The dump | Hard because | Built from | Priority |
 | --- | --- | --- | --- | --- | --- | --- |
-| X1 | Scripted real day | "When did the courier come? Did I leave the hob on?" | a day of Dan's home on his own cameras, phone and microphone, with about 30 planted events | real light, noise and codecs | the script is the truth (M3-Bench's method); private | 2 |
-| X2 | Whole phone dump | I1- and M1-style questions, plus the phone's videos | photos, videos and memos together, 40+ GB | mixed media and mixed dates | Dan's phone (private) | 2 |
+| X1 | Scripted real day | "When did the courier come? Did I leave the hob on?" | a day of the maintainer's home on his own cameras, phone and microphone, with about 30 planted events | real light, noise and codecs | the script is the truth (M3-Bench's method); private | 2 |
+| X2 | Whole phone dump | I1- and M1-style questions, plus the phone's videos | photos, videos and memos together, 40+ GB | mixed media and mixed dates | the maintainer's phone (private) | 2 |
 | L | Large-file track | the same needles, in bigger files | one 4 GB video, one 10-hour sound file, a 50 MP panorama, a 30 GB folder | a needle a minute before the end of a huge file, or straddling a fixed cut (1 s, 5 s, 60 s); files over 2 GB; time only from the mtime | re-muxed from V1, A1, I1 | 1 |
 
 ### 5.6 Question kinds
@@ -424,7 +430,7 @@ works in file offsets are graded alike.
 
 **As built (`mmsb/core/answer.py`).**
 - **Two formats.** `json` is the default. `line`, one final line `ANSWER: <answer>` with no evidence, is the recorded
-  runs' format; it exists for the pilot re-run and is to go once Dan accepts that re-run (D1, section 12).
+  runs' format; it exists for the pilot re-run and is to go once the maintainer accepts that re-run (D1, section 12).
   `--answer-format` picks one; a run keeps its format in `run.json`, and changing it on a run that has results is refused. A
   run with results and no recorded format reads as `line`, which is what the converted pilot and EgoLife runs are.
 - **Parsing.** The answer is that of the last complete JSON object in the final message; a code fence around it is just
@@ -521,12 +527,12 @@ was tuned on those runs. `mmsb run --splits dev,test` selects by it. No test spl
 
 1. **Annotated real data.** A dataset's own time spans become questions through templates in user wording: MEVA's
    activities, AMI's topics and decisions, DROID's episode instructions, camera-trap species, the soundscapes' calls,
-   FSD50K's labels. Each question is checked by rule against the spans, and Dan spot-checks 10%.
+   FSD50K's labels. Each question is checked by rule against the spans, and the maintainer spot-checks 10%.
 2. **Real needles in real backgrounds,** where annotations do not cover what users ask.
    - Sound: real event clips mixed into real ambience at a set SNR, with exact onsets (the Scaper method).
    - Video: real clips spliced at natural cuts, or a real object composited with blending. The probe must show that a
      splice is not the most unusual moment in its scope.
-3. **Owner-written questions about the owner's own data** (I1, I2, M1, X2 with Dan's own media). ScreenshotVQA, camroll
+3. **Owner-written questions about the owner's own data** (I1, I2, M1, X2 with the maintainer's own media). ScreenshotVQA, camroll
    and ATM-Bench all chose this over LLM-written questions as more natural. These stay private.
 4. **Scripted recordings** (X1, and M1/M2 as scripted sets). A person follows a script of planted events or lines while
    real devices record. This gives real light, real noise and real codecs with the truth known by construction, and sound
@@ -554,9 +560,17 @@ Dumps keep what real ones have:
 - **The prompt** says the time it is ("It is now Monday 23 December 2013, 09:00"), what the pile is and where it is (or which
   system holds it), how its files are named and timed, and the answer request (6.2).
 - **The deny words:** the scenario's and the builder's code (`from mmsb`, `import mmsb`), the source's names in commands (as
-  paths where a name is inside ordinary code: `/sins` and not `sins`, which is in `isinstance`), and `bench-data`, where the
-  sources are, in a command and in what it prints.
+  paths where a name is inside ordinary code: `/sins` and not `sins`, which is in `isinstance`), and the name of the
+  sources folder (`source_word`: its own name, or its parent's when it is called `sources`, and at least 6 letters), in a command and
+  in what it prints.
 - **The probe** (7.3).
+- **Fetching** (`mmsb/fetch.py`). `mmsb fetch --scenario NAME|all` downloads what each build reads into the folder it reads, with no
+  account: V1's clips from MEVA's public bucket and their labels from the labels repository's raw files, I3's photos from LILA's
+  bucket, M4's clips from the Hugging Face mirror of FSD50K, and A1's minute files out of SINS's Zenodo zips by HTTP Range (checked
+  by CRC-32, kept as lossless FLAC with all four channels). A file is renamed into place only when whole, so the command resumes,
+  and a count that is not what the build needs (`fetch.EXPECTED`) is refused before anything large is fetched. Retries wait as the
+  server says (429 and Retry-After) or by doubling. SINS's licence forbids passing it on, so it is fetched from Zenodo for the user
+  and never mirrored.
 
 ### 7.3 The shortcut probe and leaks
 
@@ -625,7 +639,7 @@ that pays per question cross at different sizes. The smallest rungs also give th
 ### 8.1 Where the time went in the copied pilot (measured)
 
 The pilot ran one system (mm with d1-3B) against `files`, on 3 synthetic days, seed 1
-(`D:\mm-bench\20261104-0314-pilot-s1`):
+(the run `20261104-0314-pilot-s1` in `<home>\mm-bench`):
 
 | Step | Wall time | Bounded by |
 | --- | --- | --- |
@@ -694,7 +708,7 @@ do. The longest expected cases start first. Ingest of the next dump fills the GP
 saving of running side by side at 25-35% of a run's wall time (an estimate: nothing here has measured it on real agents).
 
 Two conditions:
-- **Dan's go-ahead.** CPU-heavy work beside a GPU job goes against the laptop's current "GPU runs alone" rule. This is
+- **The maintainer's go-ahead.** CPU-heavy work beside a GPU job goes against the maintainer's laptop's current "GPU runs alone" rule. This is
   question 13.2, still unanswered, so running side by side is **off** unless `mmsb run --side-by-side` asks for it, and the
   run prints that it is on. Without the flag the cells of a run run one after another, as the copied `run_agents` did.
 - **Agents stay off the GPU:** CUDA is hidden from their environment, and `-hwaccel` and `nvidia-smi` are on their deny
@@ -814,7 +828,7 @@ default selections.
   has no system. It has no model or effort flags: `MMSB_*` apply. Cost and command: 12.2.
 
 **Ingest once (`mmsb/core/cache.py`, as built):**
-- Downloads are fetched once and content-hashed (EgoLife stays in `D:\bench-data`).
+- Downloads are fetched once and content-hashed (EgoLife stays where it was downloaded: V8 takes `--source`).
 - Each prepared dump is cached by the hash of its recipe. Its **key** is the sha256 of the scenario's name, its recipe and
   its generator as canonical JSON (reordering a dict changes nothing; a bump of the generator makes another dump). The dump is
   `<temp>/mmb-<key10>-data`, read-only. Its record is `<cache>/dumps/<key>/`: `manifest.jsonl`, `dump.json`, `questions.jsonl`,
@@ -929,7 +943,7 @@ commands and names no longer apply, and the repository README is new.
 3. Split `bench.py` into `core/runner` and `systems/mm`, and make the agent runners take tools from `serve()`. **Done.**
 4. Re-run the copied pilot through the new runner. The same verdicts for `files` and `mm` (the pilot's mm-only
    configuration) show that nothing was lost. Then `mm+files` runs for the first time. **Not done:** it needs the GPU and
-   Dan's go-ahead, and P0 ran no GPU and no paid agent. `mmsb repeat` and `mmsb compare` are built; what stands in place of
+   the maintainer's go-ahead, and P0 ran no GPU and no paid agent. `mmsb repeat` and `mmsb compare` are built; what stands in place of
    the re-run is the offline proof in TESTING.md. The command and what "the same verdicts" means (D1) are in section 12.
 5. Add case selection, `listing`, then `embed` and `transcript`. Case selection and `listing` are done; `embed` and
    `transcript` are P1.
@@ -1024,10 +1038,12 @@ screen-video memory was found.
 | [AgentNet / OpenCUA](https://huggingface.co/datasets/xlangai/AgentNet) | MIT per its card; gating unverified | 22.6K human screen-video tasks with input events | V7 |
 | MIMII | CC BY-SA 4.0 (as found) | machine sounds (valves, pumps, fans, slide rails) | A5 |
 | EPIC-KITCHENS-100 + EPIC-SOUNDS | CC BY-NC 4.0 | 100 h egocentric with sound; 78K timed sound events | a kitchen scenario, if non-commercial suits |
-| Gated: VIRAT, Ego4D, LSC/NTCIR, BirdCLEF, V3C | an agreement, an application or an account | | not without Dan |
+| Gated: VIRAT, Ego4D, LSC/NTCIR, BirdCLEF, V3C | an agreement, an application or an account | | not without the maintainer |
 
-On 4 November 2026 Dan decided that licences are not a filter for use on this machine; [MEDIA.md](MEDIA.md) records the
-licence each source states. No agent accepts an agreement or makes an account, so gated sources wait for Dan.
+MMSB publishes no media: [MEDIA.md](MEDIA.md) records the licence each source in use states and what is taken from it, and
+`mmsb fetch` downloads it from where it is published, so the user is bound by that licence. SINS's allows academic research only
+and no passing on, so the command fetches it from Zenodo for the user and it is never mirrored. No agent accepts an agreement or
+makes an account, so gated sources are not used.
 
 ## 12. Phases
 
@@ -1040,7 +1056,7 @@ licence each source states. No agent accepts an agreement or makes an account, s
 
 ### 12.1 P0's state (5 November 2026), and the real scenarios (6 November)
 
-**6 November 2026: the real scenarios.** MMSB was re-planned as a standalone benchmark of real piles of media (`PLAN.md`). Built
+**6 November 2026: the real scenarios.** MMSB was re-planned as a standalone benchmark of real piles of media. Built
 and checked offline: V1, I3, A1 and M4 (5.7) on the shared builder (7.2), the `set` rule (6.1), the neutral report (6.3), and
 the real scenarios' probe (7.3). Each full-size dump was built once and probed (TESTING.md section 9). Two independent reviews
 gated the work: one of the builder, the rule, the report and I3 before the other three copied them, and one of the whole. Real
@@ -1059,7 +1075,7 @@ it with MultimediaSearch refused, and in an environment made without the `mm` ex
   ingest, side-by-side scheduling (off by default), `mmsb compare` and `mmsb repeat`.
 - The working-time clock (`--clock`, 8.4) and `mmsb clock-check`, which has not been run.
 
-**Not done, because it needs the GPU, a paid agent or Dan's go-ahead.** No GPU and no paid agent ran in P0. Real Claude and
+**Not done, because it needs the GPU, a paid agent or the maintainer's go-ahead.** No GPU and no paid agent ran in P0. Real Claude and
 Codex have not seen the `json` request, the `S+files` prompt, the listing server, a second `--add-dir` for mm's `looks`
 folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download or the real mm model.
 
@@ -1070,7 +1086,7 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
 | D1 | "The same verdicts" cannot mean identical per question: the agents are stochastic, and no repeat run exists to measure the noise. | Accept when each cell's correct count is within 2 of the recorded one (Claude `files` 23, Claude `mm` 22, Codex `files` 27, Codex `mm` 23); McNemar of the recorded run against the new one is not significant (p under 0.05) in any cell; the verdict lines read the same; no `setup` result; and a person has read every flip. Run once in `json`; run `line` too (another $19 and about 3 h) only if a cell falls outside the band. It is written once, in `mmsb/core/compare.py` (`BAND`, `ALPHA`). A pass means no large loss; it does not mean the runs agree (a band of 2 is about 6 points of 31 questions, and McNemar over a few discordant pairs has little power) |
 | D2 | When may the re-run and the clock check spend? | Not until Stage 2 passed its review, and with the GPU free |
 | D3 | mm cannot report queue time. The working clock and the 10-case check need a small MultimediaSearch change: per-job queue seconds from `gpu.py` and `jobs.py`, and `ask`'s early return counted from GPU start. About 30-50 lines there | Make it in MultimediaSearch as its own task before the clock check. P0's code is ready for it; until then mm is `clock: wall`, more than one mm exec at once on the working clock is refused, and the 10-case check stays open |
-| D4 | Multimem had no remote, so `mmsb[mm]` was a path source with this machine's path in `pyproject.toml` | Resolved on 7 November 2026: the tool, now MultimediaSearch (`mms`), is public at github.com/DanMcInerney/MultimediaSearch, and `mmsb[mm]` is a git source pinned to a commit in `pyproject.toml` and `uv.lock`. Publishing MMSB (13.8) no longer needs a path |
+| D4 | Multimem had no remote, so `mmsb[mm]` was a path source with this machine's path in `pyproject.toml` | Resolved on 7 November 2026: the tool, now MultimediaSearch (`mms`), is public at github.com/DanMcInerney/MultimediaSearch, and `mmsb[mm]` is a direct reference to a commit in `pyproject.toml`, which `uv.lock` pins as well. Publishing MMSB (13.8) no longer needs a path |
 | D5 | 13.2, CPU work beside a GPU job | Stays off; `--side-by-side` exists and is tested |
 | D6 | What holds a GPU configuration to one exec at a time? (G2's blocker: only D3's refusal did, and the refusal offered `--clock wall`) | The owner's rule, built: a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs N` (default 1) asks for more; `--jobs` and `--clock` do not. One rule in `core/atonce.py` for the runner, every dry run and estimate, the refusal and `clock-check` (8.4) |
 
@@ -1086,7 +1102,7 @@ folder, or `--model claude-sonnet-5-5`. Nothing ran against the real V8 download
   tool names `ask`, `find`, `look` and the file `ambient-labels.json` when they are there. The imports are neutral; the wording
   is not.
 
-### 12.2 The commands that wait for Dan
+### 12.2 The commands that wait for the maintainer
 
 Each needs his go-ahead and a free GPU, because the laptop's rule is that a GPU job runs alone:
 `nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader` must print nothing.
@@ -1098,7 +1114,7 @@ another zone is refused.
 uv sync --extra mm --group mm-gpu
 uv run mmsb repeat tests/oracles/recorded/pilot-s1/converted --dry-run
 uv run mmsb repeat tests/oracles/recorded/pilot-s1/converted
-uv run mmsb compare tests/oracles/recorded/pilot-s1/converted D:\mmsb-runs\<new run>
+uv run mmsb compare tests/oracles/recorded/pilot-s1/converted <new run>
 ```
 
 - **The defaults are the pilot's.** The `files` cells run `--jobs` (3) at once and `mm/d1-3B` runs one exec at a time
@@ -1107,13 +1123,13 @@ uv run mmsb compare tests/oracles/recorded/pilot-s1/converted D:\mmsb-runs\<new 
   above 1: the laptop's rule is one GPU exec at a time, after three mm execs at once crashed the NVIDIA driver on 2 November
   2026 (with it, the working clock refuses until D3, and `--clock wall` lets it through with a warning).
 - `--group mm-gpu` installs torch 2.11.0+cu128, torchvision 0.26.0+cu128 and transformers 5.21.0 into this environment,
-  because mm runs d1 in the python that started its daemon. It is several GB, and uv copies it, because uv's cache is on C: and
-  the environment on D:; set `UV_CACHE_DIR` on D: first. It was not installed in P0.
+  because mm runs d1 in the python that started its daemon. It is several GB, and uv copies it when uv's cache and the environment
+  are on two drives; set `UV_CACHE_DIR` on the environment's drive first. It was not installed in P0.
 - The path is `.../converted` (the raw `pilot-s1/run.json` names no scenario). `repeat` reads the converted run: the recipe,
   the configurations (`files`, `mm/d1-3B`), the questions of each cell, and each agent's model and effort (Codex
   `gpt-6.1-terra` at `medium`; Claude records no effort, so only its model is checked). It builds or finds the cached dump and
   store, runs `files` and `mm/d1-3B`, and prints the `compare` command. `--answer-format json` is the default.
-  `--into D:\mmsb-runs\<new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
+  `--into <new run>` continues a run that stopped. Read the dry run first: it builds and starts nothing.
 - `mmsb compare` prints, for each cell, the correct counts of the recorded run and the new one against the band, the
   questions that flipped (with both answers), McNemar's p, the problems of each run, and the verdict lines, and then the four
   numeric conditions of D1. A person reads every flip.
@@ -1129,7 +1145,7 @@ uv run mmsb compare tests/oracles/recorded/pilot-s1/converted D:\mmsb-runs\<new 
 **2. `mm+files` for the first time (10.2 step 4, last sentence).** After the re-run, in the same run folder:
 
 ```
-uv run mmsb run D:\mmsb-runs\<new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium
+uv run mmsb run <new run> --agents codex,claude --configs mm/d1-3B+files --codex-effort medium
 ```
 
 No cost was measured. A rough ceiling is the `files` cell plus the GPU: Claude about $16 and 2 hours, Codex about 45
@@ -1148,7 +1164,7 @@ uv run mmsb clock-check <new run> --agents codex,claude --config mm/d1-3B --case
 below is the pilot's Codex at `medium`.)
 
 It asks 10 cases of each agent alone and then queued, in the two folders of 8.4, and prints the answers, tokens and charged
-seconds side by side. **It needs D3 first, and Dan's go-ahead.** With mm reporting no queue it refuses at once, naming D3, and
+seconds side by side. **It needs D3 first, and the maintainer's go-ahead.** With mm reporting no queue it refuses at once, naming D3, and
 asks nothing; and without `--gpu-jobs 2` or more it refuses too, because mm runs one exec at a time and nothing would queue.
 The flag is the go-ahead: the queued half is 2 mm execs at once, the only time the benchmark asks for more than one on the GPU
 (three at once is what crashed the driver on 2 November 2026), and the command prints a warning when it starts. Watch the GPU
@@ -1156,24 +1172,23 @@ while it runs. Cost, from the pilot's means: 20 execs for each agent; Codex abou
 Claude about 41 minutes, 2,080 GPU-seconds, about $2.25 and 3.3M tokens; together about 1 hour and 3,040 GPU-seconds. These are
 lower bounds: queued execs take longer.
 
-## 13. Open questions for Dan
+## 13. Open questions
 
-1. **Licences:** decided on 4 November 2026: not a filter for use on this machine. Gated sources still need Dan
-   ([MEDIA.md](MEDIA.md), "Decisions for Dan").
+1. **Licences:** MMSB publishes no media and each user fetches it from the source, under the licence the source states
+   ([MEDIA.md](MEDIA.md)). Sources behind an agreement or an account are not used.
 2. **CPU work beside a GPU job:** may GPU-free configurations and builds run while a system holds the GPU? Still
    unanswered. It stays off: `mmsb run --side-by-side` exists and is tested, and nothing turns it on by itself (8.3).
-3. **Where mm's plug-in lives:** decided for P0: in MMSB as `systems/mm`, with MultimediaSearch as the optional `mm` extra, a git source
-   pinned to a commit in `pyproject.toml` (D4, section 12.1).
+3. **Where mm's plug-in lives:** decided for P0: in MMSB as `systems/mm`, with MultimediaSearch as the optional `mm` extra, a direct
+   reference to a commit in `pyproject.toml` (D4, section 12.1).
 4. **Which other systems first:** `embed` (SigLIP or CLIP, plus CLAP) and `transcript` (Whisper)? Both download models.
 5. **Hosted systems:** may a paid long-context model run on the public scenarios?
-6. **Dan's own media and scripted recordings:**
+6. **The maintainer's own media and scripted recordings:**
    - a phone dump, screenshots and voice memos (I1, I2, M1, X2);
    - a scripted day (X1);
    - a scripted set of voice notes (M2).
 
-   All with questions he writes, kept private and never published.
-7. **Sources:** on 4 November 2026 every public scenario got a starter source. Some fall short: V1 cannot reach 48 h
-   per camera, A5 has no long base, and M5 has frogs, not owls. The gaps and the decisions they need are in
-   [MEDIA.md](MEDIA.md).
-8. **Publishing:** will MMSB be public? That decides the dev/test policy for the real-data scenarios, and the project's
-   own licence.
+   All with questions the maintainer writes, kept private and never published.
+7. **Sources:** the four real scenarios each have a source that `mmsb fetch` downloads. Scenarios not built have gaps: V1 cannot
+   reach 48 h per camera, A5 has no long base, and M5 has frogs, not owls.
+8. **Publishing:** decided: MMSB is public, under the MIT licence. The dev/test split of the real-data scenarios (6.4) and the
+   sources' own licences are what a user of the benchmark has to respect.

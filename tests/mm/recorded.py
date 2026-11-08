@@ -1,5 +1,5 @@
 """What the mm tests compare with, from the recorded runs (read only): the pilot's 48 mm results and the dump they were asked of, rebuilt from
-its recorded manifest (tests/oracles/recorded/pilot-s1) and read in place where its data is (D:/mm-bench-temp), and the recorded EgoLife run's 50.
+its recorded manifest (tests/oracles/recorded/pilot-s1) and read in place where its data is (the earlier runs' temp folder, `paths.EARLIER`), and the recorded EgoLife run's 50.
 `pilot-windows.json` is the pilot's table of windows (mmsb/systems/mm/estimate.py) that `capture_windows.py` made once from that data; the test that
 reads the data asserts the system still makes it (test_recorded_estimate.py)."""
 
@@ -9,6 +9,7 @@ import json
 from datetime import date
 from pathlib import Path
 
+from mmsb.core import paths
 from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of
@@ -19,8 +20,8 @@ ORACLES = Path(__file__).parent.parent / "oracles" / "recorded"
 PILOT, EGOLIFE = ORACLES / "pilot-s1", ORACLES / "egolife-s1"
 CHECKED_IN = Path(__file__).parent / "tables"
 PILOT_WINDOWS = CHECKED_IN / "pilot-windows.json"
-PILOT_DATA = Path(r"D:\mm-bench-temp\mmb-de178c4d7f-data")  # the pilot's week as it was written, frozen
-EGOLIFE_RUN = Path(r"D:\mm-bench\20261103-0257-egolife-s1")  # the recorded EgoLife run: its data folder holds the transcript
+PILOT_DATA = paths.EARLIER[1] / "mmb-de178c4d7f-data"  # the pilot's week as it was written, frozen
+EGOLIFE_RUN = paths.EARLIER[0] / "20261103-0257-egolife-s1"  # the recorded EgoLife run: its data folder holds the transcript
 DAYS = [date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)]
 
 

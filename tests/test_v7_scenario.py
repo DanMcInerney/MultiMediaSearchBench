@@ -23,6 +23,7 @@ import pytest
 from test_runfolder import DENY, MM_ISOLATION, SENTINEL, between, check_against, posix, run_of, sentinels  # noqa: F401
 
 from mmsb import scenarios
+from mmsb.core import paths
 from mmsb.core.contract import Dump, LogSource, McpServer, Served
 from mmsb.core.question import load_questions, write_questions
 from mmsb.core.runfolder import IN_ONLY
@@ -112,7 +113,7 @@ def test_the_prompt_is_the_one_the_pilot_recorded_for_each_of_its_110_execs_but_
 
 def test_a_system_and_the_files_together_get_both_sentences_and_one_way_to_answer(pilot_questions):
     question = pilot_questions["video-porch-parcel-1"]
-    data = Path(r"D:\mmsb-temp\mmb-0123456789-data")
+    data = paths.TEMP / "mmb-0123456789-data"
     got = V7.prompt(question, Access(True, data, MM, "line"))
     assert got == (
         "It is now Wednesday 04 November 2026, 12:00. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. "
@@ -152,9 +153,7 @@ def test_the_deny_words_of_v7_are_the_old_eight_and_three_that_name_the_new_pack
 
 
 def test_no_word_is_in_the_path_of_a_folder_a_run_makes_the_default_ones_included(sentinels):
-    """`check_paths` refuses a run whose data, bin or slot a word is in: a bare `mmsb` would, with `D:\\mmsb-data`."""
-    from mmsb.core import paths
-
+    """`check_paths` refuses a run whose data, bin or slot a word is in: a bare `mmsb` would, with `<home>/mmsb-data`."""
     run = run_of(V7)
     words = [w.removeprefix(IN_ONLY) for w in V7.deny_words([], paths.TEMP, run.tag)]
     for folder in (run.data, run.bin, run.slot(0), paths.TEMP / "mmb-0123456789-data", paths.TEMP / "mmb-0123456789-bin", paths.TEMP / "mmb-0123456789-w0",

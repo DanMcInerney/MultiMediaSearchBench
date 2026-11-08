@@ -3,7 +3,7 @@ transcript of what was said around him) asked three ways: without the recordings
 and with a system's tools. The download is read here and never run; this module is the scenario (DESIGN 5): the names a `Scenario` has, as
 functions.
 
-    recipe = v8_egolife.recipe(source=DOWNLOAD, seed=1)           # what the run is made from: the download, the days, the clip table
+    recipe = v8_egolife.recipe(source=download, seed=1)           # what the run is made from: the download, the days, the clip table
     dump, questions = v8_egolife.build(recipe, folder, workers)    # the clips linked, the transcript written, the manifest, the questions
     plan_hash, files_hash = v8_egolife.hashes(recipe)               # what a run records, to refuse a changed plan or download
 
@@ -44,7 +44,6 @@ name = "v8_egolife"
 code = CODE
 generator = 1  # bumped when the plan makes something other than before
 
-DOWNLOAD = Path(r"D:\bench-data\egolife")  # where the download is, read only: the folders A1_JAKE, EgoLifeQA and EgoLifeCap
 WORKERS = 3  # clips measured, and files hashed, at once
 
 # What no command of an agent with its own tools may hold, beyond the folders: the old generator's words, which the old `EgoRun.deny`
@@ -61,12 +60,12 @@ def utc_offset_text(day: date) -> str:
     return datetime.combine(day, time.min).astimezone().strftime("%z")
 
 
-def recipe(*, source: Path | str = DOWNLOAD, seed: int, days: Sequence[date | str] | None = None, per_age: int = PER_AGE,
+def recipe(*, source: Path | str, seed: int, days: Sequence[date | str] | None = None, per_age: int = PER_AGE,
            speech: int = SPEECH, workers: int = WORKERS) -> dict:
-    """What the run is made from: the download at `source`, the `seed`, the `days` (dates or ISO dates, oldest first, which cross no
-    change of the UTC offset; by default the latest three that do not, ending yesterday), the questions of each age and for speech, the
-    UTC offset of the days in this time zone and the clip table of the download (each clip's name and length, which reading takes
-    seconds a clip, `workers` at once: the plan then needs no clip file)."""
+    """What the run is made from: the download at `source` (read only; the folders A1_JAKE, EgoLifeQA and EgoLifeCap), the `seed`, the
+    `days` (dates or ISO dates, oldest first, which cross no change of the UTC offset; by default the latest three that do not, ending
+    yesterday), the questions of each age and for speech, the UTC offset of the days in this time zone and the clip table of the download
+    (each clip's name and length, which reading takes seconds a clip, `workers` at once: the plan then needs no clip file)."""
     chosen = default_days(date.today()) if days is None else tuple(date.fromisoformat(d) if isinstance(d, str) else d for d in days)
     if not chosen:
         raise ValueError("a run has days")

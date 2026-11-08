@@ -72,8 +72,8 @@ def test_neither_session_of_mm_can_say_its_queue_and_more_than_one_exec_at_once_
 def built(week, store, tmp_path) -> RunFolder:
     """A run folder over the tiny week and its real store, with `mm/d1-3B` among its configurations (its model need not be installed to be previewed)."""
     recipe, dump, questions = week
-    folder = tmp_path / "run"
-    folder.mkdir()
+    folder = tmp_path / "runs" / "run"
+    folder.mkdir(parents=True)
     write_questions(folder / "questions.jsonl", questions)
     fs.write_json(folder / "data-manifest.json", fs.stats_of(dump.root))
     write_dump(folder, dump)

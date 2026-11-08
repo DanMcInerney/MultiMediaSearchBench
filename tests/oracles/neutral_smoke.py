@@ -56,7 +56,7 @@ def main(folder: Path) -> dict:
     refused = io.StringIO()
     with contextlib.redirect_stderr(refused):
         assert cli.main(["run", str(run), "--agents", "claude", "--configs", "mm", "--dry-run"]) == 1
-    assert "mm needs the mm extra: uv sync --extra mm" in refused.getvalue(), refused.getvalue()
+    assert "mm needs the mm extra: uv sync --extra mm --group mm-gpu" in refused.getvalue(), refused.getvalue()
     assert set(systems.infos()) >= {"files", "mm"} and systems.isolation().deny_package_roots == ("mms",)
     return {"mms": None, "probe": meta["probe"]["status"], "questions": len(tiny_questions()), "results": len(results),
             "report_runs": len(figures["runs"]), "refused": refused.getvalue().strip().splitlines()[-1]}

@@ -2,6 +2,7 @@
 name = "mm"
 class = "mmsb.systems.mm.system:Mm"
 extra = "mm"
+group = "mm-gpu"
 license = "MIT"
 default_variant = "d1-3B"
 horizon = "cut"

@@ -15,8 +15,8 @@ from mms.decider import About
 from mmsb.core import fs
 
 
-MODELS_DIR = Path(os.environ.get("MMS_MODELS", "D:/models"))
-MM_GPU = "uv sync --group mm-gpu"  # what this environment needs to run a model that mms runs itself (torch, transformers)
+MODELS_DIR = Path(os.environ.get("MMS_MODELS") or config.default_home() / "models")  # where `mms model use` puts the weights (`~/.mms/models`)
+MM_GPU = "uv sync --extra mm --group mm-gpu"  # what this environment needs to run a model that mms runs itself (mms, torch, transformers)
 
 
 @dataclass(frozen=True)

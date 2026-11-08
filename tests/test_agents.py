@@ -425,7 +425,7 @@ def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_
     assert codex.check_event(output(leak), spec_of("files", deny=deny)) == f"shell output reached {deny[0]}"
     assert codex.check_event(output(f"{tmp_path}\\MM-BENCH\\run1\\x"), spec_of("files", deny=deny)) == \
         f"shell output reached {deny[0]}", "backslashes and case do not matter"
-    home_file = output("C:/Users/dan/.mms/index.db")
+    home_file = output("C:/Users/user/.mms/index.db")
     assert codex.check_event(home_file, spec_of("files", deny=deny)) == "shell output reached .mms"
     assert codex.check_event(output(leak), spec_of("files")) is None and codex.check_event(output(""), spec_of("files", deny=deny)) is None
 
@@ -450,7 +450,7 @@ def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_wor
     assert watch(both_init) is None
     # a server's call and its output may hold the system's own words, as its results hold paths under its own home
     assert watch(use("mcp__mm__find", {"since": "2026-11-01", "note": ".mms"}, "s1")) is None
-    assert watch(returned('{"home": "C:/Users/dan/.mms/index.db"}', "s1")) is None
+    assert watch(returned('{"home": "C:/Users/user/.mms/index.db"}', "s1")) is None
     assert watch(returned([{"type": "text", "text": f"{lower(tmp_path / 'answers')}/x"}], "s1")) is None
     # the own tools are held to them, in the call and in the output, and a result of an id nobody knows is one of them
     assert watch(use("Read", {"file_path": str(tmp_path / "Answers" / "x.json")}, "r1")) == f"escaped: Read reached {deny[0]}"
@@ -478,7 +478,7 @@ def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_wor
                              both) == "shell output reached .mms"
     # the server's own call, and what it returned, say whatever they say
     served = item("mcp_tool_call", "item.completed", server="mm", tool="find", arguments={"note": ".mms"},
-                  result={"content": [{"type": "text", "text": "C:/Users/dan/.mms/index.db"}]})
+                  result={"content": [{"type": "text", "text": "C:/Users/user/.mms/index.db"}]})
     assert codex.check_event(served, both) is None
     assert "held for approval" in codex.check_event(item("mcp_tool_call", "item.completed", server="mm", tool="find",
                                                           error={"message": "requires approval"}), both)

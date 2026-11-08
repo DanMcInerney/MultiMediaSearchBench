@@ -440,7 +440,7 @@ def test_a_recipe_is_refused_in_another_time_zone_and_with_other_keys():
 
 def test_no_command_may_reach_the_source_or_the_code():
     deny = V1.deny_words([], None, "k")
-    assert "bench-data" in deny and "in:/meva" in deny and "in:kitware" in deny and "in:v1_security" in deny and "in:from mmsb" in deny
+    assert realdump.source_word() in deny and "in:/meva" in deny and "in:kitware" in deny and "in:v1_security" in deny and "in:from mmsb" in deny
 
 
 class Spy:

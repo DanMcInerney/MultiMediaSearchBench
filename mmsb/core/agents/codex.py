@@ -146,11 +146,15 @@ def check_personal() -> None:
 
 
 def models_of(command: list[str]) -> dict:
-    """`codex debug models`, parsed (once a process). Never run by a dry run, which is given a saved file."""
+    """`codex debug models`, parsed (once a process). It only reads, so a dry run runs it too; CodexMissing when there is no Codex to ask."""
     key = tuple(command)
     if key not in _MODELS:
-        done = subprocess.run([*command, "debug", "models"], capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", stdin=subprocess.DEVNULL, timeout=60)
+        try:
+            done = subprocess.run([*command, "debug", "models"], capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace", stdin=subprocess.DEVNULL, timeout=60)
+        except FileNotFoundError:
+            raise CodexMissing(f"{command[0]} cannot be run: the Codex CLI is not installed or not on PATH (install it and run `codex login`; "
+                               "even a dry run asks it for the model's settings)") from None
         if done.returncode:
             raise CodexMissing(f"`codex debug models` exited {done.returncode}: {done.stderr.strip()[-300:]}")
         _MODELS[key] = json.loads(done.stdout)

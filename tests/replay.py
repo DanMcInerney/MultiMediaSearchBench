@@ -26,7 +26,7 @@ import imageio_ffmpeg
 from agent_spec import server_of
 
 from mmsb import scenarios
-from mmsb.core import fs
+from mmsb.core import fs, paths
 from mmsb.core.agents import claude, codex
 from mmsb.core.contract import Case, Description, Dump, PlainSession, Served
 from mmsb.core.question import Question, write_questions
@@ -37,7 +37,7 @@ from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 RECORDED = Path(__file__).parent / "oracles" / "recorded"
 PILOT = RECORDED / "pilot-s1"
-RECORDED_RUN = Path(r"D:\mm-bench\20261104-0314-pilot-s1")  # read only
+RECORDED_RUN = paths.EARLIER[0] / "20261104-0314-pilot-s1"  # read only
 GPU_LOST = RECORDED_RUN / "set-aside-gpu-lost"
 DAYS = [date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)]
 CELLS = [("claude", "files"), ("claude", "mm-d1-3B"), ("codex", "files"), ("codex", "mm-d1-3B")]
@@ -87,7 +87,7 @@ def checked_in() -> list[Source]:
 
 
 def recorded_run() -> list[Source]:
-    """All 110 execs of the recorded pilot, read in place from D:\\mm-bench; [] when it is not there."""
+    """All 110 execs of the recorded pilot, read in place from the earlier runs folder (`paths.EARLIER`); [] when it is not there."""
     out = []
     for agent, directory in CELLS:
         folder = RECORDED_RUN / "results" / agent / directory
@@ -264,7 +264,7 @@ class Replayer:
 def run_of(root: Path, timeout_s: float = 120.0) -> tuple[RunFolder, Dump]:
     """A run folder of the pilot's questions with made-up frozen data, as the replay's world."""
     questions = pilot_questions()
-    folder, temp = root / "run", root / "temp"
+    folder, temp = root / "runs" / "run", root / "temp"
     data = temp / "mmb-r1-data"
     (data / "notes").mkdir(parents=True)
     (data / "notes" / "a.md").write_text("a note", encoding="utf-8")
