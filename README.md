@@ -125,6 +125,16 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
   Zenodo for you, to use under that licence, and says so when it starts; never copy it anywhere others can fetch it from.** V7 needs
   no source (it is generated), and V8's EgoLife download is yours to make ([MEDIA.md](MEDIA.md)): give its folder to `mmsb build
   --scenario v8_egolife --source DIR`. The other licences ask for credit, and MEDIA.md says how.
+- **Or download them together.** [DanMcInerney/mmmb-sources](https://huggingface.co/datasets/DanMcInerney/mmmb-sources) on Hugging
+  Face holds the sources of 16 of the 23 scenarios (52 GB), one folder per source, as the builders read them. Download it into your
+  sources folder, or add `--include "caltech-camera-traps/*"` for one source:
+
+  ```
+  hf download DanMcInerney/mmmb-sources --repo-type dataset --local-dir D:/mmsb-sources
+  ```
+
+  Its card gives each folder's licence, and many are for non-commercial use only. The sources of six scenarios are not in it, and the
+  card says why and where to get them.
 - **Windows and Codex.** Codex's sandbox on Windows opens the data files through the permissions their folder gives them (`mmsb`
   resets each file to those and refuses one with permissions of its own). A folder under your user profile gives them to you,
   SYSTEM and Administrators only, while the root of a drive gives `Users` read. So with the default home Codex's sandbox may be
