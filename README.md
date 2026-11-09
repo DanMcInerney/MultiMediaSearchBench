@@ -32,6 +32,10 @@ the source's own labels.
 
 About a quarter of each scenario's questions are about things that never happened, and about 30% are `dev`.
 
+Added (9 November 2026): 17 more piles of the media people keep, for home, work, school and fun, and the questions of all of them
+filed under eight categories of what people ask. [CATALOGUE.md](CATALOGUE.md) lists them. They are built and tested without agents:
+no agent or search system has run them yet.
+
 - **Systems:** `files` (the agent alone with the files and its own tools: the baseline), `listing` (file names, sizes, times
   and metadata only: the floor and the leak check), and any plug-in search system. `mm` (MultimediaSearch, `mms`, with a local model) is one,
   optional.
@@ -102,7 +106,7 @@ uv sync --extra mm --group mm-gpu    # also torch and transformers, to run mm's 
   with the right size is left alone. It waits as a server asks (429, Retry-After) and asks for four files at a time.
 
   ```
-  uv run mmsb fetch --scenario i3_trailcam     # or v1_security, a1_home_audio, m4_samples; repeat the flag, or --scenario all
+  uv run mmsb fetch --scenario i3_trailcam     # or another scenario of the catalogue; repeat the flag, or --scenario all
   ```
 
   To keep the sources elsewhere, set `MMSB_SOURCES` first, in the shell that runs `fetch` and in the one that runs `build`
@@ -204,8 +208,9 @@ which the plug-in accepts (it asks MultimediaSearch which models it knows) but w
 | --- | --- |
 | `mmsb/core/` | the runner, the agents (`agents/`), grading, the reports (`summary.py` for the real scenarios); imports and names no system (`tests/test_neutral.py` checks it). Its V7 report (`render.py`) and its figures are still written in mm's words: asks, finds, looks, the decider tier. The recorded reports pin that text, so it was not moved out |
 | `mmsb/systems/` | `files/`, `listing/`, `mm/`, each with a `system.toml` |
-| `mmsb/fetch.py` | `mmsb fetch`: the sources of the real scenarios, from where they are published |
-| `mmsb/scenarios/` | `realdump/` (the builder the real scenarios share), `v1_security/`, `i3_trailcam/`, `a1_home_audio/`, `m4_samples/`; the extras `v7_screen/`, `v8_egolife/` |
+| `mmsb/fetch.py`, `mmsb/fetch_piles.py` | `mmsb fetch`: the sources of the real scenarios, from where they are published |
+| `mmsb/catalogue.py` | `mmsb catalogue`: [CATALOGUE.md](CATALOGUE.md), the media by shelf and the questions by category |
+| `mmsb/scenarios/` | `realdump/` (the builder the real scenarios share) and one folder for each scenario of the catalogue, with the extras `v7_screen/`, `v8_egolife/` |
 | `tests/` | the tests; `tests/oracles/recorded/` holds the recorded pilot and EgoLife runs they are held to |
 | `results/` | published reports: [the baseline](results/2026-11-06-baseline/) (6 November 2026), [the haystack pilot](results/2026-11-04-haystack-pilot/README.md) (4 November 2026) and [EgoLife](results/2026-11-03-egolife/report.md) (3 November 2026) |
 | `<home>\mmsb-runs`, `<home>\mmsb-data`, `<home>\mmsb-cache` | runs, prepared dumps, and the dumps' records with the ingested stores (`<home>` is `MMSB_HOME`; change them with `--out`, `--temp`, `--cache`; keep them on one drive) |

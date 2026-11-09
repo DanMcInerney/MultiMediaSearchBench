@@ -19,6 +19,7 @@ from pathlib import Path
 from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key
+from mmsb.core.taxonomy import Shelf, with_absent
 from mmsb.scenarios import realdump
 from mmsb.scenarios.realdump import File, report  # noqa: F401  (`report`: the Scenario's)
 from mmsb.scenarios.v1_security.questions import CODE, questions_of
@@ -38,6 +39,8 @@ from mmsb.scenarios.v1_security.source import (
 name = "v1_security"
 code = CODE
 generator = 1  # bumped when the scenario makes something other than before
+shelf = Shelf("Security cameras", "video", "work", "three cameras of one site, over an hour of continuous footage")
+filing = with_absent({"first": ("when", "sight"), "last": ("when", "sight"), "count": ("how_many", "sight")})
 
 SCALES = {"tiny": (FIRST, datetime(2018, 3, 12, 10, 10)), "standard": (FIRST, datetime(2018, 3, 12, 11, 15))}  # the wall times each covers
 RECIPE_KEYS = {"source", "scale", "seed", "days", "utc_offsets"}

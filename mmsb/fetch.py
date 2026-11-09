@@ -6,6 +6,9 @@
     mmsb fetch --scenario a1_home_audio    SINS: node 7's minute files of one day (4.9 GB read from Zenodo, 3.3 GB written as FLAC)
     mmsb fetch --scenario m4_samples       FSD50K: the labels and the 10,231 clips of the evaluation split (8.8 GB)
 
+and the scenarios of the piles of media added since (`PILES`: lectures, a podcast, meetings, a match, a dashcam, home clips, receipts, course
+pages, nature photos, music, and the sources of the first survey), whose sources `mmsb/fetch_piles.py` fetches the same way. `all` is every one.
+
 Each source is a function that lists what its builder reads (from the source's own listing or labels), checks the count against what
 the builder needs (`EXPECTED`: another count would be another dump, so it is refused before anything large is fetched, and again
 when the files are there, by the builder's own reader where that can be run), and fetches it. Nothing is written but a file that is whole: a download goes to `<name>.part`, resumes
@@ -50,7 +53,29 @@ from mmsb.scenarios.m4_samples import source as fsd
 from mmsb.scenarios.realdump import SOURCES_ENV, source_word, sources_root
 from mmsb.scenarios.v1_security import source as meva
 
-SCENARIOS = (v1_security.name, i3_trailcam.name, a1_home_audio.name, m4_samples.name)
+REAL = (v1_security.name, i3_trailcam.name, a1_home_audio.name, m4_samples.name)  # the four whose builders read what the functions below fetch
+# The scenarios of the piles of media added after them, named by plain strings (their modules are written apart and are not imported
+# here), and the sources each reads: the ids of `fetch_piles.SOURCES`, which fetches them (MEDIA.md says where each comes from).
+PILES = {
+    "v9_lectures": ("ocw-14-01",),
+    "a6_lecture_audio": ("ocw-6-0002",),
+    "a7_podcast": ("chalk-radio",),
+    "v4_meetings": ("ami",),
+    "a3_meetings": ("icsi",),
+    "v3_match": ("st2-followcam",),
+    "v2_dashcam": ("aus-dashcam",),
+    "v10_home_clips": ("charades",),
+    "i7_receipts": ("sroie", "cord-v2"),
+    "i8_course_pages": ("ocw-pages",),
+    "i9_nature": ("inat-observer",),
+    "a8_music": ("fma",),
+    "i1_camera_roll": ("atm-bench",),
+    "a4_field": ("birdvox-full-night",),
+    "m3_voicemail": ("robocall-ftc",),
+    "i2_screenshots": ("android-in-the-wild",),  # (these two are not scripted yet: `fetch_piles` says so, so they come last in `all`)
+    "i4_site_photos": ("bd3-building-defects",),
+}
+SCENARIOS = (*REAL, *PILES)  # what `--scenario` takes besides `all`
 # What each build needs, counted in the files its source gives: the clips, the photos, the minute files, the clips. Found in the
 # source's listing, a different number is another dump.
 EXPECTED = {v1_security.name: 42, i3_trailcam.name: 4256, a1_home_audio.name: 1441, m4_samples.name: 10231}
@@ -84,7 +109,7 @@ WAIT_LONGEST = 3600.0  # a server that asks for more than this is not waited for
 CHUNK = 1 << 20
 WINDOW = 1 << 16  # what a zip's directory is read in at a time
 SLACK = 1024  # bytes read past a member's data: a local header's name and extra field may be longer than the directory says
-TRANSIENT = {429, 500, 502, 503, 504}
+TRANSIENT = {429, 460, 500, 502, 503, 504}  # (460 is archive.org's own answer when a storage node is busy: it clears, or does not, after a wait)
 CHANNELS = 4  # of a SINS minute file
 
 
@@ -448,11 +473,16 @@ FETCHERS = {v1_security.name: fetch_meva, i3_trailcam.name: fetch_cct, a1_home_a
 def fetch(scenarios: Sequence[str], sources: Path, fetcher: Fetcher | None = None) -> None:
     """The sources of `scenarios` ("all" is every one) into `sources`, each into the folder its builder reads; says what it did, and
     raises when what a source gives is not what its build needs."""
-    wanted = SCENARIOS if "all" in scenarios else tuple(dict.fromkeys(scenarios))
+    wanted = (*REAL, *PILES) if "all" in scenarios else tuple(dict.fromkeys(scenarios))
     source_word(sources)  # a folder an agent could not be kept out of is refused now, not after the downloads
     fetcher = fetcher or Fetcher()
     for scenario in wanted:
-        found = FETCHERS[scenario](fetcher, Path(sources))
+        if scenario in FETCHERS:
+            found = FETCHERS[scenario](fetcher, Path(sources))
+        else:
+            from mmsb import fetch_piles  # (here: it imports this module for the fetcher)
+
+            found = sum(fetch_piles.SOURCES[source](fetcher, Path(sources)) for source in PILES[scenario])
         print(f"{scenario}: the {found} files its build needs are in {Path(sources)}")
     if Path(sources).resolve() != sources_root().resolve():
         print(f"note: a build reads {SOURCES_ENV}, which is {sources_root()}; set it to {Path(sources)} to build from what was fetched")

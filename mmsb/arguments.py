@@ -38,6 +38,11 @@ def parser_of() -> argparse.ArgumentParser:
     fetched.add_argument("--sources", type=Path, default=sources_root(), help=f"where this fetch writes, one folder per source (default MMSB_SOURCES, else {sources_root()}); a build reads "
                          "MMSB_SOURCES, so set it to the same folder")
     fetched.add_argument("--workers", type=int, default=fetch.WORKERS, help=f"requests at once (default {fetch.WORKERS})")
+    listed = sub.add_parser("catalogue", help="the benchmark's media by shelf and its questions by category, in Markdown (no dump is written and no agent is run)")
+    listed.add_argument("--out", type=Path, help="where to write the catalogue (default: print it)")
+    listed.add_argument("--full", type=Path, help="where to write every question with its answer; keep it out of the repository, as it holds the test split")
+    listed.add_argument("--scale", default="standard", help="the scale of the scenarios (default standard)")
+    listed.add_argument("--seed", type=int, default=DEFAULT_SEED, help=f"the seed of the questions (default {DEFAULT_SEED})")
     build = sub.add_parser("build", help="write a scenario's recordings, its questions and the stores, and probe for shortcuts")
     build.add_argument("--scenario", required=True, choices=tuple(scenarios.REGISTRY))
     build.add_argument("--scale", help="the scenario's scale (v7_screen: tiny, pilot, ...)")

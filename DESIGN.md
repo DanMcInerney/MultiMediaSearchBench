@@ -369,6 +369,69 @@ the manifest's `t`, from which a citation's seconds are counted, is the start to
 - needle salience (share of the frame, or SNR);
 - how vague the time hint is (a part of a day, a day, none).
 
+### 5.8 The catalogue: what people ask, and the shelves (9 November 2026)
+
+The benchmark is organised the way a person thinks of it: a shelf of their own media, and a question of the kind people ask.
+`CATALOGUE.md` is the list, made by `mmsb catalogue` from the scenarios themselves (`mmsb/catalogue.py`): the shelves, the
+balance across media, life areas and categories, and examples from the `dev` split. `--full FILE` writes every question with
+its answer, and stays out of the repository (6.4).
+
+**Eight categories, by what the person wants** (`core/taxonomy.py`), whatever the media:
+
+| Key | Category | A person says | The answer |
+| --- | --- | --- | --- |
+| `find` | Find it | "Find the receipt from the garage." | a file |
+| `find_all` | Find every one | "Show me every clip of the cat." | files or days |
+| `when` | When | "When did I last see the fox?" | a time or date |
+| `did` | Did it happen | "Did I ever photograph a Concorde? If so, when?" | not there, or which or when |
+| `how_many` | How many or how long | "How many goals were scored?" | a number |
+| `what` | What did it say or show | "What did I pay for the hotel?" | a value read or heard |
+| `who` | Who or which | "Which airline did I take?" | a name |
+| `order` | Before and after | "Which did I photograph first?" | one of the two, or the next thing |
+
+"It isn't there" is no category. About a quarter of all the questions are about something that never happened and read exactly
+like the others; they are filed as the question they read as, and fall mostly under when, did and find every one. An absent question is certain in one of two
+ways: a term in no complete label set (a word in no transcript, a shop in no receipt), or a **held-out needle**: a real
+question whose files, and anything easily taken for them, are left out of the dump.
+
+**The filing is on each scenario** (`shelf`, a `Shelf` of a name, media, life area and pile; `filing`, each template's category
+and cue), not on the question lines, so a plan's hash and a recorded run do not change when a question is refiled. The life
+areas are home, work, school and fun. The cues are what must be perceived: sight, sound, speech, text or a mix.
+
+**The second wave** of real scenarios follows 5.7's form: a reader of the source and its labels, and templates that compute
+every answer from those labels. Scenarios of talk share `realdump/speech.py`: terms confirmed in the transcripts, terms
+confirmed to be in none of them, and questions written by reading the transcripts, each resting on a phrase that the build
+checks is in the cues at its evidence.
+
+| ID | Module | The pile | Life area |
+| --- | --- | --- | --- |
+| V2 | `v2_dashcam` | a dashcam's event clips | home |
+| V3 | `v3_match` | three football matches, in 30 s clips from a virtual follow camera | fun |
+| V4 | `v4_meetings` | twelve role-played design meetings | work |
+| V9 | `v9_lectures` | a course's lecture videos | school |
+| V10 | `v10_home_clips` | thousands of short clips at home, acted | home |
+| I1 | `i1_camera_roll` | one person's phone photos over years | home |
+| I2 | `i2_screenshots` | a phone's Screenshots folder | home |
+| I4 | `i4_site_photos` | a building inspector's job folders | work |
+| I7 | `i7_receipts` | a folder of scanned receipts | work |
+| I8 | `i8_course_pages` | a student's saved pages of notes and slides | school |
+| I9 | `i9_nature` | one naturalist's photos over four years | fun |
+| A3 | `a3_meetings` | a research group's weekly meetings | work |
+| A4 | `a4_field` | a night of a field recorder | fun |
+| A6 | `a6_lecture_audio` | a course's lectures as sound | school |
+| A7 | `a7_podcast` | a podcast's back catalogue | fun |
+| A8 | `a8_music` | a music library of short clips, tags stripped | fun |
+| M3 | `m3_voicemail` | a voicemail box of scam calls; the truth is machine transcripts | work |
+
+**Honest about what is staged.** AMI's meetings are role-played, Charades is acted, the football's camera is computed from a
+wide view, V1's activity is scripted, V7 is made by the benchmark, and M3's truth is a speech recogniser's. The catalogue says
+so beside each shelf.
+
+**Left out, and why** (`MEDIA.md` has the survey). Answering-machine tapes (private people's names and numbers); voice notes
+about health; school notebooks (children's work); sources with too few questions per person, or too large per hour of use.
+No good public source was found for voice memos with human transcripts, a baby monitor or a night in a room, travel video, or
+real screen recordings (V7 stays synthetic).
+
 ## 6. Questions, answers and grading
 
 ### 6.1 The question file
@@ -399,8 +462,12 @@ it holds dataclasses. A line also has the keys the separation turned out to need
 - `retrieval`: what the retrieval run asks (the query, sources, ranges, `k`, tolerance, and the moments and other moments
   to score against), else null.
 
-`grade.rule` is one of `number`, `count`, `time`, `code_time`, `absent`, `choice`, `set`, with `truth`, `time`, `tol_s`,
-`wrong`, `ignore`, `date` and `items`. `set` is for "find every one": right only with the exact set of `items`, which are ISO
+`grade.rule` is one of `number`, `count`, `time`, `code_time`, `absent`, `choice`, `set`, `text`, `amount`, with `truth`,
+`time`, `tol_s`, `wrong`, `ignore`, `date` and `items`. `text` is a short answer of at most 25 words that holds one of the
+phrases of `truth` (separated by `|`) as whole words, offers no second guess ("or", "maybe", "perhaps", "possibly", or
+another number when the truth is a number) and names none of `wrong`. Where `wrong` is at most two phrases, the other side of a
+two-way question, an explanation may name it, and the side named first is the answer. `amount` is the one number of an answer, in the
+units the question asks for, within `tol_s` of `truth` (its `tol_s` is in those units, not seconds). `set` is for "find every one": right only with the exact set of `items`, which are ISO
 dates or file names (a file by its base name, in any case, wherever the agent saw it), and the F1 of the items found is kept
 beside the verdict as `items_f1`; a line written before `items` existed reads as none. The loader refuses a `set` with no
 items, items on another rule, a repeated item, dates mixed with file names, an item that is no date, and two files of one

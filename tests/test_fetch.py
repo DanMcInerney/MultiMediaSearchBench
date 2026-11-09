@@ -453,15 +453,16 @@ def test_a1_is_refused_when_the_zips_hold_fewer_minute_files_than_its_build_need
 
 # -- the command --------------------------------------------------------------------------------------------------------------
 
-def test_the_command_fetches_every_scenario_with_all_and_names_none_but_the_four(site, sources, monkeypatch, capsys):
+def test_the_command_fetches_every_scenario_with_all_and_names_none_but_the_four_and_the_piles(site, sources, monkeypatch, capsys):
     serve_meva(site, monkeypatch)
     serve_cct(site, monkeypatch)
     serve_fsd(site, monkeypatch)
     serve_sins(site, monkeypatch)
+    monkeypatch.setattr(fetch, "PILES", {})  # (the piles of media are fetched in test_fetch_piles.py: `all` is the four and them)
     assert cli.main(["fetch", "--scenario", "all", "--sources", str(sources), "--workers", "2"]) == 0
     assert sorted(p.name for p in sources.iterdir()) == ["caltech-camera-traps", "fsd50k", "meva", "sins"]
     out = capsys.readouterr().out
-    for scenario in fetch.SCENARIOS:
+    for scenario in fetch.REAL:
         assert f"{scenario}: the 3 files its build needs are in" in out
     with pytest.raises(SystemExit):
         cli.main(["fetch", "--scenario", "v7_screen"])

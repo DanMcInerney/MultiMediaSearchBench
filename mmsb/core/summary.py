@@ -20,6 +20,7 @@ from mmsb.core.record import kind_of
 from mmsb.core.report import answerable, is_filter, paired, results_of, side
 from mmsb.core.runfolder import COMMIT_KEY, RunFolder, is_done
 from mmsb.core.stats import mean, wilson
+from mmsb.core.taxonomy import CATEGORIES, filed
 
 ALPHA = 0.05  # a paired difference is told as shown only below this McNemar p (DESIGN 9: smaller ones are called unproven)
 FEW = 30  # questions under which a configuration's interval is noted as wide
@@ -40,7 +41,7 @@ def filters_of(runs: Sequence[RunFolder]) -> set[str]:
     return out
 
 
-def cell(rows: list[tuple]) -> dict:
+def cell(rows: list[tuple], scenario: object = None) -> dict:
     """The figures of one agent's done results in one configuration, `rows` of `(question, result)`: `report.side`'s, with the 95%
     Wilson interval of the share right, the questions by kind and by media, and the mean item F1 of the `set` questions."""
     rs = [r for _, r in rows]
@@ -52,6 +53,7 @@ def cell(rows: list[tuple]) -> dict:
     out["tokens_per_right"] = out["tokens_all"] / right if out["tokens_all"] is not None and right else None
     out["by_kind"] = tally((q.kind, r) for q, r in rows)
     out["by_media"] = tally((str(q.tags["modality"]), r) for q, r in rows)
+    out["by_category"] = tally((filed(scenario, q.tags.get("template"))[0], r) for q, r in rows)
     out["items_f1"] = mean([r["items_f1"] for r in rs if r.get("items_f1") is not None])
     return out
 
@@ -90,7 +92,7 @@ def section(runs: Sequence[RunFolder], control: str) -> dict:
                     elif c.name in filters or q.qid not in leaked:
                         done.setdefault(c.name, {})[run.name, q.qid] = (q, r)
             if c.name in done:
-                cells.setdefault(agent, {})[c.name] = cell(list(done[c.name].values()))
+                cells.setdefault(agent, {})[c.name] = cell(list(done[c.name].values()), runs[0].scenario)
         base = done.get(control, {})
         for c in configs:
             if c.name == control or c.name in filters or c.name not in done:
@@ -204,6 +206,12 @@ def section_lines(s: dict, control: str) -> list[str]:
     out += table(["agent", "configuration", *kinds],
                  [[agent, name, *(pct(*c["by_kind"].get(k, [0, 0])) for k in kinds)] for agent, by in s["cells"].items()
                   for name, c in by.items()])
+    categories = [c for c in CATEGORIES if any(c.key in cell_["by_category"] for by in s["cells"].values() for cell_ in by.values())]
+    if categories:
+        out += ["", "### By category of question", ""]
+        out += table(["agent", "configuration", *(c.name for c in categories)],
+                     [[agent, name, *(pct(*c_["by_category"].get(c.key, [0, 0])) for c in categories)] for agent, by in s["cells"].items()
+                      for name, c_ in by.items()])
     if s["filters"]:
         out += ["", "### Answerable from metadata", ""]
         out += ([f"- {x['qid']} ({x['run']}): {', '.join(x['agents'])}" for x in s["leaks"]] or

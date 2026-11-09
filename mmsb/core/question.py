@@ -18,7 +18,7 @@ from pathlib import Path
 
 from mmsb.core import fs
 
-RULES = ("number", "count", "time", "code_time", "absent", "choice", "set")  # how an answer is graded (core/grade.py)
+RULES = ("number", "count", "time", "code_time", "absent", "choice", "set", "text", "amount")  # how an answer is graded (core/grade.py)
 ISO_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")  # a `set` of dates holds them so
 QID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")  # a qid is a file name in the run folder
 CLOCK = re.compile(r"\d{1,2}:\d{2}(:\d{2})?")
@@ -43,7 +43,7 @@ class Grade:
     rule: str  # one of RULES
     truth: str | None
     time: str | None
-    tol_s: float | None
+    tol_s: float | None  # seconds; of the rule `amount`, in the units its answer is asked in
     wrong: tuple[str, ...]
     ignore: tuple[str, ...]
     date: str | None
@@ -148,7 +148,7 @@ def check(q: Question) -> None:
             date.fromisoformat(g.date)
         except ValueError:
             raise ValueError(f"grade.date {g.date!r} is not an ISO date") from None
-    if g.rule in ("number", "count", "code_time", "choice") and g.truth is None:
+    if g.rule in ("number", "count", "code_time", "choice", "text", "amount") and g.truth is None:
         raise ValueError(f"grade.truth is missing for the rule {g.rule}")
     if (g.rule == "set") != bool(g.items):
         raise ValueError("grade.items is for the rule set, which needs at least one" if g.items else "grade.items is missing for the rule set")
@@ -163,6 +163,13 @@ def check(q: Question) -> None:
             raise ValueError(f"grade.items {x!r} is not a date") from None
     if g.items and not ISO_DAY.fullmatch(g.items[0]) and len({re.split(r"[\\/]", x)[-1].casefold() for x in g.items}) != len(g.items):
         raise ValueError(f"grade.items {list(g.items)} has two files of one name: an answer names a file by its name (grade.base_name)")
+    if g.rule == "amount":
+        if g.tol_s is None or g.tol_s < 0:
+            raise ValueError("grade.tol_s is missing or negative for the rule amount")
+        try:
+            float(g.truth)
+        except ValueError:
+            raise ValueError(f"grade.truth {g.truth!r} is not a number") from None
     if g.rule == "choice" and g.truth not in tuple("ABCD"):
         raise ValueError(f"grade.truth {g.truth!r} is not a letter from A to D")
     if g.rule in ("time", "code_time"):

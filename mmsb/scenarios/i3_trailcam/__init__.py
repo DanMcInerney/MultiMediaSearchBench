@@ -20,6 +20,7 @@ from pathlib import Path
 from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key
+from mmsb.core.taxonomy import Shelf, with_absent
 from mmsb.scenarios import realdump
 from mmsb.scenarios.i3_trailcam.questions import CODE, SOURCE_NAME, questions_of
 from mmsb.scenarios.i3_trailcam.source import (
@@ -37,6 +38,8 @@ from mmsb.scenarios.realdump import File, report  # noqa: F401  (`report`: the S
 name = "i3_trailcam"
 code = CODE
 generator = 2  # bumped when the scenario makes something other than before
+shelf = Shelf("Trail camera", "image", "fun", "one camera's memory card, nearly six months of triggers, most of them empty")
+filing = with_absent({"days": ("find_all", "sight"), "count": ("how_many", "sight"), "first": ("when", "sight"), "last": ("when", "sight")})
 
 SCALES = {"tiny": ("2013-12-16", "2013-12-22"), "standard": CARD_DAYS}  # the days of the card at each scale
 RECIPE_KEYS = {"source", "scale", "seed", "days", "utc_offsets"}
