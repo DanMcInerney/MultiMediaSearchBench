@@ -21,6 +21,7 @@ from pathlib import Path
 from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key
+from mmsb.core.taxonomy import Shelf, with_absent
 from mmsb.scenarios import realdump
 from mmsb.scenarios.m4_samples.questions import CODE, SOURCE_NAME, choose, questions_of
 from mmsb.scenarios.m4_samples.source import (
@@ -36,6 +37,8 @@ from mmsb.scenarios.realdump import File, report  # noqa: F401  (`report`: the S
 name = "m4_samples"
 code = CODE
 generator = 2  # bumped when the scenario makes something other than before
+shelf = Shelf("Sound-effects library", "audio", "fun", "thousands of unnamed clips in numbered folders")
+filing = with_absent({"find": ("find_all", "sound"), "count": ("how_many", "sound")})
 
 SCALES = {"tiny": ("2026-04-01", "2026-04-30"), "standard": ("2026-04-01", "2026-09-30")}  # the days the clips are made over
 FOLDERS = {"tiny": 3, "standard": 10}  # the folders the clips are in

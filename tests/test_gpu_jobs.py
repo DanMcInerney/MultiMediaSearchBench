@@ -194,7 +194,7 @@ def test_side_by_side_keeps_its_one_gpu_cell_and_inside_it_the_same_rule_holds(w
     on_gpu(world)
     for flags, seen in (((), (1, 3)), (("--gpu-jobs", "2"), (2, 3))):
         fresh(run)
-        stub = Stub(pause=0.03)
+        stub = Stub(pause=0.3)  # long enough for the execs to overlap while other tests load the machine
         assert world.main("run", str(run.folder), *RUN, "--side-by-side", *flags, agents=agents_of(stub)) == 0, flags
         capsys.readouterr()
         assert (stub.at_once("stub-all"), stub.at_once("files")) == seen, flags

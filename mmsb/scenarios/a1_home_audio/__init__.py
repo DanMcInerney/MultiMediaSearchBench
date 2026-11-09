@@ -19,6 +19,7 @@ from pathlib import Path
 from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key
+from mmsb.core.taxonomy import Shelf, with_absent
 from mmsb.scenarios import realdump
 from mmsb.scenarios.a1_home_audio.questions import CODE, SOURCE_NAME, questions_of
 from mmsb.scenarios.a1_home_audio.source import SOURCE, read_runs, write_wav
@@ -27,6 +28,9 @@ from mmsb.scenarios.realdump import File, report  # noqa: F401  (`report`: the S
 name = "a1_home_audio"
 code = CODE
 generator = 1  # bumped when the scenario makes something other than before
+shelf = Shelf("Room recorder", "audio", "home", "a whole day from a living-room microphone, in one file")
+filing = with_absent({**{t: ("when", "sound") for t in ("vacuum_on", "vacuum_off", "tv_on", "tv_off", "visit_on", "visit_off", "leave", "return")},
+                      **{t: ("how_many", "sound") for t in ("count_vacuum", "count_tv", "count_visit")}})
 
 DAY = "2017-02-02"
 SCALES = {"tiny": (21 * 3600 + 30 * 60, 3600), "standard": (0, 86400)}  # the recording at each scale: seconds after midnight it begins, how long

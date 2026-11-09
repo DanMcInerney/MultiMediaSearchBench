@@ -30,6 +30,7 @@ from mmsb.core.contract import Dump
 from mmsb.core.question import Question
 from mmsb.core.runfolder import IN_ONLY, RunFolder
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key, files_hash, plan_hash
+from mmsb.core.taxonomy import Shelf
 from mmsb.scenarios.v8_egolife import plan as plans  # (the package's own `plan` is this module: the scenario has no `plan` function)
 from mmsb.scenarios.v8_egolife.choose import PER_AGE, SPEECH, pools
 from mmsb.scenarios.v8_egolife.manifest import TRANSCRIPT, entries_of, file_rows, measure_disk, transcript_path
@@ -43,6 +44,9 @@ from mmsb.scenarios.v8_egolife.view import files_view, release_views, seen_past_
 name = "v8_egolife"
 code = CODE
 generator = 1  # bumped when the plan makes something other than before
+shelf = Shelf("Smart-glasses days", "video", "home", "days of one person's wearable video, with speech")
+filing = {"EventRecall": ("what", "mixed"), "EntityLog": ("what", "mixed"), "RelationMap": ("who", "mixed"), "TaskMaster": ("what", "mixed"),
+          "HabitInsight": ("what", "mixed")}
 
 WORKERS = 3  # clips measured, and files hashed, at once
 

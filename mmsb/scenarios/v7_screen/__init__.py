@@ -22,6 +22,7 @@ from mmsb.core.render import markdown
 from mmsb.core.report import numbers
 from mmsb.core.runfolder import IN_ONLY, RunFolder
 from mmsb.core.scenario import Access, ProbeOutcome, dump_key, files_hash, plan_hash
+from mmsb.core.taxonomy import Shelf
 from mmsb.scenarios.v7_screen import media_check  # noqa: F401  (importing it checks the constants of the media modules against each other)
 from mmsb.scenarios.v7_screen import week
 from mmsb.scenarios.v7_screen.manifest import LOGS, entries_of, file_rows, measure_disk
@@ -34,6 +35,11 @@ from mmsb.scenarios.v7_screen.write import WORKERS, write
 name = "v7_screen"
 code = CODE
 generator = VERSION  # bumped when the plan makes something other than before
+shelf = Shelf("Developer's week", "mixed", "work", "a synthetic week of screen recording, notes, logs, phone photos, porch camera and microphone")
+filing = {"note-code": ("what", "text"), "config-asof": ("what", "text"), "log-count": ("how_many", "text"), "log-last": ("when", "text"),
+          "photo-sign": ("what", "text"), "photo-count": ("how_many", "sight"), "screen-error": ("what", "text"), "porch-parcel": ("when", "sight"),
+          "mic-doorbell": ("when", "sound"), "mic-alarm": ("when", "sound"), "absent-note": ("what", "text"), "absent-log": ("how_many", "text"),
+          "absent-sign": ("what", "text"), "absent-error": ("what", "text"), "absent-parcel": ("when", "sight"), "absent-doorbell": ("when", "sound")}
 
 # What no command of an agent with its own tools may hold, beyond the folders: the generator of the week and its truth, as code reaches
 # them (a mention in prose is no escape). An agent that runs `haystack.plan(seed, scale)` from the repository has every answer. The

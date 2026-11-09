@@ -72,6 +72,12 @@ WRAPS = ("<>", "[]", '""', "''", "``")  # what an answer may be wrapped in whole
 # "clip-0007.wav"; not "1.25"); only the extensions of the set's own files count
 FILE_NAME = re.compile(r"[\w][\w.-]*\.([a-z][a-z0-9]{1,3})\b", re.IGNORECASE)
 # a second letter named after "or", "and", "/", "&" or a comma: "B or C", "B/C", "B, C" are hedges
+SAID_WORDS = 25  # the longest answer the rule `text` takes: a short value, not a list of guesses
+HEDGE_WORD = re.compile(r" (?:or|maybe|perhaps|possibly) ")  # in `words_of`'s form: a second guess
+TWO_WAY = 2  # at most this many `wrong` phrases are the other side of a two-way question ("before or after")
+THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")  # "1,250.00"
+DOT_THOUSANDS = re.compile(r"(?<=\d)\.(?=\d{3}(?!\d))")  # "67.000" of a whole amount of 67000
+CURRENCY = re.compile(r"\b(?:rm|rp|usd|eur|gbp|myr|idr)(?=\d)")  # "rm91.50" is an amount, not a name as `cam3` is
 HEDGE = re.compile(r"(?i:\bor\b|\band\b)\s*\(?[A-D]\b(?!')|[/&,]\s*\(?[A-D]\b(?!')")
 
 
@@ -297,6 +303,40 @@ def items_f1(g: Grade, answer: str | None) -> float | None:
     return 2 * precision * recall / (precision + recall) if precision + recall else 0.0
 
 
+def words_of(text: str) -> str:
+    """`norm(text)` as its words between single spaces, with a space at each end: a phrase is found in it as whole words."""
+    return " " + " ".join(re.findall(r"[^\W_]+", norm(text))) + " "
+
+
+def said(g: Grade, answer: str) -> bool:
+    """Whether the short `answer` holds one of the phrases of `g.truth` (separated by `|`) as whole words, offers no second guess and names none of
+    `g.wrong`. A second guess is a word of `HEDGE_WORD` or, when the truth is a number, another number (the question's own left out). A `wrong` of at most
+    `TWO_WAY` phrases is the other side of a two-way question, which an explanation may name: there the side named first is the answer."""
+    plain = words_of(answer)
+    phrases = [words_of(x) for x in g.truth.split("|")]
+    found = [at for p in phrases if (at := plain.find(p)) >= 0]
+    rest = plain
+    for phrase in phrases:
+        rest = rest.replace(phrase, " ")  # an accepted phrase may hold "or"
+    if len(plain.split()) > SAID_WORDS or not found or HEDGE_WORD.search(rest):
+        return False
+    allowed = {w for p in phrases for w in p.split() if w.isdigit()}
+    if allowed and any(w.isdigit() and w not in allowed | set(split(g.ignore)[0]) for w in plain.split()):
+        return False
+    against = [at for x in g.wrong if (at := plain.find(words_of(x))) >= 0]
+    return not against or (len(g.wrong) <= TWO_WAY and min(found) < min(against))
+
+
+def amount(g: Grade, answer: str) -> bool:
+    """Whether the one number in `answer` (the question's own left out) is within `g.tol_s` of `g.truth`."""
+    digits, _ = split(g.ignore)
+    plain = THOUSANDS.sub("", NAMED.sub(" ", CURRENCY.sub(" ", norm(answer))))
+    if "." not in g.truth and float(g.truth) >= 1000:
+        plain = DOT_THOUSANDS.sub("", plain)
+    found = [float(n) for n in digits_in(plain) if n == g.truth or n not in digits]
+    return len(found) == 1 and abs(found[0] - float(g.truth)) <= g.tol_s + 1e-9
+
+
 def grade(g: Grade, answer: str | None) -> bool:
     """Whether `answer` is right by `g`: None is wrong, and so is a hedge, an answer with a number or a time that is neither the
     truth nor in `g.ignore` (the question's own numbers and times).
@@ -308,7 +348,9 @@ def grade(g: Grade, answer: str | None) -> bool:
       the answer within it or ignored), and no other number of as many digits;
     - `absent`: the answer abstains (`abstained`);
     - `choice`: the answer's letter (`choice`) is the truth, one of A to D ("unknown", an option's words and a hedge are wrong);
-    - `set`: the answer names every one of `items` (dates or file names: `named_items`) and nothing else of their kind.
+    - `set`: the answer names every one of `items` (dates or file names: `named_items`) and nothing else of their kind;
+    - `text`: a short answer holds one of the accepted phrases of the truth, offers no second guess and names no wrong one (`said`);
+    - `amount`: the answer's one number (`amount`) is within `tol_s` of the truth, in the units the question asks in.
     A `time` or `code_time` grade may hold a `date` (ISO; None or empty is none): the answer must also name that date, by its
     weekday, as "29 October", "October 29" or "29 Oct" (with a year or not), as "the 29th" or as `2026-10-29`, and name no other
     date: a time alone is wrong (`on_date`). A year in brackets, "(2026)", is no number of an answer (a `number` answer keeps
@@ -345,4 +387,8 @@ def grade(g: Grade, answer: str | None) -> bool:
     if rule == "set":
         found, others = named_items(g, answer)
         return len(found) == len(g.items) and not others
+    if rule == "text":
+        return said(g, answer)
+    if rule == "amount":
+        return amount(g, answer)
     raise ValueError(f"a question's grade is one of {', '.join(RULES)}, not {rule!r}")

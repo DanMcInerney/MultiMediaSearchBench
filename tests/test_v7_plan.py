@@ -758,7 +758,7 @@ def test_the_graders_grade_as_the_table_says():
                "I could not find it", "No doorbell rang between 12:00 and 18:00", "No one rang the doorbell",
                "I didn't see one", "No, not a single one", "There was not one"],
               ["47", "14:03", "the password is hunter2", "Not sure, maybe 47", "It rang, not at 14:03", "The code is ERR-845"])]
-    assert {s.rule for s, _, _ in table} == set(RULES) - {"choice", "set"}  # EgoLife's kind: test_grade.py; the real scenarios' "find every one": test_set_rule.py
+    assert {s.rule for s, _, _ in table} == set(RULES) - {"choice", "set", "text", "amount"}  # EgoLife's kind: test_grade.py; "find every one": test_set_rule.py; short answers: test_taxonomy.py
     for one, right, wrong in table:
         what = f"{one.rule} {one.truth}"
         assert all(grade.grade(one, a) for a in right), f"{what} must accept {[a for a in right if not grade.grade(one, a)]}"

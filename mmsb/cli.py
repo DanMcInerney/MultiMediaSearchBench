@@ -3,6 +3,7 @@ any scenario and any system). Argument parsing and the order of the steps; what 
 core/runner.py, core/retrieval.py, the scenario's `report`).
 
     mmsb fetch    --scenario NAME|all [--sources DIR --workers N]    the files the real scenarios read, from where they are published
+    mmsb catalogue [--out FILE --full FILE --scale S --seed N]    the media by shelf and the questions by category
     mmsb build    --scenario NAME [--scale S --seed N --days D,D --source DIR ...] [--out DIR --temp DIR --cache DIR --configs A,B --no-probe]
     mmsb ingest   RUN [--configs A,B]                       the stores of the systems (build makes those of its --configs)
     mmsb run      RUN [--agents claude,codex --configs A,B --jobs N --gpu-jobs N --side-by-side --subset all|pilot --controls CONFIG --only QID,.. --timeout S
@@ -36,7 +37,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from mmsb import fetch, scenarios, systems
+from mmsb import catalogue, fetch, scenarios, systems
 from mmsb.arguments import DEFAULT_SEED, OPTIONS, csv, parser_of
 from mmsb.core import fs, gpu, paths, render, report, summary
 from mmsb.core.agents import claude
@@ -413,6 +414,12 @@ def main(argv: list[str] | None = None, *, agents: Callable[[], Mapping[str, Age
         match args.command:
             case "fetch":
                 return fetch_command(args, parser)
+            case "catalogue":
+                text = catalogue.write(args.out, args.full, args.scale, args.seed)
+                if args.out is None:
+                    sys.stdout.reconfigure(encoding="utf-8")  # a question may hold any character, and a Windows console's code page does not
+                    print(text)
+                return 0
             case "build":
                 return build_command(args, parser, registry)
             case "ingest":

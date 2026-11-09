@@ -153,8 +153,8 @@ def dump_of(key: str, out: Path, scenario: str, entries: Sequence[ManifestEntry]
 # -- the questions ------------------------------------------------------------------------------------------------------------------
 
 def grade(rule: str, *, truth: str | None = None, time: str | None = None, tol_s: float | None = None, date: str | None = None,
-          items: Sequence[str] = (), ignore: Sequence[str] = ()) -> Grade:
-    return Grade(rule, truth, time, tol_s, (), tuple(ignore), date, tuple(items))
+          items: Sequence[str] = (), ignore: Sequence[str] = (), wrong: Sequence[str] = ()) -> Grade:
+    return Grade(rule, truth, time, tol_s, tuple(wrong), tuple(ignore), date, tuple(items))
 
 
 def question(*, code: str, qid: str, now: float, text: str, kind: str, template: str, modality: str, shape: str, grade: Grade,

@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Protocol
 from mmsb.core.answer import AnswerFormat
 from mmsb.core.contract import Dump, Served
 from mmsb.core.question import Question
+from mmsb.core.taxonomy import Filing, Shelf
 
 if TYPE_CHECKING:
     from mmsb.core.runfolder import RunFolder
@@ -39,6 +40,8 @@ class Scenario(Protocol):
     name: str  # "v7_screen"
     code: str  # "V7": what Question.scenario holds
     generator: int  # bumped when the scenario makes something other than before
+    shelf: Shelf  # the kind of pile it is (core/taxonomy.py)
+    filing: Filing  # each template's category and cue (core/taxonomy.py)
 
     def recipe(self, **options) -> Mapping[str, object]: ...
     def hashes(self, recipe: Mapping[str, object]) -> tuple[str, str]: ...  # (plan_hash, files_hash): what run.json records
