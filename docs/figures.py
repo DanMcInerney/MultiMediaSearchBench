@@ -116,10 +116,10 @@ def wrap(s: str, width: int) -> str:
 
 # ---------------------------------------------------------------------------------------------------------------- the piles
 
-TRAILCAM = "mmb-5b6356b8ca-data/DCIM/100RECNX"  # the standard dumps of seed 1, as `mmsb build` names them
-SECURITY = "mmb-74a64a7e31-data"
-RECORDER = "mmb-028a0ce1db-data/RECORD/REC_20170202_000000.wav"
-SOUNDS = "mmb-bf7133e280-data"
+TRAILCAM = "mmsb-5b6356b8ca-data/DCIM/100RECNX"  # the standard dumps of seed 1, as `mmsb build` names them
+SECURITY = "mmsb-74a64a7e31-data"
+RECORDER = "mmsb-028a0ce1db-data/RECORD/REC_20170202_000000.wav"
+SOUNDS = "mmsb-bf7133e280-data"
 PHOTOS, DOG = 4256, 913  # the card's photos, and the first one of a dog (question first-dog, dev)
 PEOPLE = {1: 55, 376: 432, 378: 324, 1994: 1940, 2003: 2048, 3717: 3755}  # photos of whoever tended the camera, among those the grids would show, and the empty one shown for each
 TAPE = ("rec_00869.wav", "rec_01986.wav", "rec_03971.wav", "rec_04017.wav")  # the answer of find-packing_tape (dev)

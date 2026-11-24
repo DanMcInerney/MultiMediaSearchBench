@@ -4,8 +4,8 @@ and the refusals when it is opened again. What is specific to a scenario (prompt
 
     <folder>/run.json, questions.jsonl, data-manifest.json, report.json, report.md
              results/<agent>/<config.dir>/<qid>.json     execs/<agent>/<config.dir>/<qid>/
-    <temp>/mmb-<key10>-data/ (the dump: named by its key and shared by the runs of one recipe, core/cache.py)
-    <temp>/mmb-<tag>-bin/ (the ffmpeg on the agents' PATH)  mmb-<tag>-w<k>/ (working slot k): named by the run's own random `tag`
+    <temp>/mmsb-<key10>-data/ (the dump: named by its key and shared by the runs of one recipe, core/cache.py)
+    <temp>/mmsb-<tag>-bin/ (the ffmpeg on the agents' PATH)  mmsb-<tag>-w<k>/ (working slot k): named by the run's own random `tag`
 
 `run.json` holds seed, scale, days (ISO dates), data, temp, cache (where the dump's record and the stores are kept), tag, timeout_s,
 scenario (its registered name), generator, recipe (what
@@ -43,7 +43,7 @@ from mmsb.core.scenario import Scenario
 COMMIT_KEY = "commit"  # run.json's key for the commit of the repository that made the run
 JOBS_MAX = 4  # execs at once, so the working slots; more overload an ordinary computer
 ENDS = ('/', '"', " ", "'")  # what ends a folder's name in a path or a command
-HIDDEN_DATA = tuple("-data" + after for after in ENDS)  # the end of a dump's folder name (`mmb-<tag>-data`) in a path or a command
+HIDDEN_DATA = tuple("-data" + after for after in ENDS)  # the end of a dump's folder name (`mmsb-<tag>-data`) in a path or a command
 IN_ONLY = "in:"  # a deny word that starts with this is checked in what the agent runs (a command, a path), not in what it reads
 TEMP_VARS = ("TEMP", "TMP", "TMPDIR")  # where the agents' tools write their temp files (they inherit these)
 # What keeps an agent with its own tools off the GPU (`schedule.agent_off_gpu` says when): it sees no CUDA device, and may not ask for the
@@ -143,7 +143,7 @@ class RunFolder:
 
     @property
     def bin(self) -> Path:
-        return self.temp / f"mmb-{self.tag}-bin"
+        return self.temp / f"mmsb-{self.tag}-bin"
 
     @property
     def bin_exe(self) -> Path:
@@ -155,7 +155,7 @@ class RunFolder:
         return self.folder / "data-manifest.json"
 
     def slot(self, k: int) -> Path:
-        return self.temp / f"mmb-{self.tag}-w{k}"
+        return self.temp / f"mmsb-{self.tag}-w{k}"
 
     def questions(self) -> tuple[Question, ...]:
         return load_questions(self.folder / "questions.jsonl")
@@ -199,9 +199,9 @@ class RunFolder:
         relative path) and by glob (an `IN_ONLY` word: a listing of the temp folder may name them, a command may not open them). An agent
         kept `off_gpu` also may not name the GPU's decoder or its list of users (`OFF_GPU_DENY`)."""
         others = [k for k in range(JOBS_MAX) if own is None or self.slot(k) != own]
-        base = f"mmb-{self.tag}-w"
+        base = f"mmsb-{self.tag}-w"
         slots = [IN_ONLY + word for k in others for word in (str(self.slot(k)), f"{base}{k}", f"*-w{k}", f"?-w{k}")]
-        slots += [IN_ONLY + word for word in (f"{base}*", f"{base}?", f"{base}[", "mmb-*", "mmb-?", "mmb-[")]
+        slots += [IN_ONLY + word for word in (f"{base}*", f"{base}?", f"{base}[", "mmsb-*", "mmsb-?", "mmsb-[")]
         if reads is not None and reads != self.data:  # the dump is hidden: what the agent reads is cut from it
             slots += [IN_ONLY + word for word in (str(self.data), self.data.name, "*-data", "?-data", *HIDDEN_DATA)]  # (any run's dump)
         # a folder name is matched as a path part, before a slash, a quote or a space: a worktree named like it is not one
@@ -220,11 +220,11 @@ class RunFolder:
 
 
 def check_temp(temp: Path) -> None:
-    """Raises when the temp folder holds anything but the folders of runs (`mmb-*`). An agent with its own tools can list the folder
+    """Raises when the temp folder holds anything but the folders of runs (`mmsb-*`). An agent with its own tools can list the folder
     it works in the neighbourhood of, so a temp folder that also holds other things (the tests' runs, whose questions hold answers)
     would lead it to them, and no list of words can name what it will hold tomorrow."""
-    if temp.is_dir() and (stray := next((p for p in sorted(temp.iterdir()) if not p.name.startswith("mmb-")), None)) is not None:
-        raise ValueError(f"{temp} holds {stray.name!r}, which is not a folder of a run (mmb-*): the temp folder is for runs only, as an agent "
+    if temp.is_dir() and (stray := next((p for p in sorted(temp.iterdir()) if not p.name.startswith("mmsb-")), None)) is not None:
+        raise ValueError(f"{temp} holds {stray.name!r}, which is not a folder of a run (mmsb-*): the temp folder is for runs only, as an agent "
                          f"with its own tools can list it and read what is there. Move {stray.name!r} out, or use --temp with a folder "
                          f"that nothing else uses (the default is {paths.TEMP})")
 

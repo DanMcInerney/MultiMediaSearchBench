@@ -218,7 +218,7 @@ def test_every_configuration_ran_every_question_the_system_ones_in_a_project_of_
     assert folders == ["files"] * n + ["mm-fake"] * n + ["mm-fake+files"] * n, "the configuration with no variant first, then the variant's, as given"
     for spec in probe.execs:
         folder, qid = spec.run_dir.parent.name, spec.run_dir.name
-        assert spec.work.parent == run.temp and spec.work.name.startswith(f"mmb-{run.tag}-w") and spec.bin_dir == run.bin
+        assert spec.work.parent == run.temp and spec.work.name.startswith(f"mmsb-{run.tag}-w") and spec.bin_dir == run.bin
         assert spec.own_tools == (folder != "mm-fake") and (spec.data == run.data) == spec.own_tools and (spec.server is None) == (folder == "files")
         assert probe.marks[folder, qid] == (exec_project(qid).removeprefix("id:") if folder != "files" else None), \
             "the system's slots held a project of their own"

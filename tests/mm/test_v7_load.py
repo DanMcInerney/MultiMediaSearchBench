@@ -291,7 +291,7 @@ def test_each_written_screen_file_has_the_frames_of_its_list_and_the_reader_sees
     """The file's frames are `screen_frames`' (`check_screen` pins their seconds too): the reader's windows of it (the real profile, with the
     change gate) are more than its states, since a moved cursor, a typed character and a scroll are changes, and at most its seconds with a
     frame, which is what `windows_in` counts."""
-    screen = [f for f in tiny.files if f.kind == "screen"][:6]
+    screen = [f for f in tiny.files if f.kind == "screen" and any(s["acts"] for s in f.spec["states"])][:6]  # (segments with activity)
     more = 0
     for f in screen:
         path = week[1].root / f.path

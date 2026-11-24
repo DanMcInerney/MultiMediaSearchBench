@@ -96,14 +96,14 @@ media/sources.jsonl           the sources in use, one record each (MEDIA.md is t
 | Folder | Holds | Changed with |
 | --- | --- | --- |
 | `<home>/mmsb-runs` | a run's folder | `--out` |
-| `<home>/mmsb-data` | the dumps (`mmb-<key10>-data`), each run's ffmpeg (`mmb-<tag>-bin`) and working folders (`mmb-<tag>-w<k>`) | `--temp` |
+| `<home>/mmsb-data` | the dumps (`mmsb-<key10>-data`), each run's ffmpeg (`mmsb-<tag>-bin`) and working folders (`mmsb-<tag>-w<k>`) | `--temp` |
 | `<home>/mmsb-cache` | the dumps' records and the ingested stores | `--cache` |
 | `<home>/mmsb-temp` | the tests' runs | |
 | `<home>/mmsb-sources` | the downloaded sources, one folder each; a build reads them and never writes there | `MMSB_SOURCES` |
 
 - The first three must share a volume, because a store is copied into a run with hard links. The commands refuse folders on
   two volumes.
-- The data folder may hold only `mmb-*` folders, because an agent with its own tools can list it.
+- The data folder may hold only `mmsb-*` folders, because an agent with its own tools can list it.
 - The runs folder must not hold the data folder: an agent is refused the folder its run is in, so that it cannot read the
   runs beside its own.
 
@@ -755,7 +755,7 @@ working = wall - queue        over when working >= limit, or when wall >= 3 x li
 `mmsb/core/cache.py`. What a recipe makes, and what a system ingests it into, is made once and found again.
 
 - **A dump's key** is the sha256 of the scenario's name, its recipe and its generator as canonical JSON. The dump is
-  `<temp>/mmb-<key10>-data`. Its record is `<cache>/dumps/<key>/`: the manifest, the questions, the recipe, the seconds it
+  `<temp>/mmsb-<key10>-data`. Its record is `<cache>/dumps/<key>/`: the manifest, the questions, the recipe, the seconds it
   took, the frozen file stats, and the probe's outcome.
 - **A store's key** adds the system, its version and its `store_hash`. It is `<cache>/stores/<system>-<key10>/`, with
   `ingest.json` (the ingest report). A run's `stores/<system>` is a hard-link copy, so it costs no space.
@@ -769,7 +769,7 @@ working = wall - queue        over when working >= limit, or when wall >= 3 x li
   ends, makes a second command that wants what the first is making stop at once and touch nothing.
 - **What the keys do not cover.** The libraries a generator uses, and the probe's code. When a library change alters
   bytes, bump the scenario's generator or remove the cache. There is no eviction.
-- **To force a rebuild,** remove `<temp>/mmb-<key10>-data` and `<cache>/dumps/<key>`, and the stores if the bytes changed.
+- **To force a rebuild,** remove `<temp>/mmsb-<key10>-data` and `<cache>/dumps/<key>`, and the stores if the bytes changed.
 
 ### 8.7 The run folder
 

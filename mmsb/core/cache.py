@@ -1,7 +1,7 @@
 """Cached dumps and cached stores (DESIGN.md): what a recipe makes, and what a system ingests it into, is made once and found
 again by the next command that wants it. Nothing here names a scenario or a system.
 
-    <temp>/mmb-<key10>-data/            the dump, read-only (key10: the first 10 characters of its key); mmb-<key10>-data.part while it is written
+    <temp>/mmsb-<key10>-data/            the dump, read-only (key10: the first 10 characters of its key); mmsb-<key10>-data.part while it is written
     <cache>/dumps/<key>/                its record: manifest.jsonl (the entries), dump.json (key, scenario, logs), questions.jsonl, recipe.json,
                                         built.json (the seconds it took), data-manifest.json (what `fs.freeze` saw: `fs.changed` compares), and
                                         probe/ (the scenario's probe outputs and outcome, once a build has run it)
@@ -119,7 +119,7 @@ def store_key(description: Description, dump: str) -> str:
 
 
 def dump_folder(temp: Path, key: str) -> Path:
-    return Path(temp) / f"mmb-{key[:KEY_CHARS]}-data"
+    return Path(temp) / f"mmsb-{key[:KEY_CHARS]}-data"
 
 
 def dump_meta(cache: Path, key: str) -> Path:

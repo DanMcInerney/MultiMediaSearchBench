@@ -52,7 +52,7 @@ def test_a_build_writes_the_dump_frozen_the_questions_the_stores_and_run_json_la
     assert (meta["scenario"], meta["generator"], meta["seed"], meta["scale"], meta["days"], meta["timeout_s"]) == (
         "toy", v7.generator, 7, "tiny", DAYS.split(","), 900.0)
     assert meta["recipe"] == RECIPE and re.fullmatch(r"[0-9a-f]{10}", meta["tag"])
-    assert meta["data"] == str(world.temp / f"mmb-{meta['dump_key'][:10]}-data") and meta["temp"] == str(world.temp) and meta["cache"] == str(world.cache)
+    assert meta["data"] == str(world.temp / f"mmsb-{meta['dump_key'][:10]}-data") and meta["temp"] == str(world.temp) and meta["cache"] == str(world.cache)
     assert (meta["plan"], meta["files"]) == v7.hashes(RECIPE), "the hashes of the plan the recipe makes: what `open` compares"
     assert meta["question_hash"] == hashlib.sha256((run.folder / "questions.jsonl").read_bytes()).hexdigest()
     assert meta["dump_key"] == dump_key("toy", RECIPE, v7.generator) and meta[COMMIT_KEY] == commit_of()
@@ -361,7 +361,7 @@ def test_a_build_into_a_temp_folder_that_holds_more_than_runs_is_refused_before_
     (world.temp / "pytest-coord").mkdir()
     assert world.main(*build_args(world, 1)) == 1
     err = capsys.readouterr().err
-    assert f"{world.temp} holds 'pytest-coord', which is not a folder of a run (mmb-*)" in err and "Move 'pytest-coord' out, or use --temp" in err
+    assert f"{world.temp} holds 'pytest-coord', which is not a folder of a run (mmsb-*)" in err and "Move 'pytest-coord' out, or use --temp" in err
     assert not world.out.exists() and sorted(p.name for p in world.temp.iterdir()) == ["pytest-coord"]
 
 

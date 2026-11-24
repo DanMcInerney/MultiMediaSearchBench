@@ -43,7 +43,7 @@ class _Week:
         self.chime = [float(n) for n in r.choice(DOORBELL_PAIRS)]
 
     def rng(self, name: str) -> random.Random:
-        return random.Random(f"haystack-{VERSION}-{self.seed}-{self.scale}-{name}")
+        return random.Random(f"week-{VERSION}-{self.seed}-{self.scale}-{name}")
 
     @property
     def slots(self) -> list[tuple[int, str]]:

@@ -52,7 +52,7 @@ def parser_of() -> argparse.ArgumentParser:
     build.add_argument("--per-age", dest="per_age", type=int, help="questions of each age (v8_egolife)")
     build.add_argument("--speech", type=int, help="questions that need sound (v8_egolife)")
     build.add_argument("--out", type=Path, default=paths.RUNS, help=f"where runs go (default {paths.RUNS})")
-    build.add_argument("--temp", type=Path, default=paths.TEMP, help="where the dumps (each mmb-<key>-data, found again by the next build "
+    build.add_argument("--temp", type=Path, default=paths.TEMP, help="where the dumps (each mmsb-<key>-data, found again by the next build "
                        "of the same recipe in the same folder) and the working folders go (default "
                        f"{paths.TEMP}): a folder for runs only, which an agent with its own tools can list; on the download's volume for a "
                        "scenario that links it (v8_egolife)")

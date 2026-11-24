@@ -211,10 +211,10 @@ def test_the_retrieval_run_asks_the_oracle_question_of_the_plan_over_its_source_
 
 
 # an answer to a question of the pilot week, and whether the question's `Grade` accepts it
-GRADED = [("records-log-count-1", "2", True), ("records-log-count-1", "3", False),
-          ("text-config-asof-1", "28", True), ("text-config-asof-1", "29", False),
+GRADED = [("records-log-count-1", "5", True), ("records-log-count-1", "3", False),
+          ("text-config-asof-1", "34", True), ("text-config-asof-1", "29", False),
           ("records-absent-log-1", "0", True), ("records-absent-log-1", "unknown", True), ("records-absent-log-1", "4", False),
-          ("video-porch-parcel-1", "12:02:53 p.m. on Sunday, 1 November 2026.", True),
+          ("video-porch-parcel-1", "11:16:47 a.m. on Sunday, 1 November 2026.", True),
           ("video-porch-parcel-1", "1:30 p.m. on Sunday, 1 November 2026.", False)]
 
 

@@ -98,7 +98,7 @@ def test_the_plan_is_the_same_for_a_seed_and_differs_for_another(tiny):
     other = v7_week.plan(8, "tiny", DAYS)
     assert other != tiny and [q["truth"]["value"] for q in other.questions] != [q["truth"]["value"] for q in tiny.questions]
     assert days_before(date(2026, 11, 1), 2) == DAYS, "the days ending yesterday"
-    assert VERSION == 6
+    assert VERSION == 7
     with pytest.raises(ValueError, match="7 days"):
         v7_week.plan(1, "standard", DAYS)
     with pytest.raises(ValueError, match="oldest first"):

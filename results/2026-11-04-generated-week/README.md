@@ -14,6 +14,9 @@ configurations, in a fresh agent session each time:
 Answers are graded by fixed rules (numbers, codes, times within a tolerance), not by another model. [report.md](report.md) has
 every table and a row for each question, and [shortcuts.md](shortcuts.md) the output of the shortcut probe.
 
+The week was written by generator 6. The generator is now 7 and draws a different week from the same seed, so a new run asks
+about other needles and is not a repeat of this one.
+
 ## Results
 
 24 questions about 3 synthetic days, each asked of each agent in both configurations. 16 of them are media questions (photos and video). The

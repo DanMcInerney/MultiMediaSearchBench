@@ -87,7 +87,7 @@ MMSB_GUARD = """
 
 
     def test_a_write_to_the_temp_folder_is_refused():
-        (paths.TEMP / "mmb-0123456789-data.part").write_text("x")
+        (paths.TEMP / "mmsb-0123456789-data.part").write_text("x")
 
 
     def test_a_swallowed_write_to_the_runs_folder_still_fails_the_test():

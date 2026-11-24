@@ -50,11 +50,11 @@ def again(world, seed: int = SEED, configs: str = "files,stub", *extra: str) -> 
 def test_a_second_build_of_the_same_recipe_says_cached_ingests_and_probes_nothing_and_rewrites_nothing(world, capsys):
     first = built_run(world)
     out = capsys.readouterr().out
-    assert f"dump mmb-{KEY[:10]}-data: written in " in out and "stub: ingested in 0 s" in out and "cached" not in out
+    assert f"dump mmsb-{KEY[:10]}-data: written in " in out and "stub: ingested in 0 s" in out and "cached" not in out
     before = stamps_of(world.root / "temp") | {f"cache/{k}": v for k, v in stamps_of(world.cache).items()}
     second = again(world)
     out = capsys.readouterr().out
-    assert f"dump mmb-{KEY[:10]}-data: cached (writing it took " in out and "), not written again" in out
+    assert f"dump mmsb-{KEY[:10]}-data: cached (writing it took " in out and "), not written again" in out
     assert "stub: cached, ingested in 0 s when it was made, so not ingested again" in out and "files: cached" in out
     assert "shortcut probe: cached (passed; it took " in out
     assert len(world.system.kinds("ingest")) == 1 and len(cli_world.PROBED) == 1, "the system ingested once and the probe ran once, over two runs"
@@ -174,7 +174,7 @@ def test_the_cache_and_the_dumps_are_denied_to_an_agent_with_its_own_tools_in_wh
     for path in (dump_meta(world.cache, KEY) / "questions.jsonl", world.cache / "stores" / "stub-0123456789" / "ingest.json", world.cache / "locks" / "x.lock"):
         assert reached(str(path), deny) is not None, path
     assert reached(str(paths.CACHE / "dumps" / "k" / "questions.jsonl"), deny) is not None, "the default cache too"
-    assert reached(str(run.temp / "mmb-0123456789-data" / "notes" / "a.md"), run.deny(run.slot(0), isolation, run.temp / "mmb-0123456789-d0")) is not None, \
+    assert reached(str(run.temp / "mmsb-0123456789-data" / "notes" / "a.md"), run.deny(run.slot(0), isolation, run.temp / "mmsb-0123456789-d0")) is not None, \
         "another run's dump, when the agent reads a cut of its own"
     assert reached(f"cat {dump_folder(run.temp, KEY)}/notes/a.md", run.deny(run.slot(0), isolation, run.temp / "cut")) is not None
 
@@ -193,7 +193,7 @@ def test_the_command_line_has_a_cache_for_build_and_repeat_that_is_the_default_f
     assert parser.parse_args(["repeat", "recorded"]).cache == paths.CACHE
     assert parser.parse_args(["build", "--scenario", "v7_screen", "--cache", "somewhere"]).cache == Path("somewhere")
     help_text = " ".join(parser._subparsers._group_actions[0].choices["build"].format_help().split())
-    assert "each mmb-<key>-data, found again by the next build of the same recipe" in help_text and "(v8_egolife)" in help_text
+    assert "each mmsb-<key>-data, found again by the next build of the same recipe" in help_text and "(v8_egolife)" in help_text
     assert "on the volume of --out and --temp, because a store is copied into the run with hard links" in help_text
 
 
@@ -238,11 +238,11 @@ def test_a_repeat_dry_run_says_what_is_cached_and_what_would_be_built_and_makes_
     # a repeat builds it; the dry run after it says cached, with the times of the making, and still makes nothing
     assert w.main(*repeat_args(w), agents=echoing(stub)) == 0
     built = capsys.readouterr().out
-    assert f"dump mmb-{key[:10]}-data: written in " in built and "stub: ingested in " in built
+    assert f"dump mmsb-{key[:10]}-data: written in " in built and "stub: ingested in " in built
     before = stamps_of(w.new.out.parent)
     assert w.main(*repeat_args(w, "--dry-run"), agents=echoing(stub)) == 0
     out = capsys.readouterr().out
-    assert f"  dump mmb-{key[:10]}-data: cached (toy, tiny, seed 7, 2 days): writing it took " in out and "so it is not written again" in out
+    assert f"  dump mmsb-{key[:10]}-data: cached (toy, tiny, seed 7, 2 days): writing it took " in out and "so it is not written again" in out
     assert "  store of stub: cached: ingesting it took 0 s, so it is not ingested again" in out
     assert stamps_of(w.new.out.parent) == before and len(w.system.kinds("ingest")) == 1
 
@@ -255,7 +255,7 @@ def test_a_second_repeat_finds_the_dump_and_the_stores_the_first_made_and_a_resu
     w.patch.setattr("mmsb.core.build.name_of", lambda scenario, recipe: "second-run")
     assert w.main(*repeat_args(w), agents=echoing(Stub())) == 0
     out = capsys.readouterr().out
-    assert "dump mmb-" in out and "cached (writing it took " in out and "stub: cached, ingested in 0 s when it was made" in out
+    assert "dump mmsb-" in out and "cached (writing it took " in out and "stub: cached, ingested in 0 s when it was made" in out
     assert len(w.system.kinds("ingest")) == 1 and sorted(p.name for p in w.new.out.iterdir()) == sorted([first.name, "second-run"])
     lost = sorted((first / "results" / "codex" / "files").glob("*.json"))[:2]
     for file in lost:

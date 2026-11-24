@@ -3,7 +3,7 @@ own tools get, for each question, a folder of the recordings up to the question'
 Nothing later is there to read, not even the name of a later day's file. A command's output that shows a recording past H read it somewhere
 else, and ends the exec as `escaped` like the other tripwires.
 
-The folder of slot `k` is `<temp>/mmb-<key>-d<k>`, `key` being the run's tag, and the deny words of the other slots name it (see
+The folder of slot `k` is `<temp>/mmsb-<key>-d<k>`, `key` being the run's tag, and the deny words of the other slots name it (see
 `__init__.deny_words`)."""
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ MISSING = re.compile(r"no such file|does not exist|cannot find|not found|filenot
 
 def view_dir(temp: Path, key: str, k: int) -> Path:
     """Slot `k`'s folder of recordings, for the run whose tag is `key`."""
-    return temp / f"mmb-{key}-d{k}"
+    return temp / f"mmsb-{key}-d{k}"
 
 
 def clips_of(dump: Dump) -> list[ManifestEntry]:

@@ -250,7 +250,7 @@ def test_the_json_request_of_a_choice_has_no_unknown_and_says_when_the_evidence_
 
 PLAIN = Served(None, None, (), None, None, None, {})
 MM = Served(McpServer("mm", "mm", (), {}, ()), "You answer the user's question from their memory, using the mm tools.", (), None, "mm", None, {})
-DATA = paths.TEMP / "mmb-0123456789-data"
+DATA = paths.TEMP / "mmsb-0123456789-data"
 
 
 @pytest.fixture(scope="module")

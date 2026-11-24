@@ -24,7 +24,7 @@ from mmsb.core.runfolder import COMMIT_KEY, JOBS_MAX, OFF_GPU_DENY, RunFolder, c
 
 TOP = Path("D:/") if os.name == "nt" else Path("/")  # made-up folders at the top of a drive: no run's folder is beside another's
 SENTINEL = {"folder": TOP / "__RUN__", "out": TOP / "__OUT__", "root": TOP / "__ROOT__", "temp": TOP / "__TEMP__",
-            "data": TOP / "__TEMP__" / "mmb-key0123456-data", "cache": TOP / "__CACHE__", "tag": "TAG", "seed": 1, "scale": "pilot",
+            "data": TOP / "__TEMP__" / "mmsb-key0123456-data", "cache": TOP / "__CACHE__", "tag": "TAG", "seed": 1, "scale": "pilot",
             "days": ("2026-11-01", "2026-11-02", "2026-11-03")}
 PLAN, FILES = "a" * 64, "b" * 64  # the hashes the stub scenario says its recipe makes
 RECIPE = {"scale": "pilot", "seed": 1}  # what the stub scenario is built from
@@ -78,10 +78,10 @@ def run_of(scenario, configs=(), **fields) -> RunFolder:
 
 def slot_words(run: RunFolder, ks) -> list[str]:
     """What the deny words say of the working slots numbered `ks`: the path, the folder's name, and two globs that match the name."""
-    return [word for k in ks for word in (f"in:{posix(run.slot(k))}", f"in:mmb-tag-w{k}", f"in:*-w{k}", f"in:?-w{k}")]
+    return [word for k in ks for word in (f"in:{posix(run.slot(k))}", f"in:mmsb-tag-w{k}", f"in:*-w{k}", f"in:?-w{k}")]
 
 
-GLOBS = ["in:mmb-tag-w*", "in:mmb-tag-w?", "in:mmb-tag-w[", "in:mmb-*", "in:mmb-?", "in:mmb-["]  # every slot, and every folder of a run
+GLOBS = ["in:mmsb-tag-w*", "in:mmsb-tag-w?", "in:mmsb-tag-w[", "in:mmsb-*", "in:mmsb-?", "in:mmsb-["]  # every slot, and every folder of a run
 
 
 # -- the words an agent with its own tools may not reach -----------------------------------------------------------------------
@@ -107,7 +107,7 @@ def test_the_slot_a_run_works_in_is_not_denied_to_it_and_the_scenario_is_asked_f
     assert words[-len(slot_words(run, (1, 2, 3))) - len(GLOBS):] == (*slot_words(run, (1, 2, 3)), *GLOBS)
     assert "in:truth" in words and "in:everything" not in words
     assert scenario.asked == [((1, 2, 3), run.temp, "TAG")]
-    assert run.slot(0) == SENTINEL["temp"] / "mmb-TAG-w0"
+    assert run.slot(0) == SENTINEL["temp"] / "mmsb-TAG-w0"
 
 
 def test_the_isolation_given_adds_its_words_and_the_agents_setup_is_denied_whatever_it_says(sentinels):
@@ -143,7 +143,7 @@ def test_the_dump_is_denied_by_path_name_and_glob_only_when_the_agent_reads_anot
     run = run_of(StubScenario())
     dump = [f"in:{posix(run.data)}", f"in:{run.data.name}", "in:*-data", "in:?-data", "in:-data/", 'in:-data"', "in:-data ", "in:-data'"]
     assert not set(dump) & set(run.deny(None, NO_ISOLATION)) and not set(dump) & set(run.deny(None, NO_ISOLATION, reads=run.data))
-    assert set(dump) <= set(run.deny(None, NO_ISOLATION, reads=SENTINEL["temp"] / "mmb-TAG-cut"))
+    assert set(dump) <= set(run.deny(None, NO_ISOLATION, reads=SENTINEL["temp"] / "mmsb-TAG-cut"))
 
 
 def test_an_agent_kept_off_the_gpu_may_not_name_its_decoder_or_its_list_of_users(sentinels):
@@ -188,7 +188,7 @@ ELSEWHERE = {
 
 def real_run(folder: Path = REAL_RUN, temp: Path | None = None) -> RunFolder:
     temp = temp or paths.TEMP
-    return RunFolder(folder, 1, "pilot", (date(2026, 11, 1),), temp / "mmb-abc-data", temp, "abc", 900.0, StubScenario(), ())
+    return RunFolder(folder, 1, "pilot", (date(2026, 11, 1),), temp / "mmsb-abc-data", temp, "abc", 900.0, StubScenario(), ())
 
 
 @pytest.mark.parametrize("path", ELSEWHERE.values(), ids=ELSEWHERE.keys())
@@ -295,12 +295,12 @@ def test_a_run_started_from_a_worktree_cannot_read_the_main_checkout(tmp_path, m
 
 def test_a_temp_folder_that_holds_anything_but_the_folders_of_runs_is_refused_naming_it(tmp_path):
     temp = tmp_path / "temp"
-    (temp / "mmb-abc-data").mkdir(parents=True)
+    (temp / "mmsb-abc-data").mkdir(parents=True)
     run = real_run(tmp_path / "runs" / "run", temp)
     run.check_paths(NO_ISOLATION)
     check_temp(tmp_path / "not-made-yet")
     (temp / "pytest-coord").mkdir()
-    with pytest.raises(ValueError, match=r"holds 'pytest-coord', which is not a folder of a run \(mmb-\*\).*Move 'pytest-coord' out, or use --temp"):
+    with pytest.raises(ValueError, match=r"holds 'pytest-coord', which is not a folder of a run \(mmsb-\*\).*Move 'pytest-coord' out, or use --temp"):
         run.check_paths(NO_ISOLATION)
     (temp / "pytest-coord").rmdir()
     (temp / "notes.txt").write_text("a file is no folder of a run either", encoding="utf-8")
@@ -317,8 +317,8 @@ def test_the_files_of_a_run_are_by_agent_configuration_and_question_and_its_slot
     assert run.result_path("claude", files, "video-porch-parcel-1") == folder / "results" / "claude" / "files" / "video-porch-parcel-1.json"
     assert run.result_path("codex", mm, "audio-mic-alarm-3") == folder / "results" / "codex" / "mm-d1-3B" / "audio-mic-alarm-3.json"
     assert run.exec_dir("claude", mm, "text-note-code-1") == folder / "execs" / "claude" / "mm-d1-3B" / "text-note-code-1"
-    assert run.slot(0) == SENTINEL["temp"] / "mmb-TAG-w0" and run.slot(3) == SENTINEL["temp"] / "mmb-TAG-w3"
-    assert run.bin == SENTINEL["temp"] / "mmb-TAG-bin" and run.manifest == folder / "data-manifest.json" and run.name == "__RUN__"
+    assert run.slot(0) == SENTINEL["temp"] / "mmsb-TAG-w0" and run.slot(3) == SENTINEL["temp"] / "mmsb-TAG-w3"
+    assert run.bin == SENTINEL["temp"] / "mmsb-TAG-bin" and run.manifest == folder / "data-manifest.json" and run.name == "__RUN__"
     assert run.bin_exe.name == ("ffmpeg.exe" if os.name == "nt" else "ffmpeg")
 
 
@@ -357,7 +357,7 @@ def folder_of(tmp_path: Path) -> tuple[Path, dict]:
     folder = tmp_path / "20261104-0314-pilot-s1"
     write_questions(folder / "questions.jsonl", load_questions(file_of(tmp_path, BASE)))
     meta = {"scenario": "stub", "generator": 3, "recipe": RECIPE, "dump_key": "k" * 64, "seed": 1, "scale": "pilot",
-            "days": list(SENTINEL["days"]), "data": str(tmp_path / "temp" / "mmb-de178c4d7f-data"), "temp": str(tmp_path / "temp"),
+            "days": list(SENTINEL["days"]), "data": str(tmp_path / "temp" / "mmsb-de178c4d7f-data"), "temp": str(tmp_path / "temp"),
             "tag": "de178c4d7f", "timeout_s": 900.0, "plan": PLAN, "files": FILES, "question_hash": fs.sha256_of(folder / "questions.jsonl"),
             "configs": [{"name": "files", "system": "files", "variant": None, "own_tools": True},
                         {"name": "mm/d1-3B", "system": "mm", "variant": "d1-3B", "own_tools": False}],
@@ -371,7 +371,7 @@ def test_a_run_is_opened_again_as_its_run_json_says(tmp_path):
     scenario = StubScenario()
     opened = RunFolder.open(folder, lambda name: scenario if name == "stub" else pytest.fail(name))
     assert opened == RunFolder(folder, 1, "pilot", (date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)),
-                               tmp_path / "temp" / "mmb-de178c4d7f-data", tmp_path / "temp", "de178c4d7f", 900.0, scenario,
+                               tmp_path / "temp" / "mmsb-de178c4d7f-data", tmp_path / "temp", "de178c4d7f", 900.0, scenario,
                                (parse_config("files", DEFAULTS), parse_config("mm", DEFAULTS)))
     assert [q.qid for q in opened.questions()] == ["video-porch-parcel-1"]
 

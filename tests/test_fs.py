@@ -86,7 +86,7 @@ def test_every_data_file_is_left_with_the_permissions_its_folder_gives_so_codexs
     import tempfile
 
     # the data folder sits right in TEMP, as a run's does: pytest's tmp_path is owner-only itself, which hides the fault
-    data, work = Path(tempfile.gettempdir()) / f"mmb-acl-test-{os.getpid()}-{time.time_ns()}", Path(tempfile.mkdtemp(prefix="acl-"))
+    data, work = Path(tempfile.gettempdir()) / f"mmsb-acl-test-{os.getpid()}-{time.time_ns()}", Path(tempfile.mkdtemp(prefix="acl-"))
     try:
         (data / "screen").mkdir(parents=True)
         (data / "notes").mkdir()

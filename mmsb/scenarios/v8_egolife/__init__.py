@@ -122,7 +122,7 @@ def build(recipe: Mapping[str, object], out: Path, workers: int = WORKERS) -> tu
     """Writes the dump the recipe makes into `out`, which is new or empty: the clips as hardlinks to the download under neutral names
     (`glasses/<date>/HH.MM.SS.mp4`) and the transcript as JSON lines (`transcript/<date>.jsonl`); `workers` files are hashed at once.
     Returns the dump (the manifest measured from the files written) and the questions. The files are neither frozen nor made
-    read-only: that is the cache's (core/cache.py writes it into `<temp>/mmb-<key>-data.part`, so the temp folder must be on the download's
+    read-only: that is the cache's (core/cache.py writes it into `<temp>/mmsb-<key>-data.part`, so the temp folder must be on the download's
     volume: `mmsb build --temp`). `out` must be on the download's volume."""
     made = plan_of(recipe)  # a wrong number of days, or a transcript an exec could not print, fails here, before anything is written
     check_transcript(made.logs, DOWNLOAD_WORDS)
@@ -159,7 +159,7 @@ def deny_words(others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]:
     """What no command of the agent in a slot may hold, but for the run's folders: the `truth` key of the plan's questions and the code that reaches
     this scenario; the download (`egolife` only in a command: the transcript says it once); and the other slots' folders of recordings
     (by path, by name, by glob, and the `glasses` and `transcript` folders in them, which a command's output may name too)."""
-    base = f"mmb-{key}-d"
+    base = f"mmsb-{key}-d"
     return (*(IN_ONLY + word for word in DENY_WORDS), *DOWNLOAD_WORDS,
             *(f"{base}{k}/{sub}" for k in others for sub in (VIDEO, TEXT)),
             *(IN_ONLY + w for k in others for w in (str(view_dir(temp, key, k)), f"{base}{k}", f"*-d{k}", f"?-d{k}")))
