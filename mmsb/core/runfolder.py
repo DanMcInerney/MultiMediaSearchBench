@@ -1,6 +1,6 @@
-"""A run's folder, the neutral half of what the old `bench.Run` was: where its files and the agents' working slots are, what no tool
-input of an agent with its own tools may hold, and the refusals when it is opened again. What is specific to a scenario
-(prompts, views, extra deny words) is asked of `RunFolder.scenario`; what is specific to a system never enters.
+"""A run's folder: where its files and the agents' working slots are, what no tool input of an agent with its own tools may hold,
+and the refusals when it is opened again. What is specific to a scenario (prompts, views, extra deny words) is asked of
+`RunFolder.scenario`; what is specific to a system never enters.
 
     <folder>/run.json, questions.jsonl, data-manifest.json, report.json, report.md
              results/<agent>/<config.dir>/<qid>.json     execs/<agent>/<config.dir>/<qid>/
@@ -40,7 +40,7 @@ from mmsb.core.question import Question, load_questions
 from mmsb.core.record import DONE_KINDS, kind_of
 from mmsb.core.scenario import Scenario
 
-COMMIT_KEY = "mmmb_commit"  # run.json's key for the commit: the recorded runs (tests/oracles/recorded) were written under the old name, and keep it
+COMMIT_KEY = "commit"  # run.json's key for the commit of the repository that made the run
 JOBS_MAX = 4  # execs at once, so the working slots; more crashed the laptop once
 ENDS = ('/', '"', " ", "'")  # what ends a folder's name in a path or a command
 HIDDEN_DATA = tuple("-data" + after for after in ENDS)  # the end of a dump's folder name (`mmb-<tag>-data`) in a path or a command
@@ -64,7 +64,7 @@ class RunFolder:
     timeout_s: float  # the seconds an exec may take
     scenario: Scenario
     configs: tuple[Config, ...]
-    cache: Path | None = None  # where the dump's record and the stores are cached; None for a run recorded before the cache, which builds nothing
+    cache: Path | None = None  # where the dump's record and the stores are cached; None when run.json names none, and then nothing is built
     parent: Path | None = None  # the folder of the run this one was branched from (a half of `mmsb clock-check`), which it denies as well as its own
 
     @classmethod
@@ -76,7 +76,7 @@ class RunFolder:
         folder = Path(folder)
         meta = fs.read_json(folder / "run.json")
         if "scenario" not in meta:
-            raise ValueError(f"{folder} was made before mmsb (its run.json names no scenario): mmsb reads only the runs it built")
+            raise ValueError(f"{folder} is not a run mmsb built (its run.json names no scenario)")
         scenario = scenarios(meta["scenario"])
         if meta["generator"] != scenario.generator:
             raise ValueError(f"{folder} was made by generator {meta['generator']} of {scenario.name}, this is {scenario.generator}: "
@@ -193,8 +193,7 @@ class RunFolder:
     def deny(self, own: Path | None, isolation: Isolation, reads: Path | None = None, off_gpu: bool = False) -> tuple[str, ...]:
         """What no tool input of an agent with its own tools may hold, lower case with forward slashes: this run's folder (and the one it was
         branched from, `parent`), the folders of other runs (the folder this run is in, so the runs beside it whatever `--out` was, the
-        runs and cache folders, the results and temp folder of the runs recorded before MMSB, and the tests' folder
-        unless this run is in it), the checkouts of this repository (a worktree's main checkout too), the owner's agent setup, the
+        runs and cache folders, and the tests' folder unless this run is in it), the checkouts of this repository (a worktree's main checkout too), the owner's agent setup, the
         `isolation` of the systems, the scenario's words, the working slots other than `own` (all of them when None), and the dump
         when the agent reads another folder (`reads`, from `Scenario.view`; None: the dump itself), by absolute path, by name (a
         relative path) and by glob (an `IN_ONLY` word: a listing of the temp folder may name them, a command may not open them). An agent
@@ -207,7 +206,7 @@ class RunFolder:
             slots += [IN_ONLY + word for word in (str(self.data), self.data.name, "*-data", "?-data", *HIDDEN_DATA)]  # (any run's dump)
         # a folder name is matched as a path part, before a slash, a quote or a space: a worktree named like it is not one
         cached = [self.cache] if self.cache is not None else []  # (the cache this run was built with, when it is not the default)
-        elsewhere = [paths.RUNS, paths.CACHE, *cached, *paths.EARLIER]
+        elsewhere = [paths.RUNS, paths.CACHE, *cached]
         tests = not any(folder.is_relative_to(paths.TESTS) for folder in (self.folder, self.temp))  # the tests' own runs are in it
         named = [f"/{folder.name}{after}" for folder in (*elsewhere, *([paths.TESTS] if tests else [])) for after in ENDS]
         parent = self.folder.resolve().parent  # (whole, so that a relative `--out` is not a bare word such as `runs`)

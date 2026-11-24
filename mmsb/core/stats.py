@@ -1,6 +1,5 @@
-"""Statistics of the paired comparison and of a result's cost (moved from bench.py of the MultimediaSearch repo, fe0ece5). A row of
-`pair_counts` is `(question, control result, tested result)`; `b` counts the pairs right with the tested configuration only,
-`c` those right with the control only."""
+"""Statistics of the paired comparison and of a result's cost. A row of `pair_counts` is `(question, control result, tested result)`;
+`b` counts the pairs right with the tested configuration only, `c` those right with the control only."""
 
 from __future__ import annotations
 

@@ -1,11 +1,10 @@
-"""What an agent is asked in the V7 week (moved from `Run.prompt` of bench.py of the repository at bb498a6): the time, how the sources
-are reached (the only difference between the configurations), the question and how to answer. A system's word for itself is
-`served.holder`, so this knows no system.
+"""What an agent is asked in the V7 week: the time, how the sources are reached (the only difference between the configurations), the
+question and how to answer. A system's word for itself is `served.holder`, so this knows no system.
 
 - a system's tools alone: `{holder} has recorded these sources of mine {week}.`, ending `Answer from what {holder} holds.`;
 - the agent's own tools alone: the folder the files are in, ending `Answer from these files.`;
 - both: the system's sentence, the files' sentence, and `Answer from what {holder} holds or from these files.`;
-- the system's clock note, when it has one, ends its sentence (V8's recorded text has it where this has);
+- the system's clock note, when it has one, ends its sentence (V8's prompt has it in the same place);
 - the last sentence asks for the answer in the access's format (`answer_request`), and says "unknown" is the answer when what the agent
   has (the system, the files, or both) does not hold it.
 

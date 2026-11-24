@@ -4,7 +4,7 @@ camera, and a script crops a moving, zooming 16:9 picture out of it that follows
 matches are real university matches (two by day, one under floodlights); their match days and kick-off times here are made up. The questions
 ask when a goal or a shot happened, how many there were, which clips have them, whether anyone scored in a stretch of the match, which goal
 it went into, and whether a tackle was before a shot (questions.py). Every answer is from the source's labels; the scenario is the names of
-a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = v3_match.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = v3_match.build(recipe, folder, 3)  # the clips copied as they are, with their times, and the questions

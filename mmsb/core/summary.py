@@ -1,4 +1,4 @@
-"""The summary report (DESIGN 6.3, 7.3, 9) of runs of any scenarios: for each scenario, what each agent got right in each configuration,
+"""The summary report (DESIGN.md) of runs of any scenarios: for each scenario, what each agent got right in each configuration,
 with its 95% interval, how its answers were grounded and what they cost; each other configuration set beside the control (`files`)
 question by question; the questions a leak filter answered, which every other figure leaves out; and, for runs of several scenarios, the
 same over all of them. It reads the runs' questions and results and nothing else, and names no system and no scenario. The scenarios
@@ -22,7 +22,7 @@ from mmsb.core.runfolder import COMMIT_KEY, RunFolder, is_done
 from mmsb.core.stats import mean, wilson
 from mmsb.core.taxonomy import CATEGORIES, filed
 
-ALPHA = 0.05  # a paired difference is told as shown only below this McNemar p (DESIGN 9: smaller ones are called unproven)
+ALPHA = 0.05  # a paired difference is told as shown only below this McNemar p
 FEW = 30  # questions under which a configuration's interval is noted as wide
 
 

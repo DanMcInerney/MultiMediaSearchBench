@@ -2,7 +2,7 @@
 dozen trips), of food, posters and slides at conferences, boarding passes, sights, the cat. The questions are the owner's own, in their own
 words: find the photo of this, every photo of that, when was that, how much was it, what did it say, which one, how many, did I ever,
 and ones whose answer is not in the pile (questions.py). Every answer is from the dataset's labels. The scenario is the names of a `Scenario`,
-as functions (DESIGN 5), over the shared builder (realdump).
+as functions, over the shared builder (realdump).
 
     recipe = i1_camera_roll.recipe(scale="tiny", seed=1)      # the source, the pile's days, this machine's UTC offsets
     dump, questions = i1_camera_roll.build(recipe, folder, 3)  # the photos copied in with EXIF and their times, and the questions

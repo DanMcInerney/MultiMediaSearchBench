@@ -1,3 +1,0 @@
-# Recorded goldens are compared byte for byte by the oracles: git stores and checks them out exactly, with no line-ending change.
-tests/oracles/recorded/** -text
-tests/mm/tables/** -text

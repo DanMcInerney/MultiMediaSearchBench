@@ -1,7 +1,6 @@
-"""The result record of one exec and why an agent stops (moved from bench.py of this repository at bb498a6): how an exec ended
-(`kind_of`), what it did that every configuration can count (`work_of`: views and shell commands), the record written for it
-(`record`) and the reasons an agent stops (`Halt`, `stop_reason`). What a system adds to a record is its own: `Session.audit`
-and `Session.reset` give fields the runner merges in."""
+"""The result record of one exec and why an agent stops: how an exec ended (`kind_of`), what it did that every configuration can count
+(`work_of`: views and shell commands), the record written for it (`record`) and the reasons an agent stops (`Halt`, `stop_reason`).
+What a system adds to a record is its own: `Session.audit` and `Session.reset` give fields the runner merges in."""
 
 from __future__ import annotations
 

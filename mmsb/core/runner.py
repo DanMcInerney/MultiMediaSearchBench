@@ -1,7 +1,6 @@
-"""The run loop (moved from `run_arm`, `run_agents` and `real_agents` of bench.py of this repository at bb498a6): the pending cases of
-one configuration of one agent, in their order, each in a working slot; and the configurations of a run in order, each with the
-session of its system. Only what a system does moved behind `Session`: the loop, its order, its stops and its record are the
-core's, and it names no system."""
+"""The run loop: the pending cases of one configuration of one agent, in their order, each in a working slot; and the configurations
+of a run in order, each with the session of its system. Only what a system does is behind `Session`: the loop, its order, its stops
+and its record are the core's, and it names no system."""
 
 from __future__ import annotations
 
@@ -52,12 +51,11 @@ def reads_of(view: Path | None, dump: Dump) -> Path | None:
 def answer_format_of(run: RunFolder, asked: AnswerFormat | None) -> AnswerFormat:
     """The format the final answers of a command are asked in: `asked` (the command's `--answer-format`), else the one run.json keeps,
     else DEFAULT_FORMAT; the command then keeps it in run.json (`RunFolder.rewritten`). A run's format does not change once it has
-    results (they would be of two formats): a run with results and no format in its run.json was made before the format was kept, and
-    its results are of the `line` format."""
+    results (they would be of two formats)."""
     held = fs.read_json(run.folder / "run.json").get("answer_format")
     qids = {q.qid for q in run.questions()}
-    started = any(f.stem in qids for f in (run.folder / "results").glob("*/*/*.json") if f.parent.parent.name != RETRIEVAL_FOLDER)
-    held = held or ("line" if started else None)
+    started = held is not None and any(f.stem in qids for f in (run.folder / "results").glob("*/*/*.json")
+                                       if f.parent.parent.name != RETRIEVAL_FOLDER)
     if asked is not None and started and asked != held:
         raise ValueError(f"{run.name} has results in the {held} answer format, so it cannot be asked in the {asked} format now: its results "
                          f"would be of two formats. Run it with --answer-format {held}, or build a new run")
@@ -162,7 +160,7 @@ def run_config(run: RunFolder, name: str, agent: Agent, config: Config, descript
         rec.update(held_s=round(waited, 1), **served.record, **reset)
         if config.own_tools and (bad := fs.changed(run.data, run.manifest)):
             rec.update(problem=f"escaped: the data changed: {bad}", passed=False)
-            data_halt.set(f"{name}'s {config.name} arm changed the data ({bad})")
+            data_halt.set(f"{name}'s {config.name} configuration changed the data ({bad})")
         if description is not None and description.needs_gpu and (lost := gpu.gpu_lost()):  # a setup problem: asked again
             rec.update(problem=f"setup: the GPU was lost, so {config.system}'s model may not have read: {lost}", passed=False)
         rec.update(grounded.result_fields(q, final, answer_format, rec["passed"], dump))

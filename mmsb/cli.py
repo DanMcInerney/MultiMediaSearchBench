@@ -1,6 +1,5 @@
-"""The `mmsb` command (moved from `parser_of` and `main` of bench.py and egolife.py of this repository at bb498a6, now one command over
-any scenario and any system). Argument parsing and the order of the steps; what each step does is below it (core/build.py, core/dryrun.py,
-core/runner.py, core/retrieval.py, the scenario's `report`).
+"""The `mmsb` command, one command over any scenario and any system. Argument parsing and the order of the steps; what each step does
+is below it (core/build.py, core/dryrun.py, core/runner.py, core/retrieval.py, the scenario's `report`).
 
     mmsb fetch    --scenario NAME|all [--sources DIR --workers N]    the files the real scenarios read, from where they are published
     mmsb catalogue [--out FILE --full FILE --scale S --seed N]    the media by shelf and the questions by category
@@ -11,9 +10,9 @@ core/runner.py, core/retrieval.py, the scenario's `report`).
                        --scenarios S,.. --kinds K,.. --modalities M,.. --splits S,.. --tag NAME=VALUE --rung R --limit N --discriminating RUN,..]
     mmsb retrieve RUN [--configs A,B --dry-run]             each system asked for the needles, with no agent (the GPU, alone)
     mmsb report   RUN [RUN ...] [--control CONFIG]
-    mmsb compare  RUN_A RUN_B [--across-settings]            two runs cell by cell: flips, counts, D1's band, McNemar, verdict lines
-    mmsb repeat   RECORDED [--into RUN --out DIR --temp DIR --cache DIR --jobs N --gpu-jobs N --answer-format json|line --clock working|wall --dry-run]
-                                                            a recorded run again at its agents' models and efforts
+    mmsb compare  RUN_A RUN_B [--across-settings]            two runs cell by cell: flips, counts, the band, McNemar, verdict lines
+    mmsb repeat   RUN [--into RUN --out DIR --temp DIR --cache DIR --jobs N --gpu-jobs N --answer-format json|line --clock working|wall --dry-run]
+                                                            a run again at its agents' models and efforts
     mmsb clock-check RUN --config CONFIG [--agents claude,codex --cases N --jobs N --gpu-jobs N]
                                                             the working clock tried: N cases asked alone and then queued, side by side
 
@@ -330,10 +329,10 @@ def report_command(args: argparse.Namespace, parser: argparse.ArgumentParser) ->
 
 def repeat_command(args: argparse.Namespace, parser: argparse.ArgumentParser, registry: Registry,
                    real: Callable[[], Mapping[str, Agent]]) -> int:
-    """A recorded run again (core/repeat.py): its recipe built into a new run, then `mmsb run` of that run with the recorded agents at their
-    models and efforts, over the recorded configurations and questions. With `--into` the run is one an earlier repeat built: it goes on."""
+    """A run again (core/repeat.py): its recipe built into a new run, then `mmsb run` of that run with the agents of the run repeated at
+    their models and efforts, over its configurations and questions. With `--into` the new run is one an earlier repeat built: it goes on."""
     check_jobs(args.jobs, args.gpu_jobs, parser)
-    recorded = resolve_run(args.recorded)
+    recorded = resolve_run(args.run)
     repeat = repeat_of(recorded)
     loaded, descriptions = registry.setup(repeat.configs)
     check_same_cases(repeat, descriptions)

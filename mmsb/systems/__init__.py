@@ -1,4 +1,4 @@
-"""The systems by name (DESIGN 3). A system is a folder here with a `system.toml`, which the registry reads as TOML and never by
+"""The systems by name. A system is a folder here with a `system.toml`, which the registry reads as TOML and never by
 importing the system: that is how the core knows the isolation every agent shell must have (the variables, the words and the
 repositories of each system that keeps state on the machine) with the system itself absent. A system is imported only when `load`
 is asked for it, and a system whose extra is not installed is refused then, with no fallback.

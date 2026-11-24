@@ -1,4 +1,4 @@
-"""The working-time clock (DESIGN 8.4, plan 6.5): what an exec is held to. When several cases share one resource (the GPU), a case's
+"""The working-time clock (DESIGN.md): what an exec is held to. When several cases share one resource (the GPU), a case's
 wait for it is an artefact of the benchmark, so an exec is charged its own turns plus its own service time, never its time in the
 system's queue; a wall-clock cap, a multiple of the limit, ends one that waits for ever. This is Inspect AI's `working_limit` beside a
 `time_limit`.
@@ -6,7 +6,7 @@ system's queue; a wall-clock cap, a multiple of the limit, ends one that waits f
     working = wall - queue        over when working >= limit, or when wall >= the wall cap, whatever the queue
 
 The queue is whatever the exec's system reports (`Session.queue_s`, read live). A system that cannot say (`None`) leaves the clock to run on
-the wall: `clock: wall` in the result, and the limit then applies to wall time, as it did before the working clock. That is exact only
+the wall: `clock: wall` in the result, and the limit then applies to wall time. That is exact only
 when nothing else shares the system, so a session that cannot report it is refused more than one exec at once on the working clock
 (`check_queue`). The agents start a clock when they start their process (`seconds` of a result is the same stopwatch), look at it while
 they wait for the process (`agents.common.wait_for`) and put its `figures` in their result."""
@@ -61,8 +61,8 @@ class WorkingClock:
         return max(0.0, min(self.limit_s - working, self.wall_cap_s - wall))
 
     def expired(self) -> str | None:
-        """The `problem` of an exec that is out of time, else None. The limit's text is the recorded `timeout: no answer in 900 s` unless
-        the exec waited in a queue, which it then says; the wall cap, which only a long queue reaches first, is told apart from it."""
+        """The `problem` of an exec that is out of time, else None. The limit's text is `timeout: no answer in 900 s` unless the exec
+        waited in a queue, which it then says; the wall cap, which only a long queue reaches first, is told apart from it."""
         wall, queue, working = self.look()
         waited = f"{queue:g} s" if queue else None
         if working >= self.limit_s:
@@ -93,10 +93,10 @@ def check_queue(label: str, description: Description | None, session: Session, c
 
 
 def budget_s(media_hours: float) -> float:
-    """The working seconds an exec is given for a haystack of `media_hours` of recordings (DESIGN 8.4): 300 for an hour or less, 900 for a
+    """The working seconds an exec is given for a pile of `media_hours` of recordings (DESIGN.md): 300 for an hour or less, 900 for a
     day or more, in proportion to the hours between. Its wall cap is `WALL_FACTOR` times it (`WorkingClock.of`)."""
     if media_hours < 0:
-        raise ValueError(f"a haystack of {media_hours:g} hours")
+        raise ValueError(f"a pile of {media_hours:g} hours")
     if media_hours <= 1:
         return HOUR_BUDGET_S
     if media_hours >= DAY_HOURS:

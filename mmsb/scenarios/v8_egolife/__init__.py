@@ -1,6 +1,6 @@
 """V8, the EgoLife scenario: EgoLifeQA (the public benchmark of the first-person days of EgoLife: Jake's glasses, 30 s clips, and the
 transcript of what was said around him) asked three ways: without the recordings (`blind`, the floor), with the agent's own tools (`files`)
-and with a system's tools. The download is read here and never run; this module is the scenario (DESIGN 5): the names a `Scenario` has, as
+and with a system's tools. The download is read here and never run; this module is the scenario: the names a `Scenario` has, as
 functions.
 
     recipe = v8_egolife.recipe(source=download, seed=1)           # what the run is made from: the download, the days, the clip table
@@ -14,7 +14,7 @@ folder of the clips and lines up to H (view.py).
 
 The times of the plan are local, so the recipe records the UTC offset of its days and is refused in a zone with another; the days must not
 cross a change of the offset (plan.check_days). `run.json` also holds `pools` (`pool_counts`) and `decode_s`, which the report quotes.
-There is no shortcut probe: a public dataset, so the blind configuration is the floor; `probe` says `none`, as the recorded run did."""
+There is no shortcut probe: a public dataset, so the blind configuration is the floor; `probe` says `none`."""
 
 from __future__ import annotations
 
@@ -43,18 +43,17 @@ from mmsb.scenarios.v8_egolife.view import files_view, release_views, seen_past_
 
 name = "v8_egolife"
 code = CODE
-generator = 1  # bumped when the plan makes something other than before
+generator = 1  # bumped when the plan changes what it makes
 shelf = Shelf("Smart-glasses days", "video", "home", "days of one person's wearable video, with speech")
 filing = {"EventRecall": ("what", "mixed"), "EntityLog": ("what", "mixed"), "RelationMap": ("who", "mixed"), "TaskMaster": ("what", "mixed"),
           "HabitInsight": ("what", "mixed")}
 
 WORKERS = 3  # clips measured, and files hashed, at once
 
-# What no command of an agent with its own tools may hold, beyond the folders: the old generator's words, which the old `EgoRun.deny`
-# inherited from V7's (a copy of V7's OLD_WORDS: a scenario does not import another), the code that reaches this scenario, the download
+# What no command of an agent with its own tools may hold, beyond the folders: the `truth` key of the plan's question dicts, which
+# holds each answer (the same words as V7's: a scenario does not import another), the code that reaches this scenario, the download
 # and the folders of the other slots' recordings. The quotes are as `reached` reads a command: a `"` after a backslash is `/"`.
-OLD_WORDS = ("haystack.py", "import haystack", "from haystack", "haystack.plan", "['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"')
-NEW_WORDS = ("v8_egolife", "from mmsb", "import mmsb")
+DENY_WORDS = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v8_egolife", "from mmsb", "import mmsb")
 DOWNLOAD_WORDS = ("bench-data", PERSON.lower(), IN_ONLY + "egolife")  # the download's: `egolife` only in a command (the transcript says it once)
 RECIPE_KEYS = {"source", "scale", "seed", "days", "per_age", "speech", "utc_offset", "clips"}
 
@@ -145,7 +144,7 @@ def build(recipe: Mapping[str, object], out: Path, workers: int = WORKERS) -> tu
 
 
 def probe(recipe: Mapping[str, object], dump: Dump, out: Path, ffmpeg: Path, seed: int) -> ProbeOutcome:
-    """V8 has no shortcut probe (a public dataset): the outcome is `none`, as the recorded run's run.json has it."""
+    """V8 has no shortcut probe (a public dataset): the outcome is `none`."""
     return ProbeOutcome("none", ())
 
 
@@ -157,11 +156,11 @@ def view(question: Question, slot: int, dump: Dump, temp: Path, key: str, build:
 
 
 def deny_words(others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]:
-    """What no command of the agent in a slot may hold, but for the run's folders: the old generator's words and the code that reaches
+    """What no command of the agent in a slot may hold, but for the run's folders: the `truth` key of the plan's questions and the code that reaches
     this scenario; the download (`egolife` only in a command: the transcript says it once); and the other slots' folders of recordings
     (by path, by name, by glob, and the `glasses` and `transcript` folders in them, which a command's output may name too)."""
     base = f"mmb-{key}-d"
-    return (*(IN_ONLY + word for word in (*OLD_WORDS, *NEW_WORDS)), *DOWNLOAD_WORDS,
+    return (*(IN_ONLY + word for word in DENY_WORDS), *DOWNLOAD_WORDS,
             *(f"{base}{k}/{sub}" for k in others for sub in (VIDEO, TEXT)),
             *(IN_ONLY + w for k in others for w in (str(view_dir(temp, key, k)), f"{base}{k}", f"*-d{k}", f"?-d{k}")))
 

@@ -2,7 +2,7 @@
 for flights, the weather somewhere, an app's page in the Play Store. The questions ask for the screens of what the person was doing, how many there
 were, the screen that says a few words, what a screen read, and of tasks that are not in the folder (questions.py). The screens are Android in the
 Wild's; every answer is from its labels, the goal of each episode and the text OCR read off each screen. The scenario is the names of a `Scenario`,
-as functions (DESIGN 5), over the shared builder (realdump).
+as functions, over the shared builder (realdump).
 
 The folder is not one phone's: the source's episodes were done on six kinds of device (Pixel 3, 4, 4 XL, 5 and 6, and a custom one; the screens are 270
 to 720 px wide), and they are all in this one folder, laid over the months as one person's, in their own sizes. An episode is one device's.

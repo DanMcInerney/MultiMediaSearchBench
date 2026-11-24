@@ -1,6 +1,6 @@
-"""What a system, a scenario and the runner say to each other (DESIGN 3.1, corrected: a daemon and a model load span many cases, so a
-`System` builds and clones stores and `open` returns a `Session` that lives across cases). Types only, plus `PlainSession`, the
-session of a system with nothing to run."""
+"""What a system, a scenario and the runner say to each other (DESIGN.md): a daemon and a model load span many cases, so a `System`
+builds and clones stores and `open` returns a `Session` that lives across cases. Types only, plus `PlainSession`, the session of a
+system with nothing to run."""
 
 from __future__ import annotations
 
@@ -114,7 +114,7 @@ class Served:
     server: McpServer | None
     base_line: str | None  # "You answer the user's question from their memory, using the mm tools."
     parts: tuple[str, ...]  # skill, model notes
-    server_instructions: str | None  # Codex only, as recorded
+    server_instructions: str | None  # Codex only
     holder: str | None  # "mm": the word the prompt's sentences use
     clock_note: str | None  # the sentence about a clock later than `now`
     record: Mapping[str, object]  # fields merged into the result; those the core acts on are EXCLUSIVE, GPU_ESTIMATE_S and BEYOND_TIMEOUT, the rest are the system's own

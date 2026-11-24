@@ -1,14 +1,14 @@
-# EgoLifeQA through the mm bench
+# EgoLifeQA (V8): blind, the files alone, and mm/d1-3B alone
 
-Run 20261103-0257-egolife-s1 (seed 1, 3 days, mm commit c7f62e9+dirty). 40 video questions (10 aged 0-2h, 10 aged 2-6h, 10 aged 6-24h, 10 aged 24h+; by category EventRecall 11, EntityLog 13, RelationMap 12, TaskMaster 4, HabitInsight 10) and 10 speech questions, asked as of each question's horizon. The pool before choosing: 143 video and 95 speech; dropped: 7 its time is a range or a list in one string, 1 a target is outside the clips (a gap) or after the horizon, 254 its query is after the last day. Each exec had 900 s. A glasses window decodes in 24 ms here (mm assumes 10).
+Run 20261103-0257-egolife-s1 (seed 1, 3 days). 40 video questions (10 aged 0-2h, 10 aged 2-6h, 10 aged 6-24h, 10 aged 24h+; by category EventRecall 11, EntityLog 13, RelationMap 12, TaskMaster 4, HabitInsight 10) and 10 speech questions, asked as of each question's horizon. The pool before choosing: 143 video and 95 speech; dropped: 7 its time is a range or a list in one string, 1 a target is outside the clips (a gap) or after the horizon, 254 its query is after the last day. Each exec had 900 s. A glasses window decodes in 24 ms here (mm assumes 10).
 
-Every arm saw the clips that ended by each question's horizon H (median 13 s before the question, at most 29 s; 0 questions more than 30 s, which fell after a gap) and the transcript lines that ended by H.
+Every configuration saw the clips that ended by each question's horizon H (median 13 s before the question, at most 29 s; 0 questions more than 30 s, which fell after a gap) and the transcript lines that ended by H.
 
-No shortcut probe: a public dataset, so the blind arm is the floor (what the agent knows without the recordings).
+No shortcut probe: a public dataset, so `blind` is the floor (what the agent knows without the recordings).
 
-## codex with d1-3B: 40 video questions of 50 (paired: done in all three arms)
+## codex with d1-3B: 40 video questions of 50 (paired: done in all three configurations)
 
-| arm | right (95% interval) | median s | median calls | tokens k | timed out | no letter |
+| configuration | right (95% interval) | median s | median calls | tokens k | timed out | no letter |
 | --- | --- | --- | --- | --- | --- | --- |
 | blind | 16/40 (40%, 26-55) | 5.0 | 0 | 19 | 0 | 0 |
 | files | 36/40 (90%, 77-96) | 30.5 | 6 | 4420 | 0 | 0 |
@@ -20,7 +20,7 @@ No shortcut probe: a public dataset, so the blind arm is the floor (what the age
 | files vs blind | 40 | +50 pts [+29, +65] | 22 / 2 | <0.001 |
 | mm vs blind | 40 | +45 pts [+24, +61] | 20 / 2 | <0.001 |
 
-A difference is the second arm less the first, in points; b is the questions right only in the second, c only in the first.
+A difference is the second configuration less the first, in points; b is the questions right only in the second, c only in the first.
 
 ### codex with d1-3B: by age (mm vs files; blind is the floor)
 
@@ -47,7 +47,7 @@ TaskMaster has few questions in each age: read it as a count, not a rate.
 
 ### codex with d1-3B: the 10 speech questions, apart
 
-| arm | right (95% interval) | median s | median calls | tokens k | timed out | no letter |
+| configuration | right (95% interval) | median s | median calls | tokens k | timed out | no letter |
 | --- | --- | --- | --- | --- | --- | --- |
 | blind | 1/10 (10%, 2-40) | 5.5 | 0 | 5 | 0 | 0 |
 | files | 9/10 (90%, 60-98) | 15.4 | 3 | 345 | 0 | 0 |
@@ -59,13 +59,13 @@ TaskMaster has few questions in each age: read it as a count, not a rate.
 | files vs blind | 10 | +80 pts | 8 / 0 | 0.008 |
 | mm vs blind | 10 | +70 pts | 7 / 0 | 0.016 |
 
-A difference is the second arm less the first, in points; b is the questions right only in the second, c only in the first.
+A difference is the second configuration less the first, in points; b is the questions right only in the second, c only in the first.
 
 Answered from the transcripts alone, since d1-3B does not hear.
 
-### codex with d1-3B: how each arm worked, and what a correct answer cost (the video questions)
+### codex with d1-3B: how each configuration worked, and what a correct answer cost (the video questions)
 
-| arm | called ask | asks / finds / looks | ask windows | ask GPU s | asks stopped at max_s | pictures viewed | shell commands | correct | s per correct | tokens k per correct | GPU s per correct |
+| configuration | called ask | asks / finds / looks | ask windows | ask GPU s | asks stopped at max_s | pictures viewed | shell commands | correct | s per correct | tokens k per correct | GPU s per correct |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | files | - | - | - | - | - | 1.7 | 6.3 | 36/40 | 53.2 | 122.8 | - |
 | mm | 14/40 (35%) | 1.4 / 4.1 / 1.1 | 271.4 | 38.7 | 1 | - | - | 34/40 | 76.6 | 244.2 | 45.6 |
@@ -74,7 +74,7 @@ Answered from the transcripts alone, since d1-3B does not hear.
 
 Recording times after H in mm tool results: 0 in 50 audited execs; asks started past H (the agent's confusion about mm's clock, harmless): 1/25.
 
-## The decider tier (each model's yes/no over each question's evidence, no agent)
+## The retrieval tier (each model's yes/no over each question's evidence, no agent)
 
 | model | set | asked | recall (at its hit) | p >= 0.5 | p >= 0.3 | top 5 | median needle p | sightings away from every target | median s per window | stopped at max_s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -93,11 +93,11 @@ Recall and the top 5 are read first. A sighting away from every target is told b
 
 - The published scores (GPT-4o 36.2, Gemini-1.5-Pro 36.9 and EGAgent 57.5 in the paper) are on all 500 items and 7 days without tools: a scale, not a comparison.
 - Chance is 25%. With 40 paired questions p < 0.05 needs about 6 or more discordant pairs all one way; by age, 10 questions each, only a sign.
-- EgoLife has been public since 2025: the blind arm measures what the models know of it.
-- The files and mm arms both get EgoLife's transcripts (a Chinese line and its English); mm reads them as records.
+- EgoLife has been public since 2025: `blind` measures what the models know of it.
+- The files and mm configurations both get EgoLife's transcripts (a Chinese line and its English); mm reads them as records.
 - A glasses window decodes in 24 ms here and mm assumes 10 ms, so its estimates and lint are low for these clips; asks stopped at `max_s` and timed-out execs are counted above.
-- Names are neutral in the files and mm arms: the clips are `glasses/<date>/HH.MM.SS.mp4`, with no person or dataset name.
-- A question is asked as of its horizon, so the seconds before it (above) are lost to every arm.
+- Names are neutral in the files and mm configurations: the clips are `glasses/<date>/HH.MM.SS.mp4`, with no person or dataset name.
+- A question is asked as of its horizon, so the seconds before it (above) are lost to every configuration.
 - Problems by kind: none. Results to run again: 0 of 150.
 
 ## Appendix: codex with d1-3B, one row per question

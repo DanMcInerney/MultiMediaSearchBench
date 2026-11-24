@@ -1,7 +1,7 @@
 """The rules the constants of the `media_*` modules keep against each other (a needle's shade is clear of every distractor's, a chime's
 notes are clear of every other sound's pitch, nothing on the taskbar or in the typing lines is near a needle's shade), checked when the
 package is imported: a wrong constant fails then, never in a run. It is a module of its own because it reads the constants of all the
-others. Moved from haystack_media.py of the repository at bb498a6."""
+others."""
 
 from __future__ import annotations
 

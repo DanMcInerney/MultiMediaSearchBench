@@ -1,7 +1,7 @@
-"""The report's figures (moved from `numbers` and what it calls in bench.py of this repository at bb498a6): the paired comparison of
-each tested configuration with the control, by agent, over the questions both have a done result for; by how vague the time hint is;
-how each side worked and what a correct answer cost it; one row per question; and the retrieval tier (core/retrieval.py). `render.markdown`
-turns the figures into report.md. Nothing here reads a result written by anything but `core/record.py`.
+"""The report's figures: the paired comparison of each tested configuration with the control, by agent, over the questions both have a
+done result for; by how vague the time hint is; how each side worked and what a correct answer cost it; one row per question; and the
+retrieval tier (core/retrieval.py). `render.markdown` turns the figures into report.md. Nothing here reads a result written by anything
+but `core/record.py`.
 
 A paired row is `(question, control result, tested result)`. Every figure that compares two sides has them under `control` and
 `tested`: a pooled level has several configurations on its tested side. A tested configuration is a run's configuration with a system
@@ -11,10 +11,10 @@ Markdown uses for the two sides (`render`).
 `systems.json` in a run folder says, by `Config.name`, which modalities (`asked`) a tested configuration was asked questions about: the
 runner writes it when it selects the cases (`note_configs`).
 
-A configuration whose system is a leak filter (`Description.leak_filter`, kept in systems.json, DESIGN 7.3) is a floor, not a tested
+A configuration whose system is a leak filter (`Description.leak_filter`, kept in systems.json, DESIGN.md) is a floor, not a tested
 configuration: it is not compared with the control. A question with something to find that it answers right is answerable from
 metadata, whichever agent it was asked of (the dump leaks it); the paired counts of every tested configuration leave such a question out,
-and `answerable_from_metadata` names it and the agents that answered it. An absent question is exempt (C9): an agent with nothing to
+and `answerable_from_metadata` names it and the agents that answered it. An absent question is exempt: an agent with nothing to
 read answers "unknown" to it, so every one would be flagged."""
 
 from __future__ import annotations
@@ -42,9 +42,9 @@ NOT_WORSE = 0.10  # the cost branch of the crossover lets the tested side be thi
 
 
 def grounding_of(rows: list[dict]) -> dict | None:
-    """How the answers of a side were grounded (DESIGN 6.3), beside its verdict: the results by status, `unparsed` (an exec that ended
+    """How the answers of a side were grounded (DESIGN.md), beside its verdict: the results by status, `unparsed` (an exec that ended
     with no problem and whose final message could not be read), and `accuracy`, the share that are `grounded` of those that recorded
-    a status. None when no result of the side holds one (all `line`, or recorded before the status): then nothing of it is told."""
+    a status. None when no result of the side holds one (all `line`): then nothing of it is told."""
     if not any("grounded" in r for r in rows):
         return None
     counts = Counter(status_of(r) for r in rows)
@@ -264,7 +264,7 @@ def agent_models(loaded: list[tuple]) -> dict[str, dict[str, int]]:
 
 def is_filter(config: Config, noted: dict) -> bool:
     """Whether `config` is a leak filter: no tools of its own, and its systems.json entry `noted` says its system is one. An entry
-    of a recorded run has no description."""
+    with no description is not."""
     return not config.own_tools and bool((noted.get("description") or {}).get("leak_filter"))
 
 
@@ -291,7 +291,7 @@ def sides_of(runs: Sequence[RunFolder], control: str) -> tuple[Config, dict[Conf
 
 def answerable(filters: Sequence[Config], loaded: list[tuple]) -> list[dict[str, list[str]]]:
     """For each run of `loaded`, the questions answerable from metadata, each with the agents (sorted) whose result with a leak filter
-    passed it. An absent question is never one (C9). A question one agent's filter passed is one for every agent: it says what the
+    passed it. An absent question is never one. A question one agent's filter passed is one for every agent: it says what the
     dump leaks, not what the agent knows."""
     out = []
     for _, results in loaded:

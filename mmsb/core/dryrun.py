@@ -1,6 +1,5 @@
-"""What a command says before it spends anything (moved from `dry_run`, `argv_lines`, `show_decider` and the system-specific lines of
-`show_agents` of bench.py of this repository at bb498a6): the first exec of each agent and configuration prepared in a folder of its own
-and its command line printed with nothing run, the limits only a system can state (execs at once, work that cannot finish inside an exec),
+"""What a command says before it spends anything: the first exec of each agent and configuration prepared in a folder of its own and
+its command line printed with nothing run, the limits only a system can state (execs at once, work that cannot finish inside an exec),
 and the retrieval asks still to run with about how long they take.
 
 Nothing here opens a session: a system's `preview` answers from its store's files, so a dry run starts no daemon and loads no model, and

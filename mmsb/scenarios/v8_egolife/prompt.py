@@ -1,12 +1,12 @@
-"""What an agent is asked in a V8 run (moved from `EgoRun.prompt` of egolife.py of this repository at bb498a6): the scenario's time (the
-question's own), how the recordings are reached (the only difference between the configurations), the question with its options, and how to
-answer. A system's word for itself is `served.holder`, so this knows no system.
+"""What an agent is asked in a V8 run: the scenario's time (the question's own), how the recordings are reached (the only difference
+between the configurations), the question with its options, and how to answer. A system's word for itself is `served.holder`, so this
+knows no system.
 
 - no tools: `You cannot see my recordings.`;
 - the agent's own tools alone: the folder the recordings are in, how they are named, and that ffmpeg is on PATH;
 - a system's tools alone: `{holder} has recorded these sources of mine from day 1 to now: ...`, and the system's clock note when it has one
-  (V8's recorded text has it: `mm's clock reads a later date than now ...`);
-- both: the system's sentence, then the files'. (No recorded run has this; tests/test_v8.py pins the text.)"""
+  (`mm's clock reads a later date than now ...`);
+- both: the system's sentence, then the files'. (tests/test_v8.py pins the text.)"""
 
 from __future__ import annotations
 

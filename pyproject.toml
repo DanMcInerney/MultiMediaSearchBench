@@ -17,7 +17,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 requires-python = ">=3.12,<3.13"
-# The bytes of the generated V7 week depend on these four: they are pinned to what the recorded pilot was written with.
+# The bytes of the generated V7 week depend on av, numpy, pillow and imageio-ffmpeg, so they are pinned.
 dependencies = [
     "av==19.0.2",
     "numpy==2.5.4",
@@ -76,5 +76,5 @@ module-name = "mmsb"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Four workers: a GPU run beside 12-worker suites hung the laptop's GPU driver and crashed Windows (MultimediaSearch, then called Multimem, 2026-10-30).
+# Four workers: a GPU run beside a suite of 12 workers hung the laptop's GPU driver and crashed Windows.
 addopts = "-n 4 --dist loadgroup -m 'not slow and not paid and not gpu'"

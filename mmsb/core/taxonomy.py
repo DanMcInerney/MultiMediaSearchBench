@@ -1,9 +1,9 @@
-"""The general categories the benchmark's questions and media are filed under (DESIGN 5.8). A question is in one category, by what the person
+"""The general categories the benchmark's questions and media are filed under (DESIGN.md). A question is in one category, by what the person
 wants, whatever the media. A scenario is one `Shelf`, by the kind of pile a real person has and the part of their life it is from. A cue says
 what has to be perceived to answer: a system with no speech can then be told apart from one that misses the needle.
 
 A scenario files its own questions: besides the names of a `Scenario` it has a `shelf` and a `filing`, `{template: (category, cue)}`. Nothing of
-this is in a question file, so filing a scenario changes no question, plan hash or recorded run. "It isn't there" is no category: about a quarter
+this is in a question file, so filing a scenario changes no question or plan hash. "It isn't there" is no category: about a quarter
 of the questions are about what never happened, and an absent question reads, and is filed, as the question it looks like (`with_absent`)."""
 
 from __future__ import annotations

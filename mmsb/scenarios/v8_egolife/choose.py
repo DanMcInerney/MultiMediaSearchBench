@@ -1,8 +1,8 @@
-"""Which questions of the download are asked (moved from egolife.py of this repository at bb498a6): for each of four ages (the query time
-less the latest target: under 2 h, 2-6 h, 6-24 h, over 24 h), 10 of the questions that need no sound, chosen by the rarest categories
-first, and 10 that need sound, asked from the transcript alone (`select`). Every question is asked as of its horizon H, the end of the last
-whole clip that ended by the query: no configuration may read a clip or a transcript line past H. What is lost is the seconds between H and
-the question: under 30, except after a gap in the recording."""
+"""Which questions of the download are asked: for each of four ages (the query time less the latest target: under 2 h, 2-6 h, 6-24 h,
+over 24 h), 10 of the questions that need no sound, chosen by the rarest categories first, and 10 that need sound, asked from the
+transcript alone (`select`). Every question is asked as of its horizon H, the end of the last whole clip that ended by the query: no
+configuration may read a clip or a transcript line past H. What is lost is the seconds between H and the question: under 30, except after a
+gap in the recording."""
 
 from __future__ import annotations
 

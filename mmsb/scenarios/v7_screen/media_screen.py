@@ -21,9 +21,9 @@ finds it: it opens at `overlay["at"]`, its centre (`dialog_at` draws one; DIALOG
 decider but about 8 px in a contact sheet 5 frames across, so that an agent must open or crop a frame to tell an error from the red
 "Confirm" and the red-headed warnings, as with a real dialog.
 
-The screen follows the real recorder (DESIGN.md §6: ddagrab at about 2 fps with the cursor drawn, then `mpdecimate=max=119` and
+The screen follows MultimediaSearch's recorder (ddagrab at about 2 fps with the cursor drawn, then `mpdecimate=max=119` and
 `-fps_mode vfr`): a frame whenever the picture changes, at most one every half second (a tick, TICK_S), and at least one every 60 s. mms's
-reader takes the first frame of each second, so a segment's windows are at most its seconds with a frame, and the files arm sees every
+reader takes the first frame of each second, so a segment's windows are at most its seconds with a frame, and the `files` configuration sees every
 frame. A frame is a state's start, an act (a cursor move, typing or a scroll) or a minute change of the taskbar's clock; `screen_frames`
 is the one place that says where they are, and the writer, the checks, the window counts and the probe all use it. Each frame differs from
 the one before it, as the recorder's `mpdecimate` makes them: a typed character is a visible (not space) one (`typed_text`), and the plan
@@ -41,12 +41,13 @@ The cursor is a white arrow with a black outline, 12x19 px at 1280x720 (about 6x
 moving by more than 6) is sensitive to its size: at this size 87 to 99% of moves are a change, at 0.8 times it 19 to 89%, at 0.67 times
 0 to 78%. `plan.py` plans what the owner does (`state_acts`: idle, light and busy states drawn as a chain, in runs of active
 seconds with 1 or 2 acts each, in the mix of kinds of the app), and its constants are calibrated against two real hours of a screen
-recording (TESTBED.md): the typed text is larger and bolder than the card's so that a frame of typing changes about as much of the frame
+recording: the typed text is larger and bolder than the card's so that a frame of typing changes about as much of the frame
 at 640x360 as a real one's frame (0.05 to 0.3%, the card's own size gives 0.025%), and any typed character is a change to the gate
 (98% of the seconds with a frame are windows, 71 to 86% in the real hours).
 Key frames are at a file's start and at scene cuts (x264 puts one at each state change, 1 to 4 a file), and none is forced every 10 s, so a
-segment is cut at a state's start. Not modelled: the recorder forces a key frame every 10 s (DESIGN.md §6), so its cuts land mid-state; a scroll wraps instead of bringing new lines; there are no caret blinks (A-B-A returns are
-0%, 2 to 5% in the real hours). Moved from haystack_media.py of the repository at bb498a6."""
+segment is cut at a state's start. Not modelled: the recorder forces a key frame every 10 s, so its cuts land mid-state; a scroll wraps
+instead of bringing new lines; there are no caret blinks (A-B-A returns are
+0%, 2 to 5% in the real hours)."""
 
 from __future__ import annotations
 
@@ -68,7 +69,7 @@ from mmsb.scenarios.v7_screen.media_common import (
 
 SCREEN = (1280, 720)
 
-SCREEN_CRF = 30  # capture.py's screen preset
+SCREEN_CRF = 30  # the screen preset of MultimediaSearch's capture.py
 
 DIALOG = (0.45, 0.35)  # a dialog's share of the screen's width and height: 15.75% of its area
 DIALOG_AT = ((0.38, 0.62), (0.40, 0.60))  # where a dialog's centre may be, as fractions of the screen: the range of x and of y (in the middle part)

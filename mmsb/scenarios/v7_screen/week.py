@@ -1,6 +1,6 @@
 """The week being planned: `_Week` makes the files, log lines and questions of a seed over its days, one source after the other with a
 random stream of its own for each, and `plan(seed, scale, days)` runs it and checks the result (`plan.verify`). What a plan holds is in
-plan.py. Moved from haystack.py of the repository at bb498a6."""
+plan.py."""
 
 from __future__ import annotations
 
@@ -441,7 +441,7 @@ class _Week:
     # -- video: the screen and the porch
 
     def screen(self) -> None:
-        """Each day's screen blocks as the recorder writes them (DESIGN.md §4.1, §6): a block is planned whole as states of 10 to 60 s,
+        """Each day's screen blocks as the recorder writes them: a block is planned whole as states of 10 to 60 s,
         each with an activity `level` (`next_level`: a chain over the block, from a stream of its own) and the owner's acts at that level
         (`state_acts`, from the state's own seed: the cursor's place at the start, which is where the last state left it, and its moves,
         typing and scrolling), and then cut into segments of about `screen_s` (`segments`), each starting on a state's start and holding

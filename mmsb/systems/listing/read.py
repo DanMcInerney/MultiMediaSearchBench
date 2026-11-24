@@ -101,11 +101,11 @@ def clock_text(t: float) -> str:
 def misdated_reason(entry: ManifestEntry, mtime: float) -> str | None:
     """Why the listing would put `entry` at a time other than its own, else None. The listing's only time is the file's mtime (the order, `since`
     and `until`, and the horizon `--until` all cut by it), so it must be the time the file holds: the manifest's `t`. V7's generator sets it so
-    (`os.utime(path, (t, t))`), and its recorded pilot's 1,572 files are all exactly at `t`, so the tolerance is not the generator's but
+    (`os.utime(path, (t, t))`), and each of the 1,572 files of its `pilot` scale is exactly at `t`, so the tolerance is not the generator's but
     the file systems': one second, as mm's own check of the time it stored a file at (systems/mm/load.py), which covers a volume that keeps whole
     seconds. A download's mtimes are the download's (V8's are days after the recordings), a copy may keep the server's dates: the listing would cut a
     question's horizon wrongly, at nothing or at everything. A log (media `records`) is the exception, because its `t` is its first line's time and
-    its mtime its last (V7's pilot: 237,409 to 237,435 s later): it must only not be earlier than `t`."""
+    its mtime its last (V7's `pilot` scale: 237,409 to 237,435 s later): it must only not be earlier than `t`."""
     if entry.media == "records":
         ok = mtime >= entry.t - TIME_TOL_S
         wanted = f"not before its first line, at {clock_text(entry.t)}"

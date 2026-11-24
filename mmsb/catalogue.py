@@ -1,6 +1,6 @@
-"""The catalogue of the benchmark (DESIGN 5.8): its media by shelf and its questions by category, in Markdown, made from the scenarios
+"""The catalogue of the benchmark (DESIGN.md): its media by shelf and its questions by category, in Markdown, made from the scenarios
 themselves (`mmsb catalogue`). Nothing is written to a dump and no agent or model is run: each scenario's plan is read for its files and
-questions. The catalogue shows examples from the `dev` split only, as the `test` split's questions are not for publishing (DESIGN 6.4); the
+questions. The catalogue shows examples from the `dev` split only, as the `test` split's questions are not for publishing; the
 `--full` file holds every question with its answer, and stays out of the repository."""
 
 from __future__ import annotations
@@ -11,11 +11,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from mmsb import scenarios
-from mmsb.core.question import Question, load_questions
+from mmsb.core.question import Question
 from mmsb.core.taxonomy import AREAS, CATEGORIES, CUES, MEDIA, Shelf, filed
 
 SCALE_OF = {"v7_screen": "pilot"}  # a scenario whose largest usual scale has another name than `standard`
-BUILT = {"v8_egolife": Path(__file__).parents[1] / "tests" / "oracles" / "recorded" / "egolife-s1" / "converted" / "questions.jsonl"}  # V8's recorded questions: its plan needs the 41 GB download
 ORIGIN = {  # each scenario's code and where its media is from; `media/sources.jsonl` has the links and licences
     "V1": "MEVA (scripted activity at a real site)", "V2": "Australian Roads Dashcam Driving", "V3": "SoccerTrack v2 follow-cam clips (a virtual camera)",
     "V4": "AMI Meeting Corpus (role-played)", "V7": "Made by the benchmark", "V8": "EgoLife", "V9": "MIT OpenCourseWare 14.01",
@@ -48,7 +47,7 @@ class Entry:
     code: str
     shelf: Shelf
     rows: tuple[Row, ...]
-    files: int | None  # None when only the questions are known
+    files: int | None  # None when the plan could not be read
     hours: float | None  # None for a pile with no durations
     note: str  # why it has no questions listed, when it has none
 
@@ -73,13 +72,10 @@ def row_of_plan(scenario, q: Mapping) -> Row:
     return Row(q["qid"], q["question"], NOT_THERE if q["absent"] else str(q["truth"]["value"]), "dev", bool(q["absent"]), category, cue, q["grade"]["kind"])
 
 
-def entry_of(name: str, scale: str, seed: int, built: Path | None = None) -> Entry:
-    """The catalogue's entry for the scenario `name`: its plan at `scale` and `seed`, or, from `built` (a `questions.jsonl`), its questions alone.
-    A scenario whose source is not on this machine has an entry with no questions, and says why."""
+def entry_of(name: str, scale: str, seed: int) -> Entry:
+    """The catalogue's entry for the scenario `name`: its plan at `scale` and `seed`. A scenario whose source is not on this machine has
+    an entry with no questions, and says why."""
     scenario = scenarios.get(name)
-    if built is not None:
-        rows = tuple(row_of_question(scenario, q) for q in load_questions(built))
-        return Entry(name, scenario.code, scenario.shelf, rows, None, None, "")
     try:
         made = scenario.plan_of(scenario.recipe(scale=SCALE_OF.get(name, scale), seed=seed))
     except (OSError, ValueError, TypeError, KeyError) as error:
@@ -93,7 +89,7 @@ def entry_of(name: str, scale: str, seed: int, built: Path | None = None) -> Ent
 
 
 def entries_of(scale: str, seed: int) -> list[Entry]:
-    return [entry_of(name, scale, seed, BUILT[name] if name in BUILT and BUILT[name].exists() else None) for name in scenarios.REGISTRY]
+    return [entry_of(name, scale, seed) for name in scenarios.REGISTRY]
 
 
 def code_order(entry: Entry) -> tuple[str, int]:

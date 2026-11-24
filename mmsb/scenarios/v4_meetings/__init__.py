@@ -3,7 +3,7 @@ people, each meeting four times in a day over a remote control's design, so twel
 sound of the four of them in one MP4 each, named for when it began. The questions ask of what was said (when something was first mentioned, in
 which meeting, who was the first to bring it up, what they decided and when), of how a meeting ran (who presented after whom, who went up to the
 whiteboard and when) and of things never said (questions.py). Every answer is from the corpus's words and annotations; the scenario is the
-names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+names of a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = v4_meetings.recipe(scale="tiny", seed=1)      # the source, the meetings' days, this machine's UTC offsets
     dump, questions = v4_meetings.build(recipe, folder, 3)  # each meeting's video and sound muxed into an MP4, and the questions

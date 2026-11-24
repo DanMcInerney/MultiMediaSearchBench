@@ -1,7 +1,7 @@
 """Where MMSB keeps things on this machine, all under one home (`MMSB_HOME`, else the user's home folder). The three working folders share
 a volume, because a store copy hard-links the dump's files and a hard link cannot cross volumes. Also the other places on this disk that
-hold the answers of runs (the tests' runs, the runs recorded before MMSB, the main checkout of this repository), which `RunFolder.deny`
-names so that an agent with its own tools cannot read them."""
+hold the answers of runs (the tests' runs, the main checkout of this repository), which `RunFolder.deny` names so that an agent with its
+own tools cannot read them."""
 
 from __future__ import annotations
 
@@ -15,7 +15,6 @@ RUNS = HOME / "mmsb-runs"      # a run's folder: results, execs, report
 TEMP = HOME / "mmsb-data"      # the frozen dumps, the agents' working slots, the ffmpeg they have on PATH: for runs only (`check_temp`)
 CACHE = HOME / "mmsb-cache"    # dump metadata and ingested stores
 TESTS = HOME / "mmsb-temp"     # where the tests put their runs and fresh environments (pytest --basetemp): their questions hold answers
-EARLIER = (HOME / "mm-bench", HOME / "mm-bench-temp")  # the results and the temp folder of the runs recorded before MMSB
 ROOT = Path(__file__).resolve().parents[2]  # this repository: the agents may not read it
 
 
@@ -30,8 +29,8 @@ def main_checkout(root: Path) -> Path | None:
 
 
 def checkouts() -> tuple[Path, ...]:
-    """This repository's folders that hold recorded answers (`tests/oracles/recorded`): this checkout and, when it is a linked
-    worktree, the main checkout as well."""
+    """This repository's folders, which an agent with its own tools may not read: this checkout and, when it is a linked worktree, the
+    main checkout as well."""
     main = main_checkout(ROOT)
     return (ROOT,) if main is None or main == ROOT else (ROOT, main)
 

@@ -1,8 +1,7 @@
 """The retrieval tier: each system asked, with no agent, the yes/no of a needle over its source and range, and the ranked moments it
-gives scored against the question's truth (moved from `oracle`, `run_decider`, `span_of`, `meets`, `touched`, `needle_p`, `outcome`,
-`verdicts` and `decider_figures` of bench.py of this repository at bb498a6, and `oracle_record` of egolife.py). The asking is the
-system's (`Session.oracle`); the scoring and the records are here. One record holds the fields of both scenarios' old records, and
-`decider_figures` turns the records of a run into the tier's figures for the report.
+gives scored against the question's truth. The asking is the system's (`Session.oracle`); the scoring and the records are here. One
+record holds the fields of both scenarios' records, and `decider_figures` turns the records of a run into the tier's figures for the
+report.
 
     results/retrieval/<Config.dir>/<qid>.json    one record for each question (`retrieval_record`)
     results/retrieval/<Config.dir>/warm.json     {"config", "seconds"}: how long the session took to open, loaded and warm
@@ -146,11 +145,11 @@ def verdicts(rs: list[dict]) -> dict[str, str]:
     """For one needle question and the records of each configuration asked it: the verdict, by `config`, on each that did not
     find it.
     - A near miss is below its model's hit (calibration).
-    - A scan that ended before the needle (`stopped`, `cut`) says nothing of the model's eyes or the haystack, and is told as it
+    - A scan that ended before the needle (`stopped`, `cut`) says nothing of the model's eyes or of the data, and is told as it
       is; it does not count as a family that ran.
     - A miss is the model's when any model found the needle, or a model of another family had it in its top 5.
-    - Only when nobody found it and models of two or more families scanned it and none had it in the top 5 is the haystack
-      suspect. With one family this tier cannot tell (the agent arm's look can)."""
+    - Only when nobody found it and models of two or more families scanned it and none had it in the top 5 are the data
+      suspect. With one family this tier cannot tell (an agent's own look at the files can)."""
     fair = [r for r in rs if outcome(r) in ("found", "near", "missed")]
     families = {family(r["config"]) for r in fair}
     found = any(outcome(r) == "found" for r in rs)

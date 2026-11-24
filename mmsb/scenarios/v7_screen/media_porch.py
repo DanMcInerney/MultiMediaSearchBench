@@ -8,7 +8,7 @@ distractor) carries his box to the door and back out and leaves nothing on the s
 left at `box` (`parcel_box` draws one, on the step by the door), and `BOX_AREA` is the union of every place it can take, as fractions
 of the frame. The distractors of the parcel's colour are in those places too: a `visitor` (close to the camera, in a brown coat, with a
 carrier bag or without) has more brown in `BOX_AREA` than a parcel has, and the door of the porch is not brown (a brown door would put
-brown in the parcel's place in every frame). Moved from haystack_media.py of the repository at bb498a6."""
+brown in the parcel's place in every frame)."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from mmsb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, _c
 
 PORCH = (640, 360)
 
-PORCH_CRF = 28  # capture.py's camera preset
+PORCH_CRF = 28  # the camera preset of MultimediaSearch's capture.py
 
 BOX = (0.13, 0.43, 0.38, 0.69)  # the parcel's front face on the step, as fractions of the frame: 160x95 px, 6.6% of it
 BOX_W, BOX_H = 0.25, 0.26  # its size

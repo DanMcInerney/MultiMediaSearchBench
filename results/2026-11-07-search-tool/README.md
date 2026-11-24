@@ -44,10 +44,9 @@ Ingest used no GPU: the model reads the media when it is asked, not before.
 ## Read it with these
 
 - **5 questions a cell.** A cell's 95% interval spans about 60 points.
-- **The agents were not told the 900 s.** The prompt has said the limit since 8 November, so a later run is not like for like.
+- **The agents were not told the 900 s.** The prompt now states the limit, so a later run is not like for like.
 - **Claude's `files` cell of `m4_samples` is a rerun**, made after its prompt was fixed to name two limits of its shell tool
   (a command over 10,000 characters, and a redirect), which it had taken for ffmpeg being off.
 - **The GPU dropped off once** during the `mm+files` execs (6 November, on Codex's third `i3_trailcam` exec). The runner
   halted, and after a reboot the same command resumed the run and asked that exec again.
 - **One search system, by this benchmark's author.** A second system is the check that the comparison is fair.
-- The reports were written when the benchmark was called MultiMediaMemoryBench, and are headed "MMMB report".

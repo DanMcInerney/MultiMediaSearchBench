@@ -1,8 +1,7 @@
-"""Which case starts next, and how the cells of a run run beside each other (DESIGN 8.3; `next_question` of bench.py of this repository at
-bb498a6 is `next_case`, now for every configuration).
+"""Which case starts next, and how the cells of a run run beside each other (DESIGN.md).
 
-Without `--side-by-side` the cells of a run run one after another and nothing here but `next_case` is called. With it (off by default,
-DESIGN 13.2), each cell gets a thread (`run_beside`), and what the threads share is `Pools`, made real by `Slots`:
+Without `--side-by-side` the cells of a run run one after another and nothing here but `next_case` is called. With it (off by default),
+each cell gets a thread (`run_beside`), and what the threads share is `Pools`, made real by `Slots`:
 - the GPU: one cell that needs it at a time holds its token for its whole length (its session's `open` and `close` included), the cells
   that need it taking it in the order they would have run one after another;
 - the working folders: the laptop runs at most `JOBS_MAX` execs at once, and the working slots and the deny words are for that many, so

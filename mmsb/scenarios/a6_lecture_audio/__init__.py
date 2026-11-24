@@ -2,7 +2,7 @@
 and Data Science, Fall 2016: 15 lectures, 12 hours, sound only). The files are named for the moment the recording began, and the course meets
 twice a week through the term. The questions ask when the professor first mentioned something, in which lecture, in how many, how long a lecture
 was, what came before what, and what was said, and of things never said (questions.py). Every answer is from the transcripts the lectures come
-with; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump, speech).
+with; the scenario is the names of a `Scenario`, as functions, over the shared builder (realdump, speech).
 
     recipe = a6_lecture_audio.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = a6_lecture_audio.build(recipe, folder, 3)  # the lectures' sound written as M4A with their times, and the questions

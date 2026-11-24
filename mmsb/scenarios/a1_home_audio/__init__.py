@@ -1,7 +1,7 @@
 """A1, the home recorder: a voice recorder left running in a living room for a day, one long audio file (a day of the SINS database, node 7:
 a person living alone in a vacation home). The questions ask when the vacuum cleaner went on and off, when the TV did, when a visitor
 came and left, when the resident left the house and got back, how many times, and of things that did not happen in a stretch of the day
-(questions.py). Every answer is from the database's labels; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over
+(questions.py). Every answer is from the database's labels; the scenario is the names of a `Scenario`, as functions, over
 the shared builder (realdump).
 
     recipe = a1_home_audio.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets

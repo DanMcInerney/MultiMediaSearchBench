@@ -1,7 +1,6 @@
 """Making a run: the dump a scenario writes, cached and frozen in the temp folder; the questions; the stores the systems ingest the dump
-into, cached and linked into the run; the probe; and run.json, last (moved from `build`, `ensure_data` and `ensure_bin` of bench.py and
-`build` of egolife.py of this repository at bb498a6, now for any scenario and any system, and through core/cache.py: what an earlier run
-of the same recipe and system made is found, not made again).
+into, cached and linked into the run; the probe; and run.json, last. What an earlier run of the same recipe and system made is found in
+the cache (core/cache.py), not made again.
 
     <out>/<name>/questions.jsonl  data-manifest.json  dump.json  stores/<system>/ (the system's store, ingest.json)  run.json
     <temp>/mmb-<key10>-data/      the dump, read-only, named by its key; mmb-<tag>-bin/ holds the ffmpeg
@@ -138,8 +137,7 @@ def ensure_data(run: RunFolder, dump: Dump, workers: int = WORKERS) -> Dump:
     the data gone and fails the same way. A file changed or added is an error naming it, not a rewrite. The run's manifest is made the
     one frozen with the data (a rewrite gives the files new times), and the ffmpeg of the agents with their own tools is put back."""
     if run.cache is None:
-        raise ValueError(f"{run.name} was made before the cache (its run.json names none), so its data cannot be found or written again: "
-                         "build a new run")
+        raise ValueError(f"{run.name}'s run.json names no cache, so its data cannot be found or written again: build a new run")
     got = cached_dump(run.scenario, run.recipe, run.temp, run.cache, workers)
     if (got.dump.key, got.dump.root) != (dump.key, run.data):
         raise ValueError(f"the dump of {run.name} is {got.dump.key} in {got.dump.root}, and its dump.json says {dump.key} in {run.data}")

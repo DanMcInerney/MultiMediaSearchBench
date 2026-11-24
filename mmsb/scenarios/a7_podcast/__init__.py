@@ -2,8 +2,8 @@
 of MIT OpenCourseWare: a teacher at MIT talks about teaching, seasons 1 to 5 and 7, 48 episodes, 18 hours). The files are numbered, and each is
 timed to the moment its episode came out. The questions ask when they first mentioned something, in which episode, in how many, how long an
 episode was, who the guest was, what came before what, and what was said, and of things never said (questions.py). Every answer is from the
-transcripts the episodes come with, which name the speaker at each change of speaker; the scenario is the names of a `Scenario`, as functions
-(DESIGN 5), over the shared builder (realdump, speech).
+transcripts the episodes come with, which name the speaker at each change of speaker; the scenario is the names of a `Scenario`, as
+functions, over the shared builder (realdump, speech).
 
     recipe = a7_podcast.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = a7_podcast.build(recipe, folder, 3)  # the episodes' sound written as MP3 with their times, and the questions

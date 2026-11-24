@@ -1,5 +1,4 @@
-"""What an exec leaves running in the daemon, and the waits that follow (moved from `open_jobs`, `cancel_open`, `settle`, `wait_idle`
-and `quiesce` of bench.py of this repository at bb498a6). The calls are the daemon's API (`jobs/get`, `jobs/cancel`, `status`)."""
+"""What an exec leaves running in the daemon, and the waits that follow. The calls are the daemon's API (`jobs/get`, `jobs/cancel`, `status`)."""
 
 from __future__ import annotations
 

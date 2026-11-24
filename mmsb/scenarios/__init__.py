@@ -1,4 +1,4 @@
-"""The scenarios by name (DESIGN 5): a name stands for the module that is the scenario, which has the names of a `Scenario` as
+"""The scenarios by name: a name stands for the module that is the scenario, which has the names of a `Scenario` as
 functions and is imported when it is asked for. A scenario is added by its module and a line here."""
 
 from __future__ import annotations

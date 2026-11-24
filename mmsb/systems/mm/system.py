@@ -1,13 +1,13 @@
-"""The mm system (DESIGN 3): MultimediaSearch's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
+"""The mm system: MultimediaSearch's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
 `open`); `MmSession` is what `run_config` calls for a run of one (agent, variant): it owns a copy of the ingested store and the daemon
-over it, serves each case its server, skill and notes, holds cases back by the rules of the old `run_arm` (`admits`, `max_jobs`) and takes
+over it, serves each case its server, skill and notes, holds cases back by `admits` and `max_jobs` and takes
 an exec's state out of the home when it ends (`reset`).
 
     store/home/            the ingested home (`ingest`): the daemon is never run on it again, only on copies
     store/windows.json     what the dump costs the model in windows (estimate.py), counted from the dump when it was ingested
     <homes>/<agent>-<variant>/   one copy per (agent, variant), made by `open`, its daemon started and the model loaded
 
-What the old `run_arm`, `run_agents` and `copy_home` did to the home, in their order, is split over the calls (plan 4.5, 4.6):
+What a run does to the home, in order, is split over the calls:
 `open`: copy, start the daemon, load the model with one window, sweep the labels of an earlier run (`id:bench-*`); `preview` is `open`
 for a dry run: the estimate, the jobs and the server from the store's files, with no copy, daemon or model;
 `serve`: wait for the daemon to be idle when the case holds the GPU, write the project marker into the working folder, take out the state
@@ -55,7 +55,7 @@ LOOKS = "looks"  # the folder of a home where `look` writes the pictures and sou
 TOOLS = ("ask", "find", "look", "label")  # the only mm tools the agents are offered: none that reads the disk
 CLOCK_NOTE = "mm's clock reads a later date than now: give since and until as dates and times, not as ages or \"now\"."
 CLOCK_LATE_S = 3600.0  # mms's clock is the machine's: a case whose `now` is more than this earlier needs the note
-INGEST_VERSION = 1  # bumped when ingest stores something other than before
+INGEST_VERSION = 1  # bumped when ingest changes what it stores
 SKILL = resources.files("mms") / "skills" / "mms-questions" / "SKILL.md"
 NOTES_DIR = resources.files("mms") / "skills" / "mms-questions" / "models"
 
@@ -224,8 +224,8 @@ class Mm:
 
 
 class NoQueue(PlainSession):
-    """What both of mm's sessions share: MultimediaSearch keeps no per-job wait, so they cannot say how long a case queued for the GPU (decision
-    D3, a change in MultimediaSearch). The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
+    """What both of mm's sessions share: MultimediaSearch keeps no per-job wait, so they cannot say how long a case queued for the GPU (it would take a change in MultimediaSearch).
+    The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
 
     def queue_s(self, case: Case) -> float | None:
         return None

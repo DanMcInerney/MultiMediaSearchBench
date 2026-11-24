@@ -1,6 +1,6 @@
-"""How many execs of one cell run at once (DESIGN 8.1): the one rule, which the runner, every dry run and estimate, `clock.check_queue` and
+"""How many execs of one cell run at once (DESIGN.md): the one rule, which the runner, every dry run and estimate, `clock.check_queue` and
 `clock-check` all ask. A cell runs `jobs` execs at once, unless its system needs the GPU: then it runs `gpu_jobs`, which is 1 unless the
-owner passes `--gpu-jobs`, because three execs of one decision model at once crashed this laptop's driver (2 November 2026). `--jobs` and
+owner passes `--gpu-jobs`, because three execs of one decision model at once crashed a laptop's GPU driver. `--jobs` and
 `--clock` do not raise it. The system's own limit (`Session.max_jobs`: a slow model, an index cut to a horizon) comes on top, and only
 lowers it. A command that cannot ask a session yet (`mmsb repeat`, before its stores exist) asks `asked`, the rule without that limit."""
 

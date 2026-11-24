@@ -1,8 +1,8 @@
 """The manifest of a written V8 dump: a `ManifestEntry` for each clip and for each day's transcript file, which is what a system, the
 files view and the question writer see of the dump. A clip is a video of the source `glasses` that starts at its `t` and plays its `length`;
 a day's transcript is a log of the source `transcript` whose `t` is the local midnight that starts the day and whose `length` is the day, so
-that a moment of the day is its seconds after `t`. Sizes, mtimes and sha256 are measured (`measure_disk`) or given, so the entries of the
-recorded run can be made from its recorded manifest with no download."""
+that a moment of the day is its seconds after `t`. Sizes, mtimes and sha256 are measured (`measure_disk`) or given, so the entries can be
+made from a manifest already measured, with no download."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from mmsb.core.contract import LogSource, ManifestEntry
 from mmsb.scenarios.v8_egolife.plan import TEXT, VIDEO, Plan, local
 from mmsb.scenarios.v8_egolife.source import DAY_S, plain
 
-TRANSCRIPT = LogSource(name=TEXT, folder=TEXT, glob="*.jsonl", time_field="end")  # the log source, as the old build added it
+TRANSCRIPT = LogSource(name=TEXT, folder=TEXT, glob="*.jsonl", time_field="end")  # the log source of the transcript
 
 
 def file_rows(plan: Plan) -> list[list]:

@@ -1,7 +1,6 @@
-"""The question file of a scenario: one JSON object per line, one `Question` each (DESIGN 6.1). `load_questions` is the one place
-the file is parsed. It refuses an unknown key, a missing key (but for a field with a default: a line written before the field was
-added reads as it did), a value of the wrong type, an unknown rule and a repeated `qid`, so everything after it holds dataclasses and
-trusts them."""
+"""The question file of a scenario: one JSON object per line, one `Question` each (DESIGN.md). `load_questions` is the one place
+the file is parsed. It refuses an unknown key, a missing key (but for a field with a default), a value of the wrong type, an unknown
+rule and a repeated `qid`, so everything after it holds dataclasses and trusts them."""
 
 from __future__ import annotations
 
@@ -91,8 +90,8 @@ class Question:
 
 
 def line_of(q: Question) -> dict:
-    """`q` as a line of the question file: its grade's `items` only when it has some, so that a file with no `set` question is the
-    file it was before them."""
+    """`q` as a line of the question file: its grade's `items` only when it has some, so a question that is not a `set` question has
+    none."""
     out = dataclasses.asdict(q)
     if not out["grade"]["items"]:
         del out["grade"]["items"]

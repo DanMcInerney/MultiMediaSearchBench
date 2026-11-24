@@ -1,7 +1,6 @@
-"""The daemon of an mms home, as the benchmark starts and calls it (moved from the fixtures of tests/conftest.py of MultimediaSearch at fe0ece5,
-which the old bench.py imported): `Daemon` runs `mms start` in a process of its own over a home, `Api` calls it, `write_config` writes
-the home's config and approves the sources in it as `mms approve` does, and `wait_for` polls. A daemon is always over the home it is
-given: its process gets MMS_HOME set to it, and its API is on a port the operating system picks and writes to the home's
+"""The daemon of an mms home, as the benchmark starts and calls it: `Daemon` runs `mms start` in a process of its own over a home, `Api` calls it,
+`write_config` writes the home's config and approves the sources in it as `mms approve` does, and `wait_for` polls. A daemon is always
+over the home it is given: its process gets MMS_HOME set to it, and its API is on a port the operating system picks and writes to the home's
 `daemon.json`. Nothing here reads or writes ~/.mms, and no code of this repository stops or calls a daemon it did not start."""
 
 from __future__ import annotations
@@ -43,7 +42,7 @@ class ApiFailure(Exception):
 
 
 class Api:
-    """The daemon's API as a test calls it: `daemon.json` is read at each call, so a restarted daemon is followed."""
+    """The daemon's API as the benchmark calls it: `daemon.json` is read at each call, so a restarted daemon is followed."""
 
     def __init__(self, home: Path):
         self.home = home

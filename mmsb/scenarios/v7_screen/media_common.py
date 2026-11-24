@@ -13,10 +13,10 @@ A needle is one exact shade (`NEEDLE_RGB`): the fake decider's `shade:R,G,B` say
 (`DISTRACTOR_RGB`), so a colour filter gives a shortlist and not the answer; `_clear_of_needles` refuses a colour that is closer, and
 `media_check` checks the constants of all the modules against each other when the package is imported.
 
-The files are written as the capture writes them (TESTBED.md): the screen at crf 30 and the camera at crf 28 with x264's
+The files are written as MultimediaSearch's capture writes them: the screen at crf 30 and the camera at crf 28 with x264's
 `zerolatency` tune, the microphone as opus at 24 kbit/s; in this process through PyAV (video) and a pipe to ffmpeg (sound, never a
 WAV: 42 h of it is 4.8 GB), one thread each, so that three files written at once use three cores and the bytes do not depend on
-the machine's core count. Moved from haystack_media.py of the repository at bb498a6."""
+the machine's core count."""
 
 from __future__ import annotations
 
@@ -103,8 +103,7 @@ SAFE = ((70, 90, 140), (150, 120, 90), (110, 110, 115), (235, 228, 210), (222, 2
 
 
 def ffmpeg_exe() -> str:
-    """The ffmpeg that imageio-ffmpeg ships, whatever is on PATH: the files' bytes are those of this binary (the recorded pilot's
-    microphone files are reproduced by it)."""
+    """The ffmpeg that imageio-ffmpeg ships, whatever is on PATH: the files' bytes are those of this binary."""
     return imageio_ffmpeg.get_ffmpeg_exe()
 
 

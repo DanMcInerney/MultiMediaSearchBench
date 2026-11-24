@@ -1,5 +1,5 @@
-"""The `mmsb` command line (moved out of cli.py, which holds the commands and the order of their steps): what each command and
-option is called and its default. `main` (cli.py) parses with `parser_of`, and a command added here is a subparser and a case in `main`."""
+"""The `mmsb` command line: what each command and option is called and its default (cli.py holds the commands and the order of their
+steps). `main` (cli.py) parses with `parser_of`, and a command added here is a subparser and a case in `main`."""
 
 from __future__ import annotations
 
@@ -87,11 +87,11 @@ def parser_of() -> argparse.ArgumentParser:
                      "separated; the agents of this command), and two that did not as canaries")
     run.add_argument("--timeout", type=float, help="seconds an exec may take (kept in the run; default the run's)")
     run.add_argument("--claude-effort", help="Claude's effort (default MMSB_CLAUDE_EFFORT, else high)")
-    run.add_argument("--codex-effort", help="Codex's effort (default MMSB_CODEX_EFFORT, else high; the pilot ran it at medium)")
+    run.add_argument("--codex-effort", help="Codex's effort (default MMSB_CODEX_EFFORT, else high)")
     run.add_argument("--claude-model", help="Claude's model (default MMSB_CLAUDE_MODEL, else sonnet)")
     run.add_argument("--codex-model", help="Codex's model (default MMSB_CODEX_MODEL, else the pinned one)")
     run.add_argument("--answer-format", choices=FORMATS, help="how the agent ends its final message: json, an answer with the evidence it cites "
-                     f"(graded beside the verdict), or line, `ANSWER: <answer>` as the recorded runs did (default the run's own, else {DEFAULT_FORMAT}; "
+                     f"(graded beside the verdict), or line, `ANSWER: <answer>` (default the run's own, else {DEFAULT_FORMAT}; "
                      "a run with results keeps its format)")
     run.add_argument("--side-by-side", action="store_true", help="run the cells beside each other (off by default): the ones that need no GPU while "
                      "one that does holds it, at most 4 execs at once in all and 4 of each agent (--jobs still bounds one cell), longest expected "
@@ -110,13 +110,13 @@ def parser_of() -> argparse.ArgumentParser:
     reports = sub.add_parser("report", help="the paired comparison; written in the first run's folder")
     reports.add_argument("runs", nargs="+", help="run folders; several runs of one scenario are pooled")
     reports.add_argument("--control", default="files", help="the configuration the others are compared with (pooled runs; default files)")
-    compare = sub.add_parser("compare", help="two runs of the same questions, cell by cell: the flips, the counts, D1's band, McNemar")
-    compare.add_argument("run_a", help="the run to compare with, usually the recorded one")
+    compare = sub.add_parser("compare", help="two runs of the same questions, cell by cell: the flips, the counts, the band, McNemar")
+    compare.add_argument("run_a", help="the run to compare with, usually the one repeated")
     compare.add_argument("run_b", help="the run compared, usually the repeat")
     compare.add_argument("--across-settings", action="store_true",
                          help="compare a cell made by another model or effort than the other run's (it is refused otherwise)")
-    repeats = sub.add_parser("repeat", help="a recorded run again: its recipe, agents at their models and efforts, configurations and questions")
-    repeats.add_argument("recorded", help="the recorded run's folder, or its name under the runs folder")
+    repeats = sub.add_parser("repeat", help="a run again: its recipe, agents at their models and efforts, configurations and questions")
+    repeats.add_argument("run", help="the folder of the run to repeat, or its name under the runs folder")
     repeats.add_argument("--into", help="go on in this run, which an earlier repeat built, instead of building another")
     repeats.add_argument("--out", type=Path, default=paths.RUNS, help=f"where the new run goes (default {paths.RUNS})")
     repeats.add_argument("--temp", type=Path, default=paths.TEMP, help=f"where its dump and working folders go (default {paths.TEMP}; as for build)")
@@ -125,13 +125,13 @@ def parser_of() -> argparse.ArgumentParser:
     repeats.add_argument("--workers", type=int, default=3, help="files written or read at once while building (default 3)")
     repeats.add_argument("--jobs", type=int, default=JOBS, help=JOBS_HELP)
     repeats.add_argument("--gpu-jobs", type=int, default=GPU_JOBS, help=GPU_JOBS_HELP)
-    repeats.add_argument("--answer-format", choices=FORMATS, help=f"as for run (default {DEFAULT_FORMAT}: D1 asks for json once, and for line only "
+    repeats.add_argument("--answer-format", choices=FORMATS, help=f"as for run (default {DEFAULT_FORMAT}: run once in json, and in line as well only "
                          "when a cell falls outside the band)")
     repeats.add_argument("--clock", choices=CLOCKS, help=f"as for run (default {DEFAULT_CLOCK}); a system that cannot report its queue is refused "
                          "more than one exec at once on the working clock, and the refusal comes after the build, once the store is there to ask")
     repeats.add_argument("--dry-run", action="store_true", help="say what it would do and cost, build and start nothing")
     check = sub.add_parser("clock-check", help="the working clock tried on a few cases: each asked alone, then queued with the others, and the answers, "
-                           "tokens and charged seconds side by side (DESIGN 8.4; it spends the plans' quota)")
+                           "tokens and charged seconds side by side (it spends the plans' quota)")
     check.add_argument("run", help="a run folder, or its name under the runs folder: built, with the system's store ingested")
     check.add_argument("--agents", default=",".join(AGENTS))
     check.add_argument("--config", required=True, help="the configuration to check: a system's, as mm/d1-3B")

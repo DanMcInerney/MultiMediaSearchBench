@@ -1,5 +1,5 @@
 """The words of the V7 week: what the questions say (`WORDS`, `WEEK_WORDS`, `ORACLES`), the notes' and log lines' text, and the small parts of
-a question that are made from them (`grade_of`, `shade_of`, `apart`). Moved from haystack.py of the repository at bb498a6."""
+a question that are made from them (`grade_of`, `shade_of`, `apart`)."""
 
 from __future__ import annotations
 

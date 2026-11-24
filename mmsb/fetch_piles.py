@@ -1,13 +1,14 @@
-"""`mmsb fetch` for the piles of media of the scenarios added after the first four (`fetch.PILES` says which scenario reads which source):
-lectures, a podcast, meetings, a match, a dashcam, home clips, receipts, course pages, nature photos, music, and the sources an earlier
-survey had put on disk (a camera roll, screenshots, site photos, voicemails, a field recording). One folder per source in the sources
-folder, named by the source's id in media/sources.jsonl; MEDIA.md says where each comes from and under what licence.
+"""`mmsb fetch` for the piles of media of the scenarios besides the four of fetch.py (`fetch.PILES` says which scenario reads which
+source): lectures, a podcast, meetings, a match, a dashcam, home clips, receipts, course pages, nature photos, music, a camera roll, a
+field recording and voicemails. Screenshots and site photos are not scripted: `mmsb fetch` says so, and MEDIA.md says where to get them.
+One folder per source in the sources folder, named by the source's id in media/sources.jsonl; MEDIA.md says where each comes from and
+under what licence.
 
 Each source is a function `fetch_<source>(fetcher, root, labels_only=False)` that lists what its scenario reads from the place that
 publishes it (an archive.org item's metadata, a Hugging Face repository's tree at a fixed commit, a Zenodo record, a course's download
 page, the iNaturalist API, or a fixed list of names on a server), checks the count against what was found when the source was chosen
 (`COUNTS`: another count is another pile, so it is refused before anything large is fetched) and the bytes against `BUDGET`, and fetches
-it with `fetch.Fetcher`: the same politeness, resumes and `.part` files as the first four. A file that is there already with the size the
+it with `fetch.Fetcher`: the same politeness, resumes and `.part` files as the four of fetch.py. A file that is there already with the size the
 listing (else the server) gives is not fetched again, so the same command continues a fetch that stopped. `labels_only` brings the
 labels and the small files first (the transcripts, the label files, the receipts and the dashcam, the annotation zips), the media after.
 
@@ -40,8 +41,8 @@ OCW = "https://ocw.mit.edu/courses/"
 INAT_API = "https://api.inaturalist.org/v1/observations"
 INAT_PHOTOS = "https://inaturalist-open-data.s3.amazonaws.com/photos/"
 
-# The Hugging Face repositories are read at the commit they were when each source was chosen (9 November 2026), as the first four's
-# labels are: the listing, the labels and the clips are then the ones the questions were drawn from.
+# The Hugging Face repositories are read at fixed commits, as the labels of the four of fetch.py are: the listing, the labels and the
+# clips are then the ones the questions were drawn from.
 ST2_REPO, ST2_REVISION = "algo-dev99/soccertrack-v2-followcam-events", "5ca71d867ee073335abb24b771e0604ff22d1b88"
 DASHCAM_REPO, DASHCAM_REVISION = "qutegocentric/Australian_Roads_Dashcam_Driving", "79300a79a4efac07f24b12eb3890a2977cba9e88"
 SROIE_REPO, SROIE_REVISION = "jsdnrs/ICDAR2019-SROIE", "bffe40c26759f3376ec2b3ae9031dbba54cd587c"
@@ -54,13 +55,12 @@ INAT_LICENCES = ("cc0", "cc-by", "cc-by-nc")  # the photos the open-data bucket 
 INAT_PAGE = 200
 INAT_WAIT = 1.0  # seconds between two requests of the API
 INAT_WORKERS = 3  # photos at once
-AMI_SERIES = ("ES2002", "ES2015", "ES2016", "IS1006", "TS3005")  # a to d of each (ES2002 and ES2016 were on disk from the first survey)
+AMI_SERIES = ("ES2002", "ES2015", "ES2016", "IS1006", "TS3005")  # a to d of each
 AMI_MEETINGS = tuple(f"{series}{part}" for series in AMI_SERIES for part in "abcd")
 AMI_ANNOTATION_FILES = ("DOME_documentation.pdf", "SocialRoleAnnotation.tar.gz", "ami_public_auto_1.5.1.zip", "ami_public_manual_1.6.2.zip",
                         "dome_annotations_M1.csv", "dome_dataset_M1.csv")
 AMI_SLOW_WORKERS = 2  # the mirror is slow (0.06 to 0.5 MB/s): two files at once
-# The first nine Bmr meetings of the mirror's list in order, and Bmr019 (the two on disk are Bmr005 and Bmr019): ten of the real
-# research-group meetings of ICSI.
+# The first nine Bmr meetings of the mirror's list in order, and Bmr019: ten of the real research-group meetings of ICSI.
 ICSI_MEETINGS = ("Bmr001", "Bmr002", "Bmr003", "Bmr005", "Bmr006", "Bmr007", "Bmr008", "Bmr009", "Bmr010", "Bmr019")
 ICSI_ANNOTATION_FILES = ("ICSI_original_transcripts.zip", "ICSI_plus_NXT.zip")
 ST2_MATCHES = 3  # whole matches, the first by sorted match id (8.3 GB; the first five are 14.7 GB)
@@ -488,11 +488,11 @@ def fetch_robocall_ftc(fetcher: Fetcher, root: Path, labels_only: bool = False) 
     return count_files(folder)
 
 
-# -- sources an earlier survey fetched and converted, not scripted yet -----------------------------------------------------------------
+# -- sources that are not scripted: MEDIA.md says where to get them ---------------------------------------------------------------------
 
 def not_scripted(source: str, why: str) -> Callable[..., int]:
     def fetch_nothing(fetcher: Fetcher, root: Path, labels_only: bool = False) -> int:
-        raise FetchError(f"{source}: not scripted yet ({why}); what is in {root / source} came from an earlier survey, see MEDIA.md")
+        raise FetchError(f"{source}: not scripted ({why}); MEDIA.md says where to get it, to put in {root / source}")
 
     return fetch_nothing
 

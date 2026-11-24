@@ -1,4 +1,4 @@
-"""Cached dumps and cached stores (DESIGN 8.4, plan 6.3): what a recipe makes, and what a system ingests it into, is made once and found
+"""Cached dumps and cached stores (DESIGN.md): what a recipe makes, and what a system ingests it into, is made once and found
 again by the next command that wants it. Nothing here names a scenario or a system.
 
     <temp>/mmb-<key10>-data/            the dump, read-only (key10: the first 10 characters of its key); mmb-<key10>-data.part while it is written

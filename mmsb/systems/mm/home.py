@@ -1,5 +1,4 @@
-"""An mms home and what a run does to it (moved from `copy_home`, `kept_items` and `scrub_home` of bench.py and `set_horizon` of
-egolife.py of this repository at bb498a6): a home per (agent, variant) copied from the ingested store, the baseline of what the
+"""An mms home and what a run does to it: a home per (agent, variant) copied from the ingested store, the baseline of what the
 execs may keep, the sweep that takes an exec's state out of it, and the cut of its index to a horizon. Nothing here starts a daemon
 or reads the owner's ~/.mms: a home is the folder it is given."""
 
@@ -21,7 +20,7 @@ from mmsb.core.fs import remove_tree
 from mmsb.systems.mm.models import Model
 
 # remember_max_mb: the largest file a home takes. The real piles' largest are A1's day of sound (2,765 MB) and V1's videos (up to 1,133
-# MB); at the 500 the pilot's small files allowed, mms refused every one of them and held nothing of A1 or V1.
+# MB); at 500, mms refused every one of them and held nothing of A1 or V1.
 SNAPSHOT_CONFIG = "[memory]\nfree_gb = 0\nremember_max_mb = 4000\n\n[decider]\nidle_s = 3600\n"
 COPY_SKIPS = ("daemon.json", "daemon.log*", "daemon.test.log", "daemon.stop", "looks", "fake-decider.jsonl")
 MEDIA_FOLDERS = ("files", "streams")  # what a home keeps of the recordings: a copy of a home links them instead of copying
@@ -31,8 +30,8 @@ PROJECT_PREFIX = "id:bench-"  # the project of every exec's asks and labels: `id
 def exec_project(qid: str) -> str:
     """The project an exec's asks and labels carry: `id:bench-` and 12 hex digits of the hash of its question's id. Its working
     folder's `.mms-project` holds it, less `id:`. Not the id itself: every result of mms's tools shows the agent its project,
-    and an id says what its question is after (2026-11-07: A1's `leave-0829` and `return-1730` held their answers, and every
-    `absent-` one said there is none, in every mm exec until then)."""
+    and an id says what its question is after: A1's `leave-0829` and `return-1730` hold their answers, and every
+    `absent-` one says there is none."""
     return f"{PROJECT_PREFIX}{hashlib.sha256(qid.encode()).hexdigest()[:12]}"
 
 

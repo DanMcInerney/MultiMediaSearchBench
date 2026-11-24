@@ -1,11 +1,10 @@
-"""The report as Markdown (moved from `table` .. `markdown` of bench.py of this repository at bb498a6): report.md, the tables of
-`report.numbers` and the lines that always print. The words for the two sides come from the figures' `frame`: the control's name
-(`files`) and the tested system's (`mm`), so a recorded run reads as it was written. A configuration is shown by its variant
+"""The report as Markdown: report.md, the tables of `report.numbers` and the lines that always print. The words for the two sides
+come from the figures' `frame`: the control's name (`files`) and the tested system's (`mm`). A configuration is shown by its variant
 (`d1-3B` of `mm/d1-3B`).
 
 What the Markdown says of the data and of the tested system, in "Read with these" and in the tables' column names (the asks, finds
-and looks, the GPU seconds, the decider tier), is the V7 benchmark's with mm: the recorded report.md says it, so it stays here
-until a scenario or a system brings its own."""
+and looks, the GPU seconds, the retrieval tier), is the V7 benchmark's with mm: it stays here until a scenario or a system brings
+its own."""
 
 from __future__ import annotations
 
@@ -37,12 +36,12 @@ def chance(p: float | None) -> str:
 
 
 def kilo(arm: dict) -> str:
-    """An arm's tokens in thousands (see `token_total`)."""
+    """A side's tokens in thousands (see `token_total`)."""
     return "-" if arm["tokens_all"] is None else f"{arm['tokens_all'] / 1000:.0f}"
 
 
 def diff_cell(c: dict) -> str:
-    """A difference in points with its interval; with fewer than MIN_DISCORDANT pairs right in one arm only, no interval, and
+    """A difference in points with its interval; with fewer than MIN_DISCORDANT pairs right in one side only, no interval, and
     b and c instead."""
     if c["diff"] is None:
         return "-"
@@ -73,7 +72,7 @@ def grounded_cells(f: dict, w: dict) -> list[str]:
 
 
 def has_grounding(figures: dict) -> bool:
-    """Whether any side of any table holds a grounded status: a report of recorded runs, or of the `line` format, has none."""
+    """Whether any side of any table holds a grounded status: a report of runs in the `line` format has none."""
     return any("grounding" in c[side] for models in figures["agents"].values() for m in models.values() for c in (m["all"], m["media"])
                for side in ("control", "tested"))
 
@@ -191,7 +190,7 @@ def verdict_lines(tier: dict) -> list[str]:
 
 
 def summary_lines(figures: dict) -> list[str]:
-    """One row per model: the decider tier's media figures beside each agent's accuracy and cost on the media with the tested
+    """One row per model: the retrieval tier's media figures beside each agent's accuracy and cost on the media with the tested
     system."""
     tier, agents = figures["retrieval"]["models"], figures["agents"]
     names = sorted({*tier, *(n for models in agents.values() for n in models)})
@@ -330,11 +329,11 @@ def markdown(figures: dict) -> str:
               if c["p"] is not None and c["p"] < 0.05)
     out += ["", "## Read with these", "",
             f"- Without {tested} the screen, the microphone and the cameras would not be recorded at all: the {control} arm reads a "
-            "week that exists only because the bench wrote it.",
+            "week that exists only because the benchmark wrote it.",
             "- The screen changes like a real one while the owner is active: typing (small changes), scrolling (large ones), a cursor that "
             "moves and a clock, up to 2 frames a second, with idle and busy stretches. Its totals and the size of its changes are calibrated "
-            "against two real hours of a screen recording (TESTBED.md). A caret's blinks are not modelled, and a scroll wraps instead of "
-            "bringing new lines; the reader's change gate turns 98% of the haystack's seconds with a frame into windows, where it turns "
+            "against two real hours of a screen recording. A caret's blinks are not modelled, and a scroll wraps instead of "
+            "bringing new lines; the reader's change gate turns 98% of the generated week's seconds with a frame into windows, where it turns "
             "71 to 86% of a real screen's.",
             "- `look` costs about 25 times more per frame than an ffmpeg montage: it returns separate pictures, 8 to a call, "
             "where a 5x5 montage is about 1.5k tokens. An agent that opens frames with `look` pays for it; one that tiles "

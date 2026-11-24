@@ -2,7 +2,7 @@
 a few hundred pages, named page_0001.jpg onwards in the order they were saved. The questions ask for the page that mentions a term, every page that
 does, how many, which course's notes mention a term that more than one subject has, which of two terms comes first in a course's notes, what a page said, and of terms the notes never use
 (questions.py). The pages are MIT OpenCourseWare's lecture PDFs, rendered with pypdfium2; every answer is from their text layers. The scenario is the
-names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+names of a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = i8_course_pages.recipe(scale="tiny", seed=1)      # the source, the semester's days, this machine's UTC offsets
     dump, questions = i8_course_pages.build(recipe, folder, 3)  # the pages rendered as JPEGs and saved as `Notes/page_0001.jpg`, and the questions

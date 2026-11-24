@@ -3,7 +3,7 @@ them from February 2000 to March 2001, sound only: one WAV of the room (everyone
 ask of what was said (when something was first mentioned, in which meetings, how many, what came up after what, what they said a number or a tool was)
 and of what the group does every week (when they read out their digit strings), and of things never said (questions.py). Every answer is from the
 corpus's transcripts and topic annotation; no question names or asks for a person, since the speakers are real people. The scenario is the names of a
-`Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+`Scenario`, as functions, over the shared builder (realdump).
 
     recipe = a3_meetings.recipe(scale="tiny", seed=1)      # the source, the meetings' days, this machine's UTC offsets
     dump, questions = a3_meetings.build(recipe, folder, 3)  # each meeting's WAV copied in with its time, and the questions

@@ -1,4 +1,4 @@
-"""`mmsb clock-check` (DESIGN 8.4, plan 8.2): the working clock tried before it is trusted. A few cases are asked of each agent twice, each
+"""`mmsb clock-check` (DESIGN.md): the working clock tried before it is trusted. A few cases are asked of each agent twice, each
 one alone and then all of them queued at once for the same system, and the answers, tokens and charged seconds of the two halves are
 printed side by side. If the clock does what it says, a case is charged about the same working seconds and gives about the same answer
 either way, while its wall seconds grow with the queue.
@@ -52,8 +52,8 @@ def pick(run: RunFolder, config: Config, light: Sequence[Case], cases: int) -> l
 def queued_at_once(config: Config, description: Description | None, preview: Session, cases: Sequence[Case], jobs: int, gpu_jobs: int) -> int:
     """The execs at once of the queued half of `cases` (`atonce.execs_at_once`: `gpu_jobs` for a system that needs the GPU, else `jobs`), or
     why the check would show nothing: the cases would run one at a time (the option that asks for several is named, and a system's own
-    limit, a horizon or a slow model, which no option raises, is told apart), or the system cannot report its queue (decision D3, a change
-    in the system itself), so the queued execs would have no charged time to compare."""
+    limit, a horizon or a slow model, which no option raises, is told apart), or the system cannot report its queue (only the system
+    itself can), so the queued execs would have no charged time to compare."""
     if not cases:
         raise ValueError(f"every case of {config.name} holds its system alone, so none of them queues: there is nothing to check")
     want, at_once = asked(description, jobs, gpu_jobs), execs_at_once(description, preview, cases, jobs, gpu_jobs)
@@ -64,9 +64,9 @@ def queued_at_once(config: Config, description: Description | None, preview: Ses
         raise ValueError(f"{config.name}'s system would run these cases {at_once} at a time though {want} were asked for (its own limit: a "
                          "case with a horizon cuts the whole index, and a slow model runs alone), so nothing would queue: there is nothing to check")
     if preview.queue_s(cases[0]) is None:
-        raise ValueError(f"{config.name}'s system reports no queue time (Session.queue_s is None; decision D3: the system itself must report the "
+        raise ValueError(f"{config.name}'s system reports no queue time (Session.queue_s is None: the system itself must report the "
                          f"seconds each of its jobs waits), so the {at_once} queued execs would have no charged time to compare with the ones asked "
-                         "alone. The clock-check waits for that change")
+                         "alone, and the clock-check has nothing to show")
     return at_once
 
 

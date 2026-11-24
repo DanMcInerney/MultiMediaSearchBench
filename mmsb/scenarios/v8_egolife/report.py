@@ -1,13 +1,12 @@
-"""The V8 report (moved from `duel` .. `markdown` of egolife.py of this repository at bb498a6): EgoLifeQA asked three ways, without the
-recordings (`blind`, the floor), with the agent's own tools (the control, `files`) and with a system's tools (the tested configuration), as
-paired comparisons over the questions with a done result in all three, as video and speech questions apart, by age and by category; how each
-side worked and what a correct answer cost; the horizon's audit; and the retrieval tier (each tested configuration asked, with no agent, the
-yes/no of every question's oracle). `markdown` renders the figures as report.md.
+"""The V8 report: EgoLifeQA asked three ways, without the recordings (`blind`, the floor), with the agent's own tools (the control, `files`)
+and with a system's tools (the tested configuration), as paired comparisons over the questions with a done result in all three, as video
+and speech questions apart, by age and by category; how each side worked and what a correct answer cost; the horizon's audit; and the
+retrieval tier (each tested configuration asked, with no agent, the yes/no of every question's oracle). `markdown` renders the figures as
+report.md.
 
 It reads the results the way core/report.py does (`report.results_of`, `report.paired`, `report.side`, ...), from the questions of the run
-folder. A figure that the old report keyed by the arm (`files`, `mm`) is keyed by its role here: `control`, `tested`; the figure's `frame`
-has the words the Markdown says for them (the control's configuration name and the tested system's), so a recorded run reads as it was
-written. A tested configuration is shown by its variant (`d1-3B` of `mm/d1-3B`).
+folder. A figure is keyed by its role, `control` or `tested`; the figure's `frame` has the words the Markdown says for them (the control's
+configuration name and the tested system's). A tested configuration is shown by its variant (`d1-3B` of `mm/d1-3B`).
 
 `run.json` holds, besides what a RunFolder needs, `pools` (the questions the bench could ask before choosing, from the download:
 `v8_egolife.pool_counts`) and `decode_s` (seconds the reader decodes a glasses window in here, measured at ingest by the system)."""
@@ -28,7 +27,7 @@ from mmsb.core.stats import median, wilson
 from mmsb.scenarios.v8_egolife.choose import AGE_NAMES
 from mmsb.scenarios.v8_egolife.source import CATEGORIES
 
-# what mms assumes a glasses window costs to decode (MultimediaSearch's ask script: DECODE_S), which the recorded Markdown quotes beside the
+# what mms assumes a glasses window costs to decode (MultimediaSearch's ask script: DECODE_S), which the Markdown quotes beside the
 # measured figure; tests/mm asserts that the two agree
 ASSUMED_DECODE_S = 0.010
 
@@ -38,7 +37,7 @@ ROLES = ("blind", "control", "tested")  # the three configurations, in the order
 
 
 def duel(base: Sequence[dict], other: Sequence[dict], questions: Sequence[Question]) -> dict:
-    """`report.paired` for two arms' results of the same questions: `base` and `other` figures, the difference `other - base`
+    """`report.paired` for two configurations' results of the same questions: `base` and `other` figures, the difference `other - base`
     (the mean of the paired differences) with Newcombe's interval from MIN_DISCORDANT pairs, b (right only in `other`), c (right
     only in `base`) and McNemar's p."""
     got = report.paired(list(zip(questions, base, other)))
@@ -65,15 +64,15 @@ def horizon_figures(questions: Sequence[Question], tested: Sequence[dict]) -> di
 
 
 def group_figures(rows: list[tuple]) -> dict:
-    """The figures of triples `(question, blind, control, tested)` of one set of questions: each arm, and the three pairings."""
+    """The figures of triples `(question, blind, control, tested)` of one set of questions: each configuration, and the three pairings."""
     qs, blind, control, tested = ([r[i] for r in rows] for i in range(4))
     return {"n": len(rows), "arms": {"blind": arm_figures(blind), "control": arm_figures(control), "tested": arm_figures(tested)},
             "tested_control": duel(control, tested, qs), "control_blind": duel(blind, control, qs), "tested_blind": duel(blind, tested, qs)}
 
 
 def agent_figures(questions: Sequence[Question], arms: dict, control: str, tested: str) -> dict | None:
-    """One agent with one tested configuration: the questions with a done result in all three arms (a result to run again, or none,
-    leaves a question out), as video and speech; the video ones by age and by category; how each arm worked; the crossover. `arms`
+    """One agent with one tested configuration: the questions with a done result in all three configurations (a result to run again, or none,
+    leaves a question out), as video and speech; the video ones by age and by category; how each worked; the crossover. `arms`
     are the agent's results by configuration folder; `control` and `tested` are the folders of those two."""
     qs = {q.qid: q for q in questions}
     blind, control_, tested_ = arms.get("blind", {}), arms.get(control, {}), arms.get(tested, {})
@@ -126,8 +125,8 @@ def decider_figures(run: RunFolder) -> dict:
 
 def numbers(run: RunFolder, control: str = "files") -> dict:
     """The report's figures (report.json; `markdown` renders them): per agent and tested configuration (the configurations of the
-    run with a system that is not `control`) the three arms over the video questions and over the speech ones apart, by age and by
-    category, how each arm worked and what a correct answer cost, the horizon's audit, and the retrieval tier. `frame` is what the
+    run with a system that is not `control`) the three configurations over the video questions and over the speech ones apart, by age and by
+    category, how each worked and what a correct answer cost, the horizon's audit, and the retrieval tier. `frame` is what the
     Markdown calls the two sides: the control's name and the tested system's."""
     questions = run.questions()
     meta = fs.read_json(run.folder / "run.json")
@@ -176,11 +175,11 @@ def arm_table(g: dict, frame: dict) -> list[str]:
         a = g["arms"][role]
         rows.append([arm, right(a["correct"], a["n"], a["wilson"]), render.number(a["median_s"]), render.number(a["median_calls"], ".0f"),
                      render.kilo(a), str(a["timeouts"]), str(a["unparsed"])])
-    return [render.table(["arm", "right (95% interval)", "median s", "median calls", "tokens k", "timed out", "no letter"], rows), "",
+    return [render.table(["configuration", "right (95% interval)", "median s", "median calls", "tokens k", "timed out", "no letter"], rows), "",
             render.table(["pair", "n", "difference (95% CI)", "b / c", "McNemar p"],
                          [duel_row(f"{tested} vs {control}", g["tested_control"]), duel_row(f"{control} vs blind", g["control_blind"]),
                           duel_row(f"{tested} vs blind", g["tested_blind"])]), "",
-            "A difference is the second arm less the first, in points; b is the questions right only in the second, c only in the first."]
+            "A difference is the second configuration less the first, in points; b is the questions right only in the second, c only in the first."]
 
 
 def age_lines(m: dict, frame: dict) -> list[str]:
@@ -208,13 +207,13 @@ def work_lines(m: dict, frame: dict) -> list[str]:
                      str(w["max_s"]) if role == "tested" else "-", render.known_of(w, "views") if role == "control" else "-",
                      render.known_of(w, "shells") if role == "control" else "-", f"{c['correct']}/{c['n']}", render.cost_cell(c, "s"),
                      render.cost_cell(c, "tokens_k"), render.cost_cell(c, "gpu_s") if role == "tested" else "-"])
-    return [render.table(["arm", "called ask", "asks / finds / looks", "ask windows", "ask GPU s", "asks stopped at max_s", "pictures viewed",
+    return [render.table(["configuration", "called ask", "asks / finds / looks", "ask windows", "ask GPU s", "asks stopped at max_s", "pictures viewed",
                           "shell commands", "correct", "s per correct", "tokens k per correct", "GPU s per correct"], rows)]
 
 
 def decider_lines(tier: dict) -> list[str]:
     if not tier:
-        return ["No decider results yet."]
+        return ["No retrieval results yet."]
     rows = []
     for name, d in tier.items():
         for label, r in [("all", d["all"]), *d["types"].items(), *d["categories"].items()]:
@@ -228,7 +227,7 @@ def decider_lines(tier: dict) -> list[str]:
 
 
 def horizon_rule(h: dict) -> str:
-    return (f"Every arm saw the clips that ended by each question's horizon H (median {render.number(h['median_s'], '.0f')} s before "
+    return (f"Every configuration saw the clips that ended by each question's horizon H (median {render.number(h['median_s'], '.0f')} s before "
             f"the question, at most {render.number(h['max_s'], '.0f')} s; {h['past_30s']} questions more than 30 s, which fell after a "
             "gap) and the transcript lines that ended by H.")
 
@@ -251,13 +250,13 @@ def markdown(figures: dict) -> str:
            f"{', '.join(f'{n} {why}' for why, n in r['pools']['dropped'].items())}. Each exec had {r['timeout_s']:g} s. "
            f"A glasses window decodes in {r['decode_s'] * 1000:.0f} ms here ({tested} assumes {ASSUMED_DECODE_S * 1000:.0f}).",
            "", horizon_rule(r["horizon"]), "",
-           "No shortcut probe: a public dataset, so the blind arm is the floor (what the agent knows without the recordings)."]
+           "No shortcut probe: a public dataset, so the blind configuration is the floor (what the agent knows without the recordings)."]
     for agent, models in figures["agents"].items():
         for config, m in models.items():
             name = variant_of(config)
             video = m["video"]
             out += ["", f"## {agent} with {name}: {video['n'] if video else 0} video questions of {m['questions']} (paired: done in "
-                        "all three arms)", "", *(arm_table(video, frame) if video else ["None paired yet."]), "",
+                        "all three configurations)", "", *(arm_table(video, frame) if video else ["None paired yet."]), "",
                     f"### {agent} with {name}: by age ({tested} vs {control}; blind is the floor)",
                     "", *age_lines(m, frame), "", f"### {agent} with {name}: by category (right / n)", "",
                     render.table(["category", "n", *arms], [[c, str(v["n"]), *(str(v[a]) for a in ROLES)]
@@ -266,26 +265,26 @@ def markdown(figures: dict) -> str:
                     f"### {agent} with {name}: the {m['speech']['n'] if m['speech'] else 0} speech questions, apart", ""]
             out += (arm_table(m["speech"], frame) + ["", f"Answered from the transcripts alone, since {name} does not hear."]
                     if m["speech"] else ["None paired yet."])
-            out += ["", f"### {agent} with {name}: how each arm worked, and what a correct answer cost (the video questions)", "",
+            out += ["", f"### {agent} with {name}: how each configuration worked, and what a correct answer cost (the video questions)", "",
                     *work_lines(m, frame)]
             out += ["", f"### {agent} with {name}: the horizon, from the {tested} results", "", audit_line(m["horizon"], tested)]
     if not figures["agents"]:
         out += ["", "No agent results yet."]
-    out += ["", "## The decider tier (each model's yes/no over each question's evidence, no agent)", "", *decider_lines(figures["retrieval"])]
+    out += ["", "## The retrieval tier (each model's yes/no over each question's evidence, no agent)", "", *decider_lines(figures["retrieval"])]
     t = figures["totals"]
     out += ["", "## Read with these", "",
             "- The published scores (GPT-4o 36.2, Gemini-1.5-Pro 36.9 and EGAgent 57.5 in the paper) are on all 500 items and 7 days "
             "without tools: a scale, not a comparison.",
             "- Chance is 25%. With 40 paired questions p < 0.05 needs about 6 or more discordant pairs all one way; by age, 10 "
             "questions each, only a sign.",
-            "- EgoLife has been public since 2025: the blind arm measures what the models know of it.",
-            f"- The {control} and {tested} arms both get EgoLife's transcripts (a Chinese line and its English); {tested} reads them as "
+            "- EgoLife has been public since 2025: the blind configuration measures what the models know of it.",
+            f"- The {control} and {tested} configurations both get EgoLife's transcripts (a Chinese line and its English); {tested} reads them as "
             "records.",
             f"- A glasses window decodes in {r['decode_s'] * 1000:.0f} ms here and {tested} assumes {ASSUMED_DECODE_S * 1000:.0f} ms, so "
             "its estimates and lint are low for these clips; asks stopped at `max_s` and timed-out execs are counted above.",
-            f"- Names are neutral in the {control} and {tested} arms: the clips are `glasses/<date>/HH.MM.SS.mp4`, with no person or "
+            f"- Names are neutral in the {control} and {tested} configurations: the clips are `glasses/<date>/HH.MM.SS.mp4`, with no person or "
             "dataset name.",
-            "- A question is asked as of its horizon, so the seconds before it (above) are lost to every arm.",
+            "- A question is asked as of its horizon, so the seconds before it (above) are lost to every configuration.",
             f"- Problems by kind: {render.kinds_text(t['problems'])}. Results to run again: {t['to_rerun']} of {t['results']}."]
     for agent, models in figures["agents"].items():
         for config, m in models.items():

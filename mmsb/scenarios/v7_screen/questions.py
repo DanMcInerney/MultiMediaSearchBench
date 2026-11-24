@@ -1,4 +1,4 @@
-"""The questions of a V7 week as the question file has them (DESIGN 6.1, 5.2): a projection of the plan's question dicts, whose keys do
+"""The questions of a V7 week as the question file has them: a projection of the plan's question dicts, whose keys do
 not change (`plan_hash` covers them), onto `Question`. What the plan says in absolute time is written as seconds into the file that
 holds it, found in the manifest.
 
@@ -20,7 +20,7 @@ from mmsb.scenarios.v7_screen.manifest import log_path, log_times
 from mmsb.scenarios.v7_screen.plan import BASE_OF, TOL_S, Plan
 
 CODE = "V7"
-DEV_SEEDS = range(1, 11)  # the questions of these seeds are the dev split (DESIGN 6.4), the others the test split
+DEV_SEEDS = range(1, 11)  # the questions of these seeds are the dev split, the others the test split
 FILE_KIND = {"note-code": "note", "config-asof": "config", "log-count": "log", "log-last": "log", "photo-sign": "photo",
              "photo-count": "photo", "screen-error": "screen", "porch-parcel": "porch", "mic-doorbell": "mic", "mic-alarm": "mic"}
 LOG_OF = {"log-count": "payments", "log-last": "web"}  # the service whose log holds a log template's lines

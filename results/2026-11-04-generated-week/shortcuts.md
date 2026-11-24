@@ -57,7 +57,7 @@ Not floors, and not in `check`: what a filter tuned to the needle itself leaves,
 
 ## Brute-force views
 
-Pictures in scope over 25: the 5x5 montages that look at all of them (sound has none). The least and the most of the questions of a level. The screen's first column counts its states, the second the frames the recorder keeps of them (the files arm's brute force). The porch has a second column: a montage of one frame a clip, which finds a parcel that stays on the step.
+Pictures in scope over 25: the 5x5 montages that look at all of them (sound has none). The least and the most of the questions of a level. The screen's first column counts its states, the second the frames the recorder keeps of them (the files configuration's brute force). The porch has a second column: a montage of one frame a clip, which finds a parcel that stays on the step.
 
 | level | screen, a view a state | screen, every frame | porch, every frame | porch, a frame a clip | phone |
 | --- | --- | --- | --- | --- | --- |

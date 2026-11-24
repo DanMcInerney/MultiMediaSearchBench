@@ -3,7 +3,7 @@ eastern United States (an iNaturalist observer: Ruffed Grouse, red trillium, pin
 observation the community has named to the species. The questions are the owner's, by the names a person says: on which days did I photograph a
 trillium, on how many days a Wild Turkey, when did I first or last photograph a hummingbird, find my photo of that woodpecker, did I ever
 photograph a moose, which did I see first; and some about a species the pile has none of (questions.py). Every answer is from the observations
-(source.py). The scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+(source.py). The scenario is the names of a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = i9_nature.recipe(scale="tiny", seed=1)      # the source, the pile's days, this machine's UTC offsets
     dump, questions = i9_nature.build(recipe, folder, 3)  # the photos copied in with EXIF and their times, and the questions

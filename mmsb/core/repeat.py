@@ -1,12 +1,12 @@
-"""`mmsb repeat RECORDED`: a run done again as it was done (plan 8.1): the same recipe, and the same agents at the same models and efforts, over
-the same configurations and the same questions of each cell. This module reads what the recorded run says of itself and says what the
-repeat will do; the building and the running are `mmsb build` and `mmsb run`, which the command calls, and the comparison with the
-recorded run is `mmsb compare`.
+"""`mmsb repeat RUN`: a run done again as it was done: the same recipe, and the same agents at the same models and efforts, over the same
+configurations and the same questions of each cell. This module reads what the run says of itself and says what the repeat will do; the
+building and the running are `mmsb build` and `mmsb run`, which the command calls, and the comparison of the repeat with the run is
+`mmsb compare`.
 
 What a run knows of its agents is in its results (`agent_model`, `agent_effort` of each) and in run.json's `agents`, which `mmsb run` writes
-from them when it ends (`note_agents`) and the converter wrote for the recorded runs: `{agent: {"model", "effort"}}`. A recorded run whose
-results disagree with its `agents` is refused. An agent that records no effort (Claude's results hold none) has effort None, which is its
-own default; the models are the ones the agents reported, not the aliases they were asked for."""
+from them when it ends (`note_agents`): `{agent: {"model", "effort"}}`. A run whose results disagree with its `agents` is refused. An agent
+that records no effort (Claude's results hold none) has effort None, which is its own default; the models are the ones the agents
+reported, not the aliases they were asked for."""
 
 from __future__ import annotations
 
@@ -49,8 +49,8 @@ def note_agents(run: RunFolder) -> None:
 
 @dataclass(frozen=True)
 class Repeat:
-    """What a recorded run did: its agents (name -> model and effort), its configurations (those that have results), the qids each cell
-    was asked, and all the qids in the questions' order."""
+    """What a run did, which a repeat does again: its agents (name -> model and effort), its configurations (those that have results),
+    the qids each cell was asked, and all the qids in the questions' order."""
 
     recorded: RunFolder
     agents: Mapping[str, Mapping[str, str | None]]
@@ -85,8 +85,8 @@ def repeat_of(recorded: RunFolder) -> Repeat:
 
 
 def check_same_cases(repeat: Repeat, descriptions: Mapping[Config, Description | None]) -> None:
-    """Raises when a run of the recorded configurations over the recorded qids would ask a cell other questions than the recorded run
-    asked it (a recorded run that gave only some configurations the text and records, say): the repeat would not be of the same cases."""
+    """Raises when a run of the repeated run's configurations over its qids would ask a cell other questions than that run asked it (one
+    that gave only some configurations the text and records, say): the repeat would not be of the same cases."""
     questions = selected(repeat.recorded.questions(), "all", descriptions, repeat.qids)
     for config in repeat.configs:
         wanted = {q.qid for q in config_questions(questions, config, descriptions[config])}
@@ -125,7 +125,7 @@ def setting_text(setting: Mapping[str, str | None]) -> str:
 def show_repeat(repeat: Repeat, descriptions: Mapping[Config, Description | None], jobs: int, gpu_jobs: int, folders: Sequence[Path], temp: Path,
                 cache: Path) -> None:
     """What the repeat will do, for `--dry-run` and before it starts: the agents, models and efforts, the cells and their execs, what each
-    took in the earlier runs `folders` (the recorded run among them), and what has to be made first: the dump and the stores that the cache
+    took in the earlier runs `folders` (the run repeated among them), and what has to be made first: the dump and the stores that the cache
     in `cache` holds for the recipe (the dump in `temp`) are said to be cached, the rest to be made. Each cell is counted at the execs at once
     the run will ask of it (`atonce.asked`: `jobs`, or `gpu_jobs` for a system that needs the GPU), as `mmsb run` counts it, but not at the
     fewer its system may allow (`Session.max_jobs`), which its store, not yet made, would tell."""

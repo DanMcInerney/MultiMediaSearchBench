@@ -5,7 +5,7 @@ dates are made up. The questions ask for the clip of one action, every clip of a
 how long something lasted, which room, whether another action was before or after it, and whether an action was ever filmed (questions.py). Every answer is from the dataset's
 labels (a clip's actions with their start and end, its scene), but those are not exhaustive, so the pile is built to make each question certain: of
 every action asked about it holds only the clips where the label and the words of the script agree, and none where they do not (pile.py). The
-scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+scenario is the names of a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = v10_home_clips.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = v10_home_clips.build(recipe, folder, 3)  # the clips copied out of the zip as they are, with their times, and the questions

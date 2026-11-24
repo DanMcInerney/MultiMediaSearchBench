@@ -4,7 +4,7 @@ migrating birds are faint, short and many (9,113 of them marked), and the labels
 questions ask when the first call came, how many calls there were in a short stretch with few, when the first call in a window came,
 which hour was quietest, what pitch a call had, and of stretches with no call at all
 (questions.py). Every answer is from the expert's marks, with the care that faint calls may be missing; the scenario is the names of a
-`Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+`Scenario`, as functions, over the shared builder (realdump).
 
     recipe = a4_field.recipe(scale="tiny", seed=1)      # the source, the scale's day, this machine's UTC offsets
     dump, questions = a4_field.build(recipe, folder, 3)  # the hourly files cut from the night, with their times, and the questions

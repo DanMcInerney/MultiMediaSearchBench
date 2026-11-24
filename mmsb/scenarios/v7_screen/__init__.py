@@ -1,6 +1,6 @@
 """V7, the screen scenario: a synthetic week of an owner's phone, screen, front door camera, hallway microphone, notes, config and logs,
 with needles hidden among distractors (plan.py has the week and its questions, media_*.py draw and play it, write.py writes it). This
-module is the scenario (DESIGN 5): the names a `Scenario` has, as functions.
+module is the scenario: the names a `Scenario` has, as functions.
 
     recipe = v7_screen.recipe(scale="tiny", seed=1)            # what the week is made from: the same recipe is the same bytes
     dump, questions = v7_screen.build(recipe, folder, workers)  # the files, their manifest, and the questions with their evidence
@@ -34,7 +34,7 @@ from mmsb.scenarios.v7_screen.write import WORKERS, write
 
 name = "v7_screen"
 code = CODE
-generator = VERSION  # bumped when the plan makes something other than before
+generator = VERSION  # bumped when the plan changes what it makes
 shelf = Shelf("Developer's week", "mixed", "work", "a synthetic week of screen recording, notes, logs, phone photos, porch camera and microphone")
 filing = {"note-code": ("what", "text"), "config-asof": ("what", "text"), "log-count": ("how_many", "text"), "log-last": ("when", "text"),
           "photo-sign": ("what", "text"), "photo-count": ("how_many", "sight"), "screen-error": ("what", "text"), "porch-parcel": ("when", "sight"),
@@ -42,11 +42,10 @@ filing = {"note-code": ("what", "text"), "config-asof": ("what", "text"), "log-c
           "absent-sign": ("what", "text"), "absent-error": ("what", "text"), "absent-parcel": ("when", "sight"), "absent-doorbell": ("when", "sound")}
 
 # What no command of an agent with its own tools may hold, beyond the folders: the generator of the week and its truth, as code reaches
-# them (a mention in prose is no escape). An agent that runs `haystack.plan(seed, scale)` from the repository has every answer. The
-# quotes are as `reached` reads a command: a `"` after a backslash is `/"`. The first eight are the words of the old generator, which
-# copies of it still have; the rest are the new one's. A bare `mmsb` is not one: the folders of the run are in `D:\mmsb-data` and `D:\mmsb-runs`.
-OLD_WORDS = ("haystack.py", "import haystack", "from haystack", "haystack.plan", "['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"')
-NEW_WORDS = ("v7_screen", "from mmsb", "import mmsb")
+# them (a mention in prose is no escape). An agent that runs `week.plan(seed, scale)` from the repository has every answer; the
+# `truth` key of the plan's question dicts holds each one. The quotes are as `reached` reads a command: a `"` after a backslash is
+# `/"`. A bare `mmsb` is not one: the folders of the run are in `D:\mmsb-data` and `D:\mmsb-runs`.
+DENY_WORDS = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v7_screen", "from mmsb", "import mmsb")
 RECIPE_KEYS = {"scale", "seed", "days", "utc_offsets"}
 
 
@@ -114,8 +113,8 @@ def view(question: Question, slot: int, dump: Dump, temp: Path, key: str, build:
 
 
 def deny_words(others: Sequence[int], temp: Path, key: str) -> tuple[str, ...]:
-    """What no command of the agent in a slot may hold, but for the run's folders: see OLD_WORDS and NEW_WORDS."""
-    return tuple(IN_ONLY + word for word in (*OLD_WORDS, *NEW_WORDS))
+    """What no command of the agent in a slot may hold, but for the run's folders: see DENY_WORDS."""
+    return tuple(IN_ONLY + word for word in DENY_WORDS)
 
 
 def after_exec(question: Question, out: dict, dump: Dump, access: Access) -> dict:
