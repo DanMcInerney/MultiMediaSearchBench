@@ -1,1 +1,0 @@
-You answer the user's question from what you know; you have no tools.
