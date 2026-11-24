@@ -1,12 +1,10 @@
-"""New tests for `mmsb build` and `mmsb ingest` (mmsb/cli.py, mmsb/core/build.py) and the run.json writer (`RunFolder.write`). Over the scenario
-`toy` (V7's plan, a dump of three files) and the stand-in system `stub`, unless a test says it builds the real week. Ported from
-tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4): `test_a_probe_that_fails_or_is_skipped_is_recorded_and_a_build_that_fails_it_exits_1`
-and `test_the_probe_runs_over_the_written_and_loaded_week_with_the_files_arms_ffmpeg_and_is_recorded`; its `bench.build` is the command. The
-other tests are new: the run.json this repository writes (plan 4.7), what a store's report does to a run (the finding of U7's notes: a file
-stored at a time other than its own refuses the run), and what a system measured.
+"""Tests of `mmsb build` and `mmsb ingest` (mmsb/cli.py, mmsb/core/build.py) and the run.json writer (`RunFolder.write`). Over the scenario
+`toy` (V7's plan, a dump of three files) and the stand-in system `stub`, unless a test says it builds the real week: what a probe that fails
+or is skipped does to a build, the run.json a build writes, what a store's report does to a run (a file stored at a time other than its own
+refuses the run), and what a system measured.
 
-Every expected value is worked out here from independent sources: a hash is computed over the bytes written, the plan's hashes from V7's
-own functions, the folders from the arguments of the command."""
+Every expected value is worked out here from independent sources: a hash is computed over the bytes written, the hashes of the week's plan
+from V7's own functions, the folders from the arguments of the command."""
 
 from __future__ import annotations
 
@@ -258,11 +256,11 @@ def test_data_written_again_that_is_not_the_dump_the_stores_were_made_from_is_an
     manifest = run.manifest.read_bytes()
     cli_world.CONTENT[:] = ["v2"]  # the generator, or a library, changed since
     fs.remove_tree(run.data)
-    for command in ("first", "second", "third"):  # (G1's F2: the second used to go on, with the other bytes frozen in)
+    for command in ("first", "second", "third"):  # (each one refuses: none goes on with the other bytes frozen in)
         with pytest.raises(RuntimeError, match=r"is not the dump .* was built with \(\d+ files differ"):
             ensure_data(run, dump)
         assert run.manifest.read_bytes() == manifest and not run.data.exists(), f"the {command} command kept nothing of the other bytes"
-    cli_world.CONTENT[:] = ["v1"]  # the generator is as it was: the data is written again, and is the dump
+    cli_world.CONTENT[:] = ["v1"]  # the generator makes the dump's bytes again: the data is written again, and is the dump
     assert ensure_data(run, dump) == dump and fs.changed(run.data, run.manifest) is None
 
 
@@ -301,7 +299,7 @@ def test_a_run_keeps_a_new_timeout_and_the_configurations_it_is_given_in_its_run
     assert date.fromisoformat(DAYS.split(",")[0]) == run.days[0]
 
 
-# -- G1's repairs ---------------------------------------------------------------------------------------------------------------------
+# -- the version of a store, and the folders and checkout a build is made in ------------------------------------------------------------
 
 
 def test_a_store_keeps_the_hash_of_the_system_that_made_it_and_a_run_over_a_store_of_another_version_is_refused(world, capsys):
@@ -317,7 +315,7 @@ def test_a_store_keeps_the_hash_of_the_system_that_made_it_and_a_run_over_a_stor
         assert f"the store of stub in {run.name} was made by stub with store_hash s, and it is t now" in err, argv
         assert "Build a new run" in err and f"remove {store_of(run.folder, 'stub')} and ingest again" in err, argv
     assert stub.execs == [] and not oracle.kinds("open") and not oracle.kinds("preview") and not oracle.kinds("ingest"), "refused before any session"
-    # the configuration that does not use the store is not refused for it, and the system as it was is not refused at all
+    # the configuration that does not use the store is not refused for it, and the system that made the store is not refused at all
     world.patch.setattr("mmsb.core.agents.claude.check_login", lambda: None)
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", "--only", FIRST, agents=cli_world.agents_of(stub)) == 0
     cli_world.use(world.patch, StubSystem(report=CLEAN))

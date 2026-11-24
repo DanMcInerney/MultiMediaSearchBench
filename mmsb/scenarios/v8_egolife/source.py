@@ -1,12 +1,12 @@
-"""The EgoLife download as plain data (moved from egolife.py of this repository at bb498a6): the clips of Jake's glasses with their lengths,
-the questions of EgoLifeQA and the transcripts, read as the data gives them. The download is `A1_JAKE/DAYn/DAYn_A1_JAKE_HHMMSSFF.mp4`,
+"""The EgoLife download as plain data: the clips of Jake's glasses with their lengths, the questions of EgoLifeQA and the transcripts,
+read as the data gives them. The download is `A1_JAKE/DAYn/DAYn_A1_JAKE_HHMMSSFF.mp4`,
 `EgoLifeQA/EgoLifeQA_A1_JAKE.json` and `EgoLifeCap/Transcript/A1_JAKE/DAYn/*.srt`: third-party data, read here and never run.
 
 Times: a `plain` time is `day * 86400 + seconds into the day`, with no zone, which is what the data names; the plan turns them into local
 epochs (plan.py). So the questions chosen for a seed do not depend on the day the run is built on.
 
-A clip's length is read from its packets, as MultimediaSearch's `media.duration` does (it is the end mms stores for the clip): `packet_duration` is a
-copy of it, so that no module of the scenario imports MultimediaSearch. tests/mm runs both on the same clips and asserts that they agree."""
+A clip's length is read from its packets, as MultimediaSearch's `media.duration` does (it is the end mms stores for the clip):
+`packet_duration` mirrors it, so that no module of the scenario imports MultimediaSearch. tests/mm runs both on the same clips and asserts that they agree."""
 
 from __future__ import annotations
 
@@ -64,8 +64,8 @@ class Clip:
 
 
 def packet_duration(path: Path) -> float | None:
-    """How long a media file plays, from its packets; None when PyAV finds nothing in it (a copy of `media.duration` of MultimediaSearch at
-    fe0ece5, without the `sound` option)."""
+    """How long a media file plays, from its packets; None when PyAV finds nothing in it (it mirrors `media.duration` of MultimediaSearch,
+    without the `sound` option)."""
     first = last = None
     try:
         with av.open(str(path)) as container:

@@ -1,4 +1,4 @@
-"""New tests (G1's repair of F3, F4 and F9 for the mm system): what `config_hash` and `store_hash` cover, what the system hands the agent, and what
+"""What `config_hash` and `store_hash` cover, what the system hands the agent, and what
 `describe` and `preview` need of a decision model. The core's half (what is written in systems.json and ingest.json, and what is refused) is
 tests/test_runner.py and tests/test_cli_build.py with a stand-in system; here is the system that has to make the hashes mean something.
 """
@@ -28,7 +28,7 @@ from mmsb.core.runfolder import RunFolder  # noqa: E402
 from mmsb.systems.mm import estimate, models, system  # noqa: E402
 from mmsb.systems.mm.system import Mm  # noqa: E402
 
-pytestmark = pytest.mark.xdist_group("mm-arm")
+pytestmark = pytest.mark.xdist_group("mm")
 
 
 # -- what the hashes cover -----------------------------------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ def test_describe_and_preview_need_the_facts_of_a_model_and_not_that_it_can_run_
 
 
 def test_a_dry_run_of_the_command_prints_the_exec_of_a_model_this_environment_cannot_run_and_starts_nothing(week, store, tmp_path, monkeypatch, capsys):
-    """`mmsb run RUN --dry-run --configs mm/d1-3B` with no torch installed (G1's F9), over the real system and the tiny week's real store."""
+    """`mmsb run RUN --dry-run --configs mm/d1-3B` with no torch installed, over the real system and the tiny week's real store."""
     from mmsb.core import dryrun
     from mmsb.core.agents import claude
     from mmsb.systems.mm import home as mm_home

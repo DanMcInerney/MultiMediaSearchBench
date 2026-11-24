@@ -1,4 +1,4 @@
-"""What a scenario gives the runner (DESIGN 5): a recipe, a dump with its questions, the prompt, the view of the data an agent reads
+"""What a scenario gives the runner (DESIGN.md): a recipe, a dump with its questions, the prompt, the view of the data an agent reads
 and the words it may not reach. The scenario knows its media and questions; it never knows a system."""
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ class Access:
     data: Path | None  # the folder the agent reads the recordings in (`Scenario.view`)
     served: Served
     answer_format: AnswerFormat  # how the final message is asked to end (core/answer.py)
-    timeout_s: float | None = None  # the seconds the exec is held to, for the prompt to say (the real scenarios' do; V7's and V8's are the recorded ones)
+    timeout_s: float | None = None  # the seconds the exec is held to, for the prompt to say (the realistic dumps' prompts do; V7's and V8's do not)
 
 
 @dataclass(frozen=True)

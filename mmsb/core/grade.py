@@ -1,5 +1,5 @@
-"""The graders of the agents' answers: pure rules, no model (moved from grade.py of the MultimediaSearch repo, fe0ece5). An answer is
-casefolded, number words become digits, times become minutes after midnight. `grade(g, answer)` grades one answer by a
+"""The graders of the agents' answers: pure rules, no model. An answer is casefolded, number words become digits, times become minutes
+after midnight. `grade(g, answer)` grades one answer by a
 question's `Grade`: its rule, truth, time and tolerance in seconds, wrong answers to refuse, `ignore` (the numbers and clock times
 the question itself holds, which an answer may repeat) and `date` (the day a time must be on, or None). An answer that hedges (a
 second number, time or date the question did not ask) is wrong."""

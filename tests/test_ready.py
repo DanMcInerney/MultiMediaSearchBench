@@ -1,6 +1,6 @@
 """Readiness before spending (the contract's `System.check_ready`, the CLI's `run` and `repeat`): a run that names a system which cannot run now
-(mm without torch, a model not downloaded) is refused before its first agent starts, where it used to run the `files` cells and fail at the
-`open` of the next system. A dry run starts nothing and asks nothing. mm's own answer, through `Mm` with no torch, is tests/mm/test_ready_mm.py."""
+(mm without torch, a model not downloaded) is refused before its first agent starts, so that no cell of another configuration runs first.
+A dry run starts nothing and asks nothing. mm's own answer, through `Mm` with no torch, is tests/mm/test_ready_mm.py."""
 
 from __future__ import annotations
 

@@ -2,7 +2,7 @@
 26 MP4 files of 360p video, 20 hours, one lecturer). The files are named for the day of the class, and the course meets on Mondays and Wednesdays
 through the term. The questions ask when the professor first mentioned something, in which lecture, in how many, how long a lecture was, what came
 before what, and what was said, and of things never said (questions.py). Every answer is from the transcripts the lectures come with; the scenario is
-the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump, speech).
+the names of a `Scenario`, as functions, over the shared builder (realdump, speech).
 
     recipe = v9_lectures.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = v9_lectures.build(recipe, folder, 3)  # the lectures copied in with their times, and the questions

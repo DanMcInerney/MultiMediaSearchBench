@@ -1,13 +1,13 @@
-"""The final answer of an exec, in the two formats a run can ask for (DESIGN 6.2), and the sentence a prompt ends with that asks for it.
+"""The final answer of an exec, in the two formats a run can ask for (DESIGN.md), and the sentence a prompt ends with that asks for it.
 
-- `line`: the format of the recorded runs. The prompt asks for one line `ANSWER: <answer>`; the answer is what follows the last such
-  line of the final message, and there is no evidence.
+- `line`: the prompt asks for one line `ANSWER: <answer>`; the answer is what follows the last such line of the final message, and
+  there is no evidence.
 - `json`: the prompt asks for one JSON object `{"answer": "...", "evidence": [...]}`. The answer is that of the last complete JSON object
   of the final message (a code fence around it is just text), which needs a string `answer` and a list `evidence` of citations. Anything
   else is a failed answer: `answer` is None and `error` says why. It is never read as a `line` answer.
 
 A citation names the moment that shows the answer in one of two ways, because an agent that has only a system's tools never sees a file
-path (DESIGN 6.2 corrected): `{"file": <path in the dump>, "t0", "t1"}` with seconds into the file, a clock time (`H:MM[:SS[.f]]`) or
+path: `{"file": <path in the dump>, "t0", "t1"}` with seconds into the file, a clock time (`H:MM[:SS[.f]]`) or
 an ISO time (the instant; with no offset, the dump's wall clock: a photo's time is written so) for the two times, or `{"source": <name>, "t0", "t1"}` with
 ISO times that carry an offset. `parse_final` is the one place a final message is
 read; `core/grounded.py` places a citation in time and scores it."""

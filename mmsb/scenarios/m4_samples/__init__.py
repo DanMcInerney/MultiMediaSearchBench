@@ -1,7 +1,7 @@
 """M4, the sound samples: one person's folder of short sound clips, thousands of them, each a few seconds of something (a door, a dog, a
 tune), in a few numbered folders under names that say nothing. The questions ask to find every clip of a sound, how many there are of
 one, and of sounds that are not in the folder (questions.py). The clips are FSD50K's evaluation split; every answer is from its labels. The
-scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump).
+scenario is the names of a `Scenario`, as functions, over the shared builder (realdump).
 
     recipe = m4_samples.recipe(scale="tiny", seed=1)       # the source, the scale's days, this machine's UTC offsets
     dump, questions = m4_samples.build(recipe, folder, 3)  # the clips copied in (samples only) with their times, and the questions

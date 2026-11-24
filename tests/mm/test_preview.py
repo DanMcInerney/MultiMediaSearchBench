@@ -1,4 +1,4 @@
-"""New tests for what U8 added to the mm system (mmsb/systems/mm/system.py): `Mm.preview`, the session of a dry run, and the figures `ingest` measures.
+"""`Mm.preview`, the session of a dry run, and the figures `ingest` measures (mmsb/systems/mm/system.py).
 
 `preview` is `open` without the daemon, the copy of the store and the model: the tests set it beside an opened session over the same store (the
 tiny week ingested once for the worker, tests/mm/conftest.py), for the jobs, the estimate and the server and instructions an exec would get, and

@@ -1,6 +1,5 @@
-"""Loading a dump into an mms home (replaces `load` of haystack.py and the remember loop and `check_snapshot` of egolife.py of this repository at
-bb498a6, which read the scenario's plan; this reads the `Dump` alone): each file remembered at its time, each log added as a source, and
-the home checked against the dump when the daemon has taken them in.
+"""Loading a dump into an mms home (it reads the `Dump` alone, never the scenario's plan): each file remembered at its time, each log
+added as a source, and the home checked against the dump when the daemon has taken them in.
 
 A file is given its time `t`, except one whose time is its own (`own_time`: a camera roll's EXIF or `creation_time`), which must come back
 stored at it, `time_from` metadata, within a second: one that does not is a `misdated` entry of the report, not an error. A file mms refuses

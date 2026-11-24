@@ -1,8 +1,8 @@
-"""What a run will ask of the machine, said before it starts (moved from bench.py of this repository at bb498a6): how many execs
-each agent and configuration has left, and about how long that takes. It asks nothing and opens no session (a system's `preview` says how
-many execs it allows at once). With a `history` (DESIGN 8.2, plan 6.1) the estimate is from the medians of what the same cell took in
-earlier runs: seconds, GPU seconds, tokens and dollars an exec. A cell with no earlier exec is counted at EXEC_MIN and said so; a median
-is the typical exec, and a few long ones (a timeout is 900 s) make a run take longer, so the mean is told beside it."""
+"""What a run will ask of the machine, said before it starts: how many execs each agent and configuration has left, and about how long
+that takes. It asks nothing and opens no session (a system's `preview` says how many execs it allows at once). With a `history` the
+estimate is from the medians of what the same cell took in earlier runs: seconds, GPU seconds, tokens and dollars an exec. A cell with
+no earlier exec is counted at EXEC_MIN and said so; a median is the typical exec, and a few long ones (a timeout is 900 s) make a run
+take longer, so the mean is told beside it."""
 
 from __future__ import annotations
 
@@ -205,7 +205,7 @@ def totals_text(t: Totals) -> str:
 def show_cells(cells: Sequence[Cell], jobs: int, gpu_jobs: int, history: bool) -> None:
     """A line for each cell and the estimate. A cell whose execs at once are not `jobs` says so, and the line after the cells says which
     configurations need the GPU and so run `gpu_jobs` (`atonce`). Without `history` (the earlier runs were not looked at) every exec is at
-    EXEC_MIN; with it, the totals at the medians of earlier runs (DESIGN 8.2) and at their means, which are what those runs took in all
+    EXEC_MIN; with it, the totals at the medians of earlier runs and at their means, which are what those runs took in all
     (the medians leave out the few long execs, a timeout is 900 s), and the cells that have no earlier exec."""
     for c in cells:
         print(cell_line(c, jobs, history))
@@ -213,9 +213,9 @@ def show_cells(cells: Sequence[Cell], jobs: int, gpu_jobs: int, history: bool) -
         print(f"  execs at once: {jobs} ({JOBS_FLAG}); {gpu_jobs} for those that need the GPU, {', '.join(gpu)} ({GPU_JOBS_FLAG}); "
               "a system may allow fewer")
     f = forecast(cells)
-    old = estimate([(c.todo, c.at_once, *((BLIND_MIN,) if c.config.system is None else ())) for c in cells], jobs)
+    plain = estimate([(c.todo, c.at_once, *((BLIND_MIN,) if c.config.system is None else ())) for c in cells], jobs)
     if not history or len(f.guessed) == sum(1 for c in cells if c.todo):  # no cell with execs to run has an earlier exec to say
-        print(f"{f.execs} execs to run, {old}" + (" (no earlier exec of these cells to take a median from)" if history else ""))
+        print(f"{f.execs} execs to run, {plain}" + (" (no earlier exec of these cells to take a median from)" if history else ""))
         return
     print(f"{f.execs} execs to run over {jobs} jobs (a system may allow fewer), from the earlier runs of these cells:")
     print(f"  at the medians, the typical exec: {totals_text(f.median)}")

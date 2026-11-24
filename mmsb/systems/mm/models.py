@@ -1,6 +1,5 @@
-"""The decision model behind a variant of mm (moved from `Model`, `serving`, `needs_gpu` and `MODELS_DIR` of bench.py of
-this repository at bb498a6; `resolve_models`, which listed the ready ones among several names, was not moved: `Mm.ready_model` asks for one): a variant is the name of a model MultimediaSearch knows (`mms model list`). A variant that is ready to run has its
-folder of weights in MODELS_DIR, its env prepared and, for a served model, its server answering."""
+"""The decision model behind a variant of mm: a variant is the name of a model MultimediaSearch knows (`mms model list`). A variant that
+is ready to run has its folder of weights in MODELS_DIR, its env prepared and, for a served model, its server answering."""
 
 from __future__ import annotations
 
@@ -65,7 +64,7 @@ def not_ready(model: Model) -> str | None:
         return f"{about.name}: not downloaded: mms model use {about.name}"
     if backend.served:
         return None if serving(backend.default_url) else (
-            f"{about.name}: not serving at {backend.default_url}: start serve.sh in WSL (DESIGN.md, 13.3)")
+            f"{about.name}: not serving at {backend.default_url}: start serve.sh in WSL (see MultimediaSearch's DESIGN.md)")
     if problem := modelenv.problem(backend, folder, None):
         # MultimediaSearch says to run `backend.install` in mms's project: here the model runs in this environment, which has it as a group
         return f"{about.name}: its env is not ready: " + problem.replace(f"run `{backend.install}` in mms's project", f"run `{MM_GPU}`")

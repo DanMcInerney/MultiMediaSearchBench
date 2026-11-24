@@ -1,16 +1,8 @@
-"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: V8, EgoLifeQA without MultimediaSearch, over a
-two-day fake download (tests/v8_fake.py) that is read, selected from, planned and built into a dump with its questions. What an agent with its
-own tools reads is tests/test_v8_view.py, the run loop and the report tests/test_v8_run.py. No real agent or model runs, and no daemon: the
-old `built` fixture started one to load a snapshot, and is the dump (`built`) and the run over it (`ran` in test_v8_run.py) here.
-What moved, by the plan's 3.4, 4.5 and 5.2:
-- `EgoRun` is `RunFolder` with the scenario `v8_egolife`; a plan question is a `Question` (questions.py); the old `built.plan()` is
-  `V8.plan_of(recipe)` and the old `bench.build` is `V8.build(recipe, out)`, which links the clips and writes the transcript into the dump
-  but does not freeze it (that is the cache's) or load a snapshot (that is mm's);
-- the tests that need the daemon, the index or the home are not here but in tests/mm (U7), and the command line's and the timeout's belong
-  to the CLI (U8). Both lists are in the unit's report.
-Every expected value is the source's or the plan's; the only changes are `arm` to `config`, the names above, the messages of
-`RunFolder.open` (U1) for those of `EgoRun.open`, the `timeout_s` that the runner writes now and not `extra`, and the assertions on
-a frozen dump, which are the cache's."""
+"""V8, EgoLifeQA without MultimediaSearch, over a two-day fake download (tests/v8_fake.py) that is read, selected from, planned and built into a
+dump with its questions. What an agent with its own tools reads is tests/test_v8_view.py, the run loop and the report tests/test_v8_run.py, and
+what needs the mm system (the daemon, the index, the home) is tests/mm/test_v8_mm.py. No real agent or model runs, and no daemon: the dump
+(`built`) is `V8.build(recipe, out)`, which links the clips and writes the transcript into the dump but does not freeze it (that is the cache's)
+or load a snapshot (that is mm's), and the run over it is `ran` in test_v8_run.py."""
 
 from __future__ import annotations
 
@@ -42,21 +34,15 @@ from mmsb.scenarios.v8_egolife import plan as plans
 pytestmark = pytest.mark.xdist_group("v8")
 
 
-V8 = scenarios.get("v8_egolife")
-
-
-pytestmark = pytest.mark.xdist_group("v8")
-
-
 def test_the_registry_has_the_scenario_by_its_name_and_it_has_the_names_of_a_scenario():
     assert scenarios.get("v8_egolife") is sys.modules["mmsb.scenarios.v8_egolife"]
     assert (V8.name, V8.code, V8.generator) == ("v8_egolife", "V8", 1)
     assert all(callable(getattr(V8, name)) for name in ("recipe", "hashes", "build", "probe", "prompt", "view", "deny_words", "after_exec",
                                                         "release", "report"))
-    assert V8.probe(None, None, None, None, 1) == ProbeOutcome("none", ()), "the recorded run's run.json says `none`: no probe"
+    assert V8.probe(None, None, None, None, 1) == ProbeOutcome("none", ()), "V8 has no probe: a public dataset"
 
 
-# -- 1. parsing -------------------------------------------------------------------------------------------------------------------
+# -- parsing -------------------------------------------------------------------------------------------------------------------
 
 
 def test_times_are_hundredths_and_days_are_numbers():
@@ -135,7 +121,7 @@ def test_a_clip_is_named_by_its_path_in_the_download_and_a_file_that_is_no_clip_
         src.clip_table(copy, 2)
 
 
-# -- 2. the horizon ---------------------------------------------------------------------------------------------------------------
+# -- the horizon ---------------------------------------------------------------------------------------------------------------
 
 
 def test_the_horizon_is_the_end_of_the_last_whole_clip(table):
@@ -170,7 +156,7 @@ def test_every_question_is_asked_as_of_a_clip_end_after_its_targets(plan, table,
                                                                 for q in questions)
 
 
-# -- 3. the selection -------------------------------------------------------------------------------------------------------------
+# -- the selection -------------------------------------------------------------------------------------------------------------
 
 
 IDS = itertools.count(1000)
@@ -263,7 +249,7 @@ def test_the_plan_names_the_clips_neutrally_and_holds_the_transcript(source, tab
     assert next(q for q in made.questions if q["qid"] == "ego-008")["source"] == "transcript"
 
 
-# -- 4. the recipe and the build --------------------------------------------------------------------------------------------------
+# -- the recipe and the build --------------------------------------------------------------------------------------------------
 
 
 def test_a_recipe_holds_the_download_the_seed_the_days_the_utc_offset_and_the_clip_table_and_the_hashes_are_those_of_its_plan(
@@ -403,7 +389,7 @@ def test_a_run_is_opened_and_refused_when_its_plan_or_generator_changed_or_the_d
         RunFolder.open(run.folder, scenarios.get)
 
 
-# -- 5. the retrieval tier's ranges ----------------------------------------------------------------------------------------------
+# -- the retrieval tier's ranges ----------------------------------------------------------------------------------------------
 
 
 def test_oracle_ranges_are_capped_at_h_and_merged():
@@ -428,7 +414,7 @@ def test_the_oracles_file_follows_the_rules_a_machine_can_check():
             assert o["question"].startswith("Does the text talk about "), id_
 
 
-# -- the review's cases ----------------------------------------------------------------------------------------------------------
+# -- the default days and the oracles' words ----------------------------------------------------------------------------------------------------------
 
 
 def test_the_default_days_cross_no_change_of_the_clocks_and_a_recipe_refuses_days_that_do(source, tmp_path, monkeypatch):

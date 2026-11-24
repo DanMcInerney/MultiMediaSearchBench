@@ -1,7 +1,7 @@
-"""`mmsb repeat` (core/repeat.py, plan 8.1): a recorded run again, its recipe built into a new run and the same agents run at the same models and
+"""`mmsb repeat` (core/repeat.py): a recorded run again, its recipe built into a new run and the same agents run at the same models and
 efforts over the same configurations and questions, then the command to compare the two. Over the toy scenario and the stand-in agents of
 tests/echo_agent.py, which return the model and the effort (Codex's) they were given as the real agents do, so that a repeat that loses a
-setting shows in the results as it would in a real run. The recorded pilot's own repeat (110 execs) is tests/oracles/test_recorded_repeat.py's."""
+setting shows in the results as it would in a real run."""
 
 from __future__ import annotations
 
@@ -208,7 +208,7 @@ def on_gpu(w, **kw) -> StubSystem:
 
 
 def test_a_repeat_runs_the_files_cells_at_jobs_and_a_system_that_needs_the_gpu_one_at_a_time_and_says_so_in_its_dry_run_before_it_builds(w, capsys):
-    """The pilot's way (plan 8.1): `files` three at once and `mm` one. With a system that cannot report its queue the working clock refuses several
+    """`files` three at once and a system that needs the GPU (as `mm` does) one. With a system that cannot report its queue the working clock refuses several
     execs, so the repeat is not refused only because the GPU system is held to one: that is the rule, not the refusal, and it comes before the build."""
     system = on_gpu(w, reports_queue=False)
     stub = Stub(pause=0.05)

@@ -1,8 +1,8 @@
-"""The listing refuses a dump whose files are not at the times they hold (G2 review, finding 2). Its only time is a file's modification time, which
+"""The listing refuses a dump whose files are not at the times they hold. Its only time is a file's modification time, which
 the question's horizon (`--until`) cuts by; V8's clips are hard links to the download, whose modification times are the download's, days after the
 recordings, so the horizon hid every clip from every question and the agent was given an empty listing (and a download that kept the server's dates
 would show clips past the horizon). `Listing.ingest` compares each file's mtime with the manifest's `t` and reports a file that is not at its time as
-`misdated`, which refuses the run in every command (core/build.py). The recorded V7 pilot is held to the same rule in tests/oracles/test_listing_pilot_times.py.
+`misdated`, which refuses the run in every command (core/build.py).
 
 Expected values are what a test planted (a file moved in time by an amount, a download made today of recordings from last week) and the tolerance the
 rule states (one second, whole seconds of a file system), not the code's."""
@@ -87,7 +87,7 @@ def test_a_v8_dump_is_refused_for_its_clips_which_carry_the_download_s_times_and
     dump, _ = built
     clips = [e for e in dump.entries if e.kind == "clip"]
     assert len(clips) == 24 and min(os.stat(dump.root / e.path).st_mtime for e in clips) > max(e.t for e in clips) + DAY, \
-        "the fake download was made after the days it holds, as the real one was (3 November, against 29 to 31 October)"
+        "the fake download was made after the days it holds, as a real one is"
     report = Listing().ingest(dump, tmp_path / "store")
     assert sorted(m.path for m in report.misdated) == sorted(e.path for e in clips), "every clip, and no transcript: its mtime is after its first line"
     with pytest.raises(Misdated, match="listing stored 24 files at a time other than their own") as refused:

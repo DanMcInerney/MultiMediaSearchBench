@@ -1,6 +1,6 @@
-"""What the two agents share (moved from claude_run.py, codex_run.py, bench.py and egolife.py of this repository at bb498a6): a
-tool's input or output read against the deny words, long data kept out of a log, a process tree ended, the PATH an exec gets, the text
-of the instructions file, and the JSON a tool's result holds. (The final answer in the message is read by core/answer.py, in the run.)"""
+"""What the two agents share: a tool's input or output read against the deny words, long data kept out of a log, a process tree ended,
+the PATH an exec gets, the text of the instructions file, and the JSON a tool's result holds. (The final answer in the message is read
+by core/answer.py, in the run.)"""
 
 from __future__ import annotations
 

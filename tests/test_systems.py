@@ -1,8 +1,8 @@
-"""New tests for mmsb/systems (the registry and the `files` system): the registry reads every system.toml as TOML and imports a system only
-when it is asked for, so the core knows the isolation of mm with mm absent; a system whose extra is missing is refused with the message
-the plan gives (4.2) and no fallback.
+"""Tests of mmsb/systems (the registry and the `files` system): the registry reads every system.toml as TOML and imports a system only
+when it is asked for, so the core knows the isolation of mm with mm absent; a system whose extra is missing is refused with the extra to
+install and no fallback.
 
-Expected values are plan 4.2's TOML (mm's isolation, copied by hand into tests/agent_spec.py by U3 before any registry existed), the
+Expected values are mm's isolation as written out by hand in tests/agent_spec.py (an independent copy of its system.toml), the
 contract's `Description` for a system with nothing to read through, and synthetic systems made here."""
 
 from __future__ import annotations
@@ -138,8 +138,6 @@ def test_the_mm_system_is_refused_with_the_extra_to_install_when_mms_is_absent()
 
     if importlib.util.find_spec("mms") is not None:
         pytest.skip("mms is installed here: the mm extra is not missing")
-    if not (ROOT / "mmsb" / "systems" / "mm" / "system.py").exists():
-        pytest.skip("mmsb/systems/mm/system.py is U7's and is not here yet, so importing mm fails for want of the module, not of the extra")
     with pytest.raises(systems.ExtraMissing) as error:
         systems.load("mm")
     assert str(error.value) == "mm needs the mm extra: uv sync --extra mm --group mm-gpu"
@@ -160,13 +158,12 @@ def test_the_files_system_has_nothing_to_ingest_or_serve_and_reads_every_modalit
     assert isinstance(session, PlainSession)
 
 
-def test_the_runner_and_the_registry_import_with_mms_and_the_old_root_modules_refused():
-    """A process whose import system refuses the old root modules (which the editable install would let through unnoticed) and
-    mms, the tests' helpers and the fake decider: the new code must not reach for any of them."""
+def test_the_runner_and_the_registry_import_with_mms_the_tests_helpers_and_the_fake_decider_refused():
+    """A process whose import system refuses mms, the tests' helpers and the fake decider: the runner and the registry must not reach
+    for any of them."""
     code = textwrap.dedent("""\
         import importlib, sys
-        BLOCKED = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts",
-                   "mms", "conftest", "day", "fake_decider"}
+        BLOCKED = {"mms", "conftest", "day", "fake_decider"}
 
         class Blocker:
             def find_spec(self, name, path=None, target=None):
@@ -191,13 +188,13 @@ def test_the_runner_and_the_registry_import_with_mms_and_the_old_root_modules_re
     assert done.returncode == 0 and done.stdout.strip() == "ok", done.stderr[-1500:]
 
 
-def test_no_file_of_the_runner_imports_an_old_root_module_or_mms_or_names_a_system():
+def test_no_file_of_the_runner_or_the_registry_imports_mms():
     import ast
 
-    old = {"bench", "claude_run", "codex_run", "egolife", "grade", "haystack", "haystack_media", "shortcuts", "mms"}
+    blocked = {"mms"}
     core = ["runner", "record", "schedule", "select", "costing", "gpu"]
     for file in [*(ROOT / "mmsb" / "core" / f"{n}.py" for n in core), ROOT / "mmsb" / "systems" / "__init__.py",
                  ROOT / "mmsb" / "systems" / "files" / "system.py"]:
         for node in ast.walk(ast.parse(file.read_text(encoding="utf-8"))):
             names = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
-            assert not [n for n in names if n.split(".")[0] in old], (file.name, names)
+            assert not [n for n in names if n.split(".")[0] in blocked], (file.name, names)

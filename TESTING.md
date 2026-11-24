@@ -1,421 +1,168 @@
 # MMSB: testing
 
-How the build is checked, what it is held to, and what has not been run. The design is in [DESIGN.md](DESIGN.md). Dated
-notes are at the end, newest last; add to them whenever testing teaches something.
+How MultiMediaSearchBench is tested, what the tests need, and what they do not cover. The design is in
+[DESIGN.md](DESIGN.md).
 
-The fast suite ran 1,198 tests on 6 November 2026, after the real scenarios were built (1,197 passed and 1 skipped, once one
-V7 check was told of the `set` rule); five more are slow. None starts a paid agent, uses the GPU, or needs the network.
-
-## 1. Environment
+## 1. Running the tests
 
 ```
-uv sync                              # Python 3.12, the core, the dev group (pytest 9.2.0, pytest-xdist 3.8.0)
-uv sync --extra mm                   # also MultimediaSearch (`mms`), from GitHub at the pinned commit: needed by tests/mm
-uv sync --frozen --no-default-groups # what the neutrality test makes: no extra, no pytest
+uv sync
+uv run pytest
 ```
 
-- **`--frozen`** uses `uv.lock` as it is and never locks again. The `mm` extra is `mms`, MultimediaSearch, a direct reference to one
-  commit (`mms @ git+https://github.com/DanMcInerney/MultimediaSearch@<commit>` in `pyproject.toml`); uv fetches it from GitHub to
-  lock and to install it, and locking needs the network for that. The lock holds torch
-  2.11.0+cu128, torchvision 0.26.0+cu128 and transformers 5.21.0 for the `mm-gpu` group, which P0 did not install.
-- **`uv sync` is exact:** it removes an extra you did not ask for. `uv run` does not. When several agents share the
-  environment, run `.venv\Scripts\python.exe -m pytest`, so `uv run` does not sync it under them.
-- **The pins matter.** `av==19.0.2`, `numpy==2.5.4`, `pillow==13.0.0` and `imageio-ffmpeg==0.7.0` are what the recorded
-  pilot's files were written with; V7's bytes depend on them. ffmpeg is `imageio_ffmpeg.get_ffmpeg_exe()` alone: none is on
-  PATH here, and the recorded sound files reproduce with it.
-- **Time zone.** V7's plan is in local time, so the oracles on the recorded pilot hold only in US Eastern time. Daylight
-  saving ended at 02:00 on 1 November 2026, so the UTC offsets at the midnights that start 1, 2 and 3 November and end the 3rd
-  are -0400, -0500, -0500, -0500. Elsewhere those oracles skip, and say which offsets they need. Windows has no `tzset`, so a
-  test cannot change zone itself.
-- **Where the files go.** Everything MMSB makes is under `MMSB_HOME` (default your home folder): `mmsb-runs`, `mmsb-data`,
-  `mmsb-cache`, `mmsb-temp` (`paths.TESTS`: where the tests put theirs) and, for the runs recorded before MMSB, `mm-bench` and
-  `mm-bench-temp`. The sources are in `MMSB_SOURCES` (default `<home>/mmsb-sources`). The tests' own runs and folders are
-  pytest's `tmp_path`s, in the system temp folder unless you move them: to keep a suite's files off a crowded system drive, set
-  `TEMP` and `TMP` to `<home>/mmsb-temp/tmp`, give pytest `--basetemp=<home>/mmsb-temp/pytest-<name>`, and `UV_CACHE_DIR=<home>/mmsb-temp/uv-cache`
-  for any uv call that could write its cache (uv copies when its cache and the environment are on two drives). The maintainer's
-  machine runs the suite with `MMSB_HOME=D:\` and `MMSB_SOURCES=D:\bench-data\sources`, and the D: paths below are those. In Git Bash:
-  `export MMSB_HOME=D:/ MMSB_SOURCES=D:/bench-data/sources TEMP=D:/mmsb-temp/tmp TMP=D:/mmsb-temp/tmp TZ=America/New_York`.
-- **The sources of the real scenarios.** `tests/test_v1.py`, `test_i3.py`, `test_a1.py` and `test_m4.py` read
-  `<MMSB_SOURCES>/{meva,caltech-camera-traps,sins,fsd50k}` and skip loudly when it is missing; `uv run mmsb fetch --scenario all`
-  fills it. `tests/test_fetch.py` needs none of it: it runs `mmsb fetch` against a local HTTP server.
-- **Test names.** None of `tests/`, `tests/oracles/` and `tests/mm/` has an `__init__.py`, and the test files import their helpers as
-  siblings, so a test file's name must be unique across the three. That is why oracle 1a is `test_v7_hashes.py` and oracle 2 is
-  `test_recorded_report.py`: `tests/test_v7_plan.py` and `tests/test_report.py` have the other names.
+`pyproject.toml` gives pytest the options `-n 4 --dist loadgroup -m 'not slow and not paid and not gpu'`, so a plain
+`uv run pytest` runs the fast tests on 4 workers. None of them starts a real agent, uses the GPU or reaches the network.
 
-## 2. The limits
+- **Time:** about 6 minutes on Windows at 4 workers, and under 2 minutes on Linux at 8 (`uv run pytest -n 8`).
+- **Why 4 workers:** a suite at 12 workers beside a GPU job once hung the GPU driver and crashed Windows. Ask for more with
+  `-n` only when nothing else is using the GPU.
+- **`--dist loadgroup`:** test files that share a costly fixture, or that run pytest or a command in a subprocess, carry
+  `@pytest.mark.xdist_group`, and xdist hands out the tests of a group together.
+- **CI** (`.github/workflows/test.yml`) runs `uv sync --locked` and `uv run --no-sync pytest` on Windows, Linux and macOS, for
+  each push to `main` and each pull request. It installs no extra and downloads no source, so there the tests in `tests/mm`
+  and the tests that read a real source skip.
 
-These hold for every test and every check:
-- **No paid agent runs:** no real `claude -p`, no real `codex exec`. Agents in tests are stand-in scripts that print made-up or
-  recorded events.
-- **No GPU:** no decision model, no d1, no `-m gpu`. The laptop's NVIDIA driver has crashed under one GPU job and under three.
-- **At most 4 pytest workers and 4 CPU processes.** A GPU run beside 12-worker suites hung the driver and crashed Windows once
-  (MultimediaSearch, then called Multimem, 30 October 2026). The default is `-n 4`.
-- **Throwaway homes.** A session fixture points `HOME`, `USERPROFILE`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR` and `MMS_HOME` into
-  a temporary folder. An audit hook fails a test that writes the real `~/.claude`, `~/.codex`, `~/.mms`, or the folders
-  MMSB keeps its runs in (`paths.RUNS`, `paths.TEMP`, `paths.CACHE`), even when the code under test swallows the error. A
-  test gives its commands an `--out`, `--temp` and `--cache` of its own. The same hook fails a test that starts a program named
-  `claude` or `codex`, or any program inside those three folders (`subprocess`, `os.system`, `os.exec*`, `os.spawn*`, and the
-  command a shell is given): a test that needs an agent puts a stand-in of another name in its place, and patches
-  `claude.check_login`.
-- **Read only:** the recorded runs in `<home>\mm-bench` and `<home>\mm-bench-temp`, MultimediaSearch's own folders, and the sources.
-- **mm tests** start MultimediaSearch's daemon only with throwaway homes and the `python:` fake decider, never with a real model.
+Three markers are left out of the default run. A marker on the command line replaces the default selection.
 
-## 3. Markers and how to run
-
-`pyproject.toml` makes the default `-n 4 --dist loadgroup -m "not slow and not paid and not gpu"`.
-
-| Marker | Means | Tests |
-| --- | --- | --- |
-| `slow` | seconds to minutes: a byte-exact build, a fresh environment | 5, run with `-m slow` |
-| `paid` | starts a real `claude` or `codex` and spends the plan's quota | none. The one old test of this kind was not ported |
-| `gpu` | loads a model on the GPU | none |
-
-```
-uv run pytest                          # the fast suite: about 8 to 10 minutes (484 s for 1,048 tests at U14's end; 489 s for 1,073 after the G2 repair; 465 s for 1,198 on 6 November)
-uv run pytest tests/mm --require-mm    # the tests that need the mm extra; a skip is a failure
-uv run pytest -m slow <file>           # one slow test file (section 4)
-```
-
-**Without the mm extra,** every test under `tests/mm` skips itself, and the summary says so in a banner: "N mm tests SKIPPED: the
-mm extra is not installed; run uv sync --extra mm". `--require-mm` turns that into a failure with exit status 1. In a fresh
-environment with no extra, U8 saw 554 passed and 9 skipped, with the banner "88 mm tests SKIPPED". With the extra it saw 652
-passed and 1 skipped in 261 s at 4 workers; the suite has grown since.
-
-Tests that run pytest in a subprocess carry `@pytest.mark.xdist_group`.
-
-## 4. The checks, and how to run each
-
-Oracles 1, 2, 3 and 5 hold the code to the recorded pilot and EgoLife runs: the expected values are the recorded files', never
-the code under test's, so a difference is a fault of the port, not of the expectation. Oracle 4 is the ported suite and N the
-neutrality check.
-
-| # | Checks | Command | Time |
+| Marker | Means | Run with | Tests today |
 | --- | --- | --- | --- |
-| 1a | V7: the plan hash and files hash equal `run.json`'s; its 1,572 files and 3 logs are the 1,575 of the recorded manifest, each with the recorded path and `mtime_ns` | `uv run pytest tests/oracles/test_v7_hashes.py` | about 2 s |
-| 1b | V7: 43 files written and compared by sha256, size and mtime. The rule: `random.Random(7)`, then in this order `sample(files of the kind, n)` for screen 12, photo 12, porch 6, mic 4, note 4, clip 3, config 2 | `uv run pytest -m slow tests/oracles/test_v7_sample.py` | 13 s (U13) |
-| 1c | V7: the whole pilot week, 1,575 files, by sha256, size and mtime; the shortcut probe passes and writes `shortcuts.json` and `.md` equal to the recorded ones but for the seconds | `uv run pytest -m slow tests/oracles/test_v7_full.py --v7-full=<home>/mmsb-temp/oracle1c --v7-workers=4 -n 0` | about 6 min to write at 4 workers, 1,377 worker-seconds, and 84 s to probe; about 8 min at the recorded build's 3 workers |
-| 1 (V8) | V8: the plan and files hash equal the recorded run's; its 50 questions and its 2,592 clips and 3 transcript files are the recorded ones. Needs the download at `D:\bench-data\egolife`, and skips loudly without it. It builds no 41 GB view | `uv run pytest tests/oracles/test_v8_plan.py` (the clip table, about 1.5 min, is marked `slow`) | a few seconds |
-| 2 | The report: the 110 pilot results (converted once) give, through `report.numbers` and `render.markdown`, the recorded `report.json` (through a short `legacy_view`) and `report.md` byte for byte. A planted flip of one `passed` makes it fail and moves `b` and `c` by one. Recorded answers regraded through `Question.grade` equal the recorded verdicts, 110 of 110 | `uv run pytest tests/oracles/test_recorded_report.py` | about 3 s |
-| 2 (V8) | The same for EgoLife: 150 results and 50 retrieval records, regraded 150 of 150; the 150 recorded prompts are the expected V8 prompts. Needs no download and holds in any zone | `uv run pytest tests/oracles/test_recorded_egolife.py` | about 3 s |
-| 3 | The exec the agents build: argv, environment, instructions, settings, `mcp.json` and catalog for the blind, files and server cells of Claude and Codex equal the goldens the old code wrote; for each of the 110 pilot execs, `settings.json`, instructions, `mcp.json`, the init event's tool list and the Codex catalog are what the agents write now. `files/text-note-code-1` is left out: `NOTES.txt` says two dry runs overwrote it. The catalog check reads `D:\mm-bench` and skips loudly without it | `uv run pytest tests/oracles/test_exec.py tests/oracles/test_goldens.py`; the `mm` cells: `uv run pytest tests/mm/test_exec_mm.py --require-mm` | a few seconds |
-| 4 | The ported suite: the 245 tests of MultimediaSearch's (then Multimem's) `test_bench_rules`, `test_haystack`, `test_haystack_media`, `test_shortcuts`, `test_agents`, `test_codex`, `test_bench` and `test_egolife`, moved by what they test (section 7). Their expectations changed only by the intended differences of section 6 | `uv run pytest` | the whole fast suite, about 8 minutes |
-| 5 | Replay: a stand-in prints a recorded `events.jsonl` and the real agents, watcher and classifier run over it inside the real `run_agents`. Classes: the 110 recorded execs when `D:\mm-bench` is there (104 normal, 3 timeouts that are killed, wrong and not asked again, 3 capped; 8 normal ones are checked in), a planted escape, a planted setup fault, and the 20 execs that ended on a lost GPU, which must come out as `setup` and be left to run again | `uv run pytest tests/oracles/test_replay.py` | about 1 min at 4 workers |
-| N | Neutrality, fast: a process that refuses `mms`, the tests' helpers and the old root modules imports the core, the scenarios and the systems but mm; two scans of the source. Slow: a fresh environment with no extra builds V7 tiny, probes it, runs a `files` cell with a stand-in, reports, and sees `mm` refused | `uv run pytest tests/test_neutral.py`; the slow one with `-m slow` | fast: seconds; slow: 36 s (U13) |
+| `slow` | seconds to minutes, such as a fresh environment made with uv | `uv run pytest -m slow` | one, in `tests/test_neutral.py` |
+| `paid` | starts a real `claude` or `codex` and spends the plan's quota | `uv run pytest -m paid` | none |
+| `gpu` | loads a model on the GPU | `uv run pytest -m gpu` | none |
 
-- **Agreement tests** (`tests/mm/test_agreement.py`, 16 tests, need the extra): what was copied from MultimediaSearch still agrees
-  with it. They check the small PyAV reader in `v7_screen/frames.py` against its reader, the writer's constants against
-  its and its fake decider's, the ffmpeg lookup, a clip's length, and the numbers the report quotes (`ASK_SHARE`,
-  the decode second, the words `ask` refuses). They fail loudly when MultimediaSearch renames or changes one.
-- **The recorded estimate** (`tests/mm/test_recorded_estimate.py`): `Session.estimate` rounds to the recorded `gpu_estimate_s`,
-  and `exclusive` and `beyond_timeout` match, for all 48 pilot and 50 EgoLife `mm` results.
-- **Seam tests** (`tests/mm/test_seam.py`): a stand-in `claude` or `codex` that speaks JSON-RPC to the real mm server through
-  the real agent path (`tests/stand_in_agent.py` is the stand-in, shared with the listing tests).
-- **How many execs run at once** (`tests/test_gpu_jobs.py`, 9 tests, and the cases of `test_repeat.py`, `test_clock_check.py` and
-  `tests/mm/test_clock_mm.py`). The owner's rule is a table written out in the test, and the runs are read from the times the
-  stand-in agent was called at: a system that needs the GPU runs one exec at a time at the defaults, `files` runs `--jobs`,
-  `--gpu-jobs N` gives the GPU cell N and `--jobs` and `--clock wall` do not; the same in `--side-by-side`; the dry run prints
-  the count each cell will run at and its wall estimate is the one worked out by hand from the counts the run was seen to run
-  (for the recorded pilot, from its recorded seconds: `files` at 3 and `mm` at 1, and again at `--gpu-jobs 2`); a warning line is
-  printed for several GPU execs and for no other; no refusal names `--clock wall`, each names one exec at a time by the option of its
-  system; `clock-check` of a system that needs the GPU refuses at the defaults, naming `--gpu-jobs 2`, and its queued half runs at
-  `--gpu-jobs` and warns. A half of `clock-check` denies the run it branched from (the run's `questions.jsonl`, `run.json` and the
-  other half's results are reached by the deny list every exec of a half is given).
-- **The working-time clock** (`tests/test_clock.py`, 23 tests; `tests/test_clock_check.py`, 13; `tests/mm/test_clock_mm.py`, 2).
-  With `now` and `queue_s` injected, a case at 950 s of wall time with 100 s queued is not over, one at 901 s of working time
-  is, and the wall cap fires whatever the queue. A system that gives no queue figure gives `clock: wall` and the recorded
-  `timeout: no answer in 900 s`, byte for byte, in both agents. A queue read live moves the end of the limit. A real process is
-  killed at a 0.2 s limit by each agent and the result holds `clock`, `working_s` and `queue_s`, while `seconds` stays the wall
-  time. More than one exec at once on the working clock is refused for a session that cannot say its queue, by `run`, in a dry
-  run too, and for both of mm's sessions. `budget_s` is checked at 300, 900 and between. For `clock-check`, over the stand-in
-  system: each case is asked alone and then queued in two folders and the table is printed; the cases come from those that
-  do not hold the system alone; and it refuses, before any agent starts and writing nothing, a system with no queue figure
-  (naming D3), one that would run the cases one at a time (the option that asks for more is named), one that holds every case
-  alone, one not ready, and a configuration that is not one system. A second command asks nothing, and a cut-off half goes on. None of this ran on a
-  shared GPU: see section 8.
-- **The listing's rule for a file's time** (`tests/test_listing_times.py`, 5 tests; `tests/oracles/test_listing_pilot_times.py`, 2).
-  A file whose mtime is not within one second of the manifest's `t` (a log: not before its first line) is `misdated`, and the
-  run is refused by every command. Over the fake V8 download (made today, of recordings of 29 and 30 October): every clip is
-  refused and no transcript, at `build`, at `ingest` and at a later `run`, before any agent and naming both times. Over a planted
-  dump, a file moved three days either way, or two seconds, is refused for that file and half a second is not. Over the recorded
-  pilot's manifest, all 1,575 entries are at their time (1,572 files exactly, 3 logs 237,409 to 237,435 s after their first
-  line), and a shift of 1.1 s refuses all 1,572 files.
-- **Planted faults.** A suite counts only once it has been seen to fail on a planted fault: for the runner, two kinds swapped in
-  `DONE_KINDS`; for `admits`, the heavy rule dropped; for deny, a word removed; for the report, a result flipped; for oracle 1,
-  one colour constant changed. G1 planted 32 faults: 21 were caught and 11 escaped; the repair pass followed (section 9). The G2
-  repair planted 24 more, one at a time and restored byte for byte, and all were caught (section 9).
-
-### 4.1 The real scenarios
-
-| Tests | Check | Time |
-| --- | --- | --- |
-| `tests/test_v1.py`, `test_i3.py`, `test_a1.py`, `test_m4.py` | each builds its `tiny` dump from the real source: names, recording times (mtime and EXIF), the joined media's lengths, the metadata; derives every question's truth again with a plain reader of the label files of its own, at `tiny` and at `standard` (labels only, no build) and over several seeds; the grader takes each truth and refuses planted near misses (a day too many or too few, a time out of tolerance, `unknown` on a needle, a made-up answer to an absent question); the probe passes on the tiny dump; one `mmsb build`, `run` and `report` through the CLI with a stand-in agent | 8 to 20 s each on one worker |
-| `tests/test_realdump.py` | the shared builder: files written with their times, the probe (a label's phrase and its words, in a name or a metadata text), the seeded split, the prompt in each way of reaching the files, the deny words (and that none of the four scenarios' words is in ordinary code), the recipe's time zone | about 1 s |
-| `tests/test_set_rule.py` | the `set` rule (an exact set of dates or of file names, its F1 beside it) and the question file's `grade.items` | about 1 s |
-| `tests/test_summary.py` | the neutral report over runs written by hand: leaks out of every figure but the filter's, results to run again left out, each configuration beside the control, several scenarios pooled | about 1 s |
-
-Each full-size dump was built once and probed by hand (section 9 has the times and sizes); no test builds one.
-
-### 4.2 The real-agent smoke run (paid, by hand)
-
-Run it after each update of the Claude or Codex CLI, and before a paid full run. It spends about $1 of Claude and a little of
-Codex's quota, and takes about 5 minutes.
+One option is the suite's own: `--require-mm` fails, instead of skipping, the tests in `tests/mm` when the `mm` extra is not
+installed.
 
 ```
-uv run mmsb build --scenario i3_trailcam --scale tiny --configs files,listing --out <home>/mmsb-temp/real/runs --temp <home>/mmsb-temp/real/data --cache <home>/mmsb-temp/real/cache
-uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2 --dry-run
-uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --jobs 2
+uv run pytest tests/test_grade.py        # one file
+uv run pytest tests/mm --require-mm      # the tests of the mm system; a missing extra is a failure
+uv run pytest -m slow                    # the slow test
+```
+
+## 2. What the tests need
+
+| Tests | Need | Without it |
+| --- | --- | --- |
+| most of `tests/` | `uv sync` alone | |
+| the real scenarios (`tests/test_v1.py`, `test_i3.py`, `test_a1.py` and the others named after a scenario) | that scenario's source on disk, in the folder `MMSB_SOURCES` names (else `mmsb-sources` in the MMSB home); `uv run mmsb fetch --scenario <name>` downloads it | the tests that read the source skip and give the folder they looked in. The tests of the same files that work on made-up data still run |
+| `tests/mm` | the `mm` extra: `uv sync --extra mm` | every file skips, and the summary ends with a banner: "N mm tests SKIPPED: the mm extra is not installed; run uv sync --extra mm" |
+| the slow test | `uv` on PATH, and the network if uv's cache lacks a package | it skips |
+
+- **Throwaway homes.** For the whole session `HOME`, `USERPROFILE`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR` and `MMS_HOME` lead into
+  a temporary folder, so code that looks for your agent setup finds an empty one.
+- **The guard.** An audit hook in `tests/conftest.py` fails any test that changes your real `~/.claude`, `~/.codex` or
+  `~/.mms`, or the folders MMSB keeps real runs, data and cache in (`mmsb-runs`, `mmsb-data` and `mmsb-cache` under
+  `MMSB_HOME`, else your home folder). The test fails even when the code under test swallowed the error. A test gives its
+  commands an `--out`, `--temp` and `--cache` under its own `tmp_path`.
+- **No real agent.** The same hook fails a test that starts a program named `claude` or `codex`, or any program inside those
+  three folders, whether directly or through a shell. A test that needs an agent uses a stand-in of another name.
+- **Where the tests write.** Each test writes under pytest's `tmp_path`. The slow test makes its environment in `mmsb-temp`
+  under `MMSB_HOME`; a run denies its agents that folder, because the tests' questions hold answers. To keep the tests'
+  files off the system drive, pass `--basetemp` a folder under `mmsb-temp`.
+- **The mm tests** start MultimediaSearch's daemon only over a folder under pytest's temp folder, with a fake decision model
+  that needs no GPU. Fixtures in `tests/mm/conftest.py` keep them off Hugging Face and off a real `uv`.
+- **Windows only.** Some tests skip elsewhere, each with its reason, among them directory junctions and Windows permissions
+  (`tests/test_fs.py`), Git for Windows (`tests/test_agents.py`) and drive letters (`tests/test_cache_cli.py`).
+- **Pinned packages.** `av`, `numpy`, `pillow` and `imageio-ffmpeg` are pinned because the bytes of the generated V7 week
+  depend on them. ffmpeg comes from `imageio-ffmpeg`; none needs to be on PATH.
+
+## 3. How the tests are laid out
+
+`tests/` and `tests/mm/` have no `__init__.py`, and test files import their helpers as siblings. The two folders share one
+namespace, so every file name must be unique across both (`tests/test_clock.py`, `tests/mm/test_clock_mm.py`).
+
+### Stand-ins
+
+No test runs a real agent or a real model. These take their places:
+
+| File | What it is |
+| --- | --- |
+| `tests/stub_system.py` | a system, a session and an agent for the tests of the runner, with the folders of a run. It starts no process |
+| `tests/echo_agent.py` | agents whose result says the model and effort they were given, as the real ones' results do |
+| `tests/stand_in_agent.py` | a `claude` or `codex` process run through the real agent code: it finds the server as the agent does, starts it, speaks JSON-RPC to it and writes the stream the agent writes |
+| `tests/agent_spec.py` | the session specs of the four modes of an exec (blind, files, a server, a server and files), written by hand |
+| `tests/ghost_system.py` | a system whose package is not installed, for the refusal of a missing extra |
+| `tests/cli_world.py` | a registry with the system `stub` and the scenario `toy`: V7's plan over a dump of three small files |
+| `tests/cache_world.py` | a scenario that counts its builds and a system that counts its ingests |
+| `tests/listing_world.py` | a small dump with secrets planted in its files, and a real MCP client to the listing's server |
+| `tests/v8_fake.py` | a two-day fake EgoLife download with tiny clips |
+| `tests/speech_check.py` | a second, plain reader of the transcripts of the speech scenarios, which derives each truth again |
+| `tests/mm/fake_decider.py` | a decision model that answers from content the test knows (a word, a colour, a pitch), in the real model's answer shapes |
+| `tests/mm/env_decider.py` | the fake decider, which also writes down the environment of the process it runs in |
+| `tests/mm/fakes.py` | what the mm tests share: the fake model as a variant of the system, the tiny V7 week built and ingested once for a worker, a session over a copy of that store |
+| `tests/mm/seam.py` | a stand-in agent process over the real mm session and its real server |
+| `tests/mm/day.py`, `corpus.py`, `model_folders.py` | a made-up day of files, two PDF writers, and model folders without weights |
+
+### What covers what
+
+| Part | Tests |
+| --- | --- |
+| The run loop | `tests/test_runner.py`, `test_select.py` (which questions a configuration is asked), `test_config.py`, `test_ready.py` |
+| How many execs run at once | `test_gpu_jobs.py`, `test_schedule.py`, `test_schedule_run.py`, `test_schedule_cli.py` |
+| The working-time clock | `test_clock.py`, `test_clock_check.py` |
+| The agents | `test_agents.py` (command lines, what a session may use, reading a stream), `test_codex.py` |
+| Questions, answers and grading | `test_question.py`, `test_answer.py`, `test_answer_run.py`, `test_grade.py`, `test_set_rule.py`, `test_grounded.py`, `test_taxonomy.py` |
+| Reports and statistics | `test_report.py`, `test_stats.py`, `test_summary.py`, `test_compare.py`, `test_repeat.py`, `test_costing.py` |
+| The cache and the run folder | `test_cache.py`, `test_cache_cli.py`, `test_runfolder.py`, `test_fs.py` |
+| The command line | `test_cli.py`, `test_cli_build.py`, `test_cli_v8.py`, `test_catalogue.py` |
+| `mmsb fetch` | `test_fetch.py`, `test_fetch_piles.py`, against a local HTTP server; any other address fails the test |
+| The shortcut probe | `test_probe.py`, `test_v7_probe.py` |
+| The generated week (V7) | `test_v7_plan.py`, `test_v7_media.py`, `test_v7_frames.py`, `test_v7_questions.py`, `test_v7_scenario.py` |
+| EgoLifeQA (V8) | `test_v8.py`, `test_v8_view.py`, `test_v8_run.py`, over the fake download |
+| The real scenarios | `test_realdump.py`, `test_speech.py` and `test_speech_files.py` for what they share, and one file for each scenario: `test_v1.py` to `test_v4.py`, `test_v9.py`, `test_v10.py`, `test_i1.py` to `test_i4.py`, `test_i7.py` to `test_i9.py`, `test_a1.py`, `test_a3.py`, `test_a4.py`, `test_a6.py` to `test_a8.py`, `test_m3.py`, `test_m4.py` |
+| The systems registry and `files` | `test_systems.py` |
+| The `listing` system | `test_listing.py`, `test_listing_run.py`, `test_listing_times.py` |
+| The `mm` system | `tests/mm/` |
+| Neutrality | `test_neutral.py` |
+| The suite's own setup | `test_conftest.py` |
+
+- **A real scenario's tests** build its `tiny` dump from the source, derive every answer again with a plain reader of the
+  labels that is the test's own, check that the grader takes each truth and refuses planted wrong answers, run the leak
+  probe, and for most run `mmsb build`, `run` and `report` with a stand-in agent.
+- **The mm tests** run the real system and its real daemon with the fake decider: what a session serves an agent, what keeps
+  one exec's state out of the next, the cache, readiness, the dry run's preview, and that the small copies V7 holds of
+  MultimediaSearch's reader and constants still agree with the installed package (`tests/mm/test_agreement.py`).
+- **Neutrality** (`tests/test_neutral.py`): a process that refuses to import `mms` imports the whole core, every scenario and
+  every system but `mm`; a scan of the syntax finds no import of `mms` outside `mmsb/systems/mm` and `tests/mm`; and a scan
+  of `mmsb/core` and `mmsb/scenarios` finds no system named. The slow test makes a fresh environment with no extra, builds
+  the tiny V7 week, runs a `files` cell with a stand-in agent, writes a report and sees `mm` refused.
+
+## 4. What the tests do not cover
+
+- **No test runs a real agent.** Every agent in the suite is a stand-in, so a change in the Claude Code or Codex command
+  line shows only in a real run.
+- **No test loads a real decision model.** The mm tests use the fake decider.
+- **Real agent runs have been made only on Windows 11.** The tests pass on Linux and macOS, but Codex's sandbox and Claude's
+  shell tool are untried there.
+- **The markers `paid` and `gpu` have no tests yet.** They are there so that a test of either kind can be added without
+  joining the default run.
+- **No test builds a full-size dump.** The tests build the `tiny` scale and plan the larger ones from the labels.
+- **Not run yet with real agents:** the working-time clock (`mmsb clock-check`) and more than one GPU exec at a time. Their
+  tests use stand-ins.
+
+To check the real agents by hand, run a small paid run. It spends a little of each agent's quota:
+
+```
+uv run mmsb fetch --scenario i3_trailcam
+uv run mmsb build --scenario i3_trailcam --scale tiny --configs files,listing
+uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2 --dry-run
+uv run mmsb run <run> --agents claude,codex --configs files,listing --limit 2
 uv run mmsb report <run>
 ```
 
-Read each result's `answer`, `answer_error` and `grounded`, and the exec's `final.txt` for any that is not right: an
-`answer_error` on a right answer is a fault of the reader, not of the agent. The `listing` cells should be right only on the
-absent question. Section 9 has what the first one showed.
+## 5. Before a pull request
 
-**What waits for the maintainer** (the pilot re-run, the first `mm+files` run, the clock check) is in DESIGN.md section 12.2, with its
-commands and costs.
+```
+uv sync
+uv run pytest
+```
 
-## 5. The goldens
+- All of the default run passes. If your change touches the `mm` system, also run `uv sync --extra mm` and
+  `uv run pytest tests/mm --require-mm`.
+- A change to a scenario is checked with its source on disk: read the skips in the summary, and fetch the source if the
+  scenario's tests are among them.
+- `mmsb/core/` imports and names no system: `tests/test_neutral.py` checks it.
+- A new test file needs a name no other file in `tests/` or `tests/mm/` has, and writes only under its `tmp_path`.
+- A test that needs a real agent or the GPU is marked `paid` or `gpu`, and one that takes more than a few seconds `slow`.
 
-The recorded runs are the pilot (`D:\mm-bench\20261104-0314-pilot-s1`, 4 November 2026) and EgoLife
-(`D:\mm-bench\20261103-0257-egolife-s1`, 3 November). Their small files are copied into `tests/oracles/recorded/` (2.7 MB), and
-`recorded.json` there holds where each came from and the sha256 of every copied file. `tests/oracles/test_goldens.py` checks
-the set as a whole before anything is held to it: that nobody edited a file, that there is an entry for each of the 110 execs,
-that every file of the data folder is hashed once, and that the two sources of the exec goldens agree where they overlap.
-
-**Capture commands.** Each refuses to write where its output exists. A golden is never regenerated to make a test pass: if one
-is wrong, delete it on purpose and say why in the log below.
-
-| Script | Wrote | Run |
-| --- | --- | --- |
-| `tests/oracles/capture_recorded.py` | `pilot-s1/`: byte copies of `run.json`, `data-manifest.json`, `shortcuts.json`, `shortcuts.md`, `report.json`, `report.md`; `sha256.json` (the sha256 of all 1,575 files of the data folder, hashed in one process); `execs.json` (what each of the 110 execs wrote before it ran); `instructions/<sha>.md`; `replay/` (8 small execs, 2 for each cell); `egolife-s1/{run.json,report.json,report.md}`; `recorded.json` | `uv run python tests\oracles\capture_recorded.py [--pilot RUN] [--egolife RUN] [--out recorded]` |
-| `tests/oracles/capture_exec.py` | `exec/`: argv, environment, instructions, settings, `mcp.json` and catalog for Claude and Codex in the blind, files and mm modes, and `deny-v7.json`, `deny-v8.json`; `capture.json` says where it came from | `%MMS_CHECKOUT%\.venv\Scripts\python.exe tests\oracles\capture_exec.py` (`MMS_CHECKOUT` is the search tool's checkout), with the old modules read by `git show bb498a6:<file>`. No CLI is started and nothing is asked. Run once, with the tool as `multimem`; not run again after the rename (section 6, difference 15) |
-| `tests/oracles/convert_recorded.py` | `pilot-s1/converted/` and `egolife-s1/converted/`: the results in the new format (`arm`, `model` become `config`, `system`, `variant`; nothing else changes), `questions.jsonl` from the new writers, `systems.json`, `run.json`; and `egolife-s1/prompts.json` | `uv run python tests\oracles\convert_recorded.py [pilot\|egolife\|egolife-prompts] [--run RUN] [--out DIR]`, in US Eastern time |
-
-- **Why the exec goldens are captured and not read.** No recorded run holds an argv. Exec folders hold instructions, prompt,
-  settings, `mcp.json`, catalog, events, tools, final and stderr, so the argv could only come from the code that built it.
-- **Not checked in:** the recorded timeout, capped and GPU-lost replay sources (230 to 650 KB each), the 54 recorded Codex
-  catalogs (648 KB each), and EgoLife's `clips.json` and `data-manifest.json`. Those checks read `D:\mm-bench` and skip loudly
-  without it. The Codex catalogs have two sha256 values: `ac5d2260...` for the 30 `files` execs that were not overwritten, and
-  `e67870b7...` for the 24 `mm` execs and the overwritten one.
-- **Two things that are assumptions.** The golden Claude argv has `--effort high`, the module's default, because no recorded
-  result holds Claude's effort (`agent_effort` is `None`). The golden for mm's instructions is built from MultimediaSearch's skill as it was then (Multimem's),
-  41 characters longer than the recorded one (section 6, difference 3), and with its old names (difference 15).
-- **Deny-list goldens** use the sentinels `D:\__RUN__`, `D:\__TEMP__`, `D:\__OUT__`, `D:\__ROOT__` and the tag `TAG`.
-
-## 6. Intended differences
-
-Each is asserted by a test, not ignored. The expected exec of a recorded run differs from the new one in these ways only.
-
-| # | Difference | Reason |
-| --- | --- | --- |
-| 1 | The server command's python path | a new venv |
-| 2 | Run, home, slot and data paths | a new run; the goldens use placeholders |
-| 3 | 5 lines of mm's skill: "nervelet simulator" is "robot simulator", "this machine" is "the developer's machine", 41 characters in all | MultimediaSearch (then Multimem) changed since the pilot. An exact line map in `tests/mm/test_exec_mm.py` fails, saying which lines, when the skill changes again |
-| 4 | `MM_CLAUDE_MODEL`, `MM_CLAUDE_EFFORT`, `MM_CODEX_MODEL`, `MM_CODEX_EFFORT` are `MMSB_*` | the names should not say mm |
-| 5 | V7's prompt stamp: the pilot used the real clock (4 November, 11:27 to 15:01), the new one a fixed `Question.now`, noon on the day after the last day. The test masks that first sentence for V7 only | DESIGN 6.1 wants a fixed now (C12) |
-| 6 | V7's `clock_note` when the wall clock is over an hour past `now`. V8 recorded it always, so V8 asserts it | the sentence is true then; mm's `searched.now` shows the real clock |
-| 7 | Deny words: `/mmsb-runs/`, `/mmsb-cache/` added; `/mm-bench/` stays, with `mm-bench-temp` and this repository's main checkout; module words added; `.mms` comes from `system.toml` (the golden has `.multimem`: difference 15) | the new layout; the old answers stay on the same disk (G1 F1) |
-| 8 | `timeout_s` is in every result, not only V8's | the core records it |
-| 9 | The `mm+files` cell has no golden: its argv, settings and instructions are written by hand from the design, and its `line` prompt ("unknown when mm and these files do not hold it") is pinned by a test of its literal text | it was never recorded |
-| 10 | A grader spec reads `rule` and `tol_s` where the old read `kind` and `tol_min`; a spec with no `date` key is no longer possible | the question file (DESIGN 6.1) |
-| 11 | The window count: V8's clips by a span rule, a sound by one window for each of its windows | see DESIGN 10.1 (C5). The estimate still equals the recorded one for every `mm` result |
-| 12 | A retrieval record's `warnings` is a sorted set and `seconds` is rounded to 2 decimals | the contract returns them so |
-| 13 | A skipped mm model is an error, "No agent results yet" is an error naming `systems.json`, `--controls all` is gone, the limits line says "its work" and "GPU seconds", and `show_agents` counts every configuration at `--jobs` (the old "mm at 1 job" is the system's to lower, and says so). There is no standalone `probe` command | the move to configurations and `Session` |
-| 14 | The runner reads the answer from the agent's final message; the agents no longer return `answer` | grounded answers (DESIGN 6.2) |
-| 15 | The names the search tool changed on 7 November 2026, when Multimem became MultimediaSearch: package and command `multimem` and `mm` are `mms`, `MULTIMEM_*` is `MMS_*`, `.multimem` is `.mms`, `multimem.toml` is `mms.toml`, the skill `multimem-questions` is `mms-questions`, and the tool's name in its own text. The goldens are not re-recorded: `tests/golden_names.py` holds the map (`RENAMES`), applied where a test reads a golden (`golden_text`, `golden_bytes`, `golden_json`), each entry with its reason; the rest of a golden is still compared byte for byte | the tool was renamed; the benchmark's own names stay: the system id `mm` (and so the MCP server `mm` in every `mcp.json`, `mcp__mm__ask`, and the base line's "the mm tools"), `no-mm-home`. Asserted by `tests/test_golden_names.py` and by every comparison above |
-| 16 | Lines of mm's skill that the tool gained after the goldens, in its commit `facd716` (MultimediaSearch, 7 Nov 2026): the `region` bullet of `look`, the `best_first` bullet, a second line on `limit`, `stopped` saying `limit` never ends a `best_first` scan, and a new rule 5, "A look-alike is not the thing" (the old rule 5 is 6): 5 changes, 1,243 characters, in `SKILL_CHANGES` of `tests/golden_names.py`, each the exact old text and the exact new text, applied after the renames | the tool's skill changed on purpose. `tests/test_golden_names.py` holds the list to its use: each entry is once in each of the four instruction goldens and in no other, and `tests/mm/test_exec_mm.py` finds the served text, with both lists applied, equal to the golden, so a skill that changes again fails `tests/mm/test_exec_mm.py`, saying which lines |
-
-## 7. Tests not ported
-
-Multimem's 245 tests were moved by what they test, and a ported file's first line names its source and commit (the tool at
-`fe0ece5`, when it was called Multimem). Their names do not map one to one: by name, 42 are not found in the new suite, because "arm" became
-"configuration", or a test was split between the core and `tests/mm`, or its subject went. They were not checked one by one.
-What the files themselves and the unit notes say was left out:
-
-| Left out | Why |
-| --- | --- |
-| `test_codex_recalls_the_day` | a paid test: 19 questions to a real `codex exec` over the old recall tier. It and its fixtures went |
-| `test_bench_rules`: a grader case with no `date` key | a `Grade` cannot lack one; the question loader refuses a line without it |
-| `test_agents`: two refusals about a missing home or working folder | the spec always has them |
-| `test_agents`, `test_codex`: `guidance="none"` | it went with the old recall CLI (`codex_run.main` and `prompt`), which nothing in this repository called |
-| `test_the_haystacks_open_refuses_a_run_of_another_dataset` | the `dataset` key of `run.json` and the two commands (`bench.py`, `egolife.py`) are gone; `mmsb` opens any run by its `scenario` |
-| `test_a_run_is_built_with_neutral_frozen_data` (V8) | a frozen dump is the cache's now, and `tests/test_cache.py` tests it |
-
-Moved, not dropped: the junction test to `tests/test_fs.py`; the lost-GPU test to `tests/test_runner.py` (it is a rule of the core,
-keyed on `Description.needs_gpu`); the real agents' timeout test to the agents' tests (the spec carries the timeout); the home,
-daemon, scrub, window-estimate and model tests to `tests/mm` (128 tests); the V8 tests that need a daemon to
-`tests/mm/test_v8_mm.py`; the dry-run print of asks that may not finish, to `tests/test_cli.py`. A test that mixed the two halves
-(`test_a_run_is_built_copied_and_continued`, `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`,
-`test_models_are_resolved_the_gpu_is_checked_and_the_prompt_differs_only_in_the_arm`) was split, its neutral half in the core's
-tests and its mm half in `tests/mm`. Two (`test_a_files_exec_may_open_only_its_own_slot_and_its_folders_have_no_name_that_tells_the_week`
-and `test_a_changed_distractor_with_no_version_bump_is_caught_by_the_files_hash`) have successors with other names in
-`tests/test_runfolder.py`.
-
-## 8. Not verified
-
-Nothing in P0 ran a real agent, the GPU, or the real model. The smoke run of 6 November 2026 (4.2, 9) has since shown real
-Claude (Sonnet) and Codex answering the `json` request in `files` and through the listing server, and real Claude reading from
-two `--add-dir` folders under `--restricted` and refused a file outside them. No test could show, and nothing has yet:
-- real Claude and Codex with the `mm+files` prompt; real Claude with mm's `looks` folder itself as the second `--add-dir`;
-- a full run of any of the four real scenarios with real agents, and the time and cost of one;
-- `mmsb repeat` end to end, and the times of the dump build and the ingest in the new code (none recorded);
-- a V8 build of the whole dump from `D:\bench-data\egolife` (its plan is checked; its dump is not), and the refusal of `listing`
-  there, which is seen only over the fake download (the real clips' mtimes are the download's, 3 November, against 29 to 31 October);
-- the CLI end to end with the real mm and the GPU;
-- the pilot-scale rename in the cache (antivirus could lock a folder during `os.replace`, and there is no retry), and the POSIX
-  branch of the cache lock;
-- the clock on a shared GPU, and the wall effect of its wait loop under load; Ctrl+C during `clock-check` or a side-by-side run;
-- the wall-time saving of side-by-side (paper only, `simulate`); a POSIX daemon restart, which would inherit Claude's
-  `CUDA_VISIBLE_DEVICES=-1` (it does not apply on this machine);
-- whether the labels of the real scenarios miss what a careful person would see or hear: the questions avoid the labels the
-  review judged unsure (DESIGN 5.7), but nobody has watched the MEVA video or listened to the FSD50K clips to check.
-
-(`run --dry-run --agents codex` failed in P0 because Codex did not list the pinned model; on 6 November 2026, with codex-cli
-0.159.3, it passes and the real run went through.)
-
-## 9. Log
-
-The notes before 7 November 2026 call the search tool Multimem (package `multimem`, command `mm`); it is now MultimediaSearch (`mms`).
-
-### 2026-11-04: measured while planning
-
-All offline, with Multimem's venv.
-
-| Fact | Result |
-| --- | --- |
-| The copied modules against Multimem's current `benchmarks/` | no behaviour difference; differences were a path insert, docstrings, one default (`MODELS_DIR`) and unused names |
-| Multimem since the pilot's commit | HEAD `fe0ece5` is 4 commits past `7895548` plus dirty; no functional scan change. The skill changed in 5 lines: Claude's instructions were 25,821 characters when recorded and 25,862 now; Codex's 27,364 and 27,405 |
-| The V7 plan and files hash | reproduce exactly from the copy: plan `cfdb321d22e4...`, files `b1406b488821...`, in under 2 s |
-| The V7 hash and the time zone | days 1 to 3 November cross the daylight-saving change (-0400 to -0500); Windows has no `tzset` |
-| V7 files | 1,572 files and 3 logs, 1,575 manifest entries, 31 questions; the data folder is 465,254,840 bytes and matches the manifest in every file |
-| V7 byte reproducibility | a 43-file sample rewrote sha256-identical to the recorded files. A full write is about 1,377 worker-seconds, about 5.7 min at 4 workers. The recorded build took 11:23 with load and probe, on a shared laptop |
-| The probe | run again it gives no failures in 84 s; `shortcuts.json` identical but for `seconds`, `shortcuts.md` but for its seconds line |
-| The old report code on the recorded runs | the pilot and EgoLife: 0 JSON differences, Markdown identical, about 3 s each, torch not imported. The repository's `results/*/report.json` is byte-equal to `D:\mm-bench`'s |
-| Regrading the recorded answers | `grade(q.grade, r.answer) and problem is None` equals the recorded `passed` in 110 of 110 pilot and 150 of 150 EgoLife results |
-| Argv | not recorded anywhere; captured from the old code |
-| Multimem's remote | none (`git remote -v` prints nothing), so `mmsb[mm]` is a path source |
-| Tooling | uv 0.9.10; `uv python list` shows 3.14, Multimem's venv has 3.12 |
-| Fixture sizes | the pilot's results 105,580 bytes and EgoLife's 308,923 (its decider records 175 KB): small enough to check in |
-| `mm` time arguments in the recorded runs | all 365 `since` and `until` are ISO; no relative ages; 2 `find` calls with no `until` |
-
-The recorded totals the costs in DESIGN 12.2 rest on: the pilot's 110 execs took 13,044 session-seconds and 3,655 GPU-seconds
-and cost $19.00 at list for 50.3M tokens, about 173 minutes of wall time plus 11 minutes to build. Per `mm` exec: Codex 63 s,
-48 GPU-s, about 113k tokens; Claude 123 s, 104 GPU-s, $0.11, about 164k tokens.
-
-### 2026-11-05: the P0 build
-
-- **U0, the skeleton.** The environment (left without the `mm` extra, which U7 added), the pins, and the goldens captured from the
-  recorded runs: 110 exec entries and 1,575 hashes. `D:\mm-bench` was only read.
-- **Stage 1, U1 to U8.** The shared foundation, V7 without Multimem, the agents, the runner, the report, V8 without Multimem,
-  `systems/mm`, the command and the deletion of the nine root files. At the end of U8: 652 passed and 1 skipped with
-  `--require-mm -n 4` in 261 s; in a fresh environment with no extra, 554 passed and 9 skipped, the banner "88 mm tests
-  SKIPPED", and `--require-mm` exit 1. U7 compared `systems/mm` with the old code function by function (an AST comparison): 37
-  identical and 21 different on purpose.
-- **G1, an independent review.** Every oracle passed in the reviewer's own hands. The whole pilot dump built by the command in an
-  environment with no Multimem: 1,575 files, 0 differ. Ingested through `Mm.ingest`: 1,572 items and 6,029 records, 0 differ from
-  the recorded index. The goldens, captured again from the old code, were genuine. 32 faults were planted: 21 caught and 11
-  escaped. It made 14 findings (F1 to F14), among them: an agent could read the pilot's answers on the same disk (F1); a rewrite
-  of the data froze other bytes into the run (F2); no file said which Multimem and skill a result ran with (F3); and opening
-  the file `look` names counted as an escape (F4).
-- **The G1 repair.** All of F1 to F14, a seam helper, and the masking of `close`'s error. The suite: 696 passed, 1 skipped.
-- **Stage 2, U9 to U13.** Grounded answers; case selection, `compare` and `repeat`; `listing` (957 passed and 1 skipped in 11:33
-  at `-n 2`; the slow neutrality test passed in a fresh environment); cached ingest; side-by-side scheduling (1,011 passed and 1
-  skipped in 7:33). The dry run of the pilot repeat prints 110 execs, 13,044 session-seconds and 3,655 GPU-seconds, equal to the
-  recorded ones.
-- **U14, the working-time clock.** `--clock` on `run` and `repeat`, `mmsb clock-check`, and one wait loop for both agents. 1,048
-  passed and 1 skipped in 484 s; the slow neutrality test passed in 55 s; 39 planted faults were all caught. No golden changed.
-  Two of U14's own test runs called the real `claude auth status` (read only, in the tests' throwaway home) before the fixture
-  patched `check_login`.
-- **U15, these documents,** were written beside U14 and corrected from its notes. The suite then collected 1,054 tests
-  (`pytest --collect-only -q -n 0 -m ""`).
-
-Not run in P0: see section 8 and DESIGN.md section 12.
-
-### 2026-11-05: the G2 repair
-
-G2's review passed every oracle and found one blocker. The repair, in one pass, with one coder:
-- **Finding 1, execs at once on the GPU.** `core/atonce.py` is the one rule (`--gpu-jobs`, default 1, for a system that needs the GPU;
-  `--jobs` for the others), asked by the runner, `show_agents`, `show_limits`, `check_clocks`, `show_repeat`, `check_queue` and
-  `clock-check`; `repeat` passes both options to its run. The refusals name `--gpu-jobs 1` or `--jobs 1`, never `--clock wall`.
-- **Finding 2**, the listing refuses a dump whose files are not at their time (tolerance one second); DESIGN 3.2 and 7.3 say so.
-  **Finding 3**, a clock-check half denies its parent run (`RunFolder.parent`). **Finding 4**, `EXCLUSIVE`, `GPU_ESTIMATE_S` and
-  `BEYOND_TIMEOUT` are in `core/contract.py`, and mm imports them. **Finding 5**, `grounded.check_groundable` refuses a `json` run
-  with a question that cannot be grounded, in `run_agents` and the dry run. **Finding 6**, the unused import and `resolve_models`
-  are gone. **Finding 7**, the README and DESIGN 3.2, 12.1 and 12.2 were corrected. **Finding 8**, three printed wordings.
-- **The guard.** The audit hook of `tests/conftest.py` now also refuses to start a real `claude` or `codex` or a program in the
-  owner's folders. Before it, nothing did: two test runs in U14 had reached the real `claude auth status`.
-- **Tests changed because the owner's rule did:** `test_clock_mm.py` (the refusal of mm at `--jobs 3` is now at `--gpu-jobs 2`; the
-  dry run at `--jobs 3 --clock wall` and the message that named `--clock wall` are gone; clock-check at `--jobs 1` said "1 at a
-  time, not 1"), `test_repeat_pilot.py` (`run_argv` takes `--gpu-jobs`; the dry run's counts are now checked against the
-  recorded seconds), `test_repeat.py` (`run_argv`; the refusal of a system with no queue figure now names `--jobs 1` and not
-  `--clock wall`, and two tests are new for a system that needs the GPU), `test_clock.py` (`check_queue` takes the description),
-  `test_clock_check.py` (the "one at a time" message), `test_runner.py` (`show_agents` takes `gpu_jobs`), `test_cli.py` (`JOBS`
-  moved to `atonce`), `listing_world.py` and `test_listing.py` (an entry's `t` is its file's mtime plus 0.4375 s, since the
-  listing now compares them; the leak check still finds a copy of `t`), `test_mm_arm.py` (`resolve_models` was removed; its test asks
-  `Mm.ready_model`), `test_conftest.py` and `conftest.py` (the guard).
-- **Result, run in US Eastern time with `--require-mm -n 4`:** 1,072 passed and 1 skipped in 489 s (8:09). The recorded-report, recorded-EgoLife, exec, goldens,
-  replay oracles and the slow neutrality and V7 sample tests passed, unchanged. No golden or recorded file changed.
-- **24 faults were planted**, one at a time in the worktree and restored byte for byte (a hash of `mmsb/` and `tests/` was the
-  same before and after), and all were caught: the rule ignoring `needs_gpu`; the runner, the dry runs, `show_repeat` and
-  clock-check each asking `--jobs` of a GPU system; `run_argv` and `run_command` dropping `--gpu-jobs`; the refusal offering the
-  wall clock or naming the wrong option; no warning; the listing reporting nothing misdated, a 3 s tolerance, a log held to a
-  point; the half not naming its parent; two result keys changed in `contract.py` (the recorded report oracle caught both);
-  `check_groundable` never raising or never called; three faults in the guard; the old wording of the questions. One planted fault
-  was left in `mmsb/cli.py` for a minute when the first run of the script was stopped by hand, and put back from its exact text.
-- Other projects' pytest runs (rtb-fleet) were running on the laptop beside these runs, so the times above are slower than U14's.
-
-### 2026-11-06: the real scenarios
-
-The plan was: the shared builder, the `set` rule, the neutral report and four scenarios, in two units, each gated by one
-independent review and at most one repair pass.
-- **Gate 1** (the builder, the rule, the report and I3, before three makers copied them) found ten faults, repaired in one
-  pass: among them, an answer could not repeat the question's own numbers, the probe passed a file it could not read, and a
-  burst of photos was cited by one frame.
-- **Unit 2** (V1, A1, M4, by three makers at once, one worker each) brought one fault of the shared grader: the "3" of "cam3"
-  was read as a number, so a count answer that named its camera was wrong.
-- **Gate 2** (the whole change) re-derived every truth it drew (I3, V1 and M4 over several seeds, all of A1's) with readers of
-  its own and found them right. Its findings, all repaired in one pass:
-  - a right "nothing there" that names a camera, a folder or a file was wrong (a regression of Unit 2's fix);
-  - "sins" and "meva", deny words, are in `isinstance` and `timevalue`, so an agent's own script would end its exec as an escape;
-  - the probe looked only for a label's whole phrase;
-  - a photo cited by its EXIF time (`2013-09-17T01:09:35`) made the answer unparsed;
-  - the hour after midnight of the trail camera was written as noon (375 photos); birds, which a labeller may miss, and a fox
-    beside night coyotes were asked; one last visit was the card's last motion photo, which the file list gives away;
-  - M4 kept the sounds easily taken for the ones it asks (bells beside a gong, typing beside a printer);
-  - A1's TV labels sit up to a minute from the set's sound, too near the 60 s tolerance for an answer in HH:MM;
-  - V1 asked about manoeuvres with another one seconds away, and windows across the recorder's stop;
-  - the pooled report did not mark the leak check.
-  Left as they are, with the reason: each scenario repeats about 50 lines of the protocol's plumbing (moving it into
-  `realdump` is a refactor with no caller asking); a file's modified time is its start, not the time it was closed (DESIGN 5.7);
-  a later U-turn on V1's far camera could still be taken for a reverse by someone who looks only at the end.
-- **The real-agent smoke run** (4.2), on the I3 tiny card, two questions, before the Gate 2 repairs to I3: Codex `files` 2 of 2,
-  both grounded (48 s an exec); Codex `listing` right only on the absent one; Claude `files` right on the absent one, and on the
-  bird question its answer, 2013-12-22 citing `IMG_0190.JPG` with `"t0": "2013-12-22T16:05:20-08:00"`, was recorded unparsed.
-  That was the reader's fault (a file took no ISO time) and is fixed; read again, the answer passes. Claude cost $0.37 and
-  $0.51 an exec. The run stopped Claude's `listing` cells itself: the plan was at 98% of its use. One `claude -p` with
-  `--restricted` and two `--add-dir` folders read a file in each and was refused one outside them ($0.02).
-- **The full-size dumps,** each built once and probed with the new probe, then deleted: V1 5.5 GiB in 8 s (stream copy);
-  A1 2.6 GiB in 67 s; I3 1.8 GiB in 24 s (375 photos at 00:xx, 204 at noon, the names in time order); M4 5.0 GiB in
-  45 s. Every probe passed.
-- **The fast suite, once at the end:** 1,196 passed, 1 skipped and 1 failed in 465 s at 4 workers, in US Eastern time. The
-  failure was a V7 check that every rule but `choice` is in its grading table; `set` is tested in `test_set_rule.py`, and the
-  check now says so. No golden or recorded file changed.
-
-### 2026-11-07: the search tool is MultimediaSearch (`mms`)
-
-The `mm` system's tool, Multimem, was renamed: package, distribution and command `mms`, `MMS_*` variables, `~/.mms`, `mms.toml`, the
-skill `mms-questions`. It is public at github.com/DanMcInerney/MultimediaSearch, and `mmsb[mm]` is a git source pinned to commit
-`66db891` (`pyproject.toml`, `uv.lock`); a machine locks and installs it from GitHub, with no checkout. MMSB's own names stay: the system
-id `mm`, the MCP server `mm` in every agent's `mcp.json` (`mcp__mm__*`; the goldens, the recorded init events and the base line say so),
-`no-mm-home`.
-- **The goldens are not re-recorded.** `tests/golden_names.py` holds two lists, applied where a test reads a golden: `RENAMES` (10
-  entries, each with its reason) and `SKILL_CHANGES` (5 entries, one reason: section 6, difference 16). `tests/test_golden_names.py`
-  holds both to their use. The comparisons of the rest of each golden are unchanged.
-- **The tool's text changed beyond names.** Its skill gained, in its commit `facd716` (after the goldens' `fe0ece5`, before the rename),
-  the `region` bullet of `look`, the `best_first` bullet, a second line on `limit`, a longer `stopped` line and a new rule 5, "a
-  look-alike is not the thing" (1,243 characters). Before they were listed, the 8 tests of `tests/mm/test_exec_mm.py` that compare the
-  served instructions with the goldens failed on exactly those lines and nothing else; listed, they pass, and the comparison is not looser.
-- **The baseline,** 136 passed in `tests/mm`, was run against the local checkout on its `prototype` branch at `fe0ece5`, whose skill
-  matched the goldens; the pinned commit is later, so its skill is the one of difference 16.
-- `Mm.version_of` gives the short commit of a git install (from `direct_url.json`), as it did for a checkout; the version `0.1.0`
-  alone would not tell two commits apart.
+[CONTRIBUTING.md](CONTRIBUTING.md) has the rest.

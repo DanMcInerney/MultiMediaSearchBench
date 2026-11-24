@@ -1,8 +1,7 @@
 """The retrieval tier: each system asked, with no agent, the yes/no of a needle over its source and range, and the ranked moments it
-gives scored against the question's truth (moved from `oracle`, `run_decider`, `span_of`, `meets`, `touched`, `needle_p`, `outcome`,
-`verdicts` and `decider_figures` of bench.py of this repository at bb498a6, and `oracle_record` of egolife.py). The asking is the
-system's (`Session.oracle`); the scoring and the records are here. One record holds the fields of both scenarios' old records, and
-`decider_figures` turns the records of a run into the tier's figures for the report.
+gives scored against the question's truth. The asking is the system's (`Session.oracle`); the scoring and the records are here. One
+record holds the fields of both scenarios' records, and `retrieval_figures` turns the records of a run into the tier's figures for the
+report.
 
     results/retrieval/<Config.dir>/<qid>.json    one record for each question (`retrieval_record`)
     results/retrieval/<Config.dir>/warm.json     {"config", "seconds"}: how long the session took to open, loaded and warm
@@ -30,13 +29,13 @@ LEVELS = ("part", "day", "week", "time")  # how vague a question's time hint is;
 NEAR_P = 0.5  # a needle's best p from which a miss is a near miss
 
 # the wordings of a verdict on a needle question that a configuration did not find
-SUSPECT = "haystack suspect"
+SUSPECT = "data suspect"
 CALIBRATION = "below its model's hit (calibration)"
 MISS = "this model's miss"
 STOPPED = "stopped on a false sighting before the needle"
 CUT = "cut at max_s before the needle"
-ONE_MODEL = "one model ran: the agent arm's look, or a second family, tells a miss from a haystack fault"
-ONE_FAMILY = "one family ran: the agent arm's look, or a second family, tells a miss from a haystack fault"
+ONE_MODEL = "one model ran: the agent's look, or a second family, tells a miss from a data fault"
+ONE_FAMILY = "one family ran: the agent's look, or a second family, tells a miss from a data fault"
 OUTCOMES = ("found", "near", "stopped", "cut", "missed")
 
 
@@ -146,11 +145,11 @@ def verdicts(rs: list[dict]) -> dict[str, str]:
     """For one needle question and the records of each configuration asked it: the verdict, by `config`, on each that did not
     find it.
     - A near miss is below its model's hit (calibration).
-    - A scan that ended before the needle (`stopped`, `cut`) says nothing of the model's eyes or the haystack, and is told as it
+    - A scan that ended before the needle (`stopped`, `cut`) says nothing of the model's eyes or of the data, and is told as it
       is; it does not count as a family that ran.
     - A miss is the model's when any model found the needle, or a model of another family had it in its top 5.
-    - Only when nobody found it and models of two or more families scanned it and none had it in the top 5 is the haystack
-      suspect. With one family this tier cannot tell (the agent arm's look can)."""
+    - Only when nobody found it and models of two or more families scanned it and none had it in the top 5 are the data
+      suspect. With one family this tier cannot tell (an agent's own look at the files can)."""
     fair = [r for r in rs if outcome(r) in ("found", "near", "missed")]
     families = {family(r["config"]) for r in fair}
     found = any(outcome(r) == "found" for r in rs)
@@ -170,7 +169,7 @@ def verdicts(rs: list[dict]) -> dict[str, str]:
     return out
 
 
-def decider_figures(runs: Sequence[RunFolder]) -> dict:
+def retrieval_figures(runs: Sequence[RunFolder]) -> dict:
     """The tier's figures: per configuration and type, from the records of all runs, and per template who found it, nearly missed
     it or missed it, with the verdicts."""
     records: dict[str, list[dict]] = {}

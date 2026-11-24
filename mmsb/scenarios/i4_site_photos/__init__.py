@@ -2,7 +2,7 @@
 "Harbour Road"), of cracks, peeling paint, spalling, algae, staining and plain wall. The questions are the inspector's: which photos on this
 job show cracks, how many show algae, did I photograph any spalling there, find the photo of the staining; and some are about a defect a job
 has none of (questions.py). BD3's labels are the truth: one class per photo, which may show a little of another, so a question is which
-photos are labelled so (questions.py says how it is kept certain). The scenario is the names of a `Scenario`, as functions (DESIGN 5), over
+photos are labelled so (questions.py says how it is kept certain). The scenario is the names of a `Scenario`, as functions, over
 the shared builder (realdump).
 
     recipe = i4_site_photos.recipe(scale="tiny", seed=1)      # the source, the days of the visits, this machine's UTC offsets

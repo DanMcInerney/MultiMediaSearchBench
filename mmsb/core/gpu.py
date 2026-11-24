@@ -1,5 +1,5 @@
-"""Whether the GPU is free to run a system's model on, and whether it is still there (moved from bench.py of this repository at
-bb498a6; `check_gpu` is keyed on `Description.needs_gpu` where it was keyed on the model)."""
+"""Whether the GPU is free to run a system's model on (`check_gpu`, for a system whose `Description.needs_gpu`), and whether it is
+still there."""
 
 from __future__ import annotations
 
@@ -9,11 +9,11 @@ import subprocess
 
 from mmsb.core.contract import Description
 
-# Windows' own desktop, which nvidia-smi may list as a compute app (explorer.exe, 2026-11-06, with its memory "[N/A]", as every
-# process's is under Windows' display driver): it loads no model, and no run would start beside it
+# Windows' own desktop, which nvidia-smi may list as a compute app (explorer.exe, with its memory "[N/A]", as every process's is under
+# Windows' display driver): it loads no model, and no run would start beside it
 DESKTOP = ("explorer.exe", "dwm.exe")
-# the process ids, separated by commas, that the owner lets a run share the GPU with (2026-11-07: a test suite of another project and
-# the Codex app's on-device model, 1.4 GB in all, that the owner chose to run beside): ids, not names, so nothing else slips by
+# the process ids, separated by commas, that the owner lets a run share the GPU with (a test suite of another project, say, or the Codex
+# app's on-device model): ids, not names, so nothing else slips by
 BESIDE = "MMSB_GPU_BESIDE"
 
 
@@ -60,7 +60,7 @@ def check_gpu(description: Description) -> None:
 
 def gpu_lost() -> str | None:
     """Why the GPU cannot be read any more, else None: after a driver crash nvidia-smi says "GPU is lost", a model worker cannot
-    load, and an agent answers from the little else it has (2026-11-04: 18 results so before anything noticed)."""
+    load, and an agent answers from the little else it has, so a run stops when it finds the GPU gone."""
     try:
         gpu_busy()
     except (RuntimeError, OSError, subprocess.SubprocessError) as e:

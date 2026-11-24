@@ -1,6 +1,6 @@
 """The manifest of a written V7 week: a `ManifestEntry` for each file of the plan and each log, which is what a system and the question
-writer see of the dump. Sizes, mtimes and sha256 are measured (`measure_disk`) or given, so the entries of the recorded pilot can be
-made from its recorded manifest with no data folder."""
+writer see of the dump. Sizes, mtimes and sha256 are measured (`measure_disk`) or given, so the entries can be made from a manifest already measured,
+with no data folder."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from mmsb.core.contract import LogSource, ManifestEntry
 from mmsb.scenarios.v7_screen.plan import LOG_SOURCE, PHONE, Plan
 
 MEDIA = {"photo": "image", "clip": "video", "screen": "video", "porch": "video", "mic": "audio", "note": "text", "config": "text"}
-LOGS = LogSource(name=LOG_SOURCE, folder="logs", glob="*.jsonl", time_field="ts")  # the log source, as `bench.build` added it
+LOGS = LogSource(name=LOG_SOURCE, folder="logs", glob="*.jsonl", time_field="ts")  # the log source of the week's logs
 
 
 def file_rows(plan: Plan) -> list[list]:

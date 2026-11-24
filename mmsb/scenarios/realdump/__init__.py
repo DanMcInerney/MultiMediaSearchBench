@@ -35,8 +35,8 @@ WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", 
 MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 SOURCES_ENV = "MMSB_SOURCES"  # the folder that holds the sources, one folder per source (`meva`, `sins`, ...)
 SHORTEST_WORD = 6  # a shorter folder name ("data") is in ordinary output, and would refuse innocent commands
-# The rule an agent with its own tools is held to, said: in the first baseline Codex hunted the disk for Python (C:\Users, Program
-# Files, AppData), its output named the owner's agent setup, and the exec ended as an escape, wrong by a rule it was never told.
+# The rule an agent with its own tools is held to, said to it: an agent that hunts the disk for Python (C:\Users, Program Files,
+# AppData) prints the owner's agent setup, and its exec ends as an escape, wrong by a rule it was never told.
 STAY = ("Your tools and ffmpeg are all you have: nothing else on this computer is yours to use or look at, and a command that reaches "
         "outside the files' folder and your working folder ends your answer as wrong.")
 LIMIT = "You have {:g} seconds: if you have not answered by then, you are stopped and the answer counts as wrong."  # what `--timeout` holds an exec to

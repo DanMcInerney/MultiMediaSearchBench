@@ -1,6 +1,5 @@
-"""Claude Code asked a question (TESTBED.md, Benchmark; moved from claude_run.py of this repository at bb498a6): one `claude -p`
-for the `SessionSpec` it is given, locked down to the tools of its mode, in the way `codex.py` locks down Codex. A dry run
-(`prepare`) runs nothing. It never reads, copies or moves a file of `~/.claude`: Claude reads its own login.
+"""Claude Code asked a question: one `claude -p` for the `SessionSpec` it is given, locked down to the tools of its mode, in the way
+`codex.py` locks down Codex. A dry run (`prepare`) runs nothing. It never reads, copies or moves a file of `~/.claude`: Claude reads its own login.
 
 `ask_claude` returns `{final, tools, events, seconds, clock, working_s, queue_s, turns, tokens, cost_usd, used_percent, model, denials,
 problem, argv, stderr}`: the last message (the run reads the answer in it, core/answer.py), what Claude called and got back (a tool's bare
@@ -57,21 +56,20 @@ from mmsb.core.clock import WorkingClock
 from mmsb.core.contract import Isolation, McpServer
 from mmsb.core.runfolder import OFF_GPU_ENV
 
-# The files arm's Bash runs ffmpeg alone (FILES_ALLOWED), and Claude is told so: in the pilot it was denied a `cd ... && find`,
-# took Bash for gone and answered "unknown" without trying ffmpeg. Codex needs no such line: its shell is the sandbox's, whole.
+# The files configuration's Bash runs ffmpeg alone (FILES_ALLOWED), and Claude is told so: refused a `cd ... && find`, it takes Bash
+# for gone and answers "unknown" without trying ffmpeg. Codex needs no such line: its shell is the sandbox's, whole.
 # Claude Code (2.1.x) parses no Bash command longer than LONGEST_COMMAND characters, so a longer one matches no allow rule and
-# dontAsk refuses it: in the baseline of 2026-11-06 an 11,000-character ffmpeg montage was refused twice, and Claude took ffmpeg
-# itself for denied and gave up. The line says so, and names redirects too: a `2> file` is a write, which no rule allows (refused
-# three times in that baseline's V1).
+# dontAsk refuses it: given a refused 11,000-character ffmpeg montage, Claude takes ffmpeg itself for denied and gives up. The line
+# says so, and names redirects too: a `2> file` is a write, which no rule allows.
 LONGEST_COMMAND = 10_000
 BASE_FILES = ("You answer the user's question from their files, using your tools. Bash runs ffmpeg only: start each Bash "
               f"command with ffmpeg (no cd, pipes, redirects, && or other programs), keep it under {LONGEST_COMMAND:,} characters "
               "(a longer one is refused), and write what it makes in your working folder. "
               "Find and read files with Glob, Grep and Read; Read shows you the pictures ffmpeg writes.")
 
-# `claude --help` (2.1.302) does not list --max-turns or --append-system-prompt-file, but both are taken (checked on
-# 2026-11-02). If a later version refuses one, set PROMPT_FILE to False (the text then goes in --append-system-prompt,
-# about 26k characters, under Windows' 32k command line) or MAX_TURNS to None (no cap).
+# `claude --help` (2.1.302) does not list --max-turns or --append-system-prompt-file, but both are taken. If a later version
+# refuses one, set PROMPT_FILE to False (the text then goes in --append-system-prompt, about 26k characters, under Windows' 32k
+# command line) or MAX_TURNS to None (no cap).
 PROMPT_FILE = True
 MAX_TURNS: int | None = 60
 BUDGET_USD = 5.0  # a list-price estimate per exec; the plan's own limit is separate
@@ -88,7 +86,7 @@ ENV_SET = {"CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",  # no user, project or auto-me
            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1", "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
            "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",  # a backgrounded call's result is lost in -p
            "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1"}
-ENV_DROP = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")  # -p uses a key when one is set; the bench uses the plan
+ENV_DROP = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")  # -p uses a key when one is set; the benchmark uses the plan
 ENV_DROP_FILES = ("VIRTUAL_ENV",)  # and, from an agent with its own tools, these and the variables `Isolation` names (the owner's)
 
 MCP_PREFIX = re.compile(r"^mcp__.+?__")  # of a tool the session names `mcp__<server>__<tool>`
@@ -258,7 +256,7 @@ def check_init(event: dict, spec: SessionSpec) -> str | None:
         return "the init event lists no tools, so what the session can use is unknown"
     want, have = set(session_tools(spec)), set(map(str, tools))
     if have != want:
-        return f"the session's tools are not the {spec.arm} arm's: extra {sorted(have - want)}, missing {sorted(want - have)}"
+        return f"the session's tools are not the {spec.mode} configuration's: extra {sorted(have - want)}, missing {sorted(want - have)}"
     servers = event.get("mcp_servers") or []
     if not isinstance(servers, list):
         return f"the init event's mcp_servers is not a list: {servers!r}"
@@ -268,7 +266,7 @@ def check_init(event: dict, spec: SessionSpec) -> str | None:
         if servers[0].get("status") != "connected":
             return f"the {spec.server.name!r} server is {servers[0].get('status')!r}, not connected"
     elif servers:
-        return f"the {spec.arm} arm's session has MCP servers: {servers!r}"
+        return f"the {spec.mode} configuration's session has MCP servers: {servers!r}"
     if event.get("plugins"):
         return f"the session has plugins: {event['plugins']!r}"
     if event.get("apiKeySource") not in (None, "none"):
@@ -310,7 +308,7 @@ def check_event(event: dict, spec: SessionSpec, session: str | None = None) -> s
             continue
         name = str(block.get("name"))
         if name not in allowed:
-            return f"claude used {name!r}, which is not one of the {spec.arm} arm's tools: the restriction failed"
+            return f"claude used {name!r}, which is not one of the {spec.mode} configuration's tools: the restriction failed"
         if name in FILES_TOOLS and (hit := reached(own_outputs(ran_of(block), session), spec.deny, opens=spec.served.opens)):
             return f"{name} reached {hit}"
     return None
@@ -493,7 +491,7 @@ def ask_claude(spec: SessionSpec) -> dict:
     reader.join(30)
     stderr_file.close()
     figures = clock.figures()
-    seconds = figures.pop("wall_s")  # (what `seconds` has always been: the wall time of the process)
+    seconds = figures.pop("wall_s")  # (`seconds` is the wall time of the process)
     stderr = (run_dir / "stderr.txt").read_text(encoding="utf-8", errors="replace")[-2000:]
     done = result_of(events, process.returncode, stderr)
     problem = stopped[0] if stopped else timed_out or done["problem"]

@@ -1,9 +1,8 @@
-"""Which questions a run asks and which a configuration is asked. The subset a run is asked and what each configuration without tools
-of its own is asked, which is what its system reads, moved from bench.py of this repository at bb498a6: a configuration with tools of
-its own reads every modality, so it is asked every question. The choosing of cases is new (DESIGN 8.2, plan 6.1): `select` narrows a
-run's questions by scenario, kind, modality, split and tag; `discriminating` keeps those that separated configurations in earlier runs,
-with canaries; `stratified` draws a seeded sample that keeps the mix of kinds. A selection names the qids it picks, and the run is
-asked exactly those (`--only`)."""
+"""Which questions a run asks and which a configuration is asked. The subset a run is asked, and what each configuration without tools
+of its own is asked, which is what its system reads: a configuration with tools of its own reads every modality, so it is asked every
+question. The choosing of cases (DESIGN.md): `select` narrows a run's questions by scenario, kind, modality, split and tag;
+`discriminating` keeps those that separated configurations in earlier runs, with canaries; `stratified` draws a seeded sample that keeps
+the mix of kinds. A selection names the qids it picks, and the run is asked exactly those (`--only`)."""
 
 from __future__ import annotations
 
@@ -56,8 +55,9 @@ def pick_controls(questions: Sequence[Question]) -> list[Question]:
 
 
 def pilot_questions(questions: Sequence[Question], reads: Iterable[frozenset[str]]) -> list[Question]:
-    """The pilot: the media questions of the modalities some system of the run reads (`reads`; pictures and video when there is
-    none), and 3 controls, in the questions' order. A scenario that marks its own pilot questions (a `pilot` tag) has those."""
+    """The pilot subset (`--subset pilot`): the media questions of the modalities some system of the run reads (`reads`; pictures and
+    video when there is none), and 3 controls, in the questions' order. A scenario that marks its own pilot questions (a `pilot` tag)
+    has those."""
     if any("pilot" in q.tags for q in questions):
         return [q for q in questions if q.tags.get("pilot")]
     heard = {k for r in reads for k in r} & set(MEDIA) or {"image", "video"}
@@ -67,9 +67,9 @@ def pilot_questions(questions: Sequence[Question], reads: Iterable[frozenset[str
 
 def selected(questions: Sequence[Question], subset: str, descriptions: Mapping[Config, Description | None],
              only: Sequence[str] = ()) -> list[Question]:
-    """The questions a run asks: all of them, or the pilot's; with `only`, just those qids of them (a smoke). `descriptions` are
-    those of the run's configurations (None for one with no system): the pilot's media are what the systems read that have no
-    tools of their own."""
+    """The questions a run asks: all of them, or those of the pilot subset; with `only`, just those qids of them (a smoke).
+    `descriptions` are those of the run's configurations (None for one with no system): the pilot's media are what the systems read
+    that have no tools of their own."""
     if subset not in SUBSETS:
         raise ValueError(f"a subset is one of {', '.join(SUBSETS)}, not {subset!r}")
     reads = [d.reads for c, d in descriptions.items() if d is not None and not c.own_tools]

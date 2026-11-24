@@ -521,7 +521,7 @@ def results() -> None:
     c.save("results")
 
 
-def pilot() -> None:
+def generated_week() -> None:
     W, H = 1600, 690
     c = Canvas(W, H)
     c.text(50, 30, "A generated week: as many right answers, for far less work", size=40, weight="bold")
@@ -545,7 +545,7 @@ def pilot() -> None:
                 c.text(x + 38 + w, yy + 18, fmt.format(value), size=22, weight="bold", va="center", color=TEXT if j else MUTED)
                 c.text(x + pw - 22, yy + 18, label, size=15, color=DIM, ha="right", va="center")
         c.text(x + 26, y0 + ph - 74, wrap(note, 50), size=16, color=MUTED, linespacing=1.4)
-    c.save("pilot")
+    c.save("generated-week")
 
 
 def egolife() -> None:
@@ -573,7 +573,7 @@ def egolife() -> None:
 
 
 FIGURES = {"hero": hero, "piles": piles, "how-it-works": pipeline, "catalogue": catalogue, "questions": questions,
-           "results": results, "pilot": pilot, "egolife": egolife}
+           "results": results, "generated-week": generated_week, "egolife": egolife}
 NEED_DATA = ("hero", "piles")
 
 

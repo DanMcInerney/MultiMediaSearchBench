@@ -1,9 +1,8 @@
-"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4), `test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields`
-(test_bench.py:933-971): which questions a configuration is asked, the pilot and the controls. `family` and `arm_jobs` are the mm
-system's and are tests/mm's (U7). `model` is the configuration and `About.reads` is `Description.reads`; the expected sets are written
-from the questions' own modalities, and the controls' rule is the source's: a needle of text, one of records and an absent one, each with
-a retrieval run (the old oracle) and the least vague hint, the qid breaking ties. The tests from "choosing cases" down are new (plan 6.1):
-the expected values are worked by hand, from the strata and the results the test writes, not from the code under test."""
+"""Which questions a configuration is asked, the pilot and the controls. `family` and `config_jobs` are the mm system's and are tested in
+tests/mm. The expected sets are written from the questions' own modalities, and the controls' rule is: a needle of text, one of records and
+an absent one, each with a retrieval run and the least vague hint, the qid breaking ties. The tests from "choosing cases" down check the
+draw of questions and the choice of those that discriminate: the expected values are worked by hand, from the strata and the results the
+test writes, not from the code under test."""
 
 from __future__ import annotations
 
@@ -95,7 +94,7 @@ def test_selected_gives_all_the_pilot_or_the_named_ones_of_them_and_refuses_what
     assert [q.qid for q in selected(QUESTIONS, "all", d, ["audio-mic-alarm-1"])] == ["audio-mic-alarm-1"]
 
 
-# -- choosing cases (DESIGN 8.2, plan 6.1) --------------------------------------------------------------------------------------------
+# -- choosing cases -------------------------------------------------------------------------------------------------------------------
 
 def strata_of(scenario_sizes: dict[tuple[str, str], int]) -> list:
     """Questions made from a real one, `size` of each (scenario, kind) stratum, qids numbered within it."""

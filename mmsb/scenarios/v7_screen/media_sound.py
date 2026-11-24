@@ -9,7 +9,7 @@ and every other sound's pitch is at least `PITCH_GAP` from both, which `mic_samp
 A doorbell has `notes` (a pair of DOORBELL_PAIRS, the first is the pitch to ask for) and `dur` CHIME_DUR; an alarm has `hz` (of ALARM_HZ)
 and `dur` ALARM_DUR; a distractor sound names no `hz` (`pick_hz` takes its kind's own, by its `seed`) and may name a `gain` (1 by
 default; a beeper or a timer at 2 is louder than the alarm and the chime, which a sort by loudness in the needle's band must not take
-for the needle). Moved from haystack_media.py of the repository at bb498a6."""
+for the needle)."""
 
 from __future__ import annotations
 

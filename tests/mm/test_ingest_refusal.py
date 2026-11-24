@@ -1,6 +1,6 @@
-"""New tests for the finding of U7's notes, over the real mm system: `Mm.ingest` reports a file it stored at a time other than its own as
+"""Over the real mm system: `Mm.ingest` reports a file it stored at a time other than its own as
 `misdated`, and a run is refused for it, by name, through the core (mmsb/core/build.py, which names no system); a file it refuses is in the report with
-its reason (G1's F7). The neutral half, with a stand-in
+its reason. The neutral half, with a stand-in
 system, is tests/test_cli_build.py; this is the same route with the real `ingest` of the system that can make the report (the fake decider: no
 model is loaded, and ingest loads none)."""
 
@@ -52,8 +52,8 @@ def test_a_run_over_a_real_mm_store_that_holds_a_photo_at_another_time_than_its_
 
 
 def test_a_file_mm_refuses_is_in_the_report_with_its_reason_and_the_store_is_made_and_kept(week, tmp_path):
-    """G1's F7: the daemon refuses a file (here one that is not there), `remember` collects it, and the check that the home holds the dump used to
-    count it missing and raise, so the reason was lost and the next try found a store that 'did not finish'."""
+    """The daemon refuses a file (here one that is not there) and `remember` collects it: the check that the home holds the dump does not count it
+    missing and raise, which would lose the reason and leave a store that 'did not finish'."""
     _, dump, _ = week
     note, other = [e for e in dump.entries if e.kind == "note"][:2]
     root = tmp_path / "data"
@@ -73,9 +73,9 @@ def test_a_file_mm_refuses_is_in_the_report_with_its_reason_and_the_store_is_mad
 
 
 def test_a_file_with_the_bytes_of_an_earlier_one_is_one_item_with_it_and_in_the_report_naming_it(week, tmp_path):
-    """The first mm baseline: I3's camera wrote five pairs of identical photos of one moment, and FSD50K holds one clip twice; mms left the
-    second of each unchanged and the ingest stopped. Each is a refused file now, naming the first, at the same time or not. (mms keeps one
-    item for a picture, sound or video of its source's bytes, whatever its time; a file of text it keeps each time.)"""
+    """A camera may write identical photos of one moment, and a sound dataset may hold one clip twice: mms leaves the second of each unchanged. It is
+    a refused file in the report, naming the first, at the same time or not. (mms keeps one item for a picture, sound or video of its
+    source's bytes, whatever its time; a file of text it keeps each time.)"""
     _, dump, _ = week
     photo = next(e for e in dump.entries if e.kind == "photo")
     root = tmp_path / "data"

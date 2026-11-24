@@ -1,4 +1,4 @@
-"""The listing system (DESIGN 3.2, plan 6.2): the floor and the leak filter. The agent gets a listing of the dump's files, their paths, sizes,
+"""The listing system: the floor and the leak filter. The agent gets a listing of the dump's files, their paths, sizes,
 times, EXIF tags and container fields, through two tools, and no way to open a file (`--tools ""`; the server is given no path to the dump).
 A question it answers right is answerable from metadata, or from what the model knows, and the report flags it (`Description.leak_filter`).
 
@@ -33,7 +33,7 @@ LISTING = "listing.jsonl"  # in the store
 BASE = "You answer the user's question from a listing of their files: paths, sizes, times and the metadata the files carry. You cannot open the files."
 HOLDER = NAME  # the word the prompt's sentences use for it, as "mm"
 MODALITIES = frozenset({"image", "video", "audio", "text", "records"})  # every question is asked of it: it is a filter, not a reader
-INGEST_VERSION = 1  # bumped when ingest writes something other than before
+INGEST_VERSION = 1  # bumped when ingest changes what it writes
 
 
 def sha_of(*parts: object) -> str:

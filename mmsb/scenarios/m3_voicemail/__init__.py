@@ -4,7 +4,7 @@ its letters to the carriers in 31 cases (Social Security, Amazon and Apple order
 and their times are invented (a seeded spread over nine weeks; the source has none). The questions ask to find every message that mentions a
 scheme, how many do, whether and when the first did, which one a name is in, what amount or percentage one named by its minute said, who it
 said it was from, and of schemes that no message has (questions.py). The truth is from the dataset's machine-made transcripts (Whisper's
-medium model), so what a message "says" is what its transcript has; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over
+medium model), so what a message "says" is what its transcript has; the scenario is the names of a `Scenario`, as functions, over
 the shared builder (realdump).
 
     recipe = m3_voicemail.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets

@@ -22,7 +22,6 @@ The fast tests need no agent, no GPU and no network, and take about 6 minutes. C
 - `mmsb/core/` imports and names no system: `tests/test_neutral.py` checks it.
 - Answers are graded by fixed rules. A change must not add a model as a judge.
 - Nothing is tuned on `test` questions: use the `dev` split.
-- The files under `tests/oracles/recorded/` and `tests/mm/tables/` are compared byte for byte. Do not reformat them.
 - Never commit media, and never put a dataset where its licence forbids it (SINS may not be passed on).
 
 ## Reporting a result

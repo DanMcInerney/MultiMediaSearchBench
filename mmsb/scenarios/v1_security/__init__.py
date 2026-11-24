@@ -1,7 +1,7 @@
 """V1, the security cameras: three fixed outdoor cameras over roads and car parks (MEVA, Kitware's labels), 75 minutes each, one MP4 of
 each unbroken run of the recorder's five-minute clips (the recorder stopped for five minutes at 10:35). The questions ask when an activity
 (a trunk opened, a car reversing) was first or last seen on a camera, how often it happened in a window, and of activities that
-never happened (questions.py). Every answer is from the labels; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over the
+never happened (questions.py). Every answer is from the labels; the scenario is the names of a `Scenario`, as functions, over the
 shared builder (realdump).
 
     recipe = v1_security.recipe(scale="tiny", seed=1)      # the source, the scale's day, this machine's UTC offsets

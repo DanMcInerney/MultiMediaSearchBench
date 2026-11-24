@@ -1,4 +1,4 @@
-"""New tests (G1's repair of F5, F11's a15 and F3's provenance of mm): what keeps one exec's state out of the next one's, through the real session and a
+"""What keeps one exec's state out of the next one's, through the real session and a
 real daemon with the fake decider and nothing patched, and the rules by which a session holds a case back, called directly.
 
 A fake daemon answers in milliseconds, so the real run cannot show a late label or an interrupted exec's label that the system forgot to take out; here
@@ -16,7 +16,7 @@ pytest.importorskip("mms")
 
 import fakes  # noqa: E402
 from fakes import FAKE_MODEL, Opened, context  # noqa: E402
-from test_mm_arm import NoDaemon, labels_left  # noqa: E402
+from test_mm_config import NoDaemon, labels_left  # noqa: E402
 
 from mmsb.core.contract import Case  # noqa: E402
 from mmsb.systems.mm.daemon import Api  # noqa: E402
@@ -24,7 +24,7 @@ from mmsb.systems.mm.estimate import HEAVY_S  # noqa: E402
 from mmsb.systems.mm.home import exec_project  # noqa: E402
 from mmsb.systems.mm.system import MmSession  # noqa: E402
 
-pytestmark = pytest.mark.xdist_group("mm-arm")
+pytestmark = pytest.mark.xdist_group("mm")
 
 
 def label_as(home: Path, qid: str, q) -> None:

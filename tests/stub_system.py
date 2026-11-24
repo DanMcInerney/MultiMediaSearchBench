@@ -1,10 +1,10 @@
-"""A stand-in system, session and agent for the tests of the runner (plan 7.4: neutral loop tests use a `StubSystem` built from recorded
-fields), and the folders of a run they run in. Nothing here starts a process or imports mms.
+"""A stand-in system, session and agent for the tests of the runner (the loop is tested over a `StubSystem`, not over a real one), and the
+folders of a run they run in. Nothing here starts a process or imports mms.
 
-What the stub system copies from the recorded runs is the shape of what a real session adds to a result (the fields `gpu_estimate_s`,
-`exclusive`, `beyond_timeout`, `busy_at_start`, `left`, `cancelled`, `unended`, `orphans`, `settle_s` of the pilot's results), and from the
-plan's 4.6 the two rules it holds a case back by: file versions (the sources `notes` and `config`) one at a time, and a case that may
-need more than `HEAVY_S` of the system's seconds alone. Those rules are written here from the plan's words, not from any module."""
+The stub system adds to a result what a real session adds (the fields `gpu_estimate_s`, `exclusive`, `beyond_timeout`, `busy_at_start`,
+`left`, `cancelled`, `unended`, `orphans`, `settle_s`), and its sessions hold a case back by the two rules a real one does: file versions
+(the sources `notes` and `config`) one at a time, and a case that may need more than `HEAVY_S` of the system's seconds alone. Those rules
+are written here, not taken from any module."""
 
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ def right(q: Question) -> str:
 
 class StubSession(PlainSession):
     """A session that serves a server of no use, records what the runner calls in `system.events` (kind, qid, what else) and adds to a
-    result what the pilot's results from a real session held. `rate` turns a range's seconds into the system's seconds."""
+    result the fields a real session adds. `rate` turns a range's seconds into the system's seconds."""
 
     def __init__(self, system: StubSystem, context: SessionContext) -> None:
         self.system, self.context = system, context
@@ -117,7 +117,7 @@ class StubSession(PlainSession):
 @dataclass
 class StubSystem:
     """A system named `stub` with the variants `all` (reads every modality), `narrow` (no sound) and `media` (pictures and video).
-    `rules`: its sessions hold cases back as the plan's 4.6 says. `rate`: the system's seconds for a second of a range."""
+    `rules`: its sessions hold cases back as a real session's do. `rate`: the system's seconds for a second of a range."""
 
     needs_gpu: bool = False
     rules: bool = True
@@ -132,7 +132,7 @@ class StubSystem:
     shared: list | None = None  # a log that other stand-ins write to as well, to tell the order of the calls among them
     report: IngestReport | None = None  # what `ingest` reports (the runner never ingests; the CLI's build does); None: ingest is an error
     unready: str | None = None  # why `check_ready` raises (a model not downloaded, an environment not installed); None: it is ready
-    reports_queue: bool = True  # False: its sessions cannot say how long a case waits (`Session.queue_s` is None), as mm's cannot (decision D3)
+    reports_queue: bool = True  # False: its sessions cannot say how long a case waits (`Session.queue_s` is None), as mm's cannot
     waits: dict = None  # qid -> the seconds that case waits in the queue when more than one exec runs at once; the others wait none
 
     def __post_init__(self) -> None:

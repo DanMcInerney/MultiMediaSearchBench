@@ -1,11 +1,11 @@
-"""`mmsb clock-check` and the `--clock` option of `mmsb run` (plan 8.2, 6.5, DESIGN 8.4; written for this repository, U14), through `main`, over the stand-in system of tests/stub_system.py and stand-in
-agents: the cases are drawn from those the system serves beside another, each is asked alone and then queued, in two folders under the run, and the answers,
-tokens and charged seconds are printed side by side. It refuses before any agent starts when the system cannot report its queue (decision D3) or would
-not run the cases beside each other, and it asks the system whether it is ready first. Over mm itself: tests/mm/test_clock_mm.py.
+"""`mmsb clock-check` and the `--clock` option of `mmsb run` (DESIGN.md), through `main`, over the stand-in system of tests/stub_system.py and
+stand-in agents: the cases are drawn from those the system serves beside another, each is asked alone and then queued, in two folders under the
+run, and the answers, tokens and charged seconds are printed side by side. It refuses before any agent starts when the system cannot report its
+queue or would not run the cases beside each other, and it asks the system whether it is ready first. Over mm itself: tests/mm/test_clock_mm.py.
 
-The expected values are what the test planted: the queue the stand-in system reports for each case (`StubSystem.waits`), and an agent that takes 2 s of its
-own and the queue besides, so that its charged seconds are 2 whether alone or queued and its wall seconds are not; and the cases that hold the system
-alone, which are those the plan's `HEAVY_S` names (300 of the system's seconds), worked out here from the questions' own ranges."""
+The expected values are what the test planted: the queue the stand-in system reports for each case (`StubSystem.waits`), and an agent that takes
+2 s of its own and the queue besides, so that its charged seconds are 2 whether alone or queued and its wall seconds are not; and the cases that
+hold the system alone, which are those `HEAVY_S` names (300 of the system's seconds), worked out here from the questions' own ranges."""
 
 from __future__ import annotations
 
@@ -107,12 +107,12 @@ def test_a_system_that_holds_every_case_alone_has_nothing_to_queue(world, run, c
     assert "every case of stub/all holds its system alone" in capsys.readouterr().err and not stub.execs
 
 
-def test_a_system_that_cannot_report_its_queue_is_refused_naming_decision_d3_before_any_agent_and_nothing_is_written(world, run, capsys):
+def test_a_system_that_cannot_report_its_queue_is_refused_before_any_agent_and_nothing_is_written(world, run, capsys):
     world.system.reports_queue = False
     stub = Takes()
     assert world.main(*CHECK, str(run.folder), "--jobs", "3", agents=agents_of(stub)) == 1
     err = capsys.readouterr().err
-    assert "decision D3" in err and "reports no queue time" in err and "stub/all" in err
+    assert "reports no queue time" in err and "stub/all" in err
     assert not stub.execs and not (run.folder / "clock-check").exists()
     assert world.system.kinds("open") == [], "no session was opened for it"
 

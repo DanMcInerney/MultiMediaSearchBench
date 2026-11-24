@@ -1,7 +1,5 @@
-"""The retrieval run of mm: the questions asked of the decision model through the daemon, with no agent (moved from `ask`, `warm`,
-`first_photo`, `oracle_params` and the asking half of `oracle` of bench.py, and of `oracle_record` of egolife.py, of this repository at
-bb498a6). The scoring of what comes back and the records are the core's (core/retrieval.py); here a `RetrievalQuery` becomes asks over
-the daemon's API and the answers become `Moment`s."""
+"""The retrieval run of mm: the questions asked of the decision model through the daemon, with no agent. The scoring of what comes back
+and the records are the core's (core/retrieval.py); here a `RetrievalQuery` becomes asks over the daemon's API and the answers become `Moment`s."""
 
 from __future__ import annotations
 
@@ -27,7 +25,7 @@ def ask(api, params: dict, project: str) -> tuple[dict, float]:
 
 
 def warm(api, params: dict) -> float:
-    """Seconds of the one-window ask `Run.warm_params` gives, so the model is loaded before the execs; the load is in the number."""
+    """Seconds of the one-window ask `warm_params` gives, so the model is loaded before the execs; the load is in the number."""
     _, seconds = ask(api, params, WARM_PROJECT)
     return seconds
 

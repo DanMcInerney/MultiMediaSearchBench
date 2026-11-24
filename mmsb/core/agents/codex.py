@@ -1,6 +1,4 @@
-"""Codex asked a question (TESTBED.md, Codex recall; moved from codex_run.py of this repository at bb498a6): one `codex exec` for
-the `SessionSpec` it is given, locked down to the tools of its mode. It copies the pattern of another benchmark's
-`stbench.codex_exec` (read, never imported).
+"""Codex asked a question: one `codex exec` for the `SessionSpec` it is given, locked down to the tools of its mode.
 
 `ask_codex` returns `{final, tools, events, seconds, clock, working_s, queue_s, turns, tokens, cost_usd, used_percent, model, effort,
 thread, problem, argv, stderr}`: the last message (the run reads the answer in it, core/answer.py), what Codex called and got back, how long it
@@ -10,7 +8,7 @@ clock running out), the turns and tokens it used, the plan usage that exec's own
 model or effort it does not list, or personal instructions (`AGENTS.md`) in the Codex home, whose existence and size are all that
 is looked at.
 
-How the exec is made (the plan's section 1, tier C):
+How the exec is made:
 - `codex exec --json --skip-git-repo-check --ignore-user-config --ignore-rules --strict-config -m MODEL -C <working folder>
   -- -`, the prompt on stdin (a `.cmd` shim cuts a command line at 8,000 characters and reads `[&|<>^%"\r\n]` as syntax,
   so an argument holding one is refused); every setting is a `-c`, nothing is written to `~/.codex/config.toml`;
@@ -83,8 +81,8 @@ CATALOG_PATCH = {"apply_patch_tool_type": None, "experimental_supported_tools": 
 
 WEEK = 10080  # window_minutes of the weekly limit
 ITEMS = ("agent_message", "reasoning", "error", "todo_list", "mcp_tool_call")  # what the events of an exec may hold
-ITEMS_FILES = ("agent_message", "reasoning", "error", "todo_list", "command_execution")  # and of the files arm's
-ITEMS_BLIND = ("agent_message", "reasoning", "error", "todo_list")  # and of the blind arm's: no tool at all
+ITEMS_FILES = ("agent_message", "reasoning", "error", "todo_list", "command_execution")  # and of the files configuration's
+ITEMS_BLIND = ("agent_message", "reasoning", "error", "todo_list")  # and of the blind configuration's: no tool at all
 HELPERS = {"codex": ("list_mcp_resources", "list_mcp_resource_templates")}  # Codex's own listers: no resources exist
 PERSONAL = ("AGENTS.md", "AGENTS.override.md")  # what Codex reads from its home into every exec's messages
 UNSAFE = re.compile(r'[&|<>^%"\r\n]')  # what cmd.exe reads as syntax, in an argument given to a .cmd shim
@@ -249,9 +247,9 @@ def items_of(spec: SessionSpec) -> tuple[str, ...]:
 def refusal_of(spec: SessionSpec) -> str:
     """How `check_event` ends the sentence about an item the mode does not allow."""
     if spec.server is None:
-        return ("the files arm does not allow: the restriction failed" if spec.own_tools
-                else "the blind arm does not allow: it has no tools")
-    plus = " or the files arm's" if spec.own_tools else ""
+        return ("the files configuration does not allow: the restriction failed" if spec.own_tools
+                else "the blind configuration does not allow: it has no tools")
+    plus = " or the files configuration's" if spec.own_tools else ""
     return f"is not one of {spec.server.name}'s tools{plus}: the restriction failed"
 
 
@@ -364,7 +362,7 @@ def rollout_percent(thread: str, wait_s: float = 10.0) -> float | None:
 
 def images_in(lines) -> list[dict]:
     """The `view_image` calls among the JSON lines of a rollout, as `tools_of` gives a call. `codex exec --json` has no
-    item for them (seen 2026-11-02), so the rollout is the only place they are told."""
+    item for them, so the rollout is the only place they are told."""
     out = []
     for line in lines:
         try:
@@ -452,7 +450,7 @@ def ask_codex(spec: SessionSpec) -> dict:
     reader.join(30)
     stderr_file.close()
     figures = clock.figures()
-    seconds = figures.pop("wall_s")  # (what `seconds` has always been: the wall time of the process)
+    seconds = figures.pop("wall_s")  # (`seconds` is the wall time of the process)
     stderr = (run_dir / "stderr.txt").read_text(encoding="utf-8", errors="replace")[-2000:]
     if escaped:
         problem = f"escaped: {escaped[0]}"

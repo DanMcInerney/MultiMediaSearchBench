@@ -1,15 +1,11 @@
-"""The command line over EgoLife (V8): ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4) the tests of what its command
-line did (`test_a_dry_run_names_the_files_folder_and_makes_nothing`, `test_the_commands_say_what_they_will_run_and_report_writes_its_files`,
-`test_the_estimate_prices_a_blind_exec_at_its_own_figure`), and new: `mmsb build` of a download, and the finding of U6's notes, that the
-agents with their own tools must not read the whole dump. Over the fake download of tests/v8_fake.py and the stand-in system of
-tests/stub_system.py; nothing starts a real agent.
+"""The command line over EgoLife (V8): `mmsb build` of a download, what a dry run names and makes, what the commands say they will run, what the
+estimate prices a blind exec at, and the rule that agents with their own tools must not read the whole dump. Over the fake download of
+tests/v8_fake.py and the stand-in system of tests/stub_system.py; nothing starts a real agent.
 
-The old data sat in the run's folder, which the deny list covers; the new dump is a folder of its own in the temp folder. The agents read
-the folder `Scenario.view` cuts from it, for the question's horizon, so the dump (which holds the clips past it) is hidden: `RunFolder.deny`
-names it when what the agent reads is not the dump itself. The tests of that rule are the two after the build.
-
-Intended differences of an expectation: the arms are configurations, a run's estimate counts every configuration at `--jobs` (the old mm arm
-went one at a time, which the system's own line says now), and the Markdown names `stub/all` where it named `mm`."""
+The dump is a folder of its own in the temp folder. The agents read the folder `Scenario.view` cuts from it, for the question's horizon, so
+the dump (which holds the clips past it) is hidden: `RunFolder.deny` names it when what the agent reads is not the dump itself. The tests of
+that rule are the two after the build. A run's estimate counts every configuration at `--jobs`; a system that allows fewer says so in its own
+line."""
 
 from __future__ import annotations
 
@@ -170,7 +166,7 @@ def test_the_folders_checked_are_those_the_agent_reads_and_a_dump_that_is_hidden
 
 
 def test_a_temp_folder_an_agent_may_not_name_is_refused_before_the_run(w, tmp_path, monkeypatch):
-    """The first baseline: TEMP was in the tests' folder, a compiler's warning printed its path, and the exec ended as an escape."""
+    """A TEMP folder whose path holds a word the agent may not name is refused: a compiler's warning that printed it would end the exec as an escape."""
     monkeypatch.setenv("TMP", str(tmp_path / ".codex" / "tmp"))
     with pytest.raises(ValueError, match=r"TMP is .*holds '.*\.codex"):
         w.run.check_paths(ISOLATION)
@@ -227,6 +223,6 @@ def test_the_commands_say_what_they_will_run_and_report_writes_its_files(w, caps
 
 def test_the_estimate_prices_a_blind_exec_at_its_own_figure(w, capsys):
     assert run_command(w, "--agents", "claude,codex") == 0
-    # 10 questions in each of 6 cells; every configuration is counted at the 3 jobs asked (the old mm arm went one at a time, and says so)
+    # 10 questions in each of 6 cells; every configuration is counted at the 3 jobs asked
     hours = (2 * BLIND_MIN / 3 + 2 * EXEC_MIN / 3 + 2 * EXEC_MIN / 3) * N / 60
     assert f"60 execs to run, about {hours:.1f} h at {EXEC_MIN:g} min an exec ({BLIND_MIN:g} for a blind one) over 3 jobs" in capsys.readouterr().out

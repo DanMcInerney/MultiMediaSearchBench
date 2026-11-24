@@ -1,5 +1,5 @@
-"""The ask that loads mm's model before its execs (`oracle.warm_params`): one window of the earliest file the model reads. The first mm run
-of A1 (a day of sound) was refused before any exec, because only a picture or a video could load a model, though d1-Omni-2B hears."""
+"""The ask that loads mm's model before its execs (`oracle.warm_params`): one window of the earliest file the model reads. A dump of
+sound alone (A1, M4) loads a model that hears, such as d1-Omni-2B, on a sound; for a model that does not hear it is refused, with the reason."""
 
 from __future__ import annotations
 

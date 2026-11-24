@@ -1,6 +1,6 @@
-"""What a run says it will cost before it starts (DESIGN 8.2, plan 6.1): the medians (and means) of what each cell took in earlier runs, the
+"""What a run says it will cost before it starts (DESIGN.md): the medians (and means) of what each cell took in earlier runs, the
 cells with no history at EXEC_MIN said so, and `--dry-run` printing all that and starting nothing. The expected numbers are worked out by hand
-from the results the tests write; `tests/test_runner.py` and `tests/test_cli.py` keep the estimate with no history as it was.
+from the results the tests write; `tests/test_runner.py` and `tests/test_cli.py` hold the estimate with no history.
 
 The standard of the run: `world` has the toy scenario (19 questions, a run of seed 7 at scale tiny) and the stand-in system `stub`, whose
 variant `all` reads everything and allows as many execs at once as are asked."""
@@ -178,7 +178,7 @@ def test_a_dry_run_says_what_the_run_costs_from_the_medians_of_earlier_runs_call
     assert "== claude files, question" in out and "nothing was run" in out
 
 
-def test_a_cell_with_no_history_is_said_so_by_the_dry_run_and_a_run_with_none_at_all_keeps_the_old_estimate(world, tmp_path, capsys):
+def test_a_cell_with_no_history_is_said_so_by_the_dry_run_and_a_run_with_none_at_all_is_estimated_at_the_default_exec_time(world, tmp_path, capsys):
     run = cli_world.built_run(world)
     run_history(world, tmp_path)
     no_agents_installed(world.patch)
@@ -188,7 +188,7 @@ def test_a_cell_with_no_history_is_said_so_by_the_dry_run_and_a_run_with_none_at
     assert "no earlier exec for codex files: counted at 2.5 min an exec (1 blind), with no GPU seconds, tokens or dollars" in out
     # by hand: claude's 19 at 100 s and codex's 19 at 150 s over 3 jobs: 1,900 + 2,850 s / 3 = 1,583 s = 0.4 h
     assert "at the medians, the typical exec: about 0.4 h, 4,750 session seconds" in out
-    # nothing earlier at all: the line the tests of the estimate know, and why it is that
+    # nothing earlier at all: every exec is counted at EXEC_MIN, and the line says why
     world.patch.setattr(paths, "RUNS", tmp_path / "empty")
     assert world.main("run", str(run.folder), "--agents", "claude", "--configs", "files", "--dry-run") == 0
     assert f"{N} execs to run, about {N * EXEC_MIN / 3 / 60:.1f} h at 2.5 min an exec over 3 jobs (no earlier exec of these cells to take a median from)" in \

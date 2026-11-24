@@ -1,7 +1,6 @@
-"""What a range costs the decision model (moved from `window_s`, `arm_jobs`, `decider_minutes`, `minutes_text`, `HEAVY_S`, `SLOW_S`, `ASK_SHARE` and `gpu_estimate` of bench.py, `seconds_in`,
-`measure_decode` and `EgoRun.estimate` of egolife.py, and `windows_in` of haystack.py, of this repository at bb498a6): the windows the reader will
-cut a source's files into in a range, times what a window costs the model. The old counts read the scenario's plan, which a system may not see, so they
-are counted from the dump when it is ingested (`table_of`, kept as store/windows.json) and from nothing else when a range is asked about (`windows_in`).
+"""What a range costs the decision model: the windows the reader will cut a source's files into in a range, times what a window costs the
+model. A system may not see the scenario's plan, so the counts are made from the dump when it is ingested (`table_of`, kept as
+store/windows.json) and from nothing else when a range is asked about (`windows_in`).
 
 A file's windows, by what the dump says of it:
 - a video with a `length` (a camera's clip: one frame in each second it plays): the seconds of its overlap with the range, rounded up, as
@@ -46,8 +45,8 @@ def window_s(about: About, kind: str = "video") -> float:
     return ask_script.window_seconds(kind, reader.profile_of(None, about), about)
 
 
-def arm_jobs(model: Model | None, jobs: int) -> int:
-    """The execs at once in an arm: one for a model that takes over SLOW_S a window (parallel execs share one GPU queue, so
+def config_jobs(model: Model | None, jobs: int) -> int:
+    """The execs at once for one (agent, variant): one for a model that takes over SLOW_S a window (parallel execs share one GPU queue, so
     its timeouts would be the queue's fault), else `jobs`."""
     return 1 if model is not None and window_s(model.about) > SLOW_S else jobs
 
@@ -183,7 +182,7 @@ def estimate_s(table: Mapping, about: About, sources: Sequence[str], ranges: Seq
     return total
 
 
-def decider_minutes(table: Mapping, about: About, questions: Sequence[Question]) -> float:
+def retrieval_minutes(table: Mapping, about: About, questions: Sequence[Question]) -> float:
     """Minutes the retrieval asks of `questions` take a model: the windows of each ask's sources and ranges at the model's seconds a window."""
     return sum(estimate_s(table, about, q.retrieval.sources, q.retrieval.ranges) for q in questions) / 60
 

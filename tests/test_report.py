@@ -1,10 +1,8 @@
-"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5: the report's, the verdicts' and the retrieval scoring's tests, in that file's order
-(the statistics are in test_stats.py, the run loop's are in test_runner.py, and what needs mm's daemon is in tests/mm). The mechanical
-changes: `bench.` is the module that has the name now; an arm is a configuration, the two sides of a comparison are `control` and
-`tested` in the figures, and the model `fake` is the configuration `mm/fake`; a question is a `Question`; and a run is a `RunFolder`
-that the tests write by hand, with results made by `record` where the old tests ran a stub through the runner. The changes that are
-more than that are marked `# changed:` where they are made. Expected values are the figures the old tests worked out by hand from the
-plan's questions and the stub's answers, not the code's output."""
+"""Tests for mmsb/core/report.py, render.py and retrieval.py: the report's figures and Markdown, the verdicts of the retrieval tier and its
+scoring. The statistics are in test_stats.py, the run loop's are in test_runner.py, and what needs mm's daemon is in tests/mm. The two sides
+of a comparison are `control` and `tested` in the figures, and the model `fake` is the configuration `mm/fake`; a run is a `RunFolder` that
+the tests write by hand, with results made by `record`. Expected values are figures worked out by hand from the questions of a tiny week and
+the stand-in agent's answers, not the code's output."""
 
 from __future__ import annotations
 
@@ -85,8 +83,8 @@ def shape(questions) -> types.SimpleNamespace:
 
 
 def stub_out(config: Config, q: Question) -> dict:
-    """What the old test's stub agent returned: the right answer for text and records in both configurations and for every type with
-    mm, `unknown` for pictures, video and sound without it."""
+    """What the stand-in agent returns: the right answer for text and records in both configurations and for every type with mm,
+    `unknown` for pictures, video and sound without it."""
     mm = config.system == "mm"
     answer = "unknown" if not mm and q.tags["modality"] in ("image", "video", "audio") else right(q)
     tools = ([{"tool": "ask", "arguments": {"question": q.question}}, {"tool": "find", "arguments": {"scope": "all"}}]
@@ -110,7 +108,7 @@ def stub_results(run: RunFolder, questions, *, by=None, only=None) -> None:
 @pytest.fixture(scope="module")
 def ran(tiny, tmp_path_factory) -> RunFolder:
     """The stub over the tiny week: the results of one agent in the files and mm/fake configurations, made by `record` as the runner
-    makes them, and the one ask label with no project that the old test's mm session left."""
+    makes them, and one ask label with no project."""
     run = run_of(tmp_path_factory.mktemp("ran") / "run", tiny)
     stub_results(run, tiny)
     fs.write_json(run.folder / "results" / "claude" / FAKE.dir / "ambient-labels.json", [{"id": "id:bench-0", "project": None}])
@@ -130,8 +128,8 @@ def test_the_report_counts_as_it_should(tiny, ran, tmp_path):
     assert (m["b"], m["c"], m["p"]) == (k.needles, 0, stats.mcnemar(k.needles, 0)) and m["diff"] == pytest.approx(k.needles / k.n)
     assert m["ci"][0] > 0
     absent_all = sum(k.absent_of.values())
-    for arm in ("control", "tested"):
-        assert (m[arm]["absent"], m[arm]["absent_answered"], m[arm]["needles"]) == (absent_all, 0, k.n - absent_all)
+    for role in ("control", "tested"):
+        assert (m[role]["absent"], m[role]["absent_answered"], m[role]["needles"]) == (absent_all, 0, k.n - absent_all)
     assert (m["control"]["abstained"], m["tested"]["abstained"]) == (k.needles, 0), "without mm the media needles got `unknown`"
     for type_ in ("image", "video", "audio"):
         assert model["types"][type_] == {"n": k.by_type[type_], "control": k.absent_of[type_], "tested": k.by_type[type_]}
@@ -154,7 +152,7 @@ def test_the_report_counts_as_it_should(tiny, ran, tmp_path):
     by_type = [f"{k.absent_of[t]}/{k.by_type[t]} -> {k.by_type[t]}/{k.by_type[t]}" for t in ("image", "video", "audio")]
     for line in ("## claude", f"| fake | all | {k.n}/{k.n} |", f"| fake | media | {k.media} |", pct(right_without, k.n), pct(k.n, k.n),
                  f"{100 * (k.n - right_without) / k.n:+.0f} pts", f"{100 * k.needles / k.media:+.0f} pts", f"{k.needles} / 0",
-                 render.chance(media["p"]), "## By data type", *by_type, "## The decider tier", "problems (files / mm)",
+                 render.chance(media["p"]), "## By data type", *by_type, "## The retrieval tier", "problems (files / mm)",
                  "would not be recorded at all", "mcnemar(6, 0) = 0.031", "mcnemar(5, 0) = 0.0625", "Runs pooled: 1; seeds 7",
                  f"Agents: claude stub ({2 * k.n} results).",
                  "Ask labels with no project", f"leak into another's scope): {totals['ambient_labels']}.",
@@ -178,8 +176,7 @@ def test_the_report_counts_each_agents_model_and_effort():
 
 
 def test_a_timeout_a_cap_and_an_escape_are_wrong_answers_that_are_paired(tiny, tmp_path):
-    """The report's half of the old test (that none of the three stops the agent, and that they are not asked again, is the
-    runner's: test_runner.py)."""
+    """That none of the three stops the agent, and that they are not asked again, is the runner's: test_runner.py."""
     kinds = {"image-photo-sign-1": ("timeout", "timeout: no answer in 900 s"), "video-screen-error-1": ("capped", "capped: max turns"),
              "audio-mic-doorbell-1": ("escaped", "escaped: Read reached the answers")}
     run = run_of(tmp_path / "run", tiny)
@@ -202,12 +199,12 @@ def test_a_timeout_a_cap_and_an_escape_are_wrong_answers_that_are_paired(tiny, t
 
 
 def test_a_session_that_was_not_the_one_asked_for_is_left_out_of_the_pairs_until_it_is_run_again(tiny, tmp_path):
-    """The report's half of the old test (the agent stopping at the first setup problem, and the next command asking it again with
-    the rest, in `until` order, is the runner's)."""
+    """That the agent stops at the first setup problem, and that the next command asks it again with the rest, in `until` order, is the
+    runner's."""
     run = run_of(tmp_path / "run", tiny)
     n, first = shape(tiny).n, tiny[0].qid
     stub_results(run, tiny, only={FILES.name: tiny, FAKE.name: tiny[:1]},
-                 by={(FAKE.name, first): {"problem": "setup: the session has tools the arm does not", "answer": None}})
+                 by={(FAKE.name, first): {"problem": "setup: the session has tools the configuration does not", "answer": None}})
     saved = fs.read_json(run.result_path("claude", FAKE, first))
     assert saved["problem"].startswith("setup") and saved["passed"] is False and not is_done(saved)
 
@@ -279,7 +276,7 @@ def test_an_oracle_ask_follows_the_level_rules_and_records_the_needles_p_and_mom
     last = sq("image-photo-sign-3", "week", last=True, moments=[[truth, truth]], others=[[other, other]], since=T0 - 5 * DAY, k=5)
     got = scored(last, asked([(other, other, 0.91), (truth + 4, truth + 4, 0.83), (truth + 5000, truth + 5000, 0.9)],
                              [(truth + 3, 0.7), (truth + 500, 0.95), (T0 + 10, 0.99)], stopped="limit"))
-    # changed: the ask's parameters are the query (the translation to a system's own parameters is the system's, tested in tests/mm)
+    # the ask's parameters are the query (the translation to a system's own parameters is the system's, tested in tests/mm)
     assert retrieval.query_of(last) == RetrievalQuery("image-photo-sign-3", "yes?", ("phone",), ((T0 - 5 * DAY, T0 + 6 * 3600),), 5, 5,
                                                       False, 1800.0)
     assert (got["level"], got["last"], got["limit"]) == ("week", True, 5)
@@ -318,8 +315,8 @@ def test_an_oracle_ask_follows_the_level_rules_and_records_the_needles_p_and_mom
     got = scored(sq("video-absent-error-1", absent=True), asked([(T0 + 50, T0 + 60, 0.9)]))
     assert (got["found"], got["top5"], got["p"], got["false"], got["moments_found"], got["rank"]) == (None, None, None, 1, [], None)
 
-    # changed: the level rules (5 sightings for a `last` question, 50 for a count, 20 for the rest) are the V7 writer's now, and are
-    # read here from the questions it writes for a real tiny week (the last ones are those the plan marks `last`)
+    # the level rules (5 sightings for a `last` question, 50 for a count, 20 for the rest) are the V7 writer's, and are read here from
+    # the questions it writes for a real tiny week (the last ones are those the plan marks `last`)
     k_of = {q.qid: retrieval.query_of(q).k for q in tiny if q.retrieval}
     assert {qid for qid, k in k_of.items() if k == 5} == {q.qid for q in tiny if q.tags["last"] and q.retrieval}
     assert {qid for qid, k in k_of.items() if k == 50} == {"image-photo-count-1"}
@@ -330,7 +327,7 @@ def test_an_oracle_ask_follows_the_level_rules_and_records_the_needles_p_and_mom
 def level_of_pairs(files_correct, mm_correct, n, files_s=100.0, mm_s=100.0, files_k=1000.0, mm_k=1000.0, b=None, c=None) -> dict:
     """A level as `by_level` gives it, from the counts: n pairs, each side's correct answers, the seconds and the tokens an exec
     spends (so a side's cost per correct answer is what its correct ones divide)."""
-    def arm(correct, s, k):
+    def side(correct, s, k):
         return {"correct": correct, "n": n, "accuracy": correct / n, "seconds": s * n if s is not None else 0, "median_s": s,
                 "tokens_all": k * n if k is not None else None, "tokens_n": n if k is not None else 0, "tokens_mean": k}
 
@@ -338,7 +335,7 @@ def level_of_pairs(files_correct, mm_correct, n, files_s=100.0, mm_s=100.0, file
     c = max(files_correct - mm_correct, 0) if c is None else c
     both_right = files_correct - c
     return {"n": n, "n_control": n, "diff": (b - c) / n, "ci": stats.interval(both_right, b, c, n - both_right - b - c), "b": b, "c": c,
-            "control": arm(files_correct, files_s, files_k), "tested": arm(mm_correct, mm_s, mm_k)}
+            "control": side(files_correct, files_s, files_k), "tested": side(mm_correct, mm_s, mm_k)}
 
 
 def test_the_crossover_is_the_first_level_with_enough_pairs_where_mm_leads_by_20_points_or_costs_half_without_being_worse():
@@ -370,7 +367,7 @@ def test_the_crossover_is_the_first_level_with_enough_pairs_where_mm_leads_by_20
     close = level(160, 158, 200, 100, 25, b=8, c=10)
     assert close["diff"] < 0 and close["ci"][0] > -report.NOT_WORSE and report.crossover({"day": close})["by"] == ["cost"]
     assert report.crossover({"day": level(160, 140, 200, 100, 25, b=0, c=20)}) is None, "-10 points, interval below -0.10"
-    # a cost per correct answer needs MIN_CORRECT right answers in each arm, and tokens that every exec gave
+    # a cost per correct answer needs MIN_CORRECT right answers on each side, and tokens that every exec gave
     assert report.crossover({"day": level(4, 4, 10, 100, 10)}) is None
     nothing = level(10, 10, 20, None, None, None, None)
     assert report.crossover({"part": nothing}) is None
@@ -432,8 +429,7 @@ def test_claudes_tokens_count_the_cache_it_read_and_wrote_as_codexs_input_alread
 
 def rec(model: str, qid: str, found: bool, top5: bool, p: float | None, *, false: int = 0, level: str = "part",
         stopped: str = "range_end", absent: bool = False, candidates=()) -> dict:
-    """A stub retrieval record, of the sort `retrieval_record` writes, of the variant `model` of the system mm. changed: the old
-    test's records could leave out `level` and `p` (a record from before them); the format has them now."""
+    """A stand-in retrieval record, of the sort `retrieval_record` writes, of the variant `model` of the system mm."""
     type_, *rest = qid.split("-")
     return {"qid": qid, "type": type_, "template": "-".join(rest[:-1]), "absent": absent, "config": f"mm/{model}", "system": "mm",
             "variant": model, "question": "?", "source": "phone", "since": T0, "until": T0 + 6 * 3600, "found": found, "top5": top5,
@@ -441,7 +437,7 @@ def rec(model: str, qid: str, found: bool, top5: bool, p: float | None, *, false
             "sightings": [], "candidates": list(candidates), "level": level, "p": p}
 
 
-def test_a_miss_is_the_haystacks_only_when_nobody_found_the_needle_and_two_families_scanned_it_without_it_in_their_top_5():
+def test_a_miss_is_a_fault_of_the_data_only_when_nobody_found_the_needle_and_two_families_scanned_it_without_it_in_their_top_5():
     def found(m):
         return rec(m, "video-screen-error-1", True, True, 0.97)
 
@@ -457,15 +453,15 @@ def test_a_miss_is_the_haystacks_only_when_nobody_found_the_needle_and_two_famil
     def cut(m):
         return rec(m, "video-screen-error-1", False, False, None, stopped="max_s")
 
-    # one model: this tier cannot tell a miss from a haystack fault; a near miss is below its model's hit
-    assert retrieval.verdicts([far("d1-3B")]) == {"mm/d1-3B": "one model ran: the agent arm's look, or a second family, tells a miss from a haystack fault"}
+    # one model: this tier cannot tell a miss from a data fault; a near miss is below its model's hit
+    assert retrieval.verdicts([far("d1-3B")]) == {"mm/d1-3B": "one model ran: the agent's look, or a second family, tells a miss from a data fault"}
     assert retrieval.verdicts([near("d1-3B")]) == {"mm/d1-3B": "below its model's hit (calibration)"}
     assert retrieval.verdicts([found("d1-3B")]) == {}
     # two models of one family are one family
     assert retrieval.verdicts([far("d1-3B"), far("d1-Omni-2B")]) == {n: retrieval.ONE_FAMILY for n in ("mm/d1-3B", "mm/d1-Omni-2B")}
     assert retrieval.ONE_FAMILY.startswith("one family ran:")
-    # nobody found it, two families scanned it, neither had it in its top 5: the haystack is suspect
-    assert retrieval.verdicts([far("d1-3B"), far("d3-edge")]) == {"mm/d1-3B": "haystack suspect", "mm/d3-edge": "haystack suspect"}
+    # nobody found it, two families scanned it, neither had it in its top 5: the data are suspect
+    assert retrieval.verdicts([far("d1-3B"), far("d3-edge")]) == {"mm/d1-3B": "data suspect", "mm/d3-edge": "data suspect"}
     # a model found it: every miss is that model's miss, of whichever family (a model of the same family included)
     assert retrieval.verdicts([found("d1-3B"), far("d3-edge")]) == {"mm/d3-edge": "this model's miss"}
     assert retrieval.verdicts([found("d1-Omni-2B"), far("d1-3B"), far("d3-edge")]) == {"mm/d1-3B": retrieval.MISS, "mm/d3-edge": retrieval.MISS}
@@ -473,7 +469,7 @@ def test_a_miss_is_the_haystacks_only_when_nobody_found_the_needle_and_two_famil
     assert retrieval.verdicts([found("d1-Omni-2B"), far("d1-3B")]) == {"mm/d1-3B": retrieval.MISS}
     # another family had it in its top 5: this model's miss; a model in the top 5 is below its hit
     assert retrieval.verdicts([near("d1-3B"), far("d3-edge")]) == {"mm/d1-3B": "below its model's hit (calibration)", "mm/d3-edge": "this model's miss"}
-    # a scan that ended before the needle is told as it is, and it does not make the haystack suspect or count as a family that ran
+    # a scan that ended before the needle is told as it is, and it does not make the data suspect or count as a family that ran
     assert retrieval.verdicts([stopped("d1-3B"), far("d3-edge")]) == {"mm/d1-3B": retrieval.STOPPED, "mm/d3-edge": retrieval.ONE_MODEL}
     assert retrieval.verdicts([cut("pplx-decider-flash-v1.2"), far("d3-edge"), far("d1-3B")]) == {
         "mm/pplx-decider-flash-v1.2": retrieval.CUT, "mm/d3-edge": retrieval.SUSPECT, "mm/d1-3B": retrieval.SUSPECT}
@@ -496,7 +492,7 @@ def wk(jobs: int = 0, windows: int = 0, seconds: float = 0.0, stopped: dict | No
     return {"jobs": jobs, "windows": windows, "seconds": seconds, "stopped": stopped or {}, "views": views, "shells": shells}
 
 
-FILES_ARM = {
+FILES_RESULTS = {
     "image-photo-sign-1": (True, 40, {"shell": 6, "view_image": 5}, wk(views=5, shells=6), (30000, 2000), None),
     "image-photo-sign-2": (False, 90, {"shell": 10, "view_image": 9}, wk(views=9, shells=10), (60000, 3000), None),
     "image-photo-sign-3": (False, 900, {"shell": 20, "view_image": 14}, wk(views=14, shells=20), (90000, 1000), "timeout: no answer in 900 s"),
@@ -516,21 +512,17 @@ MM_D13 = {
     "text-note-code-1": (True, 8, {"find": 1}, wk(), (6000, 300), None)}
 
 
-MM_EDGE = {  # the third has no `work` (a result that does not say); the fourth is the one the old test read from its exec's tools.json
+MM_EDGE = {  # the third has no `work` (a result that does not say); the fourth has two jobs, 380 windows, 70 GPU s, stopped at max_s and at the limit
     "image-photo-sign-1": (True, 38, {"ask": 1, "look": 1}, wk(1, 60, 5.0, {"range_end": 1}), (21000, 900), None),
     "image-photo-sign-2": (False, 30, {"ask": 1}, wk(1, 450, 80.0, {"max_s": 1}), (15000, 400), None),
     "video-screen-error-1": (True, 33, {"ask": 1, "look": 2}, None, (20000, 800), None),
-    # changed: the old test left `work` out here and the report read it from EDGE_TOOLS in the exec's tools.json (two jobs, 380 windows,
-    # 70 GPU s, stopped at max_s and at the limit), which it no longer does; this is what it read
     "video-screen-error-2": (True, 70, {"ask": 3, "look": 1}, wk(2, 380, 70.0, {"max_s": 1, "limit": 1}), (50000, 2000), None)}
 
 
-DECIDERS = {
+RETRIEVALS = {
     "d1-3B": [rec("d1-3B", "image-photo-sign-1", True, True, 0.96), rec("d1-3B", "image-photo-sign-3", False, False, None, false=1, level="week"),
               rec("d1-3B", "video-screen-error-1", True, True, 0.97), rec("d1-3B", "video-porch-parcel-1", False, False, None, level="week"),
               rec("d1-3B", "video-absent-error-1", None, None, None, absent=True),
-              # changed: the old test left out this record's level and p and the report took them from the plan (day, and the p of the candidate
-              # at the truth); the record has them now
               rec("d1-3B", "image-photo-sign-2", False, True, 0.68, level="day", candidates=[{"t": T0 + 3602, "p": 0.68}])],
     "d3-edge": [rec("d3-edge", "image-photo-sign-1", True, True, 0.94), rec("d3-edge", "image-photo-sign-2", True, True, 0.90, level="day"),
                 rec("d3-edge", "image-photo-sign-3", False, False, None, level="week"),
@@ -538,15 +530,15 @@ DECIDERS = {
 
 
 def stub_run(tmp_path) -> RunFolder:
-    """A run folder of hand-written results over stub questions that carry the new fields, with a plan that is theirs: two models
-    asked the media questions of one agent, and d1-3B also its text control."""
+    """A run folder of hand-written results over stand-in questions, with a plan that is theirs: two models asked the media questions of
+    one agent, and d1-3B also its text control."""
     questions = [sq("image-photo-sign-1", "part"), sq("image-photo-sign-2", "day"),
                  sq("image-photo-sign-3", "week", last=True, others=[[T0 - 2 * DAY] * 2]), sq("video-screen-error-1", "part"),
                  sq("video-screen-error-2", "day"), sq("video-porch-parcel-1", "week", last=True), sq("text-note-code-1", "part")]
     by_qid = {q.qid: q for q in questions}
     run = run_of(tmp_path / "stub-run", questions, seed=1, configs=(FILES, D13, EDGE),
                  asked={D13.name: ["image", "records", "text", "video"], EDGE.name: ["image", "video"]})
-    for config, results in ((FILES, FILES_ARM), (D13, MM_D13), (EDGE, MM_EDGE)):
+    for config, results in ((FILES, FILES_RESULTS), (D13, MM_D13), (EDGE, MM_EDGE)):
         for qid, (passed, seconds, tools, work, tokens, problem) in results.items():
             q = by_qid[qid]
             out = {"qid": qid, "type": q.tags["modality"], "template": q.tags["template"], "level": q.hint, "last": q.tags["last"],
@@ -560,7 +552,7 @@ def stub_run(tmp_path) -> RunFolder:
                        "held_s": 4.0, "exclusive": q.hint == "week", "beyond_timeout": qid == "video-porch-parcel-1"}
                       if config == D13 else {})}
             fs.write_json(run.result_path("codex", config, qid), out)
-    for config, records in ((D13, DECIDERS["d1-3B"]), (EDGE, DECIDERS["d3-edge"])):
+    for config, records in ((D13, RETRIEVALS["d1-3B"]), (EDGE, RETRIEVALS["d3-edge"])):
         folder = run.folder / "results" / retrieval.FOLDER / config.dir
         fs.write_json(folder / "warm.json", {"config": config.name, "seconds": 20.0})
         for r in records:
@@ -568,7 +560,7 @@ def stub_run(tmp_path) -> RunFolder:
     return run
 
 
-def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answer_cost(tmp_path, monkeypatch):
+def test_the_report_gives_the_levels_how_each_configuration_worked_and_what_a_correct_answer_cost(tmp_path, monkeypatch):
     run = stub_run(tmp_path)
     thin = report.numbers([run])  # with its two pairs a level, nothing is told of a crossover
     assert thin["agents"]["codex"]["mm/d1-3B"]["crossover"] is None and thin["agents"]["codex"]["mm/d1-3B"]["thin"] == {"part": 2, "day": 2, "week": 2}
@@ -589,7 +581,7 @@ def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answ
     assert (day["control"]["tokens_mean"], day["tested"]["tokens_mean"]) == (57500, 28750)
     assert (week["control"]["correct"], week["tested"]["correct"], week["control"]["timeouts"], week["tested"]["timeouts"]) == (0, 1, 1, 0)
     assert d13["crossover"] == {"level": "day", "by": ["accuracy"], "lead": 0.5, "seconds": None, "tokens": None}, \
-        "two right answers in an arm make no cost per correct answer"
+        "two right answers in a configuration make no cost per correct answer"
     assert (part["b"], part["c"], part["ci"], day["b"], day["c"], day["ci"]) == (0, 0, None, 1, 0, None)
     assert [lv["control"]["correct"] for lv in edge["levels"].values()] == [2, 1] and edge["crossover"] is None
     # pooled over the models: the files results count once (4 pairs at `day`, 2 files results), the mm results of both models
@@ -599,12 +591,12 @@ def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answ
     assert pooled["levels"]["day"]["tested"]["median_s"] == 40.0 and pooled["levels"]["week"]["n"] == 2
     assert pooled["crossover"]["level"] == "day" and pooled["crossover"]["lead"] == 0.25 and pooled["crossover"]["by"] == ["accuracy"]
 
-    # how each arm worked, per exec on the paired media questions
+    # how each configuration worked, per exec on the paired media questions
     mm, files = d13["work"]["tested"], d13["work"]["control"]
     assert (mm["n"], mm["ask_execs"], mm["asks"], mm["finds"], mm["looks"], mm["known"]) == (6, 5, 1.0, 0.5, 2.0, 6)
     assert (mm["windows"], mm["gpu_s"], mm["max_s"], mm["views"]) == (pytest.approx(1040 / 6), 11.0, 2, 0.0)
     assert (files["n"], files["ask_execs"], files["views"], files["shells"]) == (6, 0, 8.5, pytest.approx(64 / 6))
-    # a result with no `work` is unknown (changed: the report no longer makes it up from the exec's tools.json): 3 of the 4 say it
+    # a result with no `work` is unknown (the report does not make it up from the exec's tools.json): 3 of the 4 say it
     slim = edge["work"]["tested"]
     assert (slim["n"], slim["known"], slim["ask_execs"], slim["asks"], slim["looks"]) == (4, 3, 4, 1.5, 1.0)
     assert (slim["windows"], slim["gpu_s"], slim["max_s"]) == (pytest.approx(890 / 3), pytest.approx(155 / 3), 2)
@@ -615,7 +607,7 @@ def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answ
     assert (edge["cost"]["tested"]["correct"], edge["cost"]["tested"]["s"], edge["cost"]["tested"]["gpu_s"]) == (3, 57.0, None)
     assert report.per_correct([])["s"] is None and report.per_correct([{**NO_TOKENS, "passed": False}])["tokens_k"] is None
 
-    # one row per question, in the plan's order: the files arm's cell and each model's (none where it was not asked)
+    # one row per question, in the plan's order: the files configuration's cell and each model's (none where it was not asked)
     rows = figures["appendix"]["codex"]
     assert [r["qid"] for r in rows][:3] == ["image-photo-sign-1", "image-photo-sign-2", "image-photo-sign-3"] and len(rows) == 7
     assert rows[0] == {"seed": 1, "qid": "image-photo-sign-1", "level": "part", "type": "image",
@@ -639,17 +631,17 @@ def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answ
             "- d1-3B: `day` by accuracy (accuracy +50 pts)",
             "- d3-edge: none: at no level with 2 or more paired questions does mm lead by 20 points, or cost half as much per correct answer",
             "- all models: `day` by accuracy (accuracy +25 pts)",
-            "## How each arm worked (the media questions, per exec)",
-            "| agent | model | arm | execs | called ask | asks / finds / looks | ask windows | ask GPU s | asks stopped at max_s | "
+            "## How each configuration worked (the media questions, per exec)",
+            "| agent | model | configuration | execs | called ask | asks / finds / looks | ask windows | ask GPU s | asks stopped at max_s | "
             "GPU s estimated | held s (run alone) | estimated past the timeout | pictures viewed | shell commands |",
             "| codex | d1-3B | files | 6 | - | - | - | - | - | - | - | - | 8.5 | 10.7 |",
             "| codex | d1-3B | mm | 6 | 5/6 (83%) | 1.0 / 0.5 / 2.0 | 173.3 | 11.0 | 2 | 280.0 | 4.0 (2 alone) | 1 | - | - |",
             "| codex | d3-edge | mm | 4 | 4/4 (100%) | 1.5 / 0.0 / 1.0 | 296.7 (3/4) | 51.7 (3/4) | 2 | - | - | 0 | - | - |",
             "## Cost per correct answer (the media questions)",
-            "| agent | model | arm | correct (k) | seconds | tokens k | GPU seconds |",
+            "| agent | model | configuration | correct (k) | seconds | tokens k | GPU seconds |",
             "| codex | d1-3B | files | 3/6 | - | - | - |", "| codex | d1-3B | mm | 5/6 | 44.0 | 34.2 | 13.2 |",
             "| codex | d3-edge | mm | 3/4 | - | - | - |", "| codex | d3-edge | files | 3/4 | - | - | - |",
-            "A cost per correct answer is told from 5 correct answers (k) in the arm; below that it is `-`.",
+            "A cost per correct answer is told from 5 correct answers (k) in the configuration; below that it is `-`.",
             "## Appendix: codex, one row per question",
             "| qid | level | type | files | mm d1-3B | mm d3-edge |",
             "| image-photo-sign-1 | part | image | pass 40 s v5 | pass 30 s a1 | pass 38 s a1 |",
@@ -663,11 +655,11 @@ def test_the_report_gives_the_levels_how_each_arm_worked_and_what_a_correct_answ
     assert text.index("## Read with these") < text.index("## Appendix: codex")
 
 
-def test_the_decider_tier_reports_each_templates_needle_p_and_verdict(tmp_path):
+def test_the_retrieval_tier_reports_each_templates_needle_p_and_verdict(tmp_path):
     figures = report.numbers([stub_run(tmp_path)])
     tier = figures["retrieval"]
     d13, edge = tier["models"]["mm/d1-3B"], tier["models"]["mm/d3-edge"]
-    # the record from before the levels and p got both from the plan: its level, and the p of the candidate at the truth
+    # a record without a p of its own has the p of the candidate at the truth
     assert d13["types"]["image"] == {"asked": 3, "needles": 3, "found": 1, "p50": 2, "top5": 2, "false": 1, "s_per_window": 0.06,
                                      "absent": 0, "absent_clean": 0}
     assert d13["types"]["video"]["absent"] == 1 and d13["types"]["video"]["absent_clean"] == 1 and d13["family"] == "d1"
@@ -679,7 +671,7 @@ def test_the_decider_tier_reports_each_templates_needle_p_and_verdict(tmp_path):
     assert sign["models"]["mm/d1-3B"] == {"asked": 3, "found": 1, "near": 1, "stopped": 0, "cut": 0, "missed": 1, "p": pytest.approx(0.82)}
     assert sign["models"]["mm/d3-edge"] == {"asked": 3, "found": 2, "near": 0, "stopped": 0, "cut": 0, "missed": 1, "p": pytest.approx(0.92)}
     assert sign["verdicts"] == {"below its model's hit (calibration)": {"models": ["mm/d1-3B"], "levels": ["day"]},
-                                "haystack suspect": {"models": ["mm/d1-3B", "mm/d3-edge"], "levels": ["week"]}}
+                                "data suspect": {"models": ["mm/d1-3B", "mm/d3-edge"], "levels": ["week"]}}
     assert tier["templates"]["screen-error"]["verdicts"] == {"this model's miss": {"models": ["mm/d3-edge"], "levels": ["part"]}}
     assert tier["templates"]["porch-parcel"]["verdicts"] == {retrieval.ONE_MODEL: {"models": ["mm/d1-3B"], "levels": ["week"]}}
 
@@ -687,14 +679,14 @@ def test_the_decider_tier_reports_each_templates_needle_p_and_verdict(tmp_path):
     for line in (
             "| model | type | recall (at its hit) | recall at p >= 0.5 | top 5 | absent with no false sighting | false sightings per ask |",
             "| d1-3B | image | 1/3 (33%) | 2/3 (67%) | 2/3 (67%) | - |",
-            "Templates no model found: porch-parcel. The verdicts below say whether that is the haystack or the models.",
+            "Templates no model found: porch-parcel. The verdicts below say whether that is the data or the models.",
             "| template | needle questions | found by | nearly missed by (top 5 or p >= 0.5) | missed by | "
             "scan ended before the needle by (false sighting, max_s) | needle p (median) | verdict |",
             "| photo-sign | 3 | d1-3B 1/3, d3-edge 2/3 | d1-3B 1 | d1-3B 1, d3-edge 1 | - | d1-3B 0.82, d3-edge 0.92 | "
-            "below its model's hit (calibration): d1-3B (day); haystack suspect: d1-3B, d3-edge (week) |",
+            "below its model's hit (calibration): d1-3B (day); data suspect: d1-3B, d3-edge (week) |",
             "| screen-error | 1 | d1-3B 1/1 | - | d3-edge 1 | - | d1-3B 0.97, d3-edge 0.30 | this model's miss: d3-edge (part) |",
-            "| porch-parcel | 1 | - | - | d1-3B 1 | - | - | one model ran: the agent arm's look, or a second family, tells a miss from a "
-            "haystack fault: d1-3B (week) |",
+            "| porch-parcel | 1 | - | - | d1-3B 1 | - | - | one model ran: the agent's look, or a second family, tells a miss from a "
+            "data fault: d1-3B (week) |",
             "## Summary per model (the media questions)",
             "| model | family | recall (at its hit) | recall at p >= 0.5 | top 5 | false sightings per ask | median s per window | "
             "codex: mm accuracy | codex: s / k tokens / GPU s per correct |",
@@ -704,8 +696,7 @@ def test_the_decider_tier_reports_each_templates_needle_p_and_verdict(tmp_path):
 
 
 def test_the_report_says_when_a_runs_probe_failed_or_was_skipped_or_never_ran(tiny, tmp_path):
-    # changed: only the report's half of the old test (the lines of report.md); what `agents` and `decider` warn before they spend
-    # anything is the commands' (test_cli.py)
+    # the lines of report.md; what `run` and `retrieve` warn before they spend anything is the commands' (test_cli.py)
     outcomes = {"failed": {"status": "failed", "failures": ["a: x", "b: y"]}, "skipped": {"status": "skipped", "failures": []},
                 "none": None, "passed": {"status": "passed", "failures": []}}
     notes = {}
@@ -718,7 +709,7 @@ def test_the_report_says_when_a_runs_probe_failed_or_was_skipped_or_never_ran(ti
     assert notes["passed"] == []
     assert "failed the shortcut probe (2 failures, in its shortcuts.md)" in notes["failed"][0]
     assert "was built with --no-probe" in notes["skipped"][0]
-    assert "no shortcut probe record (it was built before the probe)" in notes["none"][0]
+    assert "has no shortcut probe record" in notes["none"][0]
     # pooled runs: one line for each run that did not pass
     a = run_of(tmp_path / "a", tiny[:2], seed=8, probe=outcomes["failed"])
     b = run_of(tmp_path / "b", tiny[:2], seed=9, probe=outcomes["skipped"])
@@ -731,7 +722,7 @@ def test_the_needles_p_takes_the_tolerance_it_is_given():
     moments = [[truth, truth]]
     sightings = [Moment(truth + 20, truth + 22, 0.8, "phone", {})]
     candidates = [Moment(truth + 25, truth + 25, 0.9, "phone", {})]
-    # changed: there is no default tolerance (the old default was V7's, 10 s; a question's retrieval spec has its own)
+    # there is no default tolerance: a question's retrieval spec has its own
     assert retrieval.needle_p(moments, sightings, candidates, 10.0) is None, "V7's tolerance"
     assert retrieval.needle_p(moments, sightings, candidates, tol=21) == 0.8
     assert retrieval.needle_p(moments, sightings, candidates, tol=30.0) == 0.9
@@ -739,8 +730,8 @@ def test_the_needles_p_takes_the_tolerance_it_is_given():
 
 
 def test_a_sighting_or_candidate_has_one_time_or_a_span_and_the_oracle_reads_both():
-    # changed: reading a system's own answer (`t`, or `t0` and `t1`, as ISO text) into a Moment is the system's, tested in tests/mm;
-    # here a Moment has two times, equal for one instant
+    # reading a system's own answer (`t`, or `t0` and `t1`, as ISO text) into a Moment is the system's, tested in tests/mm; here a Moment
+    # has two times, equal for one instant
     at = T0 + 3600
     assert retrieval.span_of(Moment(at, at, 0.7, "phone", {})) == (at, at)
     assert retrieval.span_of(Moment(at, at + 5, 0.7, "phone", {})) == (at, at + 5)
@@ -762,12 +753,11 @@ def test_the_crossover_looks_at_the_levels_it_is_given_in_their_order():
     assert report.thin_levels(thin, order=ages) == {"0-2h": 9} and report.thin_levels(thin) == {}
 
 
-# -- new: the tests of what the move changed --------------------------------------------------------------------------------------
-# Expected values are hand-counted from the plan's 19 questions of a tiny week, or from the definitions in the docstrings.
+# -- names, pooling and the retrieval records ---------------------------------------------------------------------------------------
+# Expected values are hand-counted from the 19 questions of a tiny week, or from the definitions in the docstrings.
 
 def test_a_models_family_comes_from_its_name():
-    """The family assertion of test_a_models_family_its_jobs_and_the_pilot_come_from_names_abouts_and_question_fields; the rest of that
-    test (jobs, the questions a model is asked, the pilot) is the runner's and mm's. changed: a name is a configuration's."""
+    """A family comes from a configuration's name; a model's jobs and the questions it is asked are the runner's and mm's."""
     names = ("d1-3B", "d1-2B", "d1-Omni-2B", "d3-edge", "pplx-decider-flash-v1.2", "h2o-lightning-4b", "fake")
     assert [retrieval.family(f"mm/{n}") for n in names] == ["d1", "d1", "d1", "d3", "pplx", "h2o", "fake"]
     assert [retrieval.variant_of(c) for c in ("mm/d1-3B", "mm/d1-3B+files", "listing")] == ["d1-3B", "d1-3B+files", "listing"]
@@ -775,8 +765,8 @@ def test_a_models_family_comes_from_its_name():
 
 
 def test_runs_are_pooled_by_seed_once_and_with_one_time_limit(tiny, tmp_path):
-    """The pooling half of test_a_run_whose_plan_changed_is_refused_and_a_seed_is_pooled_once (opening a run whose plan changed is
-    test_runfolder's). The time limit is new: the ask-estimate sentence in the Markdown quotes one."""
+    """A seed is pooled once (opening a run whose plan changed is test_runfolder's), and runs are pooled with one time limit: the
+    ask-estimate sentence in the Markdown quotes one."""
     one = run_of(tmp_path / "one", tiny[:3])
     with pytest.raises(ValueError, match=r"same seed \(7\) and scale \(tiny\)"):
         report.numbers([one, run_of(tmp_path / "twin", tiny[:3])])
@@ -817,14 +807,14 @@ def test_the_results_of_a_run_are_those_of_its_agents_and_configurations_and_not
     fs.write_json(run.folder / "results" / "claude" / FAKE.dir / "warm.json", {"seconds": 1.0})
     fs.write_json(run.folder / "results" / retrieval.FOLDER / FAKE.dir / "text-note-code-1.json", {"qid": "text-note-code-1"})
     assert report.results_of(run) == {"claude": {"mm-fake": {tiny[0].qid: a}}}
-    # a list some other system's session closes with is no result, whatever it is called (G1's F10): only a file named after a question is
+    # a list some other system's session closes with is no result, whatever it is called: only a file named after a question is
     fs.write_json(run.folder / "results" / "claude" / FAKE.dir / "leftovers.json", [{"x": 1}])
     fs.write_json(run.folder / "results" / "claude" / FILES.dir / "stray.json", {"x": 1})
     assert report.results_of(run) == {"claude": {"mm-fake": {tiny[0].qid: a}, "files": {}}}
 
 
-def test_a_record_holds_the_fields_of_both_scenarios_old_records(tiny):
-    """V7's record had `since`, `until`, `in_range`, `false` and `rank`; V8's, asked over several ranges, had `ranges` and `away`
+def test_a_record_holds_the_fields_of_both_scenarios_records(tiny):
+    """V7's record has `since`, `until`, `in_range`, `false` and `rank`; V8's, asked over several ranges, has `ranges` and `away`
     (sightings farther from every moment than the tolerance, in a range or not). One record has them all."""
     ranges, moments = ((100.0, 200.0), (1000.0, 1100.0)), ((150.0, 150.0), (1050.0, 1050.0))
     spec = RetrievalSpec("Is a shelf being assembled?", ("glasses",), ranges, 20, False, 30.0, moments, ())
@@ -882,7 +872,7 @@ def test_a_retrieval_run_asks_each_question_with_a_spec_once_and_the_report_tell
 
 
 def test_five_correct_answers_in_each_side_are_enough_for_a_cost_per_correct_answer_and_four_are_not():
-    """The boundary of MIN_CORRECT, which the ported crossover test crosses far from (4 of 10, and 10 of 20)."""
+    """The boundary of MIN_CORRECT, which the crossover test above crosses far from (4 of 10, and 10 of 20)."""
     five, four = level_of_pairs(5, 5, 10, 100, 40), level_of_pairs(4, 4, 10, 100, 40)
     assert report.cost_ratios(five) == pytest.approx((0.4, 1.0)) and report.cost_ratios(four) == (None, None)
     assert report.crossover({"day": five})["by"] == ["cost"] and report.crossover({"day": four}) is None

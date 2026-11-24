@@ -1,11 +1,11 @@
-"""`mmsb compare RUN_A RUN_B`: a run against another of the same questions, usually a re-run against the recorded run it repeats (plan 8.1,
-decision D1). Per agent and configuration (a cell): the questions whose verdict flipped, by qid and with both answers, the correct counts,
-whether the count is inside D1's band, McNemar's p of A against B, the problems and the `setup` ones; then, per agent and tested
-configuration, the report's verdict line of each run, and whether D1's conditions hold.
+"""`mmsb compare RUN_A RUN_B`: a run against another of the same questions, usually a re-run against the run it repeats. Per agent and
+configuration (a cell): the questions whose verdict flipped, by qid and with both answers, the correct counts, whether the count is
+inside the band (BAND answers either way), McNemar's p of A against B, the problems and the `setup` ones; then, per agent and tested
+configuration, the report's verdict line of each run, and whether the four conditions hold.
 
-What D1 settles, and what it does not: inside the band means no cell lost or gained more than BAND answers, which is no large loss. It does not
-mean the runs agree, because the agents are stochastic, BAND of 31 questions is about 7 points, and McNemar over a few discordant pairs
-has little power. So the flips are printed to be read, one by one, by a person.
+What the band settles, and what it does not: inside the band means no cell lost or gained more than BAND answers, which is no large loss.
+It does not mean the runs agree, because the agents are stochastic, BAND of 31 questions is about 7 points, and McNemar over a few
+discordant pairs has little power. So the flips are printed to be read, one by one, by a person.
 
 A cell whose results were made by another model or at another effort than the other run's is refused (its counts would be of another
 experiment), unless `across_settings` says to compare it anyway, and then the cell is marked."""
@@ -22,12 +22,12 @@ from mmsb.core.record import kind_of
 from mmsb.core.runfolder import RunFolder, is_done
 from mmsb.core.stats import mcnemar
 
-# D1 (plan 9.3), the one place these are written. The pilot's recorded counts were Claude files 23, Claude mm 22, Codex files 27, Codex mm 23.
+# The one place the numbers of the comparison are written.
 BAND = 2  # a cell's correct count is within this many of the other run's
 ALPHA = 0.05  # McNemar's p of the two runs is under this in no cell
 ANSWER_FORMAT_RULE = "run once in json; run `line` as well only if a cell falls outside the band"
 
-MEANING = ("A pass of D1's numbers means no large loss, not that the runs agree: the agents are stochastic, a band of {band} is about {pts:.0f} "
+MEANING = ("A pass of these numbers means no large loss, not that the runs agree: the agents are stochastic, a band of {band} is about {pts:.0f} "
            "points of {n} questions, and McNemar's p over so few discordant pairs has little power. Read every flip above, one by one, before "
            "calling the runs the same.")
 
@@ -101,7 +101,7 @@ class Comparison:
 
     @property
     def conditions(self) -> dict[str, bool]:
-        """D1's four numeric conditions: every cell compared and inside the band, no cell significant, the verdict lines the same, no
+        """The four numeric conditions: every cell compared and inside the band, no cell significant, the verdict lines the same, no
         `setup` in B. (A person reads the flips: the fifth.)"""
         return {"every cell inside the band": bool(self.cells) and all(c.inside for c in self.cells),
                 f"no cell with McNemar p under {ALPHA:g}": not any(c.significant for c in self.cells),
@@ -169,7 +169,7 @@ def compare_cells(a: RunFolder, b: RunFolder, *, across_settings: bool = False) 
 
 
 def compare_runs(a: RunFolder, b: RunFolder, *, across_settings: bool = False) -> Comparison:
-    """The cells of `compare_cells` and the verdict line of each run's report (which makes each run's figures: seconds for the pilot)."""
+    """The cells of `compare_cells` and the verdict line of each run's report (which makes each run's figures)."""
     cells = compare_cells(a, b, across_settings=across_settings)
     return Comparison(a.name, b.name, cells, verdicts_of(a, b), len(a.questions()))
 
@@ -206,7 +206,7 @@ def kinds(counts: Mapping[str, int]) -> str:
 def render_comparison(c: Comparison) -> str:
     """The comparison as text, for a person to read."""
     out = [f"compare {c.a} (A) with {c.b} (B): {c.n} questions", "",
-           f"D1 (plan 9.3): a cell is inside the band when its correct count is within +-{BAND} of A's; McNemar's p of A against B is under "
+           f"A cell is inside the band when its correct count is within +-{BAND} of A's; McNemar's p of A against B is under "
            f"{ALPHA:g} in none; the verdict lines read the same; B has no setup result; every flip is read by a person. {ANSWER_FORMAT_RULE}.", ""]
     for cell in c.cells:
         out += cell_lines(cell)

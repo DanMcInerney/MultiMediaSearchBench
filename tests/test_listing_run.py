@@ -1,9 +1,9 @@
-"""New tests for the listing system (plan 6.2) beside test_listing.py's: the configuration `listing` run end to end through the real runner with
+"""Tests of the listing system beside test_listing.py's: the configuration `listing` run end to end through the real runner with
 a stand-in agent that reads the real server; the real `claude.ask_claude` and `codex.ask_codex` over a stand-in process, with the real session and
 server (tests/stand_in_agent.py); and the report, which flags a question the listing answers (`answerable_from_metadata`) and keeps it out of the
 paired counts.
 
-Expected values are hand-counted from the plan's 19 questions of the tiny week, from what a test plants (a result that passed, an absent question,
+Expected values are hand-counted from the 19 questions of the tiny week, from what a test plants (a result that passed, an absent question,
 a tool the session should not have), and from the arguments the agents are given by their own flags: no paid agent runs."""
 
 from __future__ import annotations
@@ -137,7 +137,7 @@ def test_the_server_a_session_serves_starts_under_the_real_agent_path_with_no_to
     assert len(result_jsons(out["tools"][0]["result"])[0]["files"]) == 2
 
 
-def test_a_session_that_has_a_third_tool_is_not_the_listing_arm_and_a_call_outside_its_two_ends_the_exec(world, monkeypatch, git):
+def test_a_session_that_has_a_third_tool_is_not_the_listing_configuration_and_a_call_outside_its_two_ends_the_exec(world, monkeypatch, git):
     extra, _ = exec_of("claude", world, monkeypatch, git, extra_tools=["Read"])
     assert extra["problem"] and "extra ['Read']" in extra["problem"], extra["problem"]
     for agent in ("claude", "codex"):

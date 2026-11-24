@@ -2,8 +2,8 @@
 excerpts with their tags taken off (the Free Music Archive's `fma_small`). The questions ask to find every track of a genre in a folder, how
 many there are, whether a folder has one and which is the first, which folder has the most of a genre, and of a genre or a folder that has
 none (questions.py). **The genre of a track is the one its uploader gave it**, a coarse label that a listener may not share; no title or artist
-is asked, as the tags that held them are gone. Every answer is from the archive's labels; the scenario is the names of a `Scenario`, as functions
-(DESIGN 5), over the shared builder (realdump).
+is asked, as the tags that held them are gone. Every answer is from the archive's labels; the scenario is the names of a `Scenario`, as
+functions, over the shared builder (realdump).
 
     recipe = a8_music.recipe(scale="tiny", seed=1)      # the source, the span of the upload times, this machine's UTC offsets
     dump, questions = a8_music.build(recipe, folder, 3)  # the tracks copied in without their tags, with their times, and the questions

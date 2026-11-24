@@ -1,8 +1,8 @@
-"""New tests for the final answer (mmsb/core/answer.py, DESIGN 6.2, plan 5.4): the `line` format is the recorded `answer_of`, the `json`
+"""The final answer (mmsb/core/answer.py): the `line` format is the text after the last `ANSWER:` line, the `json`
 format is the last complete JSON object of the message with a string `answer` and a list `evidence` of citations, and the sentences the
-prompts end with ask for them. Expected values are written by hand from the rules in the module's text and the plan, or are what a test
+prompts end with ask for them. Expected values are written by hand from the rules in the module's text, or are what a test
 plants: a message built from known parts is read back as those parts (a law over many generated messages), a hostile message has the
-result its rule gives, and the recorded prompts' last sentences are the pilot's and EgoLife's own words.
+result its rule gives, and the last sentence of each prompt is written out here in full.
 
 The command line's side (the format a run keeps, the refusal to change it) is tests/test_answer_run.py."""
 
@@ -28,7 +28,7 @@ def json_of(text: str) -> FinalAnswer:
     return parse_final(text, "json")
 
 
-# -- the line format: the recorded one -----------------------------------------------------------------------------------------------
+# -- the line format -----------------------------------------------------------------------------------------------
 
 @pytest.mark.parametrize("text, answer", [
     ("thinking\n**ANSWER: 4821**", "4821"),
@@ -212,8 +212,8 @@ def test_a_message_made_of_an_object_between_any_prose_without_braces_is_read_ba
 # -- the sentence a prompt ends with -----------------------------------------------------------------------------------------------------
 
 LINE_ENDS = [
-    ("mm", False, "End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it."),  # the pilot's, for mm
-    ("the files", True, "End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it."),  # the pilot's, for the files
+    ("mm", False, "End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it."),  # for mm
+    ("the files", True, "End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it."),  # for the files
     ("mm and these files", True, "End with one line ANSWER: <answer>, or ANSWER: unknown when mm and these files do not hold it."),
 ]
 CITE = ('"evidence" lists each moment that shows the answer, as {"source": "<source>", "t0": "<start as an ISO time with its offset>", "t1": '
@@ -222,11 +222,11 @@ CITE = ('"evidence" lists each moment that shows the answer, as {"source": "<sou
 
 
 @pytest.mark.parametrize("holder, plural, text", LINE_ENDS)
-def test_the_line_request_is_the_words_the_pilot_recorded(holder, plural, text):
+def test_the_line_request_names_what_may_hold_the_answer(holder, plural, text):
     assert answer_request("line", holder, plural=plural) == text
 
 
-def test_the_line_request_of_a_choice_is_egolifes_recorded_last_sentence():
+def test_the_line_request_of_a_choice_names_the_options_and_has_no_unknown():
     assert answer_request("line", None, "<A, B, C or D>") == "End with one line ANSWER: <A, B, C or D>."
 
 
@@ -267,10 +267,10 @@ def question():
     (Access(True, DATA, MM, "json"), "json", 'Answer "unknown" with "evidence": [] when mm and these files do not hold it.'),
 ])
 def test_a_v7_prompt_ends_with_the_request_for_its_format_that_names_what_the_agent_has(question, access, fmt, ends):
-    """The mm and files configuration is told `unknown` when neither holds it: the old line said mm alone (the files may hold the answer)."""
+    """The mm and files configuration is told `unknown` when neither mm nor the files hold it."""
     got = V7.prompt(question, access)
     assert got.endswith(ends) and (got.count("End with one JSON object") == 1) == (fmt == "json")
-    assert f"{question.question} Answer from " in got, "the sentence before it is as it was"
+    assert f"{question.question} Answer from " in got, "the question is followed by the sentence that says where to answer from"
     assert "ANSWER:" in got or fmt == "json"
 
 
@@ -287,8 +287,8 @@ def test_an_egolife_prompt_ends_with_the_guess_and_then_the_request_for_its_form
 
 
 def test_a_file_may_be_cited_with_iso_times_as_a_photo_is_and_they_are_kept_as_written():
-    """A real agent cited a trail-camera photo by its file and the date and time of its EXIF, with an offset: that is an instant, as a
-    source's times are, and it is read, not refused with the right answer (a run of 5 November 2026)."""
+    """An agent may cite a trail-camera photo by its file and the date and time of its EXIF, with an offset: that is an instant, as a
+    source's times are, and it is read, not refused."""
     message = ('A roadrunner came by.\n\n{"answer": "2013-12-22", "evidence": [{"file": "DCIM/100RECNX/IMG_0190.JPG", '
                '"t0": "2013-12-22T16:05:20-08:00", "t1": "2013-12-22T16:05:20-08:00"}]}')
     got = json_of(message)

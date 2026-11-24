@@ -1,6 +1,6 @@
-"""How many execs of one cell run at once (DESIGN 8.1): the one rule, which the runner, every dry run and estimate, `clock.check_queue` and
+"""How many execs of one cell run at once (DESIGN.md): the one rule, which the runner, every dry run and estimate, `clock.check_queue` and
 `clock-check` all ask. A cell runs `jobs` execs at once, unless its system needs the GPU: then it runs `gpu_jobs`, which is 1 unless the
-owner passes `--gpu-jobs`, because three execs of one decision model at once crashed this laptop's driver (2 November 2026). `--jobs` and
+owner passes `--gpu-jobs`, because several execs of one decision model at once compete for GPU memory and can take down the driver. `--jobs` and
 `--clock` do not raise it. The system's own limit (`Session.max_jobs`: a slow model, an index cut to a horizon) comes on top, and only
 lowers it. A command that cannot ask a session yet (`mmsb repeat`, before its stores exist) asks `asked`, the rule without that limit."""
 
@@ -39,5 +39,5 @@ def gpu_warning(name: str, description: Description | None, at_once: int) -> str
     """The line a command prints when a cell that needs the GPU runs several execs at once (the owner asked for them with `--gpu-jobs`), else None."""
     if not on_gpu(description) or at_once < 2:
         return None
-    return (f"warning: {name}: {at_once} execs at once on the GPU, because {GPU_JOBS_FLAG} asked for them. Several at once crashed this "
-            "laptop's driver once: watch it")
+    return (f"warning: {name}: {at_once} execs at once on the GPU, because {GPU_JOBS_FLAG} asked for them. Several at once compete for "
+            "GPU memory and can take down the driver: watch it")

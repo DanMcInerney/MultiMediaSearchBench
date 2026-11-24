@@ -3,8 +3,8 @@ each a crash, a near miss or an ordinary drive, cut from two YouTube compilation
 128 clips), and presented here as one card. Their dates and times are invented, and the clocks and the sun do not agree (a night clip may be dated
 in the middle of the day). It is small, about half an hour of video, and the questions are about the vehicles and the road, never about the people in a crash: which
 clips have a crash or a near miss, at night, in the rain, on a highway, at a roundabout or in a car park, how many, which one clip, and
-what the time of day was (questions.py). Every answer is from the source's CSV; the scenario is the names of a `Scenario`, as functions
-(DESIGN 5), over the shared builder (realdump).
+what the time of day was (questions.py). Every answer is from the source's CSV; the scenario is the names of a `Scenario`, as functions,
+over the shared builder (realdump).
 
     recipe = v2_dashcam.recipe(scale="tiny", seed=1)      # the source, the scale's days, this machine's UTC offsets
     dump, questions = v2_dashcam.build(recipe, folder, 3)  # the clips remuxed without metadata, with their times, and the questions

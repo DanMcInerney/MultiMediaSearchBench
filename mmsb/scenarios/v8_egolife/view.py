@@ -1,6 +1,5 @@
-"""What an agent with its own tools reads in V8, and the recordings past the horizon it must not have seen (moved from egolife.py of this
-repository at bb498a6). The configurations with their own tools get, for each question, a folder of the recordings up to the question's
-horizon H: the clips that ended by H as hardlinks to the dump (the agent cannot write a copy) and the transcript lines that ended by H.
+"""What an agent with its own tools reads in V8, and the recordings past the horizon it must not have seen. The configurations with their
+own tools get, for each question, a folder of the recordings up to the question's horizon H: the clips that ended by H as hardlinks to the dump (the agent cannot write a copy) and the transcript lines that ended by H.
 Nothing later is there to read, not even the name of a later day's file. A command's output that shows a recording past H read it somewhere
 else, and ends the exec as `escaped` like the other tripwires.
 
@@ -21,8 +20,8 @@ from mmsb.core import fs
 from mmsb.core.contract import Dump, ManifestEntry
 from mmsb.core.runfolder import JOBS_MAX
 
-SEEN_TIME = re.compile(r"20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}")  # a transcript line's start or end, as the files arm's lines write it
-SEEN_CLIP = re.compile(r"glasses[/\\]+\d{4}-\d\d-\d\d[/\\]+\d\d\.\d\d\.\d\d\.mp4")  # a clip's path in the files arm (`\\` escaped too)
+SEEN_TIME = re.compile(r"20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}")  # a transcript line's start or end, as the lines of a slot's view write it
+SEEN_CLIP = re.compile(r"glasses[/\\]+\d{4}-\d\d-\d\d[/\\]+\d\d\.\d\d\.\d\d\.mp4")  # a clip's path in a slot's view (`\\` escaped too)
 MISSING = re.compile(r"no such file|does not exist|cannot find|not found|filenotfound", re.I)  # a line that reports a missing file
 
 
@@ -75,7 +74,7 @@ def release_views(temp: Path, key: str) -> None:
 def seen_past_horizon(texts: Sequence[str], dump: Dump, h: float) -> list[str]:
     """The recordings past the horizon `h` that `texts` show: a start or an end of a transcript line that is after it (a time of
     the transcript, not any time: a file's mtime or a computed one is the agent's own), or the name of a clip that ended after
-    it. The files arm's view holds neither, so an output that shows one read it somewhere else, without printing a path that
+    it. A slot's view holds neither, so an output that shows one read it somewhere else, without printing a path that
     `deny` would have stopped. A line that reports a missing file shows a clip name the agent made up (a guess at the clip of
     "now"), and its names are not counted."""
     ends = {c.path: c.t + c.length for c in clips_of(dump)}

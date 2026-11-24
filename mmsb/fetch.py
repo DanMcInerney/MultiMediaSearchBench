@@ -6,8 +6,9 @@
     mmsb fetch --scenario a1_home_audio    SINS: node 7's minute files of one day (4.9 GB read from Zenodo, 3.3 GB written as FLAC)
     mmsb fetch --scenario m4_samples       FSD50K: the labels and the 10,231 clips of the evaluation split (8.8 GB)
 
-and the scenarios of the piles of media added since (`PILES`: lectures, a podcast, meetings, a match, a dashcam, home clips, receipts, course
-pages, nature photos, music, and the sources of the first survey), whose sources `mmsb/fetch_piles.py` fetches the same way. `all` is every one.
+and the scenarios of the other piles of media (`PILES`: lectures, a podcast, meetings, a match, a dashcam, home clips, receipts, course
+pages, nature photos, music, a camera roll, a field recording, voicemails, screenshots, site photos), whose sources `mmsb/fetch_piles.py`
+fetches the same way. `all` is every one.
 
 Each source is a function that lists what its builder reads (from the source's own listing or labels), checks the count against what
 the builder needs (`EXPECTED`: another count would be another dump, so it is refused before anything large is fetched, and again
@@ -54,8 +55,8 @@ from mmsb.scenarios.realdump import SOURCES_ENV, source_word, sources_root
 from mmsb.scenarios.v1_security import source as meva
 
 REAL = (v1_security.name, i3_trailcam.name, a1_home_audio.name, m4_samples.name)  # the four whose builders read what the functions below fetch
-# The scenarios of the piles of media added after them, named by plain strings (their modules are written apart and are not imported
-# here), and the sources each reads: the ids of `fetch_piles.SOURCES`, which fetches them (MEDIA.md says where each comes from).
+# The scenarios of the other piles of media, named by plain strings (their modules are not imported here), and the sources each reads:
+# the ids of `fetch_piles.SOURCES`, which fetches them (MEDIA.md says where each comes from).
 PILES = {
     "v9_lectures": ("ocw-14-01",),
     "a6_lecture_audio": ("ocw-6-0002",),
@@ -72,7 +73,7 @@ PILES = {
     "i1_camera_roll": ("atm-bench",),
     "a4_field": ("birdvox-full-night",),
     "m3_voicemail": ("robocall-ftc",),
-    "i2_screenshots": ("android-in-the-wild",),  # (these two are not scripted yet: `fetch_piles` says so, so they come last in `all`)
+    "i2_screenshots": ("android-in-the-wild",),  # (these two are not scripted: `fetch_piles` says so, so they come last in `all`)
     "i4_site_photos": ("bd3-building-defects",),
 }
 SCENARIOS = (*REAL, *PILES)  # what `--scenario` takes besides `all`
@@ -82,9 +83,8 @@ EXPECTED = {v1_security.name: 42, i3_trailcam.name: 4256, a1_home_audio.name: 14
 
 MEVA_BUCKET = "https://mevadata-public-01.s3.amazonaws.com/"  # the clips: drops-123-r13/<day>/<hour>/<clip>.avi
 MEVA_CLIPS = "drops-123-r13"
-# The labels come from commits, not branches: the answers must not change under a published baseline. Each is the revision whose files
-# are the ones the baseline ran on (their sha256 were compared on 8 November 2026): the labels repositories' `master` then, and the
-# Hub's revision of the third-party FSD50K mirror. The clips of MEVA, LILA and Zenodo are in buckets that do not change.
+# The labels come from commits, not branches: the answers must not change under a published result. Each is a fixed revision of the
+# labels repository (and of the Hub's third-party FSD50K mirror). The clips of MEVA, LILA and Zenodo are in buckets that do not change.
 MEVA_REVISION = "421841a75577b697c314e952e585aecbb1b99e17"
 SINS_REVISION = "8ec915ddc49d7ff33d39115f7b72d2e2429e47fe"
 FSD50K_REVISION = "ccf1acaff12f3f4a4c10052dddafbb6d22152c9b"

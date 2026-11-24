@@ -21,7 +21,7 @@ WAITED_S = 60.0  # the longest a blocked build waits for the test to let it go
 
 def stamps_of(root: Path) -> dict[str, tuple[int, int]]:
     """(size, mtime in ns) of every file under `root` but the lock files (which taking a lock touches) and the folders of the ffmpeg a run
-    copies for its agents: what a command that only finds what was made leaves as it was."""
+    copies for its agents: what a command that only finds what was made leaves unchanged."""
     skipped = ("locks",)
     return {p.relative_to(root).as_posix(): (p.stat().st_size, p.stat().st_mtime_ns) for p in sorted(root.rglob("*"))
             if p.is_file() and not set(skipped) & set(p.relative_to(root).parts) and not any(part.endswith("-bin") for part in p.relative_to(root).parts)}

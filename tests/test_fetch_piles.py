@@ -572,6 +572,6 @@ def test_all_is_every_scenario_the_four_and_the_piles(site, sources, monkeypatch
 
 
 def test_a_source_that_is_not_scripted_says_so_and_names_no_file_it_could_not_fetch(sources):
-    with pytest.raises(fetch.FetchError, match=r"android-in-the-wild: not scripted yet .*came from an earlier survey"):
+    with pytest.raises(fetch.FetchError, match=r"android-in-the-wild: not scripted \(its screenshots are cut from TFRecord shards.*MEDIA.md says where to get it"):
         fetch_piles.SOURCES["android-in-the-wild"](fetch.Fetcher(), sources)
     assert not sources.exists()

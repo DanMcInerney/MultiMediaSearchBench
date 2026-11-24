@@ -7,7 +7,7 @@
 A needle photo is a `sign` with `rgb` NEEDLE_RGB["sign"] (its `box` 22 to 34% of the photo, or none: `sign_box` makes one) or a `car`
 with `rgb` NEEDLE_RGB["car"]; every other photo's colour is one of DISTRACTOR_RGB's. The reader hands a decider pictures of at most
 640x360 (its `max_px`), so the needles are sized for that; the shades keep 3% or more of the picture through that scaling and the
-JPEG (tests/test_v7_media.py). Moved from haystack_media.py of the repository at bb498a6."""
+JPEG (tests/test_v7_media.py)."""
 
 from __future__ import annotations
 

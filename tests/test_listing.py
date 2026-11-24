@@ -1,4 +1,4 @@
-"""New tests for the listing system (plan 6.2, DESIGN 3.2): ingest, the MCP server, the horizon, what a session serves, and what the system says
+"""Tests of the listing system (DESIGN.md): ingest, the MCP server, the horizon, what a session serves, and what the system says
 of itself. The report's treatment of its results and the runs through the runner and the real agents are in test_listing_run.py.
 
 Expected values come from sources that do not run the code under test: `os.stat` for sizes and times (the server reads a file written at ingest),

@@ -1,9 +1,7 @@
 """What the tests of the mm system share (tests/mm): the fake decider and its model, the system with that model as a variant, the tiny V7 week
 built once for a session of tests and ingested once, a session opened over a copy of that store, the run folder `run_agents` needs, and a
 stand-in agent. Nothing here starts a real agent or loads a real model; every daemon is over a folder of the test's own and has the fake
-decider (`python:` models need no GPU).
-
-Moved from tests/conftest.py of MultimediaSearch at fe0ece5: `FAKE`, `DECIDER`, `span`. Written for this repository: the rest."""
+decider (`python:` models need no GPU)."""
 
 from __future__ import annotations
 
@@ -33,12 +31,12 @@ ROOT = Path(__file__).resolve().parent
 FAKE = f"python:{ROOT / 'fake_decider.py'}"
 DECIDER = f'[decider]\nmodel = "{FAKE.replace(chr(92), "/")}"\n'
 FAKE_MODEL = Model("fake", FAKE, decider_d1.ABOUT)  # the fake has d1-Omni-2B's facts: it is asked every question
-D13_MODEL = Model("d1-3B", FAKE, decider.known("d1-3B")[1])  # d1-3B's facts and notes, the fake's answers: what the recorded pilot's skill and notes were for
+D13_MODEL = Model("d1-3B", FAKE, decider.known("d1-3B")[1])  # d1-3B's facts and notes, the fake's answers: what the skill and the notes an agent is given are made from
 MM = Mm(models={"fake": FAKE_MODEL, "d1-3B": D13_MODEL})
 S = Config("mm/fake", "mm", "fake", False)  # the system's tools alone
 S_FILES = Config("mm/fake+files", "mm", "fake", True)  # and with the agent's own tools
 FILES = Config("files", "files", None, True)
-DAYS = ["2026-10-30", "2026-10-31"]  # the tiny week of the old tests: MultimediaSearch's tests/test_haystack.py
+DAYS = ["2026-10-30", "2026-10-31"]  # the days of the tiny week
 SEED = 7
 V7 = scenarios.get("v7_screen")
 

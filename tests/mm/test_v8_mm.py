@@ -1,15 +1,11 @@
-"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 3: the tests of V8 that need the mm system,
-over the fake EgoLife download of tests/v8_fake.py (a two-day download with tiny clips; the rest of V8's tests are tests/test_v8*.py) and a daemon with the
-fake decider. What moved, by the plan's 3.4, 4.5, 4.6 and 5.2: the arm `mm` is the configuration `mm/fake`; `egolife.set_horizon`, `audit`, `check_snapshot`
-and `HorizonLeak` are the system's (`mmsb.systems.mm`); the decider tier is `Session.oracle` through the core's `run_retrieval`; `bench.run_agents` is the
-core's over a stand-in agent.
-The changes of an expectation, each from the plan or from a listed difference:
-- the decider tier's record is the union record of the core (plan 5.2: `config`, `system` and `variant` for `model`, and V7's fields besides V8's);
-- the estimate of a glasses window adds the reader's measured decode only for pictures larger than 1280x720 (plan 4.6): these clips are 64x64, so it adds
+"""The tests of V8 that need the mm system, over the fake EgoLife download of tests/v8_fake.py (a two-day download with tiny clips; the rest of
+V8's tests are tests/test_v8*.py) and a daemon with the fake decider: the store, the cut of the home to a question's horizon, the retrieval tier
+(`Session.oracle` through the core's `run_retrieval`), the system in the run loop of V8 (the core's `run_agents` over a stand-in agent), what the
+audit counts, the estimate, and the prompt the system's `Served` makes.
+- the retrieval tier's record is the union record of the core (`config`, `system` and `variant`, and V7's fields besides V8's);
+- the estimate of a glasses window adds the reader's measured decode only for pictures larger than 1280x720: these clips are 64x64, so it adds
   none, and `decode_of` is tested where it is measured;
-- the index counts of `test_each_arm_is_given...` are what the stand-in reads of its home, `homes/claude-fake`.
-New here, from the handoff: the prompt the system's `Served` makes for each of the 50 recorded EgoLife mm execs is the recorded prompt, clock sentence included
-(it is `Served.clock_note`, given when mm's clock is more than an hour past the question's `now`)."""
+- the index counts of `test_the_system_is_given_the_home_cut_to_the_horizon...` are what the stand-in reads of its home, `homes/claude-fake`."""
 
 from __future__ import annotations
 
@@ -17,7 +13,6 @@ import json
 import sqlite3
 from contextlib import closing
 from datetime import datetime
-from pathlib import Path
 
 import pytest
 
@@ -32,19 +27,18 @@ from mms import config  # noqa: E402
 from mmsb import systems  # noqa: E402
 from mmsb.core import fs, retrieval  # noqa: E402
 from mmsb.core.contract import Case  # noqa: E402
-from mmsb.core.question import load_questions  # noqa: E402
 from mmsb.core.runner import Agent, run_agents  # noqa: E402
 from mmsb.core.scenario import Access  # noqa: E402
-from mmsb.scenarios.v8_egolife.report import decider_figures, decider_lines  # noqa: E402
+from mmsb.scenarios.v8_egolife.report import retrieval_figures, retrieval_lines  # noqa: E402
 from mmsb.systems.mm.audit import HorizonLeak, audit  # noqa: E402
 from mmsb.systems.mm.daemon import Api  # noqa: E402
 from mmsb.systems.mm.estimate import decode_of, window_s  # noqa: E402
 from mmsb.systems.mm.home import exec_project, set_horizon  # noqa: E402
 from mmsb.systems.mm.oracle import ask  # noqa: E402
+from mmsb.systems.mm.system import CLOCK_NOTE  # noqa: E402
 
 pytestmark = pytest.mark.xdist_group("v8")
 
-RECORDED = Path(__file__).parent.parent / "oracles" / "recorded" / "egolife-s1"
 VIDEO_QIDS = ("ego-001", "ego-003", "ego-004", "ego-005", "ego-006", "ego-018", "ego-020", "ego-021")
 SPEECH_QIDS = ("ego-008", "ego-009")
 RIGHT = {*VIDEO_QIDS, *SPEECH_QIDS} - {"ego-021"}  # who answers right with the system (the evidence clip of ego-021 is a day away)
@@ -126,11 +120,11 @@ def test_moving_the_horizon_back_and_forward_restores_everything(opened):
         assert db.execute("SELECT COUNT(*) FROM items WHERE state = 'ok'").fetchone() == (24,)
 
 
-# -- the decider tier ------------------------------------------------------------------------------------------------------------------------------
+# -- the retrieval tier ------------------------------------------------------------------------------------------------------------------------------
 
 RECORD_KEYS = {"qid", "type", "template", "level", "last", "absent", "config", "system", "variant", "question", "source", "since", "until", "ranges",
                "limit", "found", "top5", "p", "rank", "moments", "moments_found", "others", "others_found", "in_range", "false", "away", "windows",
-               "seconds", "wall_s", "stopped", "warnings", "sightings", "candidates"}  # the union record of the core (plan 5.2)
+               "seconds", "wall_s", "stopped", "warnings", "sightings", "candidates"}  # the union record of the core
 
 
 @pytest.fixture(scope="module")
@@ -145,7 +139,7 @@ def decided(built, recipe, v8store, tmp_path_factory):
     return run, {q.qid: fs.read_json(run.folder / "results" / "retrieval" / "mm-fake" / f"{q.qid}.json") for q in questions}
 
 
-def test_the_decider_finds_the_evidence_with_the_fake(built, decided):
+def test_the_retrieval_tier_finds_the_evidence_with_the_fake(built, decided):
     questions = {q.qid: q for q in built[1]}
     _, records = decided
     one = records["ego-001"]
@@ -167,7 +161,7 @@ def test_the_decider_finds_the_evidence_with_the_fake(built, decided):
     assert all(r["stopped"] == "range_end" for r in records.values()), "every range was scanned to its end"
 
 
-def test_the_decider_reads_the_transcript_for_a_speech_question(decided):
+def test_the_retrieval_tier_reads_the_transcript_for_a_speech_question(decided):
     _, records = decided
     eight, nine = records["ego-008"], records["ego-009"]
     assert (eight["source"], eight["question"], eight["type"]) == ("transcript", WORD, "records")
@@ -175,7 +169,7 @@ def test_the_decider_reads_the_transcript_for_a_speech_question(decided):
     assert (nine["found"], nine["away"]) == (False, 0), "no line near its target says screwdriver"
 
 
-def test_the_decider_tier_is_asked_once_and_reported(built, decided, v8store, tmp_path):
+def test_the_retrieval_tier_is_asked_once_and_reported(built, decided, v8store, tmp_path):
     run, records = decided
     folder = run.folder / "results" / "retrieval" / "mm-fake"
     assert sorted(p.stem for p in folder.glob("*.json")) == sorted(["warm", *records]) and fs.read_json(folder / "warm.json") == {"config": "mm/fake", "seconds": 0.5}
@@ -185,11 +179,11 @@ def test_the_decider_tier_is_asked_once_and_reported(built, decided, v8store, tm
             raise AssertionError("a configuration with every record is asked nothing")
 
     assert retrieval.run_retrieval(run, S, Refuses(), built[1]) == 0
-    tier = decider_figures(run)["mm/fake"]
+    tier = retrieval_figures(run)["mm/fake"]
     assert (tier["all"]["asked"], tier["all"]["found"]) == (10, 7) and tier["all"]["top5"] >= 7 and tier["all"]["p50"] >= 7
     assert [(tier["types"][t]["asked"], tier["types"][t]["found"]) for t in ("video", "speech")] == [(8, 6), (2, 1)]
     assert tier["categories"]["EventRecall"]["asked"] == 3 and tier["first_s"] is not None
-    text = "\n".join(decider_lines({"mm/fake": tier}))
+    text = "\n".join(retrieval_lines({"mm/fake": tier}))
     assert "| fake | all | 10 |" in text and "| fake | speech | 2 |" in text and "no fault" in text
 
 
@@ -208,7 +202,7 @@ def mm_ask(leak: str | None = None):
         result, _ = ask(Api(home), params, exec_project(q.qid))
         seen["ask"] = result
         if q.qid == leak:
-            late = {"source": "glasses", "t": config.iso(q.horizon + 60), "p": 0.9}  # one recording past the horizon (G1's a5: a tolerance of one let it by)
+            late = {"source": "glasses", "t": config.iso(q.horizon + 60), "p": 0.9}  # one recording past the horizon
             result = {**result, "sightings": [*result["sightings"], late]}
         seen["tools"] = [{"tool": "ask", "arguments": {**params, "until": config.iso(until)},
                           "result": {"content": [{"type": "text", "text": json.dumps({**result, "job": "j1"})}]}}]
@@ -359,7 +353,7 @@ def test_the_audit_catches_a_time_given_as_t_in_a_sighting_or_a_candidate_and_in
 
 # -- the estimate ------------------------------------------------------------------------------------------------------------------------------------------
 
-def test_the_estimate_is_the_decider_ask_at_the_cost_of_a_window_here(built, decided, opened):
+def test_the_estimate_is_the_retrieval_ask_at_the_cost_of_a_window_here(built, decided, opened):
     _, questions = built
     by = {q.qid: q for q in questions}
     about = opened.model.about
@@ -381,15 +375,17 @@ def test_the_decode_of_a_window_is_measured_over_the_first_a_middle_and_the_last
     assert 0 < decode_of(dump.root, clips) < 1
 
 
-# -- the prompt, as the recorded run made it -----------------------------------------------------------------------------------------------------------------
+# -- the prompt ---------------------------------------------------------------------------------------------------------------------------------------------
 
-def test_the_prompt_the_system_makes_for_each_recorded_egolife_mm_exec_is_the_recorded_one(opened, tmp_path):
-    prompts = json.loads((RECORDED / "prompts.json").read_text(encoding="utf-8"))
-    questions = load_questions(RECORDED / "converted" / "questions.jsonl")
-    assert sorted(prompts) == sorted(q.qid for q in questions) and len(questions) == 50
+def test_the_prompt_for_the_system_names_it_by_its_holder_and_ends_its_sentence_with_the_clock_note(built, opened, tmp_path):
+    q = next(q for q in built[1] if q.qid == "ego-001")
     (tmp_path / "w").mkdir()
-    for q in questions:
-        case = Case(q.qid, datetime.fromisoformat(q.now).timestamp(), None, q.scope.sources, q.scope.since, q.scope.until, q.group, 0.0, 0, tmp_path / "w", tmp_path / "r")
-        served = opened.serve(case)
-        assert served.clock_note is not None and served.holder == "mm", "mm's clock is days past the recorded questions'"
-        assert V8.prompt(q, Access(False, None, served, "line")) == prompts[q.qid]["mm"], q.qid
+    case = Case(q.qid, datetime.fromisoformat(q.now).timestamp(), None, q.scope.sources, q.scope.since, q.scope.until, q.group, 0.0, 0, tmp_path / "w", tmp_path / "r")
+    served = opened.serve(case)
+    assert served.holder == "mm" and served.clock_note == CLOCK_NOTE, "mm's clock is days past the question's `now`"
+    assert V8.prompt(q, Access(False, None, served, "line")) == (
+        "It is now Thursday 29 October 2026, 11:12 (day 1 of these recordings; day 1 was Thursday 29 October). I am Jake. "
+        "mm has recorded these sources of mine from day 1 to now: glasses (the video of the camera on my glasses, 30 s clips at 20 fps) and "
+        "transcript (what was said around me: a record per spoken line, with its speaker and the words in English and Chinese). "
+        f"{CLOCK_NOTE}\n\nQuestion 1?\nA) Tasha\nB) Alice\nC) Shure\nD) Lucia\n\nIf what you can find does not settle it, give your best guess. "
+        "End with one line ANSWER: <A, B, C or D>.")

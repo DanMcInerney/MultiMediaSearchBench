@@ -1,14 +1,13 @@
-"""The plan of a V8 run (moved from egolife.py of this repository at bb498a6): a pure function of the download, the seed, the days, the clip
-table and the oracles file. One `File` for each clip (kind `clip`, spec `{"src", "length"}`), the transcript as logs (a date to its lines),
-and a question for each chosen item. The plan's dicts are what `plan_hash` and `files_hash` cover, so their keys do not change; questions.py
-projects them onto the question file.
+"""The plan of a V8 run: a pure function of the download, the seed, the days, the clip table and the oracles file. One `File` for each clip
+(kind `clip`, spec `{"src", "length"}`), the transcript as logs (a date to its lines), and a question for each chosen item. The plan's
+dicts are what `plan_hash` and `files_hash` cover, so their keys do not change; questions.py projects them onto the question file.
 
 Times: a plain time is turned into a local epoch with `local`, which needs the days; the offset of the local zone must not change during
 them (`check_days`), else elapsed time across that night would be an hour other in a system that keeps offsets than in the files, which
 keep naive local times.
 
-`oracles.json` holds the retrieval question of each of the 50 questions the recorded run chose, written by hand by ORACLE_RULES. Its text is part
-of the plan, so a change to it changes the plan hash."""
+`oracles.json` holds the retrieval question of each of 50 questions of the download, written by hand by ORACLE_RULES; the plan refuses a
+chosen question that has none. Its text is part of the plan, so a change to it changes the plan hash."""
 
 from __future__ import annotations
 
@@ -33,7 +32,7 @@ TEXT_ASK = "Does the text talk about "  # how a speech question's oracle starts 
 PEOPLE = ("Alice", "Choiszt", "Jake", "Katrina", "Lucia", "Nicous", "Shure", "Tasha", "Violet")  # who the transcript names
 ORACLES = Path(__file__).with_name("oracles.json")
 ORACLE_VERSION = 1
-# the words mms's ask refuses in a question (src/mms/scripts/ask.py; src/multimem/scripts/ask.py at fe0ece5: TIME_WORDS, JOINED): rules 3 and 5 of ORACLE_RULES.
+# the words mms's ask refuses in a question (src/mms/scripts/ask.py: TIME_WORDS, JOINED): rules 3 and 5 of ORACLE_RULES.
 # tests/mm asserts that they are still MultimediaSearch's.
 TIME_WORDS = re.compile(
     r"\b(yesterday|today|tonight|tomorrow|this (morning|afternoon|evening|week|month)|last (night|week|month|year)|"
@@ -184,7 +183,7 @@ def plan(source: Path, seed: int, days: Sequence[date], clips: Sequence[Clip], o
 
 
 def oracle_ranges(q: dict) -> list[tuple[float, float]]:
-    """What the decider tier asks over: each target +- PAD_S, cut at the horizon, overlapping ranges merged."""
+    """What the retrieval tier asks over: each target +- PAD_S, cut at the horizon, overlapping ranges merged."""
     spans = sorted((m - PAD_S, min(m + PAD_S, q["until"])) for m, _ in q["truth"]["moments"])
     out: list[tuple[float, float]] = []
     for a, b in spans:
@@ -207,7 +206,7 @@ def crosses_a_change(days: Sequence[date], offset=None) -> bool:
 
 def default_days(today: date, n: int = DAYS, offset=None) -> tuple[date, ...]:
     """The latest `n` consecutive days before `today` that cross no change of the local UTC offset: elapsed time across such a
-    night is an hour different in mm (which keeps offsets) and in the files arm (which keeps naive local times)."""
+    night is an hour different in mm (which keeps offsets) and in the `files` configuration (which keeps naive local times)."""
     last = today - timedelta(days=1)
     while crosses_a_change(days := tuple(last - timedelta(days=n - 1 - i) for i in range(n)), offset):
         last -= timedelta(days=1)
@@ -220,7 +219,7 @@ def check_days(days: Sequence[date], offset=None) -> None:
         raise ValueError(f"the days are consecutive, oldest first: {', '.join(d.isoformat() for d in days)}")
     if crosses_a_change(days, offset):
         raise ValueError(f"{days[0]} to {days[-1]} cross a change of the local UTC offset (the clocks change): elapsed time across "
-                         "that night would differ by an hour between mm and the files arm; use days that do not")
+                         "that night would differ by an hour between mm and the `files` configuration; use days that do not")
 
 
 def check_transcript(logs: dict[str, Sequence[dict]], deny: Sequence[str]) -> None:
@@ -229,5 +228,5 @@ def check_transcript(logs: dict[str, Sequence[dict]], deny: Sequence[str]) -> No
     for day, rows in logs.items():
         for line in rows:
             if hit := reached(line, tuple(deny), output=True):
-                raise ValueError(f"the transcript line ending {line['end']} holds {hit!r}, which the files arm ends an exec for "
+                raise ValueError(f"the transcript line ending {line['end']} holds {hit!r}, which an agent with its own tools is ended for "
                                  f"printing: {line['en'] or line['zh']!r}")

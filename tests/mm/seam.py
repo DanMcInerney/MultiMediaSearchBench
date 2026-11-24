@@ -1,13 +1,11 @@
 """The seam between the real session and the real agent, which no other test crosses: tests/mm has the real `MmSession` with stand-in agents that call
-the daemon's `Api` themselves, and tests/replay.py has the real agents with a stand-in session. Here a stand-in `claude` or `codex` process is run
+the daemon's `Api` themselves, and tests/test_agents.py has the real agents over hand-made specs. Here a stand-in `claude` or `codex` process is run
 through the real `claude.ask_claude` or `codex.ask_codex`, with the real `SessionSpec` the runner makes (the deny words of `RunFolder.deny`, the server
 and instructions of `MmSession.serve`). It finds the server as the agent does (Claude: the `--mcp-config` file; Codex: the `-c mcp_servers.*`
 settings), starts the real server command `serve` returned, speaks JSON-RPC to it over a throwaway home with the fake decider, and writes the stream as
 the agent does: Claude's init event lists the tools the server listed, Codex's items are `mcp_tool_call`s. What it asks is `find`, `ask` and `look`; with
 the agent's own tools too it then opens the file `look` named (Claude: a `Read`; Codex: a shell command, as it has no read tool). The stand-in's
-plumbing is tests/stand_in_agent.py's, which the listing system's seam test uses too; what is mm's is what it asks.
-
-Written for this repository (G1's repair of F4 and shared cause 3)."""
+plumbing is tests/stand_in_agent.py's, which the listing system's seam test uses too; what is mm's is what it asks."""
 
 from __future__ import annotations
 

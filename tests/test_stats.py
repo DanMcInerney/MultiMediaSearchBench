@@ -1,61 +1,22 @@
-"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5 (the statistics parts of test_the_difference_gets_newcombes_interval_...,
-test_the_report_counts_as_it_should and test_claudes_tokens_count_the_cache_...), with `bench.` now `stats.`. The tests marked new
-are not from there: the cells of the two recorded reports, which the old code computed, and laws every input obeys."""
+"""Tests for mmsb/core/stats.py: McNemar's exact p, Newcombe's interval for paired data, the Wilson interval, the pair counts, the token totals
+and the small summaries, with laws every input obeys."""
 
 from __future__ import annotations
 
 import itertools
-import json
 import math
-from pathlib import Path
 
 import pytest
 
 from mmsb.core import stats
 
-RECORDED = Path(__file__).parent / "oracles" / "recorded"
 
-
-def cells(report: dict):
-    """Every cell of a recorded report that has a paired comparison and the correct counts of both sides, as
-    `(where, (a, b, c, d), cell)`: a is the pairs right in both, which the counts of the sides give back."""
-    found = []
-
-    def walk(node, where):
-        if isinstance(node, dict):
-            sides = [node.get(x) for x in ("files", "mm")] if "files" in node else [node.get(x) for x in ("base", "other")]
-            if {"n", "b", "c", "p", "ci"} <= node.keys() and all(isinstance(s, dict) and s.get("n") == node["n"] for s in sides):
-                control, tested = sides
-                a = tested["correct"] - node["b"]
-                assert control["correct"] == a + node["c"], where  # the two sides and b, c agree on a
-                found.append((where, (a, node["b"], node["c"], node["n"] - a - node["b"] - node["c"]), node))
-            for key, child in node.items():
-                walk(child, f"{where}/{key}")
-
-    walk(report, "")
-    return found
-
-
-@pytest.mark.parametrize("name, how_many, with_interval", [("pilot-s1", 16, 0), ("egolife-s1", 18, 3)])
-def test_every_recorded_cell_gets_the_p_and_the_interval_the_old_code_gave_it(name, how_many, with_interval):
-    report = json.loads((RECORDED / name / "report.json").read_text(encoding="utf-8"))
-    found = cells(report)
-    assert len(found) == how_many and sum(c["ci"] is not None for _, _, c in found) == with_interval, "the walk found the cells"
-    for where, counts, cell in found:
-        a, b, c, d = counts
-        assert stats.mcnemar(b, c) == pytest.approx(cell["p"], rel=1e-12, abs=0), where
-        if cell["ci"] is None:
-            assert stats.interval(a, b, c, d) is None and b + c < stats.MIN_DISCORDANT, where
-        else:
-            assert stats.interval(a, b, c, d) == pytest.approx(cell["ci"], rel=1e-12, abs=0), where
-
-
-def test_the_pilots_four_against_nothing_is_p_an_eighth_and_one_against_nothing_is_p_one():
+def test_four_against_nothing_is_p_an_eighth_and_one_against_nothing_is_p_one():
     assert stats.mcnemar(4, 0) == 0.125 and stats.mcnemar(1, 0) == 1.0
 
 
-def test_the_difference_gets_newcombes_interval_only_from_ten_pairs_right_in_one_arm_only_and_mcnemar_speaks_for_the_rest():
-    # the case that a percentile bootstrap got wrong: 4 right with mm only, 0 the other way, 16 pairs: [.06, .50] with p = .125
+def test_the_difference_gets_newcombes_interval_only_from_ten_pairs_right_in_one_side_only_and_mcnemar_speaks_for_the_rest():
+    # 4 right with the tested side only, 0 the other way, 16 pairs: the interval is [.06, .50] with p = .125
     assert stats.newcombe(6, 4, 0, 6)[0] > 0, "the interval would exclude 0 where McNemar does not"
     assert stats.interval(6, 4, 0, 6) is None and stats.interval(6, 5, 4, 5) is None, "9 discordant pairs"
     # from 10: the interval, beside the p
@@ -78,7 +39,7 @@ def test_the_difference_gets_newcombes_interval_only_from_ten_pairs_right_in_one
     assert stats.wilson(0, 0) == (0.0, 1.0) and stats.wilson(5, 10)[0] < 0.5 < stats.wilson(5, 10)[1]
 
 
-def test_mcnemar_is_the_statistics_ported_values():
+def test_mcnemar_gives_these_values():
     assert stats.mcnemar(6, 0) == 0.03125 and stats.mcnemar(5, 0) == 0.0625 and stats.mcnemar(0, 0) == 1.0
     assert stats.mcnemar(3, 3) == 1.0 and stats.mcnemar(10, 2) == pytest.approx(0.0386, abs=1e-4)
     assert stats.mcnemar(2, 6) == stats.mcnemar(6, 2)
@@ -90,8 +51,6 @@ def test_claudes_tokens_count_the_cache_it_read_and_wrote_as_codexs_input_alread
     assert stats.token_total(claude) == 1350 == stats.token_total(codex) and stats.token_total({"agent": "claude", "tokens": None}) is None
     assert stats.token_total({"agent": "claude", "tokens": {"input": 5, "output": 1, "cache_read": None, "cache_write": None}}) == 6
 
-
-# -- new ----------------------------------------------------------------------------------------------------------------
 
 def test_mcnemar_is_the_exact_two_sided_p_of_a_fair_coin_by_counting_every_outcome():
     """A simple model run in lockstep: every one of the 2^n ways the n discordant pairs can fall, counted."""

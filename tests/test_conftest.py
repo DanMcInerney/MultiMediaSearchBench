@@ -257,7 +257,7 @@ def program(path: Path) -> Path:
 
 
 def test_a_test_may_not_start_the_owners_agents_or_a_program_in_the_owners_folders_and_may_start_anything_else(tmp_path):
-    """Two test runs once reached the real `claude auth status` before a fixture patched `check_login`. Programs named as the agents are stand-ins
+    """A test that has not patched `check_login` would reach the real `claude auth status`. Programs named as the agents are stand-ins
     here that leave a marker when they run, so the test cannot start a real one even if the guard were gone."""
     ext = ".cmd" if os.name == "nt" else ""
     owner, stand_ins = tmp_path / "owner", tmp_path / "stand-ins"

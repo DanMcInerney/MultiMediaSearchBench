@@ -1,9 +1,9 @@
-"""Grounded scoring beside the old verdict (DESIGN 6.3): whether the evidence an agent cited is where the question's truth is.
+"""Grounded scoring beside the verdict (DESIGN.md): whether the evidence an agent cited is where the question's truth is.
 
-`passed` is still the value rule and no problem. The grounded status is told apart from it:
+`passed` is the value rule and no problem. The grounded status is told apart from it:
 
 | the answer                                                       | status         |
-| the `line` format, or a result made before the status existed    | `not_recorded` |
+| the `line` format, which holds no status                         | `not_recorded` |
 | the value fails its rule                                         | `wrong`        |
 | an absent question, the value passes, no evidence                | `grounded`     |
 | an absent question, the value passes, evidence given             | `wrong`        |
@@ -30,12 +30,12 @@ from mmsb.core.question import Question
 
 Status = Literal["grounded", "lucky", "wrong", "not_recorded"]
 NOT_RECORDED: Status = "not_recorded"
-TOLERANCE_S = {"video": 10.0, "audio": 5.0, "records": 5.0}  # DESIGN 6.3; the last is the correction for a log or transcript line (C8)
-SAME_FILE = ("image", "text")  # a picture, a note, a version of a config: the file itself (DESIGN 6.3; C8)
+TOLERANCE_S = {"video": 10.0, "audio": 5.0, "records": 5.0}  # the last is for a log or transcript line
+SAME_FILE = ("image", "text")  # a picture, a note, a version of a config: the file itself
 POINT_S = 1.0  # a source's citation names the picture or note whose time it holds, told to the second
 CLOCK_SLACK_S = 1.0  # a clock time is told to the second: one up to a second before a file starts is still that file's
 EPS = 1e-6  # seconds: a gap that is the tolerance, as floats, is within it
-COLLARS = (("f1_1s", 1.0), ("f1_5s", 5.0))  # the collars a count's event F1 is told with (DESIGN 6.3)
+COLLARS = (("f1_1s", 1.0), ("f1_5s", 5.0))  # the collars a count's event F1 is told with
 
 
 @dataclass(frozen=True)
@@ -57,7 +57,7 @@ class Grounding:
 
 
 def status_of(result: dict) -> Status:
-    """The grounded status a result holds, `not_recorded` when it holds none: a result of the `line` format, or made before the status."""
+    """The grounded status a result holds, `not_recorded` when it holds none: a result of the `line` format."""
     return result.get("grounded", NOT_RECORDED)
 
 

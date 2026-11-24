@@ -1,7 +1,7 @@
-"""New tests for mmsb/core/runfolder.py and paths.py. The deny words are held to the goldens the old code wrote (U0:
-tests/oracles/recorded/exec/deny-v7.json and deny-v8.json, from `Run.deny` and `EgoRun.deny` over sentinel folders); the intended
-differences of plan 7.3 (difference 7) are asserted, not ignored. What belongs to a scenario's own words (V7's `haystack` words, V8's
-folders of recordings) is fed in from the same goldens here and compared against the real scenarios in U2 and U6."""
+"""Tests for mmsb/core/runfolder.py and paths.py: where a run's files and working slots are, the words an agent with its own tools may not
+reach (`RunFolder.deny`), and the refusals when a run is opened again. The deny words are checked against explicit expected values over made-up
+folders at the top of a drive (`SENTINEL`), so they read the same on Windows and elsewhere; what belongs to a scenario's own words is fed in by
+a stub here and checked against the real scenarios in their own tests."""
 
 from __future__ import annotations
 
@@ -13,7 +13,6 @@ from datetime import date
 from pathlib import Path
 
 import pytest
-from golden_names import golden_json
 from test_question import BASE, file_of
 
 from mmsb.core import fs, paths
@@ -21,24 +20,25 @@ from mmsb.core.agents.common import reached
 from mmsb.core.config import parse_config
 from mmsb.core.contract import Isolation
 from mmsb.core.question import load_questions, write_questions
-from mmsb.core.runfolder import IN_ONLY, JOBS_MAX, RunFolder, check_temp, package_root
+from mmsb.core.runfolder import COMMIT_KEY, JOBS_MAX, OFF_GPU_DENY, RunFolder, check_temp, package_root
 
-RECORDED = Path(__file__).parent / "oracles" / "recorded"
-DENY = {name: golden_json(RECORDED / "exec" / f"deny-{name}.json") for name in ("v7", "v8")}  # with the renames of tests/golden_names.py: `.mms`
-PILOT = json.loads((RECORDED / "pilot-s1" / "run.json").read_text(encoding="utf-8"))
-RECIPE = {"scale": "pilot", "seed": 1}  # what the stub scenario is built from; its hashes are the recorded pilot's
-SENTINEL = DENY["v7"]["inputs"]  # D:\__RUN__, D:\__TEMP__, D:\__OUT__, D:\__ROOT__, tag TAG
-CACHE = r"D:\__CACHE__"  # the golden has no cache folder: the old code had none
+TOP = Path("D:/") if os.name == "nt" else Path("/")  # made-up folders at the top of a drive: no run's folder is beside another's
+SENTINEL = {"folder": TOP / "__RUN__", "out": TOP / "__OUT__", "root": TOP / "__ROOT__", "temp": TOP / "__TEMP__",
+            "data": TOP / "__TEMP__" / "mmb-key0123456-data", "cache": TOP / "__CACHE__", "tag": "TAG", "seed": 1, "scale": "pilot",
+            "days": ("2026-11-01", "2026-11-02", "2026-11-03")}
+PLAN, FILES = "a" * 64, "b" * 64  # the hashes the stub scenario says its recipe makes
+RECIPE = {"scale": "pilot", "seed": 1}  # what the stub scenario is built from
 NO_ISOLATION = Isolation((), (), (), {})
 MM_ISOLATION = Isolation(("MMS_",), (".mms",), (), {"MMS_HOME": "no-mm-home"})
 DEFAULTS = {"files": None, "mm": "d1-3B"}
-# the old DENY_WORDS' path part for the old out folder, which G1's F1 keeps, and the same rule for the sentinel runs and cache folders, for the
-# results and the temp folder of the runs recorded before MMSB, and for the tests' folder
-OLD_OUT_WORDS = ("/mm-bench/", '/mm-bench"', "/mm-bench ", "/mm-bench'")
-NEW_RUNS_WORDS = ("/__out__/", '/__out__"', "/__out__ ", "/__out__'")
-NEW_CACHE_WORDS = ("/__cache__/", '/__cache__"', "/__cache__ ", "/__cache__'")
-EARLIER_TEMP_WORDS = ("/mm-bench-temp/", '/mm-bench-temp"', "/mm-bench-temp ", "/mm-bench-temp'")
-TESTS_WORDS = (str(paths.TESTS).lower().replace("\\", "/"), "/mmsb-temp/", '/mmsb-temp"', "/mmsb-temp ", "/mmsb-temp'")
+# how a folder's name is told in a path or a command: before a slash, a quote, a space or another quote
+RUNS_WORDS = ("/__out__/", '/__out__"', "/__out__ ", "/__out__'")
+CACHE_WORDS = ("/__cache__/", '/__cache__"', "/__cache__ ", "/__cache__'")
+TESTS_WORDS = ("/mmsb-temp/", '/mmsb-temp"', "/mmsb-temp ", "/mmsb-temp'")
+
+
+def posix(text) -> str:
+    return str(text).lower().replace("\\", "/")
 
 
 class StubScenario:
@@ -50,7 +50,7 @@ class StubScenario:
         self.words = words or {}
         self.asked: list[tuple[tuple[int, ...], Path, str]] = []
         self.hashed: list = []  # the recipes `hashes` was asked for
-        self.hash_of = (PILOT["plan"], PILOT["files"])
+        self.hash_of = (PLAN, FILES)
 
     def deny_words(self, others, temp, key):
         self.asked.append((tuple(others), temp, key))
@@ -65,63 +65,49 @@ class StubScenario:
 
 @pytest.fixture
 def sentinels(monkeypatch):
-    monkeypatch.setattr(paths, "RUNS", Path(SENTINEL["out"]))
-    monkeypatch.setattr(paths, "CACHE", Path(CACHE))
-    monkeypatch.setattr(paths, "ROOT", Path(SENTINEL["root"]))
+    monkeypatch.setattr(paths, "RUNS", SENTINEL["out"])
+    monkeypatch.setattr(paths, "CACHE", SENTINEL["cache"])
+    monkeypatch.setattr(paths, "ROOT", SENTINEL["root"])
 
 
-def run_of(scenario, configs=()) -> RunFolder:
-    return RunFolder(Path(SENTINEL["folder"]), SENTINEL["seed"], SENTINEL["scale"], tuple(date.fromisoformat(d) for d in SENTINEL["days"]),
-                     Path(SENTINEL["v7_data"]), Path(SENTINEL["temp"]), SENTINEL["tag"], 900.0, scenario, tuple(configs))
+def run_of(scenario, configs=(), **fields) -> RunFolder:
+    """A run in the sentinel folders (`fields`: more of its fields, such as `cache` or `parent`)."""
+    return RunFolder(SENTINEL["folder"], SENTINEL["seed"], SENTINEL["scale"], tuple(date.fromisoformat(d) for d in SENTINEL["days"]),
+                     SENTINEL["data"], SENTINEL["temp"], SENTINEL["tag"], 900.0, scenario, tuple(configs), **fields)
 
 
-def between(words: list[str], after: str, before: str) -> tuple[str, ...]:
-    return tuple(words[words.index(after) + 1:words.index(before)])
+def slot_words(run: RunFolder, ks) -> list[str]:
+    """What the deny words say of the working slots numbered `ks`: the path, the folder's name, and two globs that match the name."""
+    return [word for k in ks for word in (f"in:{posix(run.slot(k))}", f"in:mmb-tag-w{k}", f"in:*-w{k}", f"in:?-w{k}")]
 
 
-def posix(text) -> str:
-    return str(text).lower().replace("\\", "/")
+GLOBS = ["in:mmb-tag-w*", "in:mmb-tag-w?", "in:mmb-tag-w[", "in:mmb-*", "in:mmb-?", "in:mmb-["]  # every slot, and every folder of a run
 
 
-def check_against(golden: list[str], got: tuple[str, ...], scenario_words: tuple[str, ...]) -> None:
-    """The deny words `got` are the golden's with the plan's differences, and nothing else."""
-    assert len(set(got)) == len(got), "no word twice"
-    assert set(golden) - set(got) == set(), "no word of the golden goes: the old out folder's stay (G1's F1)"
-    assert set(got) - set(golden) == {posix(CACHE), *NEW_RUNS_WORDS, *NEW_CACHE_WORDS, *EARLIER_TEMP_WORDS, *TESTS_WORDS}, \
-        "and only the cache folder's, the earlier runs' temp folder's, the tests' folder's and the new words come"
-    assert set(OLD_OUT_WORDS) <= set(got)
-    assert sorted(w for w in got if w in golden) == sorted(golden), "every word of the golden, once"
-    assert got[:6] == (*golden[:2], posix(CACHE), *golden[2:5]), "the run, the runs folder, the cache (new), the repo, .claude, .codex first"
-    slots = tuple(w for w in golden if w.startswith(IN_ONLY) and ("-w" in w or w in ("in:mmb-*", "in:mmb-?", "in:mmb-[")))
-    assert got[-len(slots):] == slots, "the slot words last, in the old order"
-    assert set(scenario_words) <= set(got)
+# -- the words an agent with its own tools may not reach -----------------------------------------------------------------------
+
+def test_the_deny_words_are_the_runs_folder_the_other_runs_the_checkout_the_setup_the_isolation_the_scenario_and_the_slots(sentinels):
+    scenario = StubScenario({(0, 1, 2, 3): ("in:truth", "answers.json")})
+    run = run_of(scenario)
+    assert run.deny(None, MM_ISOLATION) == (
+        posix(SENTINEL["folder"]),  # this run's folder
+        posix(SENTINEL["out"]), posix(SENTINEL["cache"]),  # the runs and cache folders
+        posix(SENTINEL["root"]), ".claude", ".codex",  # the checkout; the setup of the agents
+        *RUNS_WORDS, *CACHE_WORDS, *TESTS_WORDS,  # the folders by name, for a relative path
+        posix(paths.TESTS), ".mms",  # the tests' folder; what the isolation adds
+        "in:truth", "answers.json",  # the scenario's
+        *slot_words(run, range(JOBS_MAX)), *GLOBS)
+    assert scenario.asked == [((0, 1, 2, 3), run.temp, "TAG")]
 
 
-@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
-def test_v7_deny_words_are_the_old_ones_but_for_the_new_folders_with_no_slot_and_with_slot_0(sentinels):
-    v7 = DENY["v7"]["v7"]
-    source = between(v7["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0")  # V7's `haystack` words: the scenario's, U2 checks them
-    assert len(source) == 8 and all(w.startswith(IN_ONLY) for w in source)
-    for own, key in ((None, "none"), (0, "slot0")):
-        scenario = StubScenario({(0, 1, 2, 3): source, (1, 2, 3): source})
-        run = run_of(scenario)
-        got = run.deny(None if own is None else run.slot(own), MM_ISOLATION)
-        check_against(v7[key], got, source)
-        assert scenario.asked == [((0, 1, 2, 3) if own is None else (1, 2, 3), run.temp, "TAG")]
-    assert run.slot(0) == Path(v7["slot0_path"])
-
-
-@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
-def test_v8_deny_words_are_the_old_ones_but_for_the_new_folders_the_scenarios_words_come_from_it(sentinels):
-    v8 = DENY["v8"]["v8"]
-    for own, key, next_slot in ((None, "none", "in:d:/__temp__/mmb-tag-w0"), (0, "slot0", "in:d:/__temp__/mmb-tag-w1")):
-        golden = v8[key]
-        source = between(golden, "/mm-bench'", next_slot)  # bench.Run.deny's SOURCE_WORDS, which EgoRun.deny keeps
-        extras = tuple(golden[golden.index("in:mmb-[") + 1:])  # V8's folders of recordings, after the last slot word
-        assert extras[:3] == ("bench-data", "a1_jake", "in:egolife") and len(extras) > 20
-        scenario = StubScenario({(0, 1, 2, 3): (*source, *extras), (1, 2, 3): (*source, *extras)})
-        run = run_of(scenario)
-        check_against(golden, run.deny(None if own is None else run.slot(own), MM_ISOLATION), (*source, *extras))
+def test_the_slot_a_run_works_in_is_not_denied_to_it_and_the_scenario_is_asked_for_the_slots_that_are_others(sentinels):
+    scenario = StubScenario({(1, 2, 3): ("in:truth",), (0, 1, 2, 3): ("in:everything",)})
+    run = run_of(scenario)
+    words = run.deny(run.slot(0), NO_ISOLATION)
+    assert words[-len(slot_words(run, (1, 2, 3))) - len(GLOBS):] == (*slot_words(run, (1, 2, 3)), *GLOBS)
+    assert "in:truth" in words and "in:everything" not in words
+    assert scenario.asked == [((1, 2, 3), run.temp, "TAG")]
+    assert run.slot(0) == SENTINEL["temp"] / "mmb-TAG-w0"
 
 
 def test_the_isolation_given_adds_its_words_and_the_agents_setup_is_denied_whatever_it_says(sentinels):
@@ -137,13 +123,34 @@ def test_every_word_is_lower_case_with_forward_slashes_and_only_the_other_slots_
     for k in range(JOBS_MAX):
         words = run.deny(run.slot(k), NO_ISOLATION)
         assert all(w == w.lower() and "\\" not in w for w in words)
-        own = [f"in:{posix(run.slot(k))}", f"in:mmb-tag-w{k}", f"in:*-w{k}", f"in:?-w{k}"]
-        assert not set(own) & set(words), "the own slot is not denied by path, name or glob of its number"
+        assert not set(slot_words(run, [k])) & set(words), "the own slot is not denied by path, name or glob of its number"
         for j in range(JOBS_MAX):
             if j != k:
-                assert {f"in:{posix(run.slot(j))}", f"in:mmb-tag-w{j}", f"in:*-w{j}", f"in:?-w{j}"} <= set(words), "the others are"
-        assert {"in:mmb-tag-w*", "in:mmb-tag-w?", "in:mmb-tag-w[", "in:mmb-*", "in:mmb-?", "in:mmb-["} <= set(words), "and every slot by glob"
-    assert all(f"in:mmb-tag-w{k}" in run.deny(None, NO_ISOLATION) for k in range(JOBS_MAX)), "with no own slot, all of them"
+                assert set(slot_words(run, [j])) <= set(words), "the others are"
+        assert set(GLOBS) <= set(words), "and every slot by glob"
+    assert set(slot_words(run, range(JOBS_MAX))) <= set(run.deny(None, NO_ISOLATION)), "with no own slot, all of them"
+
+
+def test_the_cache_the_run_was_built_with_and_the_run_it_was_branched_from_are_denied_too(sentinels):
+    cache, parent = TOP / "__OTHER_CACHE__", TOP / "__PARENT__"
+    plain = run_of(StubScenario()).deny(None, NO_ISOLATION)
+    words = run_of(StubScenario(), cache=cache, parent=parent).deny(None, NO_ISOLATION)
+    assert {posix(cache), posix(parent), "/__other_cache__/", '/__other_cache__"'} <= set(words)
+    assert not {posix(cache), posix(parent)} & set(plain)
+
+
+def test_the_dump_is_denied_by_path_name_and_glob_only_when_the_agent_reads_another_folder(sentinels):
+    run = run_of(StubScenario())
+    dump = [f"in:{posix(run.data)}", f"in:{run.data.name}", "in:*-data", "in:?-data", "in:-data/", 'in:-data"', "in:-data ", "in:-data'"]
+    assert not set(dump) & set(run.deny(None, NO_ISOLATION)) and not set(dump) & set(run.deny(None, NO_ISOLATION, reads=run.data))
+    assert set(dump) <= set(run.deny(None, NO_ISOLATION, reads=SENTINEL["temp"] / "mmb-TAG-cut"))
+
+
+def test_an_agent_kept_off_the_gpu_may_not_name_its_decoder_or_its_list_of_users(sentinels):
+    run = run_of(StubScenario())
+    assert OFF_GPU_DENY == ("in:-hwaccel", "in:nvidia-smi")
+    assert run.deny(None, NO_ISOLATION, off_gpu=True)[-len(OFF_GPU_DENY):] == OFF_GPU_DENY
+    assert not set(OFF_GPU_DENY) & set(run.deny(None, NO_ISOLATION))
 
 
 def test_the_repository_of_an_installed_package_is_denied_and_a_missing_package_is_not(sentinels, tmp_path, monkeypatch):
@@ -167,15 +174,15 @@ def test_a_package_installed_in_site_packages_denies_its_own_folder_and_not_the_
     assert package_root("fakeinstalled") == site / "fakeinstalled"
 
 
-# -- the answers elsewhere on the disk (G1's F1) ---------------------------------------------------------------------------------
+# -- the answers elsewhere on the disk ----------------------------------------------------------------------------------------
 
 REAL_RUN = paths.RUNS / "20261201-0000-v7-pilot-s1"
-# where an agent with its own tools once could read a recorded or planted answer, each the way the review reached it
+# where an agent with its own tools could read the questions of another run, each the way it might name them
 ELSEWHERE = {
     "a run of the tests": str(paths.TESTS / "pytest-coord" / "popen-gw0" / "pilot0" / "20261104-0314-pilot-s1" / "questions.jsonl"),
-    "a recorded run, by a bash path": f"cat {paths.EARLIER[0].as_posix()}/20261104-0314-pilot-s1/results/claude/files/text-config-asof-1.json",
-    "a recorded run's report": f"type {paths.EARLIER[0] / '20261104-0314-pilot-s1' / 'report.md'}",
-    "the temp folder of a recorded run": str(paths.EARLIER[1] / "mmb-de178c4d7f-data" / "notes" / "a.md"),
+    "a run in the runs folder, by a bash path": f"cat {paths.RUNS.as_posix()}/20261104-0314-pilot-s1/results/claude/files/text-config-asof-1.json",
+    "a run's report": f"type {paths.RUNS / '20261104-0314-pilot-s1' / 'report.md'}",
+    "the cache": str(paths.CACHE / "dumps" / ("k" * 64) / "store" / "notes" / "a.md"),
 }
 
 
@@ -185,16 +192,16 @@ def real_run(folder: Path = REAL_RUN, temp: Path | None = None) -> RunFolder:
 
 
 @pytest.mark.parametrize("path", ELSEWHERE.values(), ids=ELSEWHERE.keys())
-def test_what_a_run_of_the_tests_or_a_recorded_run_holds_is_denied_to_a_run_that_is_not_in_them(path):
+def test_what_a_run_of_the_tests_or_another_run_or_the_cache_holds_is_denied_to_a_run_that_is_not_in_them(path):
     run = real_run()
     assert reached(path, run.deny(run.slot(0), MM_ISOLATION)) is not None
 
 
-def test_the_temp_folder_a_run_uses_by_default_is_not_the_folder_the_tests_use_and_the_earlier_runs_words_keep_their_form():
+def test_the_temp_folder_a_run_uses_by_default_is_not_the_folder_the_tests_use():
     assert paths.TEMP == paths.HOME / "mmsb-data" and not paths.TEMP.is_relative_to(paths.TESTS) and paths.TESTS == paths.HOME / "mmsb-temp"
-    assert [p.name for p in paths.EARLIER] == ["mm-bench", "mm-bench-temp"]
     words = real_run().deny(None, NO_ISOLATION)
-    assert {*OLD_OUT_WORDS, *EARLIER_TEMP_WORDS, *TESTS_WORDS} <= set(words)
+    assert {posix(paths.RUNS), posix(paths.CACHE), posix(paths.TESTS), *TESTS_WORDS} <= set(words)
+    assert posix(paths.TEMP) not in words, "the temp folder is not denied whole: the run's own dump and slots are in it"
 
 
 def paths_in(home: str | None, tmp_path: Path) -> dict[str, str]:
@@ -208,12 +215,9 @@ def paths_in(home: str | None, tmp_path: Path) -> dict[str, str]:
 def test_every_folder_is_under_the_mmsb_home_which_is_the_users_home_unless_it_is_set(tmp_path):
     home = tmp_path / "mine"
     got = paths_in(str(home), tmp_path)
-    assert {k: Path(v) for k, v in got.items() if k != "EARLIER"} == {"HOME": home, "RUNS": home / "mmsb-runs", "TEMP": home / "mmsb-data",
-                                                                      "CACHE": home / "mmsb-cache", "TESTS": home / "mmsb-temp"}
+    assert {k: Path(v) for k, v in got.items()} == {"HOME": home, "RUNS": home / "mmsb-runs", "TEMP": home / "mmsb-data",
+                                                    "CACHE": home / "mmsb-cache", "TESTS": home / "mmsb-temp"}
     assert paths_in(None, tmp_path)["HOME"] == str(Path.home()) and paths_in("", tmp_path)["HOME"] == str(Path.home())
-    check = subprocess.run([sys.executable, "-c", "from mmsb.core import paths; print(*map(str, paths.EARLIER))"], capture_output=True, text=True,
-                           env={**os.environ, "MMSB_HOME": str(home)}, check=True)
-    assert check.stdout.split() == [str(home / "mm-bench"), str(home / "mm-bench-temp")]
 
 
 def test_a_run_in_a_folder_of_its_own_denies_that_folder_so_the_runs_beside_it_are_out_of_reach(tmp_path):
@@ -258,12 +262,12 @@ def test_a_checkout_whose_path_begins_like_the_data_folders_is_refused_before_a_
 
 def test_the_tests_folder_is_denied_unless_the_run_is_in_it_so_the_tests_still_run():
     sibling = str(paths.TESTS / "pytest-coord" / "popen-gw0" / "pilot0" / "questions.jsonl")
-    assert reached(sibling, real_run().deny(None, NO_ISOLATION)) in TESTS_WORDS
+    assert reached(sibling, real_run().deny(None, NO_ISOLATION)) in (posix(paths.TESTS), *TESTS_WORDS)
     in_tests = paths.TESTS / "pytest-x" / "run"
     for run in (real_run(in_tests, paths.TESTS / "pytest-x" / "temp"), real_run(REAL_RUN, paths.TESTS / "pytest-x" / "temp"),
                 real_run(in_tests, paths.TEMP)):
         words = run.deny(None, NO_ISOLATION)
-        assert not {*TESTS_WORDS} & set(words) and reached(sibling, words) is None, (run.folder, run.temp)
+        assert not {posix(paths.TESTS), *TESTS_WORDS} & set(words) and reached(sibling, words) is None, (run.folder, run.temp)
         assert reached(str(run.folder), words) is not None, "its own folder is still denied"
 
 
@@ -271,13 +275,13 @@ def git(*args: str, cwd: Path) -> None:
     subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=cwd, check=True, capture_output=True)
 
 
-def test_a_run_started_from_a_worktree_cannot_read_the_recorded_answers_in_the_main_checkout(tmp_path, monkeypatch):
+def test_a_run_started_from_a_worktree_cannot_read_the_main_checkout(tmp_path, monkeypatch):
     main, tree = tmp_path / "main", tmp_path / "tree"
     main.mkdir()
     git("init", "-q", cwd=main)
     git("commit", "-q", "--allow-empty", "-m", "x", cwd=main)
     git("worktree", "add", "-q", str(tree), cwd=main)
-    answers = main / "tests" / "oracles" / "recorded" / "pilot-s1" / "converted" / "questions.jsonl"
+    answers = main / "runs" / "20261104-0314-pilot-s1" / "questions.jsonl"
     run = real_run(tmp_path / "runs" / "run", tmp_path / "temp")
     monkeypatch.setattr(paths, "ROOT", tree)
     words = run.deny(None, NO_ISOLATION)
@@ -306,18 +310,15 @@ def test_a_temp_folder_that_holds_anything_but_the_folders_of_runs_is_refused_na
 
 # -- the layout ---------------------------------------------------------------------------------------------------------
 
-@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
-def test_the_folders_of_a_run_are_where_the_recorded_runs_and_the_old_code_put_them(sentinels):
+def test_the_files_of_a_run_are_by_agent_configuration_and_question_and_its_slots_by_the_runs_tag(sentinels):
     files, mm = parse_config("files", DEFAULTS), parse_config("mm", DEFAULTS)
     run = run_of(StubScenario(), (files, mm))
-    execs = json.loads((RECORDED / "pilot-s1" / "execs.json").read_text(encoding="utf-8"))["execs"]
-    by_dir = {"files": files, "mm-d1-3B": mm}
-    assert len(execs) == 110
-    for e in execs:
-        assert run.result_path(e["agent"], by_dir[e["dir"]], e["qid"]) == run.folder / "results" / e["agent"] / e["dir"] / f"{e['qid']}.json"
-        assert run.exec_dir(e["agent"], by_dir[e["dir"]], e["qid"]) == run.folder / "execs" / e["agent"] / e["dir"] / e["qid"]
-    assert run.slot(0) == Path(DENY["v7"]["v7"]["slot0_path"]) and run.slot(3) == run.temp / "mmb-TAG-w3"
-    assert run.bin == run.temp / "mmb-TAG-bin" and run.manifest == run.folder / "data-manifest.json" and run.name == "__RUN__"
+    folder = SENTINEL["folder"]
+    assert run.result_path("claude", files, "video-porch-parcel-1") == folder / "results" / "claude" / "files" / "video-porch-parcel-1.json"
+    assert run.result_path("codex", mm, "audio-mic-alarm-3") == folder / "results" / "codex" / "mm-d1-3B" / "audio-mic-alarm-3.json"
+    assert run.exec_dir("claude", mm, "text-note-code-1") == folder / "execs" / "claude" / "mm-d1-3B" / "text-note-code-1"
+    assert run.slot(0) == SENTINEL["temp"] / "mmb-TAG-w0" and run.slot(3) == SENTINEL["temp"] / "mmb-TAG-w3"
+    assert run.bin == SENTINEL["temp"] / "mmb-TAG-bin" and run.manifest == folder / "data-manifest.json" and run.name == "__RUN__"
     assert run.bin_exe.name == ("ffmpeg.exe" if os.name == "nt" else "ffmpeg")
 
 
@@ -352,24 +353,40 @@ def test_the_three_folders_share_a_volume_and_the_check_says_when_they_do_not():
 # -- opening a run again ------------------------------------------------------------------------------------------------
 
 def folder_of(tmp_path: Path) -> tuple[Path, dict]:
-    """A run folder as the pilot's run.json says it, with the keys the new layout adds."""
+    """A run folder as `RunFolder.write` leaves it: questions.jsonl and a run.json with every key `open` reads."""
     folder = tmp_path / "20261104-0314-pilot-s1"
     write_questions(folder / "questions.jsonl", load_questions(file_of(tmp_path, BASE)))
-    meta = {**PILOT, "scenario": "stub", "recipe": RECIPE, "timeout_s": 900.0, "question_hash": fs.sha256_of(folder / "questions.jsonl"), "dump_key": "k" * 64,
-            "generator": 3, "configs": [{"name": "files", "system": "files", "variant": None, "own_tools": True},
-                                        {"name": "mm/d1-3B", "system": "mm", "variant": "d1-3B", "own_tools": False}]}
+    meta = {"scenario": "stub", "generator": 3, "recipe": RECIPE, "dump_key": "k" * 64, "seed": 1, "scale": "pilot",
+            "days": list(SENTINEL["days"]), "data": str(tmp_path / "temp" / "mmb-de178c4d7f-data"), "temp": str(tmp_path / "temp"),
+            "tag": "de178c4d7f", "timeout_s": 900.0, "plan": PLAN, "files": FILES, "question_hash": fs.sha256_of(folder / "questions.jsonl"),
+            "configs": [{"name": "files", "system": "files", "variant": None, "own_tools": True},
+                        {"name": "mm/d1-3B", "system": "mm", "variant": "d1-3B", "own_tools": False}],
+            "created": "2026-11-04T03:14:00", COMMIT_KEY: "abc1234"}
     fs.write_json(folder / "run.json", meta)
     return folder, meta
 
 
-def test_a_run_is_opened_again_as_it_was_recorded(tmp_path):
+def test_a_run_is_opened_again_as_its_run_json_says(tmp_path):
     folder, _ = folder_of(tmp_path)
     scenario = StubScenario()
     opened = RunFolder.open(folder, lambda name: scenario if name == "stub" else pytest.fail(name))
     assert opened == RunFolder(folder, 1, "pilot", (date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)),
-                               Path(r"D:\mm-bench-temp\mmb-de178c4d7f-data"), Path(r"D:\mm-bench-temp"), "de178c4d7f", 900.0, scenario,
+                               tmp_path / "temp" / "mmb-de178c4d7f-data", tmp_path / "temp", "de178c4d7f", 900.0, scenario,
                                (parse_config("files", DEFAULTS), parse_config("mm", DEFAULTS)))
     assert [q.qid for q in opened.questions()] == ["video-porch-parcel-1"]
+
+
+def test_a_run_whose_run_json_names_a_cache_has_it(tmp_path):
+    folder, meta = folder_of(tmp_path)
+    fs.write_json(folder / "run.json", {**meta, "cache": str(tmp_path / "cache")})
+    assert RunFolder.open(folder, lambda name: StubScenario()).cache == tmp_path / "cache"
+
+
+def test_a_folder_whose_run_json_names_no_scenario_is_not_a_run_mmsb_built(tmp_path):
+    folder, meta = folder_of(tmp_path)
+    fs.write_json(folder / "run.json", {k: v for k, v in meta.items() if k != "scenario"})
+    with pytest.raises(ValueError, match=r"is not a run mmsb built \(its run.json names no scenario\)"):
+        RunFolder.open(folder, lambda name: StubScenario())
 
 
 def test_a_run_whose_generator_changed_is_refused(tmp_path):
@@ -398,7 +415,7 @@ def test_the_plan_and_the_files_the_recipe_makes_now_are_those_the_run_recorded(
 def test_a_run_whose_plan_changed_with_no_generator_bump_is_refused(tmp_path):
     folder, _ = folder_of(tmp_path)
     scenario = StubScenario()
-    scenario.hash_of = ("0" * 64, PILOT["files"])  # the questions the recipe makes now are other than those it was built with
+    scenario.hash_of = ("0" * 64, FILES)  # the questions the recipe makes now are other than those it was built with
     with pytest.raises(ValueError, match=r"plan is not the one its run.json recorded: stub changed without a generator bump"):
         RunFolder.open(folder, lambda name: scenario)
 
@@ -406,7 +423,7 @@ def test_a_run_whose_plan_changed_with_no_generator_bump_is_refused(tmp_path):
 def test_a_run_whose_files_changed_with_no_generator_bump_is_refused(tmp_path):
     folder, _ = folder_of(tmp_path)
     scenario = StubScenario()
-    scenario.hash_of = (PILOT["plan"], "0" * 64)  # a distractor changed, and no question did
+    scenario.hash_of = (PLAN, "0" * 64)  # a distractor changed, and no question did
     with pytest.raises(ValueError, match=r"files are not those its run.json recorded: stub changed without a generator bump"):
         RunFolder.open(folder, lambda name: scenario)
 

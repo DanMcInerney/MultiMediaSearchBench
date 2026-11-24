@@ -4,7 +4,7 @@ and views over a dump of three small files, written in a second instead of a wee
 or imports mms.
 
 `toy` is a module with the names of a `Scenario`, as the real ones are; `use` puts it in the scenario registry for a test. Its probe
-returns what a test sets (`PROBE`) and notes how it was called (`PROBED`), as the old tests' stand-in for `shortcuts.run` did."""
+returns what a test sets (`PROBE`) and notes how it was called (`PROBED`)."""
 
 from __future__ import annotations
 

@@ -77,7 +77,7 @@ sees and hears.
   exec that times out records no tokens. Codex reports no cost.
 - **The wait before a pile can be searched.** Ingesting into MultimediaSearch took 20 s to 284 s for each pile and wrote 1.9 GB
   to 5.8 GB. The baseline needs none.
-- **Read with these.** The agents were not told the 900 s (the prompt has said the limit since 8 November, so a later run is
+- **Read with these.** The agents were not told the 900 s (the prompt now states the limit, so a later run is
   not like for like). Claude's `files` figure for `m4_samples` is a rerun, after its prompt was fixed to name two limits of its
   shell tool. The GPU dropped off once during the `mm+files` execs: the run was resumed and the exec asked again.
 
@@ -87,11 +87,10 @@ The reports, with a row for every question: [files and listing](results/2026-11-
 ### A generated week, with and without a search system (4 November 2026)
 
 <p align="center">
-  <img src="docs/img/pilot.png" alt="Three panels comparing files alone with a search system for Codex and Claude Code: questions right of 24 (22 to 23, and 18 to 22), tokens in millions (5.3 to 2.7, and 29.9 to 3.9) and median seconds a question (28 to 19, and 58 to 32)." width="100%">
+  <img src="docs/img/generated-week.png" alt="Three panels comparing files alone with a search system for Codex and Claude Code: questions right of 24 (22 to 23, and 18 to 22), tokens in millions (5.3 to 2.7, and 29.9 to 3.9) and median seconds a question (28 to 19, and 58 to 32)." width="100%">
 </p>
 
-The first run, made while the benchmark was still part of MultimediaSearch. 24 questions about 3 generated days of a
-developer's screen, door camera, phone, microphone and logs (scenario `v7_screen`), where every needle is planted among
+24 questions about 3 generated days of a developer's screen, door camera, phone, microphone and logs (scenario `v7_screen`), where every needle is planted among
 decoys. Each agent answered once with the files alone and once with only MultimediaSearch's tools (`d1-3B`, which sees but
 does not hear).
 
@@ -104,7 +103,7 @@ does not hear).
 - It adds local GPU time: 77 to 179 GPU seconds for each right media answer.
 - The gains are not yet significant (McNemar p = 1.0 and 0.125), and planted needles are easier to filter for than real ones.
 
-Read it in [its own write-up](results/2026-11-04-haystack-pilot/README.md), which shows four questions side by side: how each
+Read it in [its own write-up](results/2026-11-04-generated-week/README.md), which shows four questions side by side: how each
 agent went about them, and what each cost.
 
 ### Real smart-glasses video: EgoLifeQA (3 November 2026)
@@ -306,7 +305,7 @@ Then pass `--configs files,mm` (or `mm+files`, `mm/d1-Omni-2B+files`) to `build`
 - The `mm` extra is a direct reference to [MultimediaSearch](https://github.com/DanMcInerney/MultimediaSearch) at one commit
   (`pyproject.toml`, which `uv.lock` pins as well), so it needs the network and no checkout of it.
 - The model's weights are looked for in `MMS_MODELS`, else `~/.mms/models`, which is where `mms model use <name>` puts them.
-- `mm` runs one exec at a time, because it needs the GPU and the maintainer's laptop driver crashed under three at once.
+- `mm` runs one exec at a time, because several execs of one decision model compete for GPU memory and can take down the driver.
   `--gpu-jobs 2` asks for more, and until MultimediaSearch reports its queue the working clock refuses it (`--clock wall`
   lets it through, with a warning).
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.
@@ -330,7 +329,7 @@ Each has `--help`.
 | `mmsb retrieve RUN` | each system asked for the needles with no agent (the GPU, alone) |
 | `mmsb report RUN [RUN ...]` | figures and Markdown; runs of one real scenario (or of V7) are pooled, V8's are reported one at a time, and runs of several scenarios get a table over all |
 | `mmsb compare A B` | two runs of the same questions, cell by cell: the flips, the counts, McNemar |
-| `mmsb repeat RECORDED` | a recorded run again, at its agents' models and efforts, then `compare` |
+| `mmsb repeat RUN` | a run made again: the same recipe, agents, models and efforts, then `compare` |
 | `mmsb clock-check RUN --config CONFIG` | the working clock tried on a few cases, each asked alone and then queued (not run yet) |
 
 ## Measuring another system
@@ -358,7 +357,7 @@ uv run pytest
 runs the fast tests (about 1,400, in about 6 minutes at 4 workers) with no agent, no GPU and no network. The tests of the real
 scenarios read the sources and skip, saying so, where `MMSB_SOURCES` has none. Without the `mm` extra the tests in `tests/mm`
 skip, and say so in the summary. CI runs them on Windows, Linux and macOS for each push to main and each pull request.
-[TESTING.md](TESTING.md) has the markers, the oracles, and the commands for the slow ones.
+[TESTING.md](TESTING.md) has the markers and the commands for the slow ones.
 
 ## Where things are
 
@@ -369,17 +368,14 @@ skip, and say so in the summary. CI runs them on Windows, Linux and macOS for ea
 | `mmsb/scenarios/` | `realdump/` (the builder the real scenarios share) and one folder for each scenario of the catalogue |
 | `mmsb/fetch.py`, `mmsb/fetch_piles.py` | `mmsb fetch` |
 | `mmsb/catalogue.py` | `mmsb catalogue` |
-| `tests/` | the tests; `tests/oracles/recorded/` holds the recorded pilot and EgoLife runs they are held to |
+| `tests/` | the tests |
 | `results/` | the published reports |
 | `docs/` | this README's figures (`img/`) and the script that draws them (`figures.py`) |
 | [VISION.md](VISION.md) | what MMSB is for and what it must stay true to |
 | [DESIGN.md](DESIGN.md) | how it is built and what is measured |
 | [CATALOGUE.md](CATALOGUE.md) | every pile, and example questions of every category |
 | [MEDIA.md](MEDIA.md) | where each pile's media comes from, under what licence, and what is taken from it |
-| [TESTING.md](TESTING.md) | how the build is checked, with dated notes of what was run |
-
-DESIGN.md and TESTING.md are the working record of the build. Their dated notes say what was true on that date, and some
-predate the runs above.
+| [TESTING.md](TESTING.md) | how the benchmark is tested |
 
 ## Status and limits
 
@@ -389,13 +385,11 @@ predate the runs above.
   search system has answered them yet.
 - **Agents have only been run on Windows 11.** On Linux the tests pass, a pile builds and a run is priced (`--dry-run`), and CI
   runs the tests on Linux and macOS as well. No real agent exec has been made off Windows, so Codex's sandbox and Claude's shell
-  tool are untried there. A few tests are held to runs recorded on Windows and skip elsewhere, saying so.
+  tool are untried there.
 - **Two agents:** Claude Code and Codex. Another is a module in `mmsb/core/agents/`.
 - **One search system so far:** MultimediaSearch, by the author of this benchmark. The core names no system, and a second one
   is the best check of that: see [Measuring another system](#measuring-another-system).
 - **Not run yet:** the working-time clock (`mmsb clock-check`) and more than one GPU exec at a time.
-- **Older reports keep older names.** The benchmark was first called MultiMediaMemoryBench (`mmmb`), and the search tool
-  Multimem. Reports in `results/` are kept as they were written.
 
 ## Credits
 

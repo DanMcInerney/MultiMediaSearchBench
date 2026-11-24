@@ -1,7 +1,5 @@
-"""What an mm exec's calls show, and what the home shows of them (moved from `ambient_labels` and the ask half of `work_of` of bench.py,
-and `tool_times`, `accepted_asks`, `audit`, `AUDIT_S` and `HorizonLeak` of egolife.py, of this repository at bb498a6): the ask jobs it ran,
-the recordings past a horizon its results held (a leak of the harness, not an answer), and the labels the daemon holds that no project
-owns."""
+"""What an mm exec's calls show, and what the home shows of them: the ask jobs it ran, the recordings past a horizon its
+results held (a leak of the harness, not an answer), and the labels the daemon holds that no project owns."""
 
 from __future__ import annotations
 
@@ -19,7 +17,7 @@ AUDIT_S = 0.001  # a time in a tool result is past H when it is more than this a
 
 
 class HorizonLeak(RuntimeError):
-    """A tool result of the mm arm held a recording from after the question's horizon: the harness is wrong, not the answer."""
+    """A tool result of an mm exec held a recording from after the question's horizon: the harness is wrong, not the answer."""
 
 
 def work_of(tools: Sequence[dict]) -> dict:

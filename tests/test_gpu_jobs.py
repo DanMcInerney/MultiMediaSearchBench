@@ -1,10 +1,10 @@
-"""How many execs of a cell run at once (core/atonce.py; the owner's rule of 5 November 2026, after three execs of one decision model at once crashed
-the laptop's driver on 2 November): a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs` asks for more, and `--jobs`
-and `--clock` do not; the others run `--jobs`. Through `main`, over the stand-in system of tests/stub_system.py (which can be made to need the GPU, with
+"""How many execs of a cell run at once (core/atonce.py): a configuration whose system needs the GPU runs one exec at a time unless `--gpu-jobs`
+asks for more, and `--jobs` and `--clock` do not raise it; the others run `--jobs`. Several execs of one decision model at once compete for GPU
+memory and can take down the driver. Through `main`, over the stand-in system of tests/stub_system.py (which can be made to need the GPU, with
 a GPU that is free and not lost, so nvidia-smi is not asked) and stand-in agents. The rule is the same for the runner, every dry run and its estimate,
 the refusal of the working clock, `--side-by-side` and `clock-check`; the repeat's own tests are in test_repeat.py, the check's in test_clock_check.py.
 
-The expected values are not the code's: the table of the rule is written here from the owner's words, what a run did is read from the times the
+The expected values are not the code's: the table of the rule is written here from the rule, what a run did is read from the times the
 stand-in agent was called at (`Stub.at_once`), and the dry run's estimate is worked out from those counts by hand (a cell's execs at 2.5 minutes each over
 the execs at once it was seen to run)."""
 
@@ -49,7 +49,7 @@ def on_gpu(world, **kw) -> StubSystem:  # noqa: F811
 
 
 def fresh(run) -> None:
-    """The run as it was before any exec: nothing asked, so that the same command is a whole run again."""
+    """The run with no exec made: nothing asked, so that the same command is a whole run again."""
     shutil.rmtree(run.folder / "results", ignore_errors=True)
     shutil.rmtree(run.folder / "execs", ignore_errors=True)
 
@@ -61,7 +61,7 @@ def test_the_rule_is_jobs_for_a_system_with_no_gpu_gpu_jobs_for_one_that_needs_i
     for needs, jobs, gpu_jobs, limit in itertools.product((False, True), range(1, 5), range(1, 5), (None, 1, 2)):
         description = StubSystem(needs_gpu=needs).describe("all")
         session = StubSession(StubSystem(job_limit=limit), None)
-        want = gpu_jobs if needs else jobs  # the owner's rule, written out
+        want = gpu_jobs if needs else jobs  # the rule, written out
         assert asked(description, jobs, gpu_jobs) == want
         assert execs_at_once(description, session, [case], jobs, gpu_jobs) == min(want, limit or 4), (needs, jobs, gpu_jobs, limit)
         assert flag_of(description) == ("--gpu-jobs" if needs else "--jobs")

@@ -1,14 +1,11 @@
-"""Ported from MultimediaSearch tests/test_shortcuts.py at fe0ece5 (all 31 tests).
-
-The shortcut probe (`shortcuts.py`): on a small haystack of its own, written with the `media_*` writers into a temporary
+"""The shortcut probe (`shortcuts.py`): on a small week of its own, written with the `media_*` writers into a temporary
 folder, it finds the shortcuts that single a needle out (a colour filter, frame differencing, a band filter, the file's size) and
-passes a haystack whose distractors share each needle's colour, motion and pitch; its floors, report and ffmpeg check are pinned.
+passes a week whose distractors share each needle's colour, motion and pitch; its floors, report and ffmpeg check are pinned.
 A screen state is one candidate however many frames the owner's acts and the clock give it (its measures are the median of its frames).
-The last test runs it on the plan's `tiny` scale (the harder haystack, generator `VERSION` 6).
+The last test runs it on the plan's `tiny` scale.
 
-The two tests that took a `DIALOG_AREA` and a `BOX_AREA` away from the module `haystack_media` (`monkeypatch.delattr`) to see the probe
-fall back on the one place a needle is drawn now set them to None in `shortcuts`, which imports them; a test that gave the module other
-areas sets them there. (What they test is the same: `area_of` uses the area it is given when it is not empty.)"""
+The tests of the areas where the error dialog and the parcel are drawn set `DIALOG_AREA` and `BOX_AREA` in `shortcuts`, which imports
+them. With None the probe falls back on the one place a needle is drawn; `area_of` uses the area it is given when it is not empty."""
 
 from __future__ import annotations
 
@@ -42,7 +39,7 @@ DAY = date(2026, 10, 28)
 
 @dataclass(frozen=True)
 class File:
-    """A file of a plan, as `haystack.File` has it."""
+    """A file of a plan, as far as the probe reads one."""
 
     path: str
     source: str
@@ -67,7 +64,7 @@ def at(hour: int, minute: int = 0, second: float = 0) -> float:
     return datetime(DAY.year, DAY.month, DAY.day).timestamp() + hour * 3600 + minute * 60 + second  # (hour 24 is the next midnight)
 
 
-class Haystack:
+class Week:
     """Files written into `folder` and the questions about them."""
 
     def __init__(self, folder: Path):
@@ -99,7 +96,7 @@ class Haystack:
 
     def porch(self, hour: int, minute: int, spec: dict, crate: bool = False) -> File:
         """A porch clip. With `crate`, a big brown crate (the courier's box colour) sits in the area a parcel can be left in from the 3rd second:
-        a brown thing that is no parcel, which the generator's own distractors may or may not supply (its door was brown, and is now blue)."""
+        a brown thing that is no parcel, which the generator's own distractors may not supply."""
         path = f"porch/porch-{DAY}_{hour:02d}-{minute:02d}-00.mp4"
         stamp = f"{DAY} {hour:02d}:{minute:02d}:00"
         if crate:
@@ -151,9 +148,9 @@ def parcel_clip(seed: int = 7) -> dict:
 
 
 @pytest.fixture(scope="module")
-def good(tmp_path_factory) -> Haystack:
-    """A haystack whose distractors share each needle's colour, motion and pitch."""
-    h = Haystack(tmp_path_factory.mktemp("good"))
+def good(tmp_path_factory) -> Week:
+    """A week whose distractors share each needle's colour, motion and pitch."""
+    h = Week(tmp_path_factory.mktemp("good"))
     first = h.screen(9, 0, [("editor", None, None), ("browser", None, {"kind": "banner"}), ("terminal", None, None), ("chat", None, {"kind": "toast"}),
                             ("sheet", None, {"kind": "cells"}), error_state(), ("chat", {"kind": "confirm"}, None), ("slides", None, None),
                             ("browser", None, None), ("terminal", None, None)])
@@ -194,10 +191,10 @@ def good_rows(good) -> dict[str, dict]:
 
 
 @pytest.fixture(scope="module")
-def bad(tmp_path_factory) -> Haystack:
-    """A haystack where each shortcut singles the needle out: nothing else red on the screen, nothing else green in the photos, a still
+def bad(tmp_path_factory) -> Week:
+    """A week where each shortcut singles the needle out: nothing else red on the screen, nothing else green in the photos, a still
     porch, a lone alarm among sounds of another pitch."""
-    h = Haystack(tmp_path_factory.mktemp("bad"))
+    h = Week(tmp_path_factory.mktemp("bad"))
     first = h.screen(9, 0, [(app, None, None) for app in ("editor", "chat", "sheet")] + [error_state()] + [("terminal", None, None), ("slides", None, None)])
     h.ask("video-screen-error-1", "screen", at(8), at(12), [[first.t + 90, first.t + 120]], SHADE_ERROR)
     sign_photo = h.photo(8, 0, {"scene": "sign", "rgb": list(NEEDLE["sign"]), "word": "GATE", "number": "47", "seed": 1})
@@ -215,10 +212,10 @@ def bad(tmp_path_factory) -> Haystack:
 
 
 @pytest.fixture(scope="module")
-def decoys(tmp_path_factory) -> Haystack:
-    """A haystack where a filter tuned to the needle finds more: a second error dialog and a second green sign in the needle's own shade,
+def decoys(tmp_path_factory) -> Week:
+    """A week where a filter tuned to the needle finds more: a second error dialog and a second green sign in the needle's own shade,
     and a second alarm within 8% of its pitch."""
-    h = Haystack(tmp_path_factory.mktemp("decoys"))
+    h = Week(tmp_path_factory.mktemp("decoys"))
     first = h.screen(9, 0, [("editor", None, None), error_state("E-4417"), ("browser", None, None), error_state("E-5230"), ("terminal", None, None)])
     h.ask("video-screen-error-1", "screen", at(8), at(12), [[first.t + 30, first.t + 60]], SHADE_ERROR)
     needle = h.photo(8, 0, {"scene": "sign", "rgb": list(NEEDLE["sign"]), "word": "GATE", "number": "47", "seed": 1})
@@ -261,9 +258,9 @@ def test_a_share_is_the_part_of_the_pixels_in_the_band():
     assert shortcuts.band_share(frame, "brown").tolist() == [0.0, 0.0]
 
 
-# -- a haystack where no shortcut singles the needle out --------------------------------------------------------------------
+# -- a week where no shortcut singles the needle out --------------------------------------------------------------------
 
-def test_a_haystack_of_distractors_that_share_each_needles_colour_motion_and_pitch_passes(good, good_rows):
+def test_a_week_of_distractors_that_share_each_needles_colour_motion_and_pitch_passes(good, good_rows):
     rows = list(good_rows.values())
     assert [r["qid"] for r in rows] == [q["qid"] for q in good.questions if q["probe"]], "a row for each media question, and none for text"
     assert shortcuts.check(rows, "tiny") == []
@@ -279,7 +276,7 @@ def test_a_haystack_of_distractors_that_share_each_needles_colour_motion_and_pit
 
 def test_a_screen_state_with_a_moving_cursor_typing_and_scrolling_is_one_candidate_whose_colour_is_the_median_of_its_frames(tmp_path):
     states = [(app, None, None) for app in ("editor", "chat", "sheet")] + [error_state()] + [("terminal", None, None), ("slides", None, None)]
-    still, moving = Haystack(tmp_path / "still"), Haystack(tmp_path / "moving")
+    still, moving = Week(tmp_path / "still"), Week(tmp_path / "moving")
     busy = [[2 * sec, "move", 480 + 20 * sec, 220 + 5 * sec] for sec in range(2, 28)] + [[2 * sec + 1, "type", sec] for sec in range(2, 28, 4)]
     for h, acts in ((still, None), (moving, {3: sorted(busy), 1: [[10, "move", 10, 10], [12, "move", 800, 500], [13, "scroll", 1]]})):
         first = h.screen(9, 0, states, acts)
@@ -287,7 +284,7 @@ def test_a_screen_state_with_a_moving_cursor_typing_and_scrolling_is_one_candida
     a, b = (shortcuts.probe(h.plan, h.folder)[0] for h in (still, moving))
     assert len(screen_frames(moving.files[0].spec, moving.files[0].t)) == 6 + 26 + 7 + 3, "a frame for each state and each act (the clock changes only where a state starts)"
     assert (a["candidates"], a["frames"]) == (b["candidates"], b["frames"]) == (6, 6), "a state is a candidate, whatever its frames"
-    assert (a["recorded_frames"], b["recorded_frames"], a["recorded_views"], b["recorded_views"]) == (6, 42, 1, 2), "the frames the files arm would read are counted beside"
+    assert (a["recorded_frames"], b["recorded_frames"], a["recorded_views"], b["recorded_views"]) == (6, 42, 1, 2), "the frames the files configuration would read are counted beside"
     assert b["needles"] == 1 and b["colour_needle"] == pytest.approx(a["colour_needle"], rel=0.05), "a cursor over the dialog does not change what the state holds"
     assert b["colour_shortlist"] == a["colour_shortlist"] and b["size_files"] == a["size_files"]
     assert screen_frames(still.files[0].spec, still.files[0].t) != screen_frames(moving.files[0].spec, moving.files[0].t)
@@ -346,7 +343,7 @@ def test_a_colour_filter_a_frame_difference_and_a_band_filter_that_single_the_ne
 
 
 def test_a_needle_file_that_is_the_largest_of_its_scope_by_a_wide_margin_is_a_failure(tmp_path):
-    h = Haystack(tmp_path / "sizes")
+    h = Week(tmp_path / "sizes")
     sign = {"scene": "sign", "rgb": list(NEEDLE["sign"]), "word": "GATE", "number": "47", "seed": 1}
     needle = h.photo(8, 0, sign, noise=60)
     for k in range(1, 15):
@@ -355,7 +352,7 @@ def test_a_needle_file_that_is_the_largest_of_its_scope_by_a_wide_margin_is_a_fa
     (row,) = shortcuts.probe(h.plan, h.folder)
     assert row["size_extreme"] and row["size_rank"] == "largest" and row["size_z"] > 2.5 and row["size_files"] == 15
     assert any("the largest of 15 in scope" in f and "size gives it away" in f for f in shortcuts.check([row], "tiny"))
-    quiet = Haystack(tmp_path / "plain")  # the needle among signs of other colours, which are as small a file as it is
+    quiet = Week(tmp_path / "plain")  # the needle among signs of other colours, which are as small a file as it is
     quiet.photo(8, 0, sign)
     for k, colour in enumerate(("yellow", "white", "blue", "grey"), 1):
         quiet.photo(8, 3 * k, {"scene": "sign", "rgb": list(DISTRACTOR["sign"][colour]), "word": "ROOM", "number": str(200 + k), "seed": k})
@@ -454,7 +451,7 @@ def test_the_area_is_the_union_the_module_names_and_the_one_fixed_place_when_it_
     monkeypatch.setattr(shortcuts, "DIALOG_AREA", (0.1, 0.2, 0.9, 0.7))
     monkeypatch.setattr(shortcuts, "BOX_AREA", [0.05, 0.4, 0.5, 0.75])
     assert shortcuts.area_of(NEEDLE["error"]) == (0.1, 0.2, 0.9, 0.7) and shortcuts.area_of(NEEDLE["parcel"]) == (0.05, 0.4, 0.5, 0.75)
-    assert shortcuts.region_of(NEEDLE["error"]) != (0.1, 0.2, 0.9, 0.7), "the fixed place stays as it was"
+    assert shortcuts.region_of(NEEDLE["error"]) != (0.1, 0.2, 0.9, 0.7), "the fixed place is not the area"
     frames = np.zeros((1, 90, 160, 3), np.uint8)
     frames[0, 18:63, 16:144] = NEEDLE["error"]  # fills the wider area ...
     frames[0, 29:61, 44:116] = 0  # ... but not the centred dialog's box
@@ -492,7 +489,7 @@ def test_cropping_the_area_is_held_to_the_colour_shortlists_floors_and_the_rank_
     assert shortcuts.check([row(problems=["x"])], "tiny") == ["video-screen-error-1 (part, screen): x"]
 
 
-def test_the_tuned_filters_leave_no_other_frame_or_sound_in_a_haystack_of_distractors_of_the_needles_names(good_rows):
+def test_the_tuned_filters_leave_no_other_frame_or_sound_in_a_week_of_distractors_of_the_needles_names(good_rows):
     for qid in ("video-screen-error-1", "image-photo-sign-1", "video-porch-parcel-1"):
         r = good_rows[qid]
         assert r["tuned_colour_needle"] > 0 and (r["tuned_colour_shortlist"], r["tuned_colour_rank"]) == (0, 1), qid
@@ -575,7 +572,7 @@ def test_standard_has_the_floors_of_the_plan_and_pilot_a_lower_week_by_level_and
         assert "band filter" in shortcuts.check([row(**mic, band_shortlist=BAND_FLOORS[level] - 1)], scale)[0]
 
 
-def test_the_pilots_week_floors_are_under_what_its_haystack_measures_and_only_the_week_differs():
+def test_the_pilots_week_floors_are_under_what_the_pilot_measures_and_only_the_week_differs():
     assert shortcuts.FLOORS["standard"] == {"candidates": shortcuts.CANDIDATES, "shortlist": shortcuts.SHORTLIST, "band": shortcuts.BAND}
     standard, pilot = shortcuts.FLOORS["standard"], shortcuts.FLOORS["pilot"]
     assert {(level, source): n for level, by_source in pilot["candidates"].items() for source, n in by_source.items()} == PILOT_FLOORS
@@ -583,7 +580,7 @@ def test_the_pilots_week_floors_are_under_what_its_haystack_measures_and_only_th
     for level in ("part", "day"):
         assert pilot["candidates"][level] == standard["candidates"][level] and pilot["shortlist"][level] == standard["shortlist"][level]
     week = pilot["candidates"]["week"]
-    assert week["screen"] <= 1409 and week["porch"] <= 53 and week["phone"] <= 101 and pilot["shortlist"]["week"] <= 30, "what the pilot measured after its last needle"
+    assert week["screen"] <= 1409 and week["porch"] <= 53 and week["phone"] <= 101 and pilot["shortlist"]["week"] <= 30, "what the pilot measures after its last needle"
 
 
 def test_a_needle_that_a_filter_ranks_first_fails_at_day_and_week_on_pilot_and_standard_and_nowhere_else():
@@ -630,9 +627,9 @@ def test_a_row_without_a_needle_is_held_to_its_candidates_only_and_a_size_outlie
 
 # -- ffmpeg -----------------------------------------------------------------------------------------------------------------
 
-def test_the_files_arms_ffmpeg_has_no_ocr_filter():
+def test_the_ffmpeg_of_the_files_configuration_has_no_ocr_filter():
     names = shortcuts.filters()
-    assert len(names) > 100 and {"scale", "tile", "showinfo", "silencedetect", "highpass"} <= set(names), "the filters the smoke's files arm used are listed"
+    assert len(names) > 100 and {"scale", "tile", "showinfo", "silencedetect", "highpass"} <= set(names), "the filters the files configuration uses are listed"
     assert "ocr" not in names and shortcuts.ocr_failures(names) == []
 
 
@@ -647,7 +644,7 @@ def test_an_ffmpeg_with_an_ocr_filter_or_a_listing_that_was_not_read_is_a_failur
 def test_the_report_is_json_and_markdown_in_the_run_folder_and_never_the_data_folder(good, good_rows, tmp_path):
     rows = list(good_rows.values())
     failures = shortcuts.check(rows, "standard")
-    assert failures, "a haystack of a few files is far under the floors of a standard one"
+    assert failures, "a week of a few files is far under the floors of a standard one"
     meta = {"scale": "standard", "seed": 3, "seconds": 1.5, "ffmpeg": "ffmpeg.exe", "ocr": False}
     json_path, md_path = shortcuts.write_report(rows, failures, tmp_path / "run", good.folder, meta)
     assert (json_path.name, md_path.name) == ("shortcuts.json", "shortcuts.md") and json_path.parent == (tmp_path / "run").resolve()
@@ -685,16 +682,16 @@ def test_run_probes_checks_the_ffmpeg_and_writes_the_report(good, tmp_path):
         shortcuts.run(good.plan, good.folder, good.folder / "run")
 
 
-# -- the harder haystack ----------------------------------------------------------------------------------------------------
+# -- the tiny week ----------------------------------------------------------------------------------------------------
 
-def test_the_probe_passes_the_tiny_haystack(tmp_path):
-    assert VERSION >= 3, "the probe reads the questions' `probe`, which the harder haystack (VERSION 3) has"
+def test_the_probe_passes_the_tiny_week(tmp_path):
+    assert VERSION >= 3, "the probe reads the questions' `probe`, which generator VERSION 3 or later writes"
     plan = v7_week.plan(1, "tiny", days_before(date(2026, 10, 30), SCALES["tiny"].days))
     write(plan, tmp_path / "data")
     start = time.perf_counter()
     failures = shortcuts.run(plan, tmp_path / "data", tmp_path / "run")
     seconds = time.perf_counter() - start
-    print(f"\nthe probe of the tiny haystack: {seconds:.1f} s (the target: 10 s)")
+    print(f"\nthe probe of the tiny week: {seconds:.1f} s (the target: 10 s)")
     assert failures == []
     saved = json.loads((tmp_path / "run" / "shortcuts.json").read_text(encoding="utf-8"))
     for r in saved["rows"]:

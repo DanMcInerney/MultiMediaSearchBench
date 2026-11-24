@@ -1,5 +1,5 @@
-"""What an agent is given for one exec (plan 4.4), in place of the old `bench.Exec`: everything both agents read, and nothing of a
-system or a scenario. An agent is a `Callable[[SessionSpec], dict]`. What a system offers it comes only from `served`."""
+"""What an agent is given for one exec: everything both agents read, and nothing of a system or a scenario. An agent is a
+`Callable[[SessionSpec], dict]`. What a system offers it comes only from `served`."""
 
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ class SessionSpec:
         return self.served.server
 
     @property
-    def arm(self) -> str:
-        """What the checks' messages call this exec: `blind`, `files`, the server's name, or the server's name and `+files`."""
+    def mode(self) -> str:
+        """What the checks' messages call this exec's configuration: `blind`, `files`, the server's name, or the server's name and `+files`."""
         if self.server is None:
             return "files" if self.own_tools else "blind"
         return self.server.name + ("+files" if self.own_tools else "")

@@ -1,5 +1,5 @@
-"""The shortcut probe of the V7 week (TESTBED.md, benchmark): offline, from the plan and the files `write` made, it checks that a cheap
-shortcut does not pick out a needle, so that the files arm cannot skip the work an `ask` does. It is the scenario's own (it reads the
+"""The shortcut probe of the V7 week: offline, from the plan and the files `write` made, it checks that a cheap shortcut does not pick
+out a needle, so that the `files` configuration cannot skip the work an `ask` does. It is the scenario's own (it reads the
 plan's specs and V7's floors by scale); the core keeps only the outcome.
 
     rows = shortcuts.probe(plan, folder)             # one row per media question, from the data folder (read only)
@@ -8,8 +8,8 @@ plan's specs and V7's floors by scale); the core keeps only the outcome.
 
 For each media question (a question whose `probe` is `{"kind": "shade", "hue", "rgb"}` or `{"kind": "pitch", "hz", "band"}`; text and
 records have none) it measures, over the question's scope (`since` to `until`; for a `last` question, from the end of the template's
-last needle, which is what a scan from the newest has to read before it hits one), what the shortcuts the smoke's files arm used
-give an agent:
+last needle, which is what a scan from the newest has to read before it hits one), what the shortcuts an agent with its own tools can use
+give it:
 - candidates: the screen states, porch clips, photos or sounds of the source in scope (`FLOORS` has the least of each, by scale);
 - colour shortlist: the other frames or photos whose share of pixels in the needle's hue band (HSV, as a filter for "red", "green" or
   "brown" would cut it, at 160x90) is at least half the needle's (the median over the needle's frames);
@@ -23,8 +23,8 @@ give an agent:
   drawn (`area_of`: `media_screen.DIALOG_AREA` or `media_porch.BOX_AREA`, the union of the positions it can take, else the one place `DIALOG` and
   `BOX` give), which an agent can crop from the start, with no needle found first: its shortlist is held to the colour shortlist's floors;
 - brute-force views: the pictures in scope over 25, the 5x5 montages that look at all of them (`views`; for the screen a picture is a
-  state, and `recorded_frames` and `recorded_views` count the frames the recorder keeps of those states, the files arm's brute force; for the porch, whose needle
-  stays on the step, `views_per_clip` is a montage of one frame a clip).
+  state, and `recorded_frames` and `recorded_views` count the frames the recorder keeps of those states, the `files` configuration's
+  brute force; for the porch, whose needle stays on the step, `views_per_clip` is a montage of one frame a clip).
 Each shortlist has a `rank` beside it: 1 plus the others with more than the needle's value (1: sorting by the filter's measure puts
 the needle first). On `pilot` and `standard` a rank of 1 at day or week level fails a question, as the floors on the shortlists do (the area's too). An
 absent question has no needle, so it has the candidates and the views only.
@@ -33,9 +33,9 @@ keeps the needle's own hue, saturation and value within `TUNE`; `region_colour_*
 needle's value, the others it keeps at half of it (a quarter of the level for sound), and the needle's rank. A frame is placed from the file's spec (a porch frame at its second, a
 screen frame by `media_screen.screen_frames`, which is what the writer put there): a file with another number of frames is a `ValueError`. A screen state is
 one candidate however many frames the owner's acts (cursor moves, typing, scrolling) and the clock give it (the floors count states), and its
-measures are the median of its frames; a dialog, an accent and the taskbar never move, so the median holds what the state shows. The files arm
-sees every frame, up to 2 a second (`recorded_frames`, `recorded_views`).
-The files arm's ffmpeg is checked too: it must have no `ocr` filter (`filters`, `ocr_failures`). Moved from shortcuts.py of the repository at bb498a6."""
+measures are the median of its frames; a dialog, an accent and the taskbar never move, so the median holds what the state shows. The `files`
+configuration sees every frame, up to 2 a second (`recorded_frames`, `recorded_views`).
+The `files` configuration's ffmpeg is checked too: it must have no `ocr` filter (`filters`, `ocr_failures`)."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ SLACK_S = 0.5  # a picture is the needle's when it is within this of its moment;
 WINDOW_S = 0.5  # the sound level is the peak RMS over windows of this length
 TUNE = (10.0, 0.10, 0.10)  # a tuned colour filter keeps the needle's own hue (degrees), saturation and value, plus or minus this much
 NARROW = 0.08  # a tuned band filter keeps this share either side of the needle's dominant pitch
-NO_OCR = ("ocr",)  # the filters the files arm's ffmpeg must not have: they read text off a picture
+NO_OCR = ("ocr",)  # the filters the `files` configuration's ffmpeg must not have: they read text off a picture
 LEVELS = ("part", "day", "week")
 SOURCES = {"screen": ("screen", "screen states"), "porch": ("porch", "porch clips"), "phone": ("photo", "photos"), "mic": ("mic", "sounds")}  # source: file kind, the unit of its candidates
 CANDIDATES = {"part": {"screen": 250, "porch": 8, "phone": 15, "mic": 5},
@@ -528,8 +528,8 @@ def check(rows: list[dict], scale: str) -> list[str]:
 # -- ffmpeg -----------------------------------------------------------------------------------------------------------------
 
 def filters(ffmpeg: str | Path | None = None) -> list[str]:
-    """The names of the filters of `ffmpeg` (`ffmpeg -hide_banner -filters`): by default imageio-ffmpeg's binary, the one the files
-    arm gets (`RunFolder.ensure_bin` copies it)."""
+    """The names of the filters of `ffmpeg` (`ffmpeg -hide_banner -filters`): by default imageio-ffmpeg's binary, the one the `files`
+    configuration gets (`RunFolder.ensure_bin` copies it)."""
     if ffmpeg is None:
         import imageio_ffmpeg
 
@@ -549,7 +549,7 @@ def ocr_failures(names: list[str], ffmpeg: str | Path = "ffmpeg") -> list[str]:
     """A sentence for each filter of `names` that reads text off a picture (`NO_OCR`), and one when `names` is empty (it was not read)."""
     if not names:
         return [f"{ffmpeg} lists no filters: its output was not read"]
-    return [f"{ffmpeg} has the {name} filter: the files arm could read the screen with it" for name in NO_OCR if name in names]
+    return [f"{ffmpeg} has the {name} filter: the `files` configuration could read the screen with it" for name in NO_OCR if name in names]
 
 
 # -- the report -------------------------------------------------------------------------------------------------------------
@@ -599,7 +599,7 @@ def markdown(rows: list[dict], failures: list[str], meta: dict) -> str:
             lines.append(f"| {r['qid']} | {r['level']} | {colour} | {region} | {band} |")
     lines += ["", "## Brute-force views", "",
               "Pictures in scope over 25: the 5x5 montages that look at all of them (sound has none). The least and the most of the questions of a level. "
-              "The screen's first column counts its states, the second the frames the recorder keeps of them (the files arm's brute force). "
+              "The screen's first column counts its states, the second the frames the recorder keeps of them (the `files` configuration's brute force). "
               "The porch has a second column: a montage of one frame a clip, which finds a parcel that stays on the step.", "",
               "| level | screen, a view a state | screen, every frame | porch, every frame | porch, a frame a clip | phone |", "| --- | --- | --- | --- | --- | --- |"]
     for level in (*LEVELS, "time"):
@@ -624,7 +624,7 @@ def write_report(rows: list[dict], failures: list[str], out: Path, folder: Path,
 
 
 def run(plan, folder, out, *, ffmpeg: str | Path | None = None, seed: int | None = None) -> list[str]:
-    """`probe` and `check` the plan's media questions over the data in `folder`, check that `ffmpeg` (default: the files arm's) has no
+    """`probe` and `check` the plan's media questions over the data in `folder`, check that `ffmpeg` (default: the `files` configuration's) has no
     `ocr` filter, write the report into `out` and return the failures. `build` raises on them unless it was told `--no-probe`."""
     start = time.perf_counter()
     rows = probe(plan, folder)

@@ -1,4 +1,4 @@
-"""A configuration: what an agent is given for one run of a question (DESIGN 4). It is a system's tools, the agent's own tools, both,
+"""A configuration: what an agent is given for one run of a question (DESIGN.md). It is a system's tools, the agent's own tools, both,
 or nothing (`blind`). Results and exec folders are named by `Config.dir`."""
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ def parse_config(text: str, defaults: Mapping[str, str | None]) -> Config:
     if "+" in base:
         raise ValueError(f"{text!r} is not a configuration: the only + is a final +files")
     if system == "gold":
-        raise ValueError("gold is not built yet (DESIGN section 4; not P0)")
+        raise ValueError("gold is not built yet")
     if system == "blind":
         if slash or plus:
             raise ValueError(f"blind has no tools to add to and no variants: {text!r}")

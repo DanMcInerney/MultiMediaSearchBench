@@ -1,13 +1,10 @@
-"""Ported from tests/test_haystack.py and tests/test_haystack_media.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in those files' orders: the tests of
-the haystack that need MultimediaSearch's reader or a daemon (the rest are tests/test_v7_plan.py and tests/test_v7_media.py). The tiny week is built
-once by the scenario (V7.build, about 35 s) and ingested once by the system (`Mm.ingest`, conftest's `week` and `store`), and each test that
-asks a daemon asks one over a copy of that store. What changed, by plan 4.6 and 7.4:
-- `haystack.load` is `Mm.ingest`; a phone file that is not at its own time is a `misdated` entry of the report, no longer an AssertionError
-  (test_ingest_reports_a_phone_file...);
-- `haystack.windows_in` is the table of windows (mmsb/systems/mm/estimate.py), counted from the files by the reader's own demux; the mic's count is
-  every window of the sound, so an upper bound (the old count used the plan's loud spans): its equality with what the reader reads is `<=` now;
-- the pilot week cut down for the `last` test is written by `write` and ingested by a dump of its files alone.
-Every other expectation is the source's."""
+"""The tests of V7's week that need MultimediaSearch's reader or a daemon (the rest are tests/test_v7_plan.py and tests/test_v7_media.py). The tiny
+week is built once by the scenario (V7.build, about 35 s) and ingested once by the system (`Mm.ingest`, conftest's `week` and `store`), and each test
+that asks a daemon asks one over a copy of that store.
+- a phone file that is not at its own time is a `misdated` entry of the ingest report (test_ingest_reports_a_phone_file...);
+- the table of windows (mmsb/systems/mm/estimate.py) is counted from the files by the reader's own demux; the mic's count is every window of the
+  sound, so an upper bound: its equality with what the reader reads is `<=`;
+- the pilot week cut down for the `last` test is written by `write` and ingested as a dump of its files alone."""
 
 from __future__ import annotations
 
@@ -43,7 +40,7 @@ from mmsb.systems.mm.models import Model  # noqa: E402
 from mmsb.systems.mm.system import Mm  # noqa: E402
 
 DAYS_OF = [date(2026, 10, 30), date(2026, 10, 31)]
-LOAD_S = 8.0  # a tiny week is ingested in this many seconds (the old `load` took 8: the daemon starts, the files are remembered, the daemon stops)
+LOAD_S = 8.0  # a tiny week is ingested in this many seconds: the daemon starts, the files are remembered, the daemon stops
 # a single process (`-n 0`) is held to this; under xdist (`-n 4`, with another suite or a GPU run possibly sharing the machine) the bound is
 # SLACK times as loose, so that the test fails for a daemon that got several times slower and never for a busy machine
 SLACK = 4.0 if os.environ.get("PYTEST_XDIST_WORKER") else 1.0
@@ -91,7 +88,7 @@ def test_each_model_is_asked_only_about_what_it_reads(tiny, week):
 # -- through the reader ----------------------------------------------------------------------------------------------------------
 
 def scan(api, q: dict, **more) -> dict:
-    """The shipped `ask` as a job over the question's source and range with its fake question, as `test_day`'s `scan`."""
+    """The shipped `ask` as a job over the question's source and range with its fake question."""
     params = {"question": q["fake"]["question"], "sources": [q["source"]], "since": q["since"], "until": q["until"],
               "limit": q["fake"]["limit"], "oldest_first": q["fake"]["oldest_first"], **more}
     job = api.call("jobs/start", script="ask", params=params, wait_s=50)
@@ -222,7 +219,7 @@ def test_a_last_question_whose_range_holds_several_needles_gets_the_newest_throu
 
 def test_the_phones_files_are_remembered_with_no_time_at_the_time_they_carry(opened, tiny):
     """A photo's EXIF and a clip's `creation_time` are the time `remember` stores it at (`time_from` metadata), through `write` and `ingest`:
-    `ingest` gave the phone's files no `t`, and reports one that is not at `f.t`; every other source is given its `t`."""
+    `ingest` gives the phone's files no `t` and reports one that is not at `f.t`; every other source is given its `t`."""
     store = Store(opened.home)
     try:
         items = store.items_of("phone")

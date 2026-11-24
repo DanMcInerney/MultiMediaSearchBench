@@ -1,4 +1,4 @@
-"""New tests for the cache over the real mm system (plan 6.3, DESIGN 8.4; core/cache.py and core/build.py are tests/test_cache.py's and
+"""The cache over the real mm system (core/cache.py and core/build.py are tests/test_cache.py's and
 tests/test_cache_cli.py's, over stand-ins): the tiny week of V7 built into two runs through `mm/fake`, with the fake decider (no model is loaded,
 and ingest loads none). The dump is written once and the store ingested once, by a counter, the second run finds both; the dump's bytes are the
 bytes of the plain build the other tests use; the run's copy of the store is the cached store's files under other names, so a session over it

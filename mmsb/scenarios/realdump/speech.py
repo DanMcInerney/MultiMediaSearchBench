@@ -1,4 +1,4 @@
-"""Questions from what was said (DESIGN 5.8): the timed transcripts of the scenarios whose pile is talk, and the question templates over them. A
+"""Questions from what was said: the timed transcripts of the scenarios whose pile is talk, and the question templates over them. A
 scenario reads its transcripts into `Talk`s and gives a `Say` (how the person calls things), its `Term`s, the terms that were never said and any
 `Curated` questions, written by reading the transcripts. `questions_of` makes the questions, every answer from the transcripts:
 

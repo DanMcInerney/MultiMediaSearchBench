@@ -1,4 +1,4 @@
-"""The `files` system (DESIGN 3.2): the agent's own tools on the recordings and nothing else. There is nothing to ingest and nothing to
+"""The `files` system: the agent's own tools on the recordings and nothing else. There is nothing to ingest and nothing to
 serve; the configuration `files` is the agent with its shell, `Read`, `Glob` and `Grep` over the dump."""
 
 from __future__ import annotations

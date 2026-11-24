@@ -1,5 +1,4 @@
-"""What an exec leaves running in the daemon, and the waits that follow (moved from `open_jobs`, `cancel_open`, `settle`, `wait_idle`
-and `quiesce` of bench.py of this repository at bb498a6). The calls are the daemon's API (`jobs/get`, `jobs/cancel`, `status`)."""
+"""What an exec leaves running in the daemon, and the waits that follow. The calls are the daemon's API (`jobs/get`, `jobs/cancel`, `status`)."""
 
 from __future__ import annotations
 
@@ -77,7 +76,7 @@ def wait_idle(api, allowed: int, limit_s: float) -> int | None:
 
 
 def quiesce(api, tools: Sequence[dict], others: int = 0, limit_s: float | None = None) -> dict:
-    """What an mm exec leaves running when it ends, dealt with before its labels are scrubbed and its template released: the jobs
+    """What an mm exec leaves running when it ends, dealt with before its labels are scrubbed and its project released: the jobs
     its log shows open are cancelled and waited for (an ask labels what it found when it stops, a cancel included, so a label may
     land after the cancel), then the daemon's job count is waited down to `others`, one for each exec still running (a job whose id
     the log never held is only in the count; with others running that is a guess, so the wait is OTHERS_WAIT_S). Returns the

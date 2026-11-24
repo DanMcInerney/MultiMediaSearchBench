@@ -1,5 +1,5 @@
-"""A synthetic week of an owner's phone, screen, front door camera, hallway microphone, notes, config and logs (TESTBED.md,
-benchmark): the ground truth of the V7 scenario. Needles are things a question asks for (a code in a note, a sign's number,
+"""A synthetic week of an owner's phone, screen, front door camera, hallway microphone, notes, config and logs: the ground truth of the V7
+scenario. Needles are things a question asks for (a code in a note, a sign's number,
 an error on screen, a doorbell), hidden among distractors that must never match a needle's question. A needle is told apart by
 meaning (an error dialog among red banners and a red "Delete?" dialog, a parcel among a brown dog and the courier's own box, a
 smoke alarm among beepers and chimes) and, for the fake decider of the offline tests, by an exact shade or pitch that is its alone
@@ -23,7 +23,7 @@ files' specs and not from the questions. The truth stays in the plan's questions
 - `truth`: `{"value", "moments", "others"}`, the answer, the spans `[t0, t1]` it is on record in (None and none when absent) and,
   for a `week` question, the spans of the template's other needles (all earlier: nothing of the template comes after the last);
 - `grade`: what `mmsb/core/grade.py` grades by (`kind`, `truth`, `time`, `tol_min`, `wrong`, `ignore`, `date`: the day a `week` question's
-  time must be on); the earlier needles are a `week` question's `wrong` answers. The keys are those of the recorded plan, which
+  time must be on); the earlier needles are a `week` question's `wrong` answers. The keys are what
   `plan_hash` covers; `questions.py` writes them as a `Grade` (`kind` is its `rule`, `tol_min` is `tol_s` in seconds);
 - `oracle`: a yes/no for a real model over the source and range, or None; `fake`: the question the fake decider is asked
   (`question`, `oldest_first`, `limit`) and what its sightings must show (`check`: `overlap` each moment is found and every sighting
@@ -70,8 +70,7 @@ A part question names a part with enough to look through (`Scale.part_floor`: 25
 no question names the evening's screen block (an hour) or the microphone's one hour of the afternoon.
 Times are local, made with `datetime(y, m, d, h, mi, s)` and never by adding seconds across days, and no event is before 06:00
 (daylight saving changes happen at night). `write` asserts its own checks (a needle's shade or pitch is the fake decider's after
-encoding, no distractor has it, a needle's code is in its own file only), so a wrong fixture fails here and never in the reader.
-Moved from haystack.py of the repository at bb498a6."""
+encoding, no distractor has it, a needle's code is in its own file only), so a wrong fixture fails here and never in the reader."""
 
 from __future__ import annotations
 
@@ -84,7 +83,7 @@ from datetime import date, datetime, timedelta
 from mmsb.scenarios.v7_screen.media_common import NEEDLE_RGB, _rng
 from mmsb.scenarios.v7_screen.media_screen import SCREEN, typing_cap
 
-VERSION = 6  # bump when plan() changes what it makes (6: the screen's acts, TESTBED.md)
+VERSION = 6  # bump when plan() changes what it makes
 TYPES = ("text", "records", "image", "video", "audio")
 TEMPLATES = {"text": ("note-code", "config-asof"), "records": ("log-count", "log-last"),
              "image": ("photo-sign", "photo-count"), "video": ("screen-error", "porch-parcel"),
@@ -179,7 +178,7 @@ MIC_BLOCKS = ((7 * HOUR, 9 * HOUR), (17 * HOUR, 21 * HOUR))
 FULL = dict(asks=FULL_ASKS, photos=60, clips=3, screen=(BLOCKS,), screen_s=60, porch=30, mic=(MIC_BLOCKS,), mic_extra=0.25,
             tv_s=1800, notes=15, config=2, log_lines=2000, mix=FULL_MIX, cars=(2, 4), other_cars=(0, 2), other_min=2,
             part_floor={"screen": 250, "porch": 8, "phone": 15, "mic": 5})
-# The owner's activity on the screen, calibrated against two real hours (TESTBED.md: per hour, over 150 plan hours, 2,360 seconds with a frame
+# The owner's activity on the screen, calibrated against two real hours (per hour, over 150 plan hours, 2,360 seconds with a frame
 # and 1.86 frames a second with a frame; over three encoded hours, 2,329 gated windows, 10% of the minutes with 2 or fewer gated windows, 34% of
 # the frame pairs changing under 0.05%, median 0.084%, 90th percentile 7.6%). A state has a level, drawn as a chain over its block
 # (the next state's level depends on the last's, so idle comes in stretches of a minute or more): `idle` has no acts (reading, thinking,

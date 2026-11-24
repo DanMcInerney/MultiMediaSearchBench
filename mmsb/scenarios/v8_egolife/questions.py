@@ -1,4 +1,4 @@
-"""The questions of a V8 run as the question file has them (DESIGN 6.1, 5.2): a projection of the plan's question dicts, whose keys do not
+"""The questions of a V8 run as the question file has them: a projection of the plan's question dicts, whose keys do not
 change (`plan_hash` covers them), onto `Question`. What the plan says in absolute time is written as seconds into the file that holds it,
 found in the manifest.
 
@@ -17,7 +17,7 @@ from mmsb.core.question import Grade, Question, RetrievalSpec, Scope, Span, Trut
 from mmsb.scenarios.v8_egolife.plan import TEXT, TOL_S, Plan, oracle_ranges
 
 CODE = "V8"
-ORACLE_LIMIT = 20  # sightings a retrieval run keeps (the old `bench.ORACLE_LIMIT`)
+ORACLE_LIMIT = 20  # sightings a retrieval run keeps
 EPS = 1e-6  # seconds: a moment is in a file that it touches
 
 

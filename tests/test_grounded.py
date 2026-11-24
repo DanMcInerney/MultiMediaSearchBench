@@ -1,7 +1,7 @@
-"""New tests for grounded scoring (mmsb/core/grounded.py, DESIGN 6.3, plan 5.5): where a citation is in time, whether it hits the truth by the
+"""Grounded scoring (mmsb/core/grounded.py): where a citation is in time, whether it hits the truth by the
 kind of file the truth is in, the status beside the verdict, the event F1 of a count, the fields a result holds, and the report's figures.
 
-Expected values are written by hand from DESIGN 6.3 and the plan's table, over a small dump made here by hand (a video, a sound, two
+Expected values are written by hand over a small dump made here by hand (a video, a sound, two
 pictures, notes, versions of a config, two logs, a file that crosses midnight), not from the code: a video gap of exactly 10 s is accepted
 and 10.01 s is not, a sound's 5 s and 5.01 s, a log line within 5 s of the same source, a picture only by being that file; the same moment
 cited as seconds, as a clock time and as a source with ISO times is one absolute time, across midnight too; the event F1 tables are worked
@@ -93,7 +93,7 @@ def status(q: Question, final: FinalAnswer, passed: bool = True) -> str:
     return ground(q, final, passed, DUMP).status
 
 
-# -- the tolerances of DESIGN 6.3 ----------------------------------------------------------------------------------------------------------
+# -- the tolerances ------------------------------------------------------------------------------------------------------------------------
 
 VIDEO = question("find", Span("cam/long.mp4", 100.0, 110.0))
 SOUND = question("find", Span("mic/a1.wav", 100.0, 110.0))
@@ -107,7 +107,7 @@ LINE = question("find", Span("logs/web.jsonl", 60.0, 60.0))
     (60.0, 89.99, "lucky"),  # 10.01 s
     (105.0, 106.0, "grounded"),  # inside
     (95.0, 125.0, "grounded"),  # around it
-    (0.0, 3600.0, "grounded"),  # the whole file overlaps it (DESIGN says overlap; a broad citation is not penalised)
+    (0.0, 3600.0, "grounded"),  # the whole file overlaps it: a broad citation is not penalised
     (2000.0, 2010.0, "lucky"),
 ])
 def test_a_citation_of_a_video_hits_within_ten_seconds_by_file_seconds(a, b, expected):
@@ -124,7 +124,7 @@ def test_a_citation_of_a_sound_hits_within_five_seconds(a, b, expected):
 
 @pytest.mark.parametrize("a, b, expected", [(65.0, 65.0, "grounded"), (65.01, 66.0, "lucky"), (55.0, 55.0, "grounded"), (54.99, 54.99, "lucky")])
 def test_a_citation_of_a_line_hits_within_five_seconds_of_it_in_any_file_of_its_source(a, b, expected):
-    """The truth is a line of web.jsonl; a log source holds several files, and a line of auth.jsonl at that time is the same source (DESIGN 6.3 corrected)."""
+    """The truth is a line of web.jsonl; a log source holds several files, and a line of auth.jsonl at that time is the same source."""
     assert status(LINE, said(cf("logs/auth.jsonl", a, b))) == expected
     assert status(LINE, said(cf("logs/web.jsonl", a, b))) == expected
 
@@ -178,7 +178,7 @@ ABSENT = question("absent")
     (said(), False, "wrong", 0, 0, 0),
     (said(ELSEWHERE), False, "wrong", 1, 0, 0),
 ])
-def test_the_status_of_a_needle_question_is_told_by_the_value_and_the_evidence_as_6_3_says(final, passed, expected, cited, matched, unresolved):
+def test_the_status_of_a_needle_question_is_told_by_the_value_and_the_evidence_it_cites(final, passed, expected, cited, matched, unresolved):
     assert ground(VIDEO, final, passed, DUMP) == Grounding(expected, cited, matched, unresolved)
 
 
@@ -203,7 +203,7 @@ def test_a_question_with_evidence_in_a_file_the_dump_lacks_or_with_none_at_all_i
 
 def test_the_status_a_result_holds_is_read_and_a_result_that_holds_none_is_not_recorded():
     assert status_of({"grounded": "lucky"}) == "lucky" and status_of({"grounded": "grounded"}) == "grounded"
-    assert status_of({"passed": True, "answer": "5"}) == "not_recorded", "a recorded result, or one of the line format"
+    assert status_of({"passed": True, "answer": "5"}) == "not_recorded", "a result with no status field"
     assert status_of({"answer_format": "line"}) == "not_recorded"
 
 
@@ -223,7 +223,7 @@ def test_an_offset_a_clock_time_and_a_source_with_iso_times_are_one_absolute_mom
 
 
 def test_a_photo_cited_by_its_file_with_an_iso_time_is_grounded_whatever_offset_the_agent_guessed():
-    """As a real agent cited a trail-camera photo: the file with the time from its EXIF and an offset of its own guessing."""
+    """A trail-camera photo cited as the file with the time from its EXIF and an offset of the agent's own guessing."""
     picture = question("find", Span("phone/p1.jpg", 0.0, 0.0))
     assert status(picture, said(cf("phone/p1.jpg", "2026-11-03T14:00:00-08:00", "2026-11-03T14:00:00-08:00"))) == "grounded"
     assert status(VIDEO, said(cf("cam/long.mp4", at(T0 + 2000.0), at(T0 + 2010.0)))) == "lucky", "a video's instant must still be near"
@@ -366,7 +366,7 @@ def json_result(config, q: Question, message: str, dump: Dump) -> dict:
 
 
 def line_result(config, q: Question) -> dict:
-    """A result of the line format, as a recorded run has it: the verdict and no status."""
+    """A result of the line format: the verdict and no status."""
     return record(q, "claude", config, 7, f"execs/claude/{config.dir}/{q.qid}", "2026-11-02T12:00:00", stub_out(config, q))
 
 
@@ -401,7 +401,7 @@ def test_the_report_tells_grounded_accuracy_lucky_and_unparsed_beside_the_verdic
     all_ = figures["agents"]["claude"]["mm/fake"]["all"]
     assert all_["tested"]["grounding"] == {"grounded": n - 4, "lucky": 1, "wrong": 3, "not_recorded": 0, "unparsed": 1,
                                            "accuracy": pytest.approx((n - 4) / n)}
-    assert all_["tested"]["correct"] == n - 2 and "grounding" not in all_["control"], "the verdict is as it was, and the line side tells nothing of it"
+    assert all_["tested"]["correct"] == n - 2 and "grounding" not in all_["control"], "the verdict counts the value alone, whatever the evidence, and the line side tells nothing of grounding"
     text = render.markdown(figures)
     assert "| grounded (files / mm) | lucky (files / mm) | unparsed (files / mm) |" in text
     assert f"| - / {n - 4}/{n} ({100 * (n - 4) / n:.0f}%) | - / 1 | - / 1 |" in text
@@ -411,17 +411,17 @@ def test_the_report_tells_grounded_accuracy_lucky_and_unparsed_beside_the_verdic
 def test_results_with_no_status_among_results_with_one_are_not_recorded_and_left_out_of_the_accuracy(tiny, tmp_path):
     dump = tiny_dump()
     run = report_run_of(tmp_path / "run", tiny)
-    older = {q.qid for q in tiny[:5]}  # five results of the tested side are of the line format (as if recorded before)
+    of_line = {q.qid for q in tiny[:5]}  # five results of the tested side are of the line format
     for q in tiny:
         fs.write_json(run.result_path("claude", REPORT_FILES, q.qid), line_result(REPORT_FILES, q))
         fs.write_json(run.result_path("claude", REPORT_FAKE, q.qid),
-                      line_result(REPORT_FAKE, q) if q.qid in older else json_result(REPORT_FAKE, q, cited(q), dump))
+                      line_result(REPORT_FAKE, q) if q.qid in of_line else json_result(REPORT_FAKE, q, cited(q), dump))
     got = report.numbers([run])["agents"]["claude"]["mm/fake"]["all"]["tested"]["grounding"]
     assert got == {"grounded": len(tiny) - 5, "lucky": 0, "wrong": 0, "not_recorded": 5, "unparsed": 0, "accuracy": 1.0}
 
 
 def test_a_report_of_results_that_hold_no_status_tells_nothing_of_grounding(tiny, tmp_path):
-    """Recorded results, and results of the line format, have no status: the figures hold no `grounding` and the Markdown no word of it."""
+    """Results of the line format have no status: the figures hold no `grounding` and the Markdown no word of it."""
     run = report_run_of(tmp_path / "run", tiny)
     for config in (REPORT_FILES, REPORT_FAKE):
         for q in tiny:

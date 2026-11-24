@@ -1,13 +1,13 @@
-"""The mm system (DESIGN 3): MultimediaSearch's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
+"""The mm system: MultimediaSearch's memory, read by a local decision model through its daemon. `Mm` is the `System` (`describe`, `ingest`,
 `open`); `MmSession` is what `run_config` calls for a run of one (agent, variant): it owns a copy of the ingested store and the daemon
-over it, serves each case its server, skill and notes, holds cases back by the rules of the old `run_arm` (`admits`, `max_jobs`) and takes
+over it, serves each case its server, skill and notes, holds cases back by `admits` and `max_jobs` and takes
 an exec's state out of the home when it ends (`reset`).
 
     store/home/            the ingested home (`ingest`): the daemon is never run on it again, only on copies
     store/windows.json     what the dump costs the model in windows (estimate.py), counted from the dump when it was ingested
     <homes>/<agent>-<variant>/   one copy per (agent, variant), made by `open`, its daemon started and the model loaded
 
-What the old `run_arm`, `run_agents` and `copy_home` did to the home, in their order, is split over the calls (plan 4.5, 4.6):
+What a run does to the home, in order, is split over the calls:
 `open`: copy, start the daemon, load the model with one window, sweep the labels of an earlier run (`id:bench-*`); `preview` is `open`
 for a dry run: the estimate, the jobs and the server from the store's files, with no copy, daemon or model;
 `serve`: wait for the daemon to be idle when the case holds the GPU, write the project marker into the working folder, take out the state
@@ -41,7 +41,7 @@ from mmsb.systems import read as read_system_toml
 from mmsb.systems.mm.audit import HorizonLeak, ambient_labels, work_of
 from mmsb.systems.mm.audit import audit as horizon_audit
 from mmsb.systems.mm.daemon import Api, Daemon, wait_for, write_config
-from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, arm_jobs, beyond_timeout, estimate_s, heavy, table_of
+from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, beyond_timeout, config_jobs, estimate_s, heavy, table_of
 from mmsb.systems.mm.home import PROJECT_PREFIX, SNAPSHOT_CONFIG, copy_home, exec_project, kept_items, scrub_home, set_horizon
 from mmsb.systems.mm.jobs import JOB_WAIT_S, quiesce, wait_idle
 from mmsb.systems.mm.load import check_snapshot, load
@@ -55,7 +55,7 @@ LOOKS = "looks"  # the folder of a home where `look` writes the pictures and sou
 TOOLS = ("ask", "find", "look", "label")  # the only mm tools the agents are offered: none that reads the disk
 CLOCK_NOTE = "mm's clock reads a later date than now: give since and until as dates and times, not as ages or \"now\"."
 CLOCK_LATE_S = 3600.0  # mms's clock is the machine's: a case whose `now` is more than this earlier needs the note
-INGEST_VERSION = 1  # bumped when ingest stores something other than before
+INGEST_VERSION = 1  # bumped when ingest changes what it stores
 SKILL = resources.files("mms") / "skills" / "mms-questions" / "SKILL.md"
 NOTES_DIR = resources.files("mms") / "skills" / "mms-questions" / "models"
 
@@ -129,7 +129,7 @@ def parts_of(model: Model) -> tuple[str, ...]:
 
 def jobs_of(model: Model, cases: Sequence[Case], requested: int) -> int:
     """One exec at a time when a case has a horizon (the cut is the whole home's) or the model is slow, else `requested`."""
-    return 1 if any(c.horizon is not None for c in cases) else arm_jobs(model, requested)
+    return 1 if any(c.horizon is not None for c in cases) else config_jobs(model, requested)
 
 
 def served_of(home: Path, parts: tuple[str, ...], case: Case, context: SessionContext, busy_at_start: int | None) -> Served:
@@ -224,8 +224,8 @@ class Mm:
 
 
 class NoQueue(PlainSession):
-    """What both of mm's sessions share: MultimediaSearch keeps no per-job wait, so they cannot say how long a case queued for the GPU (decision
-    D3, a change in MultimediaSearch). The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
+    """What both of mm's sessions share: MultimediaSearch keeps no per-job wait, so they cannot say how long a case queued for the GPU (it would take a change in MultimediaSearch).
+    The working clock then runs on the wall, and more than one exec at once on it is refused (core/clock.py)."""
 
     def queue_s(self, case: Case) -> float | None:
         return None

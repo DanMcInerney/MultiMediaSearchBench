@@ -1,7 +1,7 @@
 """I3, the trail camera: the memory card of one camera in the hills of the south-western United States (Caltech Camera Traps, location
 23), months of photos of whatever passed, day and night (at night in infrared), most of them of nothing. The questions ask which days an
 animal came, how often, when it was first or last seen, and of animals that never came (questions.py). Every answer is from the
-dataset's labels; the scenario is the names of a `Scenario`, as functions (DESIGN 5), over the shared builder (realdump). The photos the
+dataset's labels; the scenario is the names of a `Scenario`, as functions, over the shared builder (realdump). The photos the
 dataset times as 12:MM:SS, which are noon and the hour after midnight alike, are told apart by the AM or PM burned into their strip, and
 those of the night are at 00:MM:SS (source.py `told`).
 

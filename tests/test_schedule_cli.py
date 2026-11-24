@@ -1,7 +1,7 @@
-"""`mmsb run --side-by-side` (plan 6.4, D5: off unless asked): the flag, what a dry run prints of it, and a run that has it, over the scenario
-`toy` and the stand-in system of tests/cli_world.py, with the fixtures of tests/test_cli.py. Written for this repository (U13).
+"""`mmsb run --side-by-side` (off unless asked): the flag, what a dry run prints of it, and a run that has it, over the scenario
+`toy` and the stand-in system of tests/cli_world.py, with the fixtures of tests/test_cli.py.
 
-The expected values are the plan's words (the flag is off by default; the run says it is on; the same set of results as without it; a dry run
+The expected values are the flag's rules (the flag is off by default; the run says it is on; the same set of results as without it; a dry run
 shows it, with a wall estimate through `simulate` or says it is not estimated; the agents' own tools are kept off the GPU beside other cells),
 the estimate worked out by hand in the test that checks it, and what the test planted."""
 

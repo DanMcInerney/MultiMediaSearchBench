@@ -1,5 +1,5 @@
-"""New tests for mmsb/core/config.py. The expected results are the plan's section 4.3 table (written by hand) and the folder names
-of the recorded runs (`mm-d1-3B`, `files`, `blind`)."""
+"""Tests for mmsb/core/config.py. The expected results are the table below, written by hand: what a configuration is called on the command
+line, its `Config`, and the name of its results folder (`mm-d1-3B`, `files`, `blind`)."""
 
 from __future__ import annotations
 
@@ -27,13 +27,13 @@ TABLE = [
 
 
 @pytest.mark.parametrize("written, config, folder", TABLE, ids=[t[0] for t in TABLE])
-def test_a_written_configuration_is_the_config_and_the_results_folder_of_the_plans_table(written, config, folder):
+def test_a_written_configuration_is_the_config_and_the_results_folder_of_the_table(written, config, folder):
     got = parse_config(written, DEFAULTS)
     assert got == config and got.dir == folder
 
 
 REFUSED = [
-    ("gold", "gold is not built yet (DESIGN section 4; not P0)"),
+    ("gold", "gold is not built yet"),
     ("gold+files", "gold is not built yet"),
     ("gold/x", "gold is not built yet"),
     ("embed", "not a configuration: blind, or one of the systems files, listing, mm, other"),

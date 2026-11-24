@@ -1,8 +1,8 @@
-"""Which questions of the download are asked (moved from egolife.py of this repository at bb498a6): for each of four ages (the query time
-less the latest target: under 2 h, 2-6 h, 6-24 h, over 24 h), 10 of the questions that need no sound, chosen by the rarest categories
-first, and 10 that need sound, asked from the transcript alone (`select`). Every question is asked as of its horizon H, the end of the last
-whole clip that ended by the query: no configuration may read a clip or a transcript line past H. What is lost is the seconds between H and
-the question: under 30, except after a gap in the recording."""
+"""Which questions of the download are asked: for each of four ages (the query time less the latest target: under 2 h, 2-6 h, 6-24 h,
+over 24 h), 10 of the questions that need no sound, chosen by the rarest categories first, and 10 that need sound, asked from the
+transcript alone (`select`). Every question is asked as of its horizon H, the end of the last whole clip that ended by the query: no
+configuration may read a clip or a transcript line past H. What is lost is the seconds between H and the question: under 30, except after a
+gap in the recording."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def age_of(item: dict) -> str:
 
 
 def pools(items: Sequence[dict], clips: Sequence[Clip], lines: Sequence[dict], days: int = DAYS) -> tuple[list[dict], list[dict], Counter]:
-    """The questions the bench can ask, `(video, speech, dropped)`. A question is asked when its query is on days 1..`days`, a clip
+    """The questions the benchmark can ask, `(video, speech, dropped)`. A question is asked when its query is on days 1..`days`, a clip
     had ended by then, and each of its targets is inside a clip that ended by the horizon; a speech question (needs sound) also
     when a transcript line that ended by the horizon is within NEAR_S of a target. `dropped` counts the others by why."""
     video, speech, dropped = [], [], Counter()

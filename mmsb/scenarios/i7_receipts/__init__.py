@@ -3,7 +3,7 @@ receipts (ringgit, a shop's name and the day on each) and CORD's Indonesian cafe
 the folder is one person's only as a pile of what a person who travels between the two might keep. The questions ask for the receipt of a shop on a day, what was paid, every receipt of a shop, how many, which shop gave the biggest bill in a
 month, the receipt with an item and its price, and of shops and items that are not there (questions.py). The receipts are SROIE's scans (company, date
 and total of each) and CORD's photographs (the menu lines and totals); every answer is from their labels. The scenario is the names of a `Scenario`,
-as functions (DESIGN 5), over the shared builder (realdump).
+as functions, over the shared builder (realdump).
 
     recipe = i7_receipts.recipe(scale="tiny", seed=1)       # the sources, the scale's days, this machine's UTC offsets
     dump, questions = i7_receipts.build(recipe, folder, 3)  # the receipts copied in as `scan_0001.jpg` onwards, and the questions

@@ -3,8 +3,8 @@
     write(plan, folder, workers)    every file and log of the plan under `folder`; the plan's own checks are asserted
 
 `write` asserts the plan's own checks: each needle is what the fake decider sees after encoding, no distractor is, each needle's code is in
-its own file only, and no two recordings are the same bytes (which `remember` would keep once). Nothing of the truth is written. Moved from
-haystack.py of the repository at bb498a6; the checks that read a file back use `frames`, the copy of the reader's decoding."""
+its own file only, and no two recordings are the same bytes (which `remember` would keep once). Nothing of the truth is written. The checks
+that read a file back use `frames`, the mirror of the reader's decoding."""
 
 from __future__ import annotations
 
@@ -151,7 +151,7 @@ def write_file(f: File, folder: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     spec = f.spec
     stamped = datetime.fromtimestamp(f.t).strftime("%Y-%m-%d %H:%M:%S")
-    with tempfile.TemporaryDirectory(prefix="haystack-") as work_dir:
+    with tempfile.TemporaryDirectory(prefix="mmsb-week-") as work_dir:
         work = Path(work_dir)
         if f.kind == "photo":
             photo_image(spec).save(path, quality=90, exif=exif_of(f.t))
@@ -215,7 +215,7 @@ def check_text(plan: Plan, folder: Path) -> None:
 def write(plan: Plan, folder: Path, workers: int = WORKERS) -> None:
     """Write every file and log of the plan under `folder`, set their mtimes, and assert the plan's own checks (each needle is
     what the fake decider sees after encoding, no distractor is, each needle's code is in its own file only, no two recordings are
-    the same bytes, which `remember` would keep once: photos too, which are recordings now). Nothing of the truth is written. `workers`
+    the same bytes, which `remember` would keep once: photos too, which are recordings). Nothing of the truth is written. `workers`
     files are written at once."""
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
