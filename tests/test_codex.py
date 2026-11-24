@@ -13,7 +13,7 @@ from typing import NamedTuple
 import pytest
 from agent_spec import served_of, server_of, spec_of
 
-from mmsb.core.agents import codex, common
+from mmsb.core.agents import codex
 from mmsb.core.answer import answer_of
 from mmsb.core.grade import code, near, norm, numbers, unknown
 

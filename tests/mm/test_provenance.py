@@ -8,7 +8,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import shutil
-from datetime import date, datetime
+from datetime import datetime
 
 import pytest
 
