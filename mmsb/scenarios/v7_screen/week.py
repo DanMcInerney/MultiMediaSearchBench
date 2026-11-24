@@ -241,7 +241,7 @@ class _Week:
         self.texts.append(json.dumps(line))
 
     def logs_needles(self) -> None:
-        r, sc = self.rng("log-needles"), self.sc
+        r = self.rng("log-needles")
         n = len(self.days)
         everywhere = set(self.slots)
         spot = self.spot("log-count", everywhere)

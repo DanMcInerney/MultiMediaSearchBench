@@ -15,14 +15,12 @@ import types
 import cli_world
 import pytest
 from cli_world import DAYS, SCALE, SEED, build_args, world  # noqa: F401
-from stub_system import Stub, StubSystem, tiny_questions
+from stub_system import Stub, tiny_questions
 
-from mmsb import scenarios
 from mmsb.core import costing, dryrun, fs, paths
 from mmsb.core.agents import claude, codex
 from mmsb.core.config import Config
 from mmsb.core.costing import BLIND_MIN, EXEC_MIN, Cell, Figures, Typical, earlier_runs, forecast, history_of, typical_of
-from mmsb.core.runfolder import RunFolder
 
 pytestmark = pytest.mark.xdist_group("cli")
 N = len(tiny_questions())

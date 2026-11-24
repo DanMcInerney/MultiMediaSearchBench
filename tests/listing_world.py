@@ -14,7 +14,6 @@ import json
 import os
 import re
 import struct
-import sys
 import wave
 import zlib
 from collections.abc import Callable, Sequence

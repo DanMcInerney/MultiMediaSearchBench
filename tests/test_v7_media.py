@@ -27,7 +27,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from mmsb.scenarios.v7_screen import constants, media_sound, shortcuts
+from mmsb.scenarios.v7_screen import constants, media_sound
 from mmsb.scenarios.v7_screen.constants import PITCH_RMS, PITCH_SHARE, PROFILE, RATE, SHADE_TOL, pitch_share, shade_share
 from mmsb.scenarios.v7_screen.frames import audio_span, decode_frames, fit, frame_times
 from mmsb.scenarios.v7_screen.media_common import DISTRACTOR_RGB, NEEDLE_RGB, SHADE_GAP, SOURCE_NEEDLES, _px, distance, gap

@@ -39,7 +39,7 @@ from pathlib import Path
 
 from mmsb import catalogue, fetch, scenarios, systems
 from mmsb.arguments import DEFAULT_SEED, OPTIONS, csv, parser_of
-from mmsb.core import fs, gpu, paths, render, report, summary
+from mmsb.core import fs, gpu, paths, summary
 from mmsb.core.agents import claude
 from mmsb.core.build import build_run, check_stores, ensure_data, ingest_stores, read_dump, store_hashes, store_of
 from mmsb.core.clockcheck import light_cases, pick, queued_at_once, run_halves, show_sides

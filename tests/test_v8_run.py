@@ -24,7 +24,6 @@ from stub_system import STUB, StubSession, StubSystem
 from v8_fake import (BLIND, FILES, OPTIONS, SHADE, V8, built, clip_ends, line_at, lines_by, oracle_file, plan, recipe, source, table,  # noqa: F401
                      view_files, write_run)
 
-from mmsb import systems
 from mmsb.core import fs
 from mmsb.core.contract import Dump
 from mmsb.core.runfolder import RunFolder
