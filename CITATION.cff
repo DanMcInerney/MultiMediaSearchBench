@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use MultiMediaSearchBench, please cite it as below."
+type: software
+title: "MultiMediaSearchBench: how well AI agents find things in the video, pictures and sound people keep"
+abstract: "A benchmark of how well an AI agent, alone or with a search system, finds things in large piles of real video, pictures and sound, with every answer known in advance and graded by fixed rules."
+authors:
+  - family-names: McInerney
+    given-names: Dan
+repository-code: "https://github.com/DanMcInerney/MultiMediaSearchBench"
+license: MIT
+version: 0.1.0
+date-released: "2026-11-24"
+keywords:
+  - benchmark
+  - multimodal
+  - agents
+  - video search
+  - audio search
+  - image search

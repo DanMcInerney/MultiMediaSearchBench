@@ -5,6 +5,15 @@ description = "MultiMediaSearchBench: how well AI agents, alone or with a search
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
+authors = [{ name = "Dan McInerney" }]
+keywords = ["benchmark", "multimodal", "agents", "video", "audio", "images", "search", "retrieval"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 requires-python = ">=3.12,<3.13"
 # The bytes of the generated V7 week depend on these four: they are pinned to what the recorded pilot was written with.
 dependencies = [
@@ -21,6 +30,11 @@ dependencies = [
 [project.optional-dependencies]
 # MultimediaSearch, at the commit whose default model is d1-Omni-2B (the commit uv.lock pins as well)
 mm = ["mms @ git+https://github.com/DanMcInerney/MultimediaSearch@7237e41c1677b32aee8189aac782c43d1324260d"]
+
+[project.urls]
+Repository = "https://github.com/DanMcInerney/MultiMediaSearchBench"
+Issues = "https://github.com/DanMcInerney/MultiMediaSearchBench/issues"
+Sources = "https://huggingface.co/datasets/DanMcInerney/mmmb-sources"
 
 [project.scripts]
 mmsb = "mmsb.cli:main"

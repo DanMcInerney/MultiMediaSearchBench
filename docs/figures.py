@@ -524,7 +524,7 @@ def results() -> None:
 def pilot() -> None:
     W, H = 1600, 690
     c = Canvas(W, H)
-    c.text(50, 30, "A generated week: the same answers for far less work", size=40, weight="bold")
+    c.text(50, 30, "A generated week: as many right answers, for far less work", size=40, weight="bold")
     c.text(50, 88, "24 questions about 3 generated days of screen, door camera, phone and logs (4 November 2026). The files alone, against MultimediaSearch (d1-3B) alone.",
            size=19.5, color=MUTED)
     panels = (("Right, of 24", (("Codex", 22, 23), ("Claude Code", 18, 22)), 24, "{:.0f}", "The gains are not yet significant: McNemar p = 1.0 for Codex, 0.125 for Claude."),
