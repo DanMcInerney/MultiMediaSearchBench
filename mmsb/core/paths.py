@@ -46,9 +46,20 @@ def check_apart(out: Path, temp: Path) -> None:
                          "ffmpeg and working folders. Give --out a folder of its own (not your home folder or a drive's root), or --temp one outside it")
 
 
+def volume(folder: Path) -> str:
+    """What `folder` is stored on: its drive on Windows, and elsewhere the device of the nearest folder above it that exists (a
+    folder not made yet will be on its parent's)."""
+    if os.name == "nt":
+        return folder.drive.casefold()
+    folder = folder.absolute()
+    while not folder.exists() and folder != folder.parent:
+        folder = folder.parent
+    return str(folder.stat().st_dev)
+
+
 def check_volume(*folders: Path) -> None:
-    """Raises when `folders` are not all on one drive."""
-    drives = {f.drive.casefold() for f in folders}
+    """Raises when `folders` are not all on one drive (Windows) or one file system (elsewhere)."""
+    drives = {volume(f) for f in folders}
     if len(drives) > 1:
         raise ValueError("these folders must share a volume, so that a copy of a store can hard-link the dump: "
                          + ", ".join(str(f) for f in folders))

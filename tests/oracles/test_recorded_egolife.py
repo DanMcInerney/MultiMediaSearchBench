@@ -10,6 +10,7 @@ Unlike the pilot's, this oracle needs no download and holds in any time zone: th
 
 from __future__ import annotations
 
+import os
 import json
 import shutil
 import subprocess
@@ -33,6 +34,11 @@ NAME = "20261103-0257-egolife-s1"  # the run's folder name is in the report, so 
 RENAMES = {"control": "files", "tested": "mm", "tested_control": "mm_files", "control_blind": "files_blind", "tested_blind": "mm_blind",
            "mm/d1-3B": "d1-3B", "retrieval": "decider"}
 CLOCK = "mm's clock reads a later date than now: give since and until as dates and times, not as ages or \"now\"."
+
+
+def as_recorded(written: bytes) -> bytes:
+    """`written` with the line ends of the recorded report, which was written on Windows (CRLF)."""
+    return written if os.linesep == "\r\n" else written.replace(b"\n", b"\r\n")
 
 
 def legacy_view(figures: dict) -> dict:
@@ -88,7 +94,7 @@ def test_the_figures_of_the_converted_run_are_the_recorded_report_json(run):
 def test_the_markdown_of_the_converted_run_is_the_recorded_report_md_byte_for_byte(run, tmp_path):
     """Written as a run writes it (`fs.write_text`, in text mode as the old code wrote report.md, so with Windows line ends)."""
     fs.write_text(tmp_path / "report.md", V8.report([run])[1])
-    assert (tmp_path / "report.md").read_bytes() == (RECORDED / "report.md").read_bytes()
+    assert as_recorded((tmp_path / "report.md").read_bytes()) == (RECORDED / "report.md").read_bytes()
 
 
 def test_regrading_the_150_recorded_answers_through_the_questions_gives_the_recorded_verdicts(run):
@@ -218,4 +224,4 @@ def test_the_report_of_the_converted_run_is_the_same_with_the_old_modules_and_mm
     done = subprocess.run([sys.executable, "-c", NEUTRAL, str(run.folder), str(tmp_path / "report.md")], capture_output=True, text=True,
                           cwd=tmp_path)
     assert done.returncode == 0, done.stderr[-2000:]
-    assert (tmp_path / "report.md").read_bytes() == (RECORDED / "report.md").read_bytes()
+    assert as_recorded((tmp_path / "report.md").read_bytes()) == (RECORDED / "report.md").read_bytes()

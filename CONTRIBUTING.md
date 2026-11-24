@@ -6,7 +6,7 @@ Thank you for looking. Issues and pull requests are welcome, most of all:
 - **results**: a run of any pile with any agent, with its `report.md` and `report.json`;
 - **a new pile** of media people really keep, from a public dataset whose licence allows it ([MEDIA.md](MEDIA.md) shows what
   is recorded for each source);
-- **Linux and macOS**: the benchmark has only been run on Windows 11.
+- **Linux and macOS runs**: the tests pass there, but real agent runs have only been made on Windows 11.
 
 ## Before a pull request
 
@@ -15,7 +15,7 @@ uv sync
 uv run pytest
 ```
 
-The fast tests need no agent, no GPU and no network, and take about 6 minutes. CI runs them on Windows.
+The fast tests need no agent, no GPU and no network, and take about 6 minutes. CI runs them on Windows, Linux and macOS.
 
 - [VISION.md](VISION.md) says what the benchmark must stay true to, and [DESIGN.md](DESIGN.md) how it is built. A change that
   alters what is measured belongs in DESIGN.md too.

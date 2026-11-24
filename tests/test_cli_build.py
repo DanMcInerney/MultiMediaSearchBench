@@ -16,7 +16,6 @@ import importlib.metadata
 import json
 import os
 import re
-import stat
 from dataclasses import dataclass
 from datetime import date
 
@@ -245,7 +244,7 @@ def test_a_lost_data_folder_is_written_again_from_the_recipe_and_frozen(world, c
     fs.remove_tree(run.data / "screen")  # one file gone is the folder lost
     ensure_data(run, dump)
     assert "writing it again" in capsys.readouterr().out and (run.data / "screen" / "s.mkv").is_file()
-    (run.data / "notes" / "a.md").chmod(stat.S_IWRITE)
+    (run.data / "notes" / "a.md").chmod(fs.WRITABLE)
     (run.data / "notes" / "a.md").write_text("vandal", encoding="utf-8")
     with pytest.raises(RuntimeError, match=r"is not as it was frozen \(changed: notes/a.md\)"):  # (a file that changed is not lost: the cache refuses it)
         ensure_data(run, dump)
