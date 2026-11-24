@@ -252,7 +252,7 @@ def test_a_file_is_found_by_its_path_or_by_a_longer_path_that_ends_with_it_and_n
     want = Placed("cam", T0 + 5, T0 + 6, "cam/long.mp4")
     assert resolve(cf("cam/long.mp4", 5.0, 6.0), DUMP) == want
     assert resolve(cf("cam\\long.mp4", 5.0, 6.0), DUMP) == want, "backslashes are slashes"
-    assert resolve(cf(r"D:\mmsb-data\mmb-1-data\cam\long.mp4", 5.0, 6.0), DUMP) == want, "the path the agent read it by"
+    assert resolve(cf(r"D:\mmsb-data\mmsb-1-data\cam\long.mp4", 5.0, 6.0), DUMP) == want, "the path the agent read it by"
     assert resolve(cf("/work/view/cam/long.mp4", 5.0, 6.0), DUMP) == want
     assert resolve(cf("long.mp4", 5.0, 6.0), DUMP) is None, "a bare name is no path"
     assert resolve(cf("xcam/long.mp4", 5.0, 6.0), DUMP) is None, "a path that ends with the name but not after a folder"

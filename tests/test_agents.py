@@ -297,7 +297,7 @@ def test_the_files_configuration_may_read_back_its_own_saved_output_and_nothing_
     """A Bash output over Claude Code's limit is saved under ~/.claude/projects/<folder>/<session>/tool-results, and its result
     names the file (2.1.302): the files configuration may read that file back, not another session's or anything else under ~/.claude."""
     sid = "eb90273e-5f48-4dad-b3d2-2370a8a15ac1"
-    saved = f"C:\\Users\\dan\\.claude\\projects\\D--mmsb-data-mmb-w2\\{sid}\\tool-results\\bbelb0265.txt"
+    saved = f"C:\\Users\\dan\\.claude\\projects\\D--mmsb-data-mmsb-w2\\{sid}\\tool-results\\bbelb0265.txt"
     deny = (".claude",)
     big = {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "t1", "content":
            f"<persisted-output>\nOutput too large (2.4MB). Full output saved to: {saved}\n\nPreview (first 2KB):\nInput #0\n"}]}}

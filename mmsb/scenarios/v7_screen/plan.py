@@ -83,7 +83,7 @@ from datetime import date, datetime, timedelta
 from mmsb.scenarios.v7_screen.media_common import NEEDLE_RGB, _rng
 from mmsb.scenarios.v7_screen.media_screen import SCREEN, typing_cap
 
-VERSION = 6  # bump when plan() changes what it makes
+VERSION = 7  # bump when plan() changes what it makes
 TYPES = ("text", "records", "image", "video", "audio")
 TEMPLATES = {"text": ("note-code", "config-asof"), "records": ("log-count", "log-last"),
              "image": ("photo-sign", "photo-count"), "video": ("screen-error", "porch-parcel"),

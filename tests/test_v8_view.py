@@ -66,8 +66,8 @@ def test_the_scenarios_view_is_the_slots_folder_cut_to_the_questions_horizon_and
     dump, questions = built
     q = dataclasses.replace(questions[0], horizon=clip_ends(table)[2])
     folder = V8.view(q, 1, dump, tmp_path, "abc", True)
-    assert folder == tmp_path / "mmb-abc-d1" and len([n for n in view_files(folder) if n.startswith("glasses/")]) == 3
-    assert V8.view(q, 3, dump, tmp_path, "abc", False) == tmp_path / "mmb-abc-d3" and not (tmp_path / "mmb-abc-d3").exists(), "a dry run"
+    assert folder == tmp_path / "mmsb-abc-d1" and len([n for n in view_files(folder) if n.startswith("glasses/")]) == 3
+    assert V8.view(q, 3, dump, tmp_path, "abc", False) == tmp_path / "mmsb-abc-d3" and not (tmp_path / "mmsb-abc-d3").exists(), "a dry run"
     V8.release(tmp_path, "abc")
     assert not folder.exists()
     assert V8.view(q, 1, dump, tmp_path, "abc", True) == folder and folder.exists(), "made again"
@@ -98,10 +98,10 @@ def test_the_deny_words_of_v8_are_the_words_of_its_code_the_download_and_the_vie
     assert V8.DENY_WORDS == words
     own = tuple(IN_ONLY + word for word in words)
     assert V8.deny_words([], Path("t"), "k") == (*own, "a1_jake", "in:egolife"), "with no other slot, no folder of recordings"
-    view = lambda k: str(Path("t") / f"mmb-k-d{k}")  # noqa: E731
+    view = lambda k: str(Path("t") / f"mmsb-k-d{k}")  # noqa: E731
     assert V8.deny_words([1, 2], Path("t"), "k") == (
-        *own, "a1_jake", "in:egolife", "mmb-k-d1/glasses", "mmb-k-d1/transcript", "mmb-k-d2/glasses", "mmb-k-d2/transcript",
-        *(IN_ONLY + word for k in (1, 2) for word in (view(k), f"mmb-k-d{k}", f"*-d{k}", f"?-d{k}"))), \
+        *own, "a1_jake", "in:egolife", "mmsb-k-d1/glasses", "mmsb-k-d1/transcript", "mmsb-k-d2/glasses", "mmsb-k-d2/transcript",
+        *(IN_ONLY + word for k in (1, 2) for word in (view(k), f"mmsb-k-d{k}", f"*-d{k}", f"?-d{k}"))), \
         "the other slots' folders by path, by name, by glob, and the folders in them"
     run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, tmp_path / "data", tmp_path / "temp", "t8", 900.0, V8, ())
     for slot in (None, 0):
@@ -124,7 +124,7 @@ def test_the_deny_list_keeps_an_agent_off_the_other_slots_and_the_download_and_n
     assert not stopped(f"ffmpeg -i {own}/{clip} frame.png") and not stopped(f"Input #0, from '{own}\\glasses\\x.mp4'", output=True)
     assert stopped(f"ffmpeg -i {other}/{clip} frame.png")
     assert stopped(r"copy D:\downloads\egolife\A1_JAKE\DAY2\DAY2_A1_JAKE_10050125.mp4 .")
-    assert stopped(f"cd ..\\{other.name}") and stopped("dir D:\\mmb-temp\\*-d1") and stopped(f"dir {run.temp}\\mmb-?-d2")
+    assert stopped(f"cd ..\\{other.name}") and stopped("dir D:\\mmsb-temp\\*-d1") and stopped(f"dir {run.temp}\\mmsb-?-d2")
     assert stopped(f"Input #0, from '{other}\\glasses\\x.mp4'", output=True), "ffmpeg echoes the path it reads"
     assert stopped("Directory of D:\\x\\A1_JAKE\\DAY1", output=True) and stopped(f"{other.name}/transcript/2026-10-29.jsonl", output=True)
     assert not stopped(f"{other.name}\n{run.slot(1).name}", output=True), "a listing of the temp folder may name a view"
@@ -142,7 +142,7 @@ PLAIN = Served(None, None, (), None, None, None, {})
 
 def test_a_prompt_for_a_system_and_the_files_together_has_both_sentences_and_a_prompt_for_another_format_or_a_holderless_server_is_refused(built):
     q = next(q for q in built[1] if q.qid == "ego-001")
-    data = paths.TEMP / "mmb-0123456789-d0"
+    data = paths.TEMP / "mmsb-0123456789-d0"
     held = Served(server_of(Path("home"), Path("work")), "base", (), None, "mm", None, {})
     got = V8.prompt(q, Access(True, data, held, "line"))
     assert got == (

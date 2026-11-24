@@ -106,7 +106,7 @@ def test_a_dump_is_built_once_and_found_again_with_nothing_rewritten(where):
 def test_what_a_build_leaves_is_a_frozen_dump_named_by_its_key_and_a_record_that_says_what_it_is(where):
     temp, cache = where
     made = cached_dump(Toy(), RECIPE, temp, cache)
-    final, meta = temp / f"mmb-{SHORT}-data", cache / "dumps" / KEY
+    final, meta = temp / f"mmsb-{SHORT}-data", cache / "dumps" / KEY
     assert (dump_folder(temp, KEY), dump_meta(cache, KEY)) == (final, meta) and made.dump.root == final and made.meta == meta
     assert sorted(p.name for p in temp.iterdir()) == [final.name] and sorted(p.name for p in (cache / "dumps").iterdir()) == [KEY], "no .part is left"
     assert sorted(p.relative_to(final).as_posix() for p in final.rglob("*") if p.is_file()) == sorted(FILES)
@@ -127,7 +127,7 @@ def test_a_builder_that_raises_leaves_no_folder_no_part_and_no_record_and_the_ne
     for failure in (RuntimeError("disk full"), KeyboardInterrupt()):
         with pytest.raises(type(failure)):
             cached_dump(Toy(fails=failure), RECIPE, temp, cache)
-        assert not (temp / f"mmb-{SHORT}-data").exists() and not (temp / f"mmb-{SHORT}-data.part").exists()
+        assert not (temp / f"mmsb-{SHORT}-data").exists() and not (temp / f"mmsb-{SHORT}-data.part").exists()
         assert not (cache / "dumps" / KEY).exists() and not (cache / "dumps" / f"{KEY}.part").exists()
     assert cached_dump(Toy(), RECIPE, temp, cache).what == BUILT_NOW, "the lock was let go"
 
@@ -156,7 +156,7 @@ def test_a_dump_the_temp_folder_lost_is_written_again_compared_and_frozen_again(
     record = bytes_of(made.meta)
     fs.remove_tree(made.dump.root)  # Windows cleaned the temp folder
     again = cached_dump(toy, RECIPE, temp, cache)
-    assert f"the dump mmb-{SHORT}-data is gone from {temp}: writing it again from the recipe" in capsys.readouterr().out
+    assert f"the dump mmsb-{SHORT}-data is gone from {temp}: writing it again from the recipe" in capsys.readouterr().out
     assert (again.what, len(toy.builds), again.dump) == (REWRITTEN, 2, made.dump), "the dump is what the record says, not what the rewrite measured"
     assert fs.changed(again.dump.root, made.meta / STATS) is None and fs.read_json(made.meta / STATS) == fs.stats_of(again.dump.root)
     assert {k: v for k, v in bytes_of(made.meta).items() if k != STATS} == {k: v for k, v in record.items() if k != STATS}
@@ -171,7 +171,7 @@ def test_data_written_again_that_is_not_the_dump_is_removed_the_record_is_left_a
     record = bytes_of(made.meta)
     fs.remove_tree(made.dump.root)
     for command in ("first", "second", "third"):
-        with pytest.raises(RuntimeError, match=r"is not the dump mmb-\w+-data was built with \(3 files differ, the first logs/web\.jsonl\)"):
+        with pytest.raises(RuntimeError, match=r"is not the dump mmsb-\w+-data was built with \(3 files differ, the first logs/web\.jsonl\)"):
             cached_dump(Toy(content="v2"), RECIPE, temp, cache)
         assert not made.dump.root.exists() and not part_of(made.dump.root).exists(), f"the {command} command kept nothing of the other bytes"
         assert bytes_of(made.meta) == record, "the record, the stats too, is unchanged"
@@ -215,7 +215,7 @@ def test_data_with_no_record_is_not_taken_for_the_dump_and_is_not_removed(where)
 def test_the_temp_folder_that_holds_a_part_passes_the_check_that_it_holds_only_runs(where):
     temp, _ = where
     part_of(dump_folder(temp, KEY)).mkdir(parents=True)
-    check_temp(temp)  # (a dump being written is `mmb-*`, like the folders of a run)
+    check_temp(temp)  # (a dump being written is `mmsb-*`, like the folders of a run)
 
 
 # -- two commands after one dump -----------------------------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ def test_the_temp_folder_that_holds_a_part_passes_the_check_that_it_holds_only_r
 def test_a_command_that_finds_the_lock_held_stops_with_busy_and_touches_nothing(where):
     temp, cache = where
     toy = Toy()
-    with locked(cache, f"dump-{SHORT}", "the dump"), pytest.raises(Busy, match=r"another mmsb command is making the dump mmb-\w+-data .*wait for it to finish, then run this again"):
+    with locked(cache, f"dump-{SHORT}", "the dump"), pytest.raises(Busy, match=r"another mmsb command is making the dump mmsb-\w+-data .*wait for it to finish, then run this again"):
         cached_dump(toy, RECIPE, temp, cache)
     assert toy.builds == [] and not temp.exists(), "no part, no folder"
     assert cached_dump(toy, RECIPE, temp, cache).what == BUILT_NOW, "the lock is let go at the end of the block"

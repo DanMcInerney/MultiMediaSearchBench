@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/python-3.12-3776AB" alt="Python 3.12">
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-0078D4" alt="Windows, Linux and macOS">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-5BD38C" alt="MIT licence"></a>
-  <a href="https://huggingface.co/datasets/DanMcInerney/mmmb-sources"><img src="https://img.shields.io/badge/sources-Hugging%20Face-F6B445" alt="Sources on Hugging Face"></a>
+  <a href="https://huggingface.co/datasets/DanMcInerney/mmsb-sources"><img src="https://img.shields.io/badge/sources-Hugging%20Face-F6B445" alt="Sources on Hugging Face"></a>
 </p>
 
 # MultiMediaSearchBench (MMSB)
@@ -264,12 +264,12 @@ says so when it starts. Never copy it anywhere others can fetch it from.**
 V7 needs no source (it is generated). V8's EgoLife download is yours to make ([MEDIA.md](MEDIA.md)): give its folder to
 `mmsb build --scenario v8_egolife --source DIR`.
 
-**Or download them together.** [DanMcInerney/mmmb-sources](https://huggingface.co/datasets/DanMcInerney/mmmb-sources) on
+**Or download them together.** [DanMcInerney/mmsb-sources](https://huggingface.co/datasets/DanMcInerney/mmsb-sources) on
 Hugging Face holds the sources of 16 of the 23 scenarios (52 GB), one folder per source, as the builders read them. Download
 it into your sources folder, or add `--include "caltech-camera-traps/*"` for one source:
 
 ```
-hf download DanMcInerney/mmmb-sources --repo-type dataset --local-dir D:/mmsb-sources
+hf download DanMcInerney/mmsb-sources --repo-type dataset --local-dir D:/mmsb-sources
 ```
 
 Its card gives each folder's licence, and many are for non-commercial use only. The sources of six scenarios are not in it, and

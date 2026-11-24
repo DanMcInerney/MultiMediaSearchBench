@@ -140,7 +140,7 @@ def test_the_deny_list_names_the_dump_when_the_agent_reads_a_folder_cut_from_it_
     def stopped(deny, text: str, output: bool = False) -> bool:
         return reached(text, deny, output) is not None
 
-    other = run.temp / "mmb-0123456789-data"  # another run's dump, as a listing of the temp folder shows it
+    other = run.temp / "mmsb-0123456789-data"  # another run's dump, as a listing of the temp folder shows it
     for text in (f"ffmpeg -i {run.data}/{CLIP} frame.png", f"cat {run.data}\\transcript\\2026-10-29.jsonl", f"copy ..\\{run.data.name}\\glasses x",
                  f"dir {run.temp}\\*-data", f"ffmpeg -i {other}/{CLIP} frame.png", f"dir {other}", json.dumps({"path": str(other)})):
         assert stopped(hidden, text), text
@@ -157,12 +157,12 @@ def test_the_folders_checked_are_those_the_agent_reads_and_a_dump_that_is_hidden
     run.check_paths(ISOLATION, own)
     run.check_paths(ISOLATION)
     # a dump's name as a run gives it: a bare `data`, denied by name when hidden, is in any path through AppData (pytest's own temp)
-    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "mmb-0123456789-data")
+    refused = dataclasses.replace(run, data=tmp_path / ".codex" / "mmsb-0123456789-data")
     refused.check_paths(ISOLATION, own)  # the dump is not read: the word in its path is only more reason to keep the agent off it
     with pytest.raises(ValueError, match=r"holds '.*\.codex"):
         refused.check_paths(ISOLATION)
-    with pytest.raises(ValueError, match="holds 'mmb-"):
-        run.check_paths(ISOLATION, run.temp / f"mmb-{run.tag}-d0" / f"mmb-{run.tag}-w1")
+    with pytest.raises(ValueError, match="holds 'mmsb-"):
+        run.check_paths(ISOLATION, run.temp / f"mmsb-{run.tag}-d0" / f"mmsb-{run.tag}-w1")
 
 
 def test_a_temp_folder_an_agent_may_not_name_is_refused_before_the_run(w, tmp_path, monkeypatch):

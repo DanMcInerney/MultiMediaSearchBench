@@ -3,7 +3,7 @@ into, cached and linked into the run; the probe; and run.json, last. What an ear
 the cache (core/cache.py), not made again.
 
     <out>/<name>/questions.jsonl  data-manifest.json  dump.json  stores/<system>/ (the system's store, ingest.json)  run.json
-    <temp>/mmb-<key10>-data/      the dump, read-only, named by its key; mmb-<tag>-bin/ holds the ffmpeg
+    <temp>/mmsb-<key10>-data/      the dump, read-only, named by its key; mmsb-<tag>-bin/ holds the ffmpeg
     <cache>/dumps/<key>/, <cache>/stores/<system>-<key10>/    the dump's record and the stores (core/cache.py)
 
 `dump.json` is the dump's entries and logs (run.json does not carry them): what `Scenario.view`, `System.open` and the audits read. A store

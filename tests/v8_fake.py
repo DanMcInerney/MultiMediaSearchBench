@@ -177,7 +177,7 @@ def plan(recipe) -> plans.Plan:
 def built(tmp_path_factory, recipe) -> tuple[Dump, tuple]:
     """The dump the recipe makes, in a folder on the download's volume, and its questions. No daemon, no snapshot: that is mm's. The
     folder is named as a run names a dump: a bare `data`, denied by name when hidden, is in any path through AppData (pytest's own temp)."""
-    return V8.build(recipe, tmp_path_factory.mktemp("dump") / "mmb-0123456789-data", 2)
+    return V8.build(recipe, tmp_path_factory.mktemp("dump") / "mmsb-0123456789-data", 2)
 
 
 def clip_ends(table: list[src.Clip]) -> list[float]:

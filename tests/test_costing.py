@@ -147,7 +147,7 @@ def test_a_build_and_a_dry_run_work_in_the_default_folders_of_a_mmsb_home_that_i
             assert paths.RUNS == home / "mmsb-runs" and paths.TEMP == home / "mmsb-data" and paths.CACHE == home / "mmsb-cache"
             assert world.main("build", "--scenario", "toy", "--scale", SCALE, "--seed", str(SEED), "--days", DAYS, "--configs", "files") == 0
             (name,) = os.listdir(home / "mmsb-runs")
-            assert any((home / "mmsb-data").glob("mmb-*-data")) and (home / "mmsb-cache" / "dumps").is_dir()
+            assert any((home / "mmsb-data").glob("mmsb-*-data")) and (home / "mmsb-cache" / "dumps").is_dir()
             capsys.readouterr()
             assert world.main("run", name, "--agents", "claude", "--configs", "files", "--dry-run") == 0
             assert "nothing was run" in capsys.readouterr().out

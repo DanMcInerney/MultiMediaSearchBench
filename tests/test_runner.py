@@ -77,7 +77,7 @@ def test_every_configuration_is_run_over_its_questions_and_a_second_command_asks
     assert [Stub.dir_of(s) for s in stub.execs] == ["files"] * N + ["stub-all"] * N, "the configuration with no variant before the system's"
     for s in stub.execs:
         files = Stub.dir_of(s) == "files"
-        assert s.work.parent == run.temp and s.work.name.startswith("mmb-t1-w") and s.deny == run.deny(s.work, NO_ISOLATION)
+        assert s.work.parent == run.temp and s.work.name.startswith("mmsb-t1-w") and s.deny == run.deny(s.work, NO_ISOLATION)
         assert s.data == (run.data if files else None) and s.bin_dir == run.bin and s.timeout_s == 900.0 and s.own_tools == files
         assert (s.server is None) == files and s.isolation == NO_ISOLATION and s.model is None and s.effort is None
         assert ("stub has recorded" in s.prompt) != files and (str(run.data) in s.prompt) == files

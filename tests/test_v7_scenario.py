@@ -48,7 +48,7 @@ def offset_of(day: date) -> str:
 
 def test_the_registry_has_the_scenario_by_its_name_and_the_scenario_has_the_names_of_a_scenario():
     assert scenarios.get("v7_screen") is sys.modules["mmsb.scenarios.v7_screen"]
-    assert (V7.name, V7.code, V7.generator) == ("v7_screen", "V7", 6)
+    assert (V7.name, V7.code, V7.generator) == ("v7_screen", "V7", 7)
     assert all(callable(getattr(V7, name)) for name in PROTOCOL)
     with pytest.raises(ValueError, match="'nonesuch' is not a scenario: v7_screen"):
         scenarios.get("nonesuch")
@@ -103,7 +103,7 @@ WEEK = "from Sunday 1 November to Tuesday 3 November"
 
 def test_the_files_alone_get_the_folder_they_are_in_and_the_system_alone_gets_its_own_sentence(pilot_questions):
     question = pilot_questions["video-porch-parcel-1"]
-    data = paths.TEMP / "mmb-0123456789-data"
+    data = paths.TEMP / "mmsb-0123456789-data"
     assert V7.prompt(question, Access(True, data, PLAIN, "line")) == (
         f"It is now Wednesday 04 November 2026, 12:00. The files of these sources, {WEEK}, are in {data}, one folder per source; each file is "
         "named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on "
@@ -127,7 +127,7 @@ def test_every_question_of_the_pilot_is_asked_with_its_own_question_and_the_way_
 
 def test_a_system_and_the_files_together_get_both_sentences_and_one_way_to_answer(pilot_questions):
     question = pilot_questions["video-porch-parcel-1"]
-    data = paths.TEMP / "mmb-0123456789-data"
+    data = paths.TEMP / "mmsb-0123456789-data"
     got = V7.prompt(question, Access(True, data, MM, "line"))
     assert got == (
         "It is now Wednesday 04 November 2026, 12:00. mm has recorded these sources of mine from Sunday 1 November to Tuesday 3 November. "
@@ -168,7 +168,7 @@ def test_no_word_is_in_the_path_of_a_folder_a_run_makes_the_default_ones_include
     """`check_paths` refuses a run whose data, bin or slot a word is in: a bare `mmsb` would, with `<home>/mmsb-data`."""
     run = run_of(V7)
     words = [w.removeprefix(IN_ONLY) for w in V7.deny_words([], paths.TEMP, run.tag)]
-    for folder in (run.data, run.bin, run.slot(0), paths.TEMP / "mmb-0123456789-data", paths.TEMP / "mmb-0123456789-bin", paths.TEMP / "mmb-0123456789-w0",
+    for folder in (run.data, run.bin, run.slot(0), paths.TEMP / "mmsb-0123456789-data", paths.TEMP / "mmsb-0123456789-bin", paths.TEMP / "mmsb-0123456789-w0",
                    paths.RUNS / "20261104-1200-pilot-s1", paths.CACHE / "dumps" / ("k" * 64)):
         text = re.sub(r"[\\/]+", "/", json.dumps(str(folder)).lower())
         assert not [w for w in map(posix, words) if w in text], folder
@@ -194,7 +194,7 @@ def built(tmp_path_factory):
 def test_a_week_is_built_and_its_dump_is_measured_from_the_files_left_on_disk(built):
     recipe, dump, questions, root = built
     plan = V7.plan_of(recipe)
-    assert (dump.key, dump.root, dump.scenario) == (dump_key("v7_screen", recipe, 6), root / "data", "v7_screen")
+    assert (dump.key, dump.root, dump.scenario) == (dump_key("v7_screen", recipe, 7), root / "data", "v7_screen")
     assert dump.logs == (LogSource("logs", "logs", "*.jsonl", "ts"),)
     assert [e.path for e in dump.entries] == [f.path for f in plan.files] + [f"logs/{s}.jsonl" for s in plan.logs]
     on_disk = {p.relative_to(dump.root).as_posix() for p in dump.root.rglob("*") if p.is_file()}

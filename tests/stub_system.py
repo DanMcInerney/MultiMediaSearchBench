@@ -239,7 +239,7 @@ def run_of(root: Path, configs=(FILES, STUB), scenario=None, questions=None, tag
 
     questions = tuple(questions or tiny_questions())
     folder, temp = root / "runs" / "run", root / "temp"
-    data = temp / f"mmb-{tag}-data"
+    data = temp / f"mmsb-{tag}-data"
     for rel, text in (("notes/a.md", "a note"), ("screen/s.mkv", "a screen"), ("logs/web.jsonl", "{}")):
         (data / rel).parent.mkdir(parents=True, exist_ok=True)
         (data / rel).write_text(text, encoding="utf-8")

@@ -36,7 +36,7 @@ mm = ["mms @ git+https://github.com/DanMcInerney/MultimediaSearch@7237e41c1677b3
 [project.urls]
 Repository = "https://github.com/DanMcInerney/MultiMediaSearchBench"
 Issues = "https://github.com/DanMcInerney/MultiMediaSearchBench/issues"
-Sources = "https://huggingface.co/datasets/DanMcInerney/mmmb-sources"
+Sources = "https://huggingface.co/datasets/DanMcInerney/mmsb-sources"
 
 [project.scripts]
 mmsb = "mmsb.cli:main"
