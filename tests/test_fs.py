@@ -8,7 +8,6 @@ import hashlib
 import os
 import random
 import shutil
-import stat
 import subprocess
 import time
 from pathlib import Path
@@ -54,7 +53,7 @@ def test_a_frozen_folder_names_a_change_an_addition_and_a_removal_and_a_link_is_
         return folder, tmp_path / f"{name}.json"
 
     folder, manifest = frozen("edited")
-    (folder / "two.txt").chmod(stat.S_IWRITE)
+    (folder / "two.txt").chmod(fs.WRITABLE)
     (folder / "two.txt").write_text("twenty")
     assert fs.changed(folder, manifest) == "changed: two.txt"
     folder, manifest = frozen("added")

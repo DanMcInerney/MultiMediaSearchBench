@@ -97,6 +97,7 @@ def check_against(golden: list[str], got: tuple[str, ...], scenario_words: tuple
     assert set(scenario_words) <= set(got)
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
 def test_v7_deny_words_are_the_old_ones_but_for_the_new_folders_with_no_slot_and_with_slot_0(sentinels):
     v7 = DENY["v7"]["v7"]
     source = between(v7["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0")  # V7's `haystack` words: the scenario's, U2 checks them
@@ -110,6 +111,7 @@ def test_v7_deny_words_are_the_old_ones_but_for_the_new_folders_with_no_slot_and
     assert run.slot(0) == Path(v7["slot0_path"])
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
 def test_v8_deny_words_are_the_old_ones_but_for_the_new_folders_the_scenarios_words_come_from_it(sentinels):
     v8 = DENY["v8"]["v8"]
     for own, key, next_slot in ((None, "none", "in:d:/__temp__/mmb-tag-w0"), (0, "slot0", "in:d:/__temp__/mmb-tag-w1")):
@@ -304,6 +306,7 @@ def test_a_temp_folder_that_holds_anything_but_the_folders_of_runs_is_refused_na
 
 # -- the layout ---------------------------------------------------------------------------------------------------------
 
+@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
 def test_the_folders_of_a_run_are_where_the_recorded_runs_and_the_old_code_put_them(sentinels):
     files, mm = parse_config("files", DEFAULTS), parse_config("mm", DEFAULTS)
     run = run_of(StubScenario(), (files, mm))
@@ -334,9 +337,15 @@ def test_the_ffmpeg_is_copied_once_and_left_alone_after(tmp_path, monkeypatch):
 
 def test_the_three_folders_share_a_volume_and_the_check_says_when_they_do_not():
     paths.check_volume(paths.RUNS, paths.TEMP, paths.CACHE)
-    paths.check_volume(Path("D:/a"), Path("d:/b/c"))
-    with pytest.raises(ValueError, match="share a volume"):
-        paths.check_volume(Path("D:/a"), Path("C:/b"))
+    if os.name == "nt":
+        paths.check_volume(Path("D:/a"), Path("d:/b/c"))
+        with pytest.raises(ValueError, match="share a volume"):
+            paths.check_volume(Path("D:/a"), Path("C:/b"))
+    else:  # (a folder not made yet is on its parent's file system, and /proc is one of its own)
+        paths.check_volume(Path.home() / "not-made" / "yet", Path.home())
+        if Path("/proc").is_dir():
+            with pytest.raises(ValueError, match="share a volume"):
+                paths.check_volume(Path.home(), Path("/proc"))
     assert (paths.ROOT / "pyproject.toml").is_file() and (paths.ROOT / "mmsb" / "core" / "paths.py").is_file()
 
 

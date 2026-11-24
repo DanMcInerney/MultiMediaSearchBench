@@ -87,6 +87,7 @@ def test_a_view_that_cannot_be_removed_is_told_and_does_not_hide_the_error(tmp_p
     assert not view_dir(tmp_path, "abc", 0).exists()
 
 
+@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
 def test_the_deny_words_of_v8_are_the_old_ones_but_for_the_new_folders_and_three_that_name_the_new_package(sentinels):
     golden = DENY["v8"]["v8"]
     new = tuple(IN_ONLY + word for word in ("v8_egolife", "from mmsb", "import mmsb"))

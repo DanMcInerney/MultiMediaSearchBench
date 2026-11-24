@@ -12,7 +12,6 @@ import dataclasses
 import hashlib
 import json
 import os
-import stat
 import subprocess
 import sys
 import time
@@ -137,7 +136,7 @@ def test_one_changed_file_refuses_naming_it_and_an_added_one_too_and_nothing_is_
     temp, cache = where
     toy = Toy()
     made = cached_dump(toy, RECIPE, temp, cache)
-    (made.dump.root / "notes" / "a.md").chmod(stat.S_IWRITE)
+    (made.dump.root / "notes" / "a.md").chmod(fs.WRITABLE)
     (made.dump.root / "notes" / "a.md").write_text("vandal", encoding="utf-8")
     with pytest.raises(RuntimeError, match=r"is not as it was frozen \(changed: notes/a\.md\).*escape"):
         cached_dump(toy, RECIPE, temp, cache)

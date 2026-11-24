@@ -10,9 +10,12 @@ import json
 import os
 import re
 import shutil
-import stat
 import subprocess
 from pathlib import Path
+
+# A frozen file and one made writable again. Windows reads only the write bit; elsewhere the owner's write bit alone (stat.S_IWRITE)
+# would leave a file nobody can read.
+READ_ONLY, WRITABLE = 0o444, 0o644
 
 
 def slug(name: str) -> str:
@@ -92,7 +95,7 @@ def remove_tree(path: Path) -> None:
         if function is os.unlink and os.lstat(target).st_nlink > 1:
             unlink(Path(target))
             return
-        os.chmod(target, stat.S_IWRITE)
+        os.chmod(target, WRITABLE)
         function(target)
 
     if path.is_dir() and not path.is_symlink():
@@ -100,7 +103,7 @@ def remove_tree(path: Path) -> None:
     elif path.lstat().st_nlink > 1:
         unlink(path)
     else:
-        os.chmod(path, stat.S_IWRITE)
+        os.chmod(path, WRITABLE)
         path.unlink()
 
 
@@ -161,7 +164,7 @@ def freeze(data: Path, manifest: Path) -> None:
                            f"{', '.join(mine[:5])}")
     for path in data.rglob("*"):
         if path.is_file():
-            os.chmod(path, stat.S_IREAD)
+            os.chmod(path, READ_ONLY)
     manifest.write_text(json.dumps(stats_of(data)), encoding="utf-8")
 
 

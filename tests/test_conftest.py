@@ -240,7 +240,7 @@ def test_a_test_may_read_the_folders_of_runs_dumps_and_cache_and_may_not_change_
     assert all({"FAILED", "ERROR"} & found[t] for t in refused), done.stdout
     assert all(found[t] == {"PASSED"} for t in allowed), done.stdout
     for folder in (paths.CACHE, paths.TEMP, paths.RUNS):  # (each was refused by the guard, not by a folder that was not there)
-        assert re.search(rf"must not.*: (os\.mkdir|open) {re.escape(str(folder))}\\", done.stdout), (folder, done.stdout)
+        assert re.search(rf"must not.*: (os\.mkdir|open) {re.escape(str(folder) + os.sep)}", done.stdout), (folder, done.stdout)
     assert [folder.exists() for folder in (paths.CACHE, paths.TEMP, paths.RUNS)] == before, "refused before anything was made"
 
 

@@ -14,7 +14,6 @@ import dataclasses
 import importlib.metadata
 import json
 import re
-import stat
 import subprocess
 import threading
 import types
@@ -173,7 +172,7 @@ def test_a_changed_file_stops_the_configuration_with_its_own_tools_and_the_next_
 
     class Vandal(Stub):
         def __call__(self, spec):
-            victim.chmod(stat.S_IWRITE)
+            victim.chmod(fs.WRITABLE)
             victim.write_bytes(victim.read_bytes() + b"x")
             return super().__call__(spec)
 

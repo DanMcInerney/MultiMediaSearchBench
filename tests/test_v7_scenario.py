@@ -7,6 +7,7 @@ recorded prompts (tests/oracles/recorded/pilot-s1/execs.json), and the golden de
 
 from __future__ import annotations
 
+import os
 import ast
 import hashlib
 import json
@@ -139,6 +140,7 @@ def test_a_clock_note_ends_the_systems_sentence_and_a_prompt_with_no_way_to_the_
 
 # -- what an agent may not reach ------------------------------------------------------------------------------------------------
 
+@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
 def test_the_deny_words_of_v7_are_the_old_eight_and_three_that_name_the_new_package_and_no_folder_of_a_run(sentinels):
     golden = DENY["v7"]["v7"]
     old = between(golden["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0")

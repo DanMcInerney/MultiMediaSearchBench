@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/DanMcInerney/MultiMediaSearchBench/actions/workflows/test.yml"><img src="https://github.com/DanMcInerney/MultiMediaSearchBench/actions/workflows/test.yml/badge.svg" alt="tests"></a>
   <img src="https://img.shields.io/badge/python-3.12-3776AB" alt="Python 3.12">
-  <img src="https://img.shields.io/badge/platform-Windows%2011-0078D4" alt="Windows 11">
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-0078D4" alt="Windows, Linux and macOS">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-5BD38C" alt="MIT licence"></a>
   <a href="https://huggingface.co/datasets/DanMcInerney/mmmb-sources"><img src="https://img.shields.io/badge/sources-Hugging%20Face-F6B445" alt="Sources on Hugging Face"></a>
 </p>
@@ -169,8 +169,9 @@ About 30% of each pile's questions are `dev`, for tuning a system. The rest are 
 
 ## Quick start
 
-Needs Python 3.12 and [uv](https://docs.astral.sh/uv/), on Windows 11. A real run also needs the Claude Code and Codex CLIs
-signed in (the runs use your plans' quota) and Git for Windows (Claude's shell tool needs it).
+Needs Python 3.12 and [uv](https://docs.astral.sh/uv/), on Windows, Linux or macOS. A real run also needs the Claude Code and
+Codex CLIs signed in (the runs use your plans' quota) and, on Windows, Git for Windows (Claude's shell tool needs it). The
+commands are the same on each system: only the paths differ (`<home>\mmsb-runs` here is `<home>/mmsb-runs` off Windows).
 
 ```
 uv sync
@@ -278,7 +279,7 @@ the card says why and where to get them.
 </details>
 
 <details>
-<summary><b>Windows and Codex</b></summary>
+<summary><b>Windows only: Codex's sandbox and folder names</b></summary>
 
 Codex's sandbox on Windows opens the data files through the permissions their folder gives them (`mmsb` resets each file to
 those and refuses one with permissions of its own). A folder under your user profile gives them to you, SYSTEM and
@@ -356,7 +357,7 @@ uv run pytest
 
 runs the fast tests (about 1,400, in about 6 minutes at 4 workers) with no agent, no GPU and no network. The tests of the real
 scenarios read the sources and skip, saying so, where `MMSB_SOURCES` has none. Without the `mm` extra the tests in `tests/mm`
-skip, and say so in the summary. CI runs them on Windows for each push to main and each pull request.
+skip, and say so in the summary. CI runs them on Windows, Linux and macOS for each push to main and each pull request.
 [TESTING.md](TESTING.md) has the markers, the oracles, and the commands for the slow ones.
 
 ## Where things are
@@ -386,7 +387,9 @@ predate the runs above.
   week and EgoLifeQA. No pile has had a full run: those cost real quota and are next.
 - **Built and tested without agents:** the other 19 piles. Their builders, questions and graders are tested, but no agent or
   search system has answered them yet.
-- **Windows 11 only.** Nothing has been run on Linux or macOS.
+- **Agents have only been run on Windows 11.** On Linux the tests pass, a pile builds and a run is priced (`--dry-run`), and CI
+  runs the tests on Linux and macOS as well. No real agent exec has been made off Windows, so Codex's sandbox and Claude's shell
+  tool are untried there. A few tests are held to runs recorded on Windows and skip elsewhere, saying so.
 - **Two agents:** Claude Code and Codex. Another is a module in `mmsb/core/agents/`.
 - **One search system so far:** MultimediaSearch, by the author of this benchmark. The core names no system, and a second one
   is the best check of that: see [Measuring another system](#measuring-another-system).
