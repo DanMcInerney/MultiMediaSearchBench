@@ -1,4 +1,4 @@
-"""New tests (G1's shared cause 3 and the F4 repair): the real `MmSession`, the real server command it serves and the real `claude.ask_claude` or
+"""The real `MmSession`, the real server command it serves and the real `claude.ask_claude` or
 `codex.ask_codex` together, through a stand-in agent process (tests/mm/seam.py). What a stand-in agent that calls the daemon's `Api` itself cannot show:
 that the server the session serves starts as an agent starts it, lists the four tools, works in the exec's project, and that what `look` returns to the
 agent with its own tools too (a path in the run folder, which is denied) is not an escape.
@@ -21,7 +21,7 @@ pytest.importorskip("mms")
 import fakes  # noqa: E402
 import seam  # noqa: E402
 from fakes import S, S_FILES, Opened, run_of  # noqa: E402
-from test_mm_arm import by_qid  # noqa: E402
+from test_mm_config import by_qid  # noqa: E402
 
 from mmsb.core.agents import claude  # noqa: E402
 from mmsb.core.agents.common import result_jsons  # noqa: E402
@@ -31,7 +31,7 @@ from mmsb.core.grounded import ground, resolve  # noqa: E402
 from mmsb.systems.mm.home import exec_project  # noqa: E402
 
 TOOLS = {"ask", "find", "look", "label"}
-pytestmark = pytest.mark.xdist_group("mm-arm")
+pytestmark = pytest.mark.xdist_group("mm")
 agents = pytest.mark.parametrize("agent", ("claude", "codex"))
 
 
@@ -90,7 +90,7 @@ def test_the_server_a_session_serves_starts_under_the_real_agent_path_lists_its_
 
 @agents
 def test_an_agent_with_its_own_tools_too_may_open_the_picture_look_named_though_it_is_in_the_denied_run_folder(agent, week, store, tmp_path, monkeypatch, git):
-    """G1's F4 through the real path: before, opening the file `look` named ended the exec as `escaped`, which counts as a wrong answer."""
+    """Through the real path: opening the file `look` named is no escape, though the file is in the denied run folder (an escape counts as a wrong answer)."""
     done = exec_of(agent, week, store, tmp_path, monkeypatch, git, S_FILES)
     look = check_server_exchange(done)
     path, last = look["image"]["path"], done.out["tools"][-1]
@@ -107,7 +107,7 @@ def test_an_agent_with_its_own_tools_too_may_open_the_picture_look_named_though_
 @agents
 def test_an_agent_that_cites_the_sightings_of_its_ask_by_source_and_iso_time_is_grounded_by_the_real_servers_own_times(agent, week, store, tmp_path,
                                                                                                                        monkeypatch, git):
-    """DESIGN 6.2 corrected (C7): an agent with the system's tools alone has no file path, only a source and times, which are what the real
+    """An agent with the system's tools alone has no file path, only a source and times, which are what the real
     server's `ask` gives. The final message of the stand-in here is the right answer citing each sighting its ask returned; the sightings of the
     photo question are the photo, so the citation is where the truth is: `source` phone and the photo's own time, from the manifest."""
     _, dump, questions = week

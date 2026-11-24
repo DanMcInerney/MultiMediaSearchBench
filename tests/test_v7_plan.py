@@ -1,15 +1,7 @@
-"""Ported from MultimediaSearch tests/test_haystack.py at fe0ece5 (24 of its 31 tests; the other 7 are tests/mm's or the select tests).
-
-The 7 left out start a daemon, use `load`, `windows_in` or the real reader, or ask which model reads what. Its graders are the core's now.
-
-The V7 plan (plan.py, week.py): it is pure, the same for a seed, and checks itself; the levels of its questions are balanced and each
+"""The V7 plan (plan.py, week.py): it is pure, the same for a seed, and checks itself; the levels of its questions are balanced and each
 question's scope holds what its level says (one needle, the last needle, none), with distractors of the needle's colour or pitch in
 every scope; the week is written in a few seconds, and what is written is what the plan says; and the graders (`mmsb/core/grade.py`)
-grade as their table says. The files are made once for the module on each worker that runs it, and only read.
-
-Two of the tests changed more than their names: `test_the_levels_are_balanced_as_the_plan_says` takes the 24 questions of a model that
-does not hear as the ones whose type is not audio (it asked `questions_for`, which `Description.reads` and core/select.py replaced),
-and `test_tiny_is_written_in_30_seconds_and_loaded_in_8` is the first half (the load is tests/mm's)."""
+grade as their table says. The files are made once for the module on each worker that runs it, and only read."""
 
 from __future__ import annotations
 
@@ -65,13 +57,13 @@ FULL = [("note-code", "part"), ("note-code", "day"), ("config-asof", "time"), ("
         ("porch-parcel", "week"), ("absent-error", "part"), ("absent-error", "day"), ("absent-parcel", "day"), ("mic-doorbell", "part"),
         ("mic-doorbell", "day"), ("mic-alarm", "part"), ("mic-alarm", "day"), ("mic-alarm", "week"), ("absent-doorbell", "part"),
         ("absent-doorbell", "day")]
-TIMES: dict[str, float] = {}  # seconds: how long the module's tiny week took to write, and its last load
-WRITE_S = 30.0  # a tiny week is written in this many seconds: its screen is about 3,700 frames (2 a second while the owner types and
+TIMES: dict[str, float] = {}  # seconds: how long the module's tiny week took to write
+WRITE_S = 30.0  # a tiny week is written in this many seconds: its screen is about 3,700 frames
 
 # a single process (`-n 0`) is held to these; under xdist (`-n 4`, with another suite or a GPU run possibly sharing the machine) the bound is
-# SLACK times as loose, so that the test fails for a writer or a daemon that got several times slower and never for a busy machine
+# SLACK times as loose, so that the test fails for a writer that got several times slower and never for a busy machine
 SLACK = 4.0 if os.environ.get("PYTEST_XDIST_WORKER") else 1.0
-pytestmark = pytest.mark.xdist_group("haystack")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
+pytestmark = pytest.mark.xdist_group("week")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
 
 
 @pytest.fixture(scope="module")
@@ -81,7 +73,7 @@ def tiny():
 
 @pytest.fixture(scope="module")
 def folder(tiny, tmp_path_factory):
-    where = tmp_path_factory.mktemp("haystack")
+    where = tmp_path_factory.mktemp("week")
     began = time.perf_counter()
     write(tiny, where)
     TIMES["write"] = time.perf_counter() - began

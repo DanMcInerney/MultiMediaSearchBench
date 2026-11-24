@@ -1,6 +1,5 @@
-"""Ported from MultimediaSearch tests/test_bench_rules.py at fe0ece5 (its 13 grader tests; the 6 about the fake decider go to tests/mm), with
-the literal specs now `Grade`s: `kind` is `rule`, `tol_min` is `tol_s`, lists are tuples. The one case dropped is a spec with no
-`date` key, which a `Grade` cannot be (test_question refuses a question line without one)."""
+"""The grader (mmsb/core/grade.py) over `Grade`s: dates, years, time ranges, counts, times with a tolerance in seconds, and the choice of an
+option. A `Grade` always has a date (test_question refuses a question line without one)."""
 
 from __future__ import annotations
 
@@ -220,7 +219,7 @@ def test_an_unknown_choice_is_wrong_and_also_abstains_and_a_choice_has_no_other_
         grade.grade(dataclasses.replace(one, rule="pick"), "D")
 
 
-# -- new: what the move to `Grade` and to seconds could break, and a rule the ported tests do not reach ---------------------
+# -- tolerances in seconds, and numbers in names ----------------------------------------------------------------------------
 
 def test_a_time_is_right_within_its_tolerance_in_seconds_and_not_a_second_further():
     """The model is plain arithmetic in seconds: an answer 21:MM is right when it is at most `tol_s` from the truth."""
@@ -256,7 +255,7 @@ def test_a_count_reads_no_number_in_a_name_and_takes_the_truth_even_when_the_que
 @pytest.mark.parametrize("answer", ["No one rode a bicycle on cam2.", "unknown (nothing on cam2)", "0 times on cam3", "No fox in DCIM/100RECNX",
                                     "unknown (nothing in REC_20170202_000000.wav then)", "None in cam3_20180312_100000-103500.mp4"])
 def test_an_abstention_that_names_a_camera_a_folder_or_a_file_abstains(answer):
-    """The digits of a name are no number of an answer (Gate 2: they were, once the question's own were no longer ignored)."""
+    """The digits of a name are no number of an answer."""
     assert grade.grade(Grade("absent", None, None, None, (), (), None), answer)
     assert not grade.grade(Grade("absent", None, None, None, (), (), None), "maybe 2, on cam3")
 

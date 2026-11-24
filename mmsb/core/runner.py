@@ -234,7 +234,7 @@ def run_agents(run: RunFolder, agents: Mapping[str, Agent], configs: Sequence[Co
     stops every cell of that agent; an error in any cell stops all of them, each cell closes its session, and the first error is raised."""
     for flag, n in (("jobs", jobs), ("gpu_jobs", gpu_jobs)):
         if not 1 <= n <= JOBS_MAX:
-            raise ValueError(f"{flag} is 1 to {JOBS_MAX}, not {n}: more crashed the laptop once")
+            raise ValueError(f"{flag} is 1 to {JOBS_MAX}, not {n}: more execs at once overload an ordinary computer")
     if len({c.dir for c in configs}) != len(configs):
         raise ValueError("these configurations share a results folder (two variants that differ only in characters a folder name "
                          f"cannot hold): {', '.join(c.name for c in configs)}")

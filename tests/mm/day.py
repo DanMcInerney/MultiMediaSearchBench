@@ -1,7 +1,6 @@
-"""A synthetic day of an owner's laptop and phone (TESTBED.md): the files as the devices write them, each remembered at
-its time, so a test asks the questions an owner would. `tests/test_day.py` asks with the fake decider (the sounds are
-beeps and rings, no voices); `tests/test_codex.py` asks Codex, over the same day built for "yesterday" with Windows
-speech (SAPI) for the voices.
+"""A synthetic day of an owner's laptop and phone: the files as the devices write them, each remembered at
+its time, so a test asks the questions an owner would. With the fake decider the sounds are beeps and rings, no voices;
+with `speech`, Windows speech (SAPI) makes the voices.
 
     events = build(folder, day, speech)   # writes the files, and says what happened when
     load(api, folder, events)             # remembers each at its time, adds the log source, waits for its records

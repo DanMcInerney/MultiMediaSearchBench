@@ -44,7 +44,7 @@ filing = {"note-code": ("what", "text"), "config-asof": ("what", "text"), "log-c
 # What no command of an agent with its own tools may hold, beyond the folders: the generator of the week and its truth, as code reaches
 # them (a mention in prose is no escape). An agent that runs `week.plan(seed, scale)` from the repository has every answer; the
 # `truth` key of the plan's question dicts holds each one. The quotes are as `reached` reads a command: a `"` after a backslash is
-# `/"`. A bare `mmsb` is not one: the folders of the run are in `D:\mmsb-data` and `D:\mmsb-runs`.
+# `/"`. A bare `mmsb` is not one: the folders of the run are in `mmsb-data` and `mmsb-runs`.
 DENY_WORDS = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v7_screen", "from mmsb", "import mmsb")
 RECIPE_KEYS = {"scale", "seed", "days", "utc_offsets"}
 

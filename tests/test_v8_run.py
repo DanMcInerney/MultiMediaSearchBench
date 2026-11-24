@@ -1,11 +1,9 @@
-"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: the run loop of V8 with a
-stub agent and the report, over the fake download of tests/v8_fake.py. The tests of the scenario's data, build, views and deny words are
-tests/test_v8.py. What moved, by the plan's 3.4, 4.5 and 5.2:
-- the mm arm is the configuration `stub/all` of a stand-in system (tests/stub_system.py), as in tests/test_runner.py; its words in the
-  report ("mm", the model "fake") are the stand-in's ("stub", the variant "all"). The stand-in's session adds the audit fields a system
-  that is cut to the horizon adds; what the real audit makes of an ask's results, the home's index and the decider tier are tests/mm's (U7);
-- the retrieval tier's records are planted by hand, with the numbers the expected figures are worked out from.
-Every expected value is the source's or worked out from what the test planted; the only changes are `arm` to `config` and the names above."""
+"""V8, part 3: the run loop of V8 with a stub agent, and the report, over the fake download of tests/v8_fake.py. The tests of the scenario's data,
+build, views and deny words are tests/test_v8.py and tests/test_v8_view.py.
+- the system's configuration is `stub/all` of a stand-in system (tests/stub_system.py), as in tests/test_runner.py; its words in the report are the
+  stand-in's ("stub", the variant "all"). The stand-in's session adds the audit fields a system that is cut to the horizon adds; what the real
+  audit makes of an ask's results, the home's index and the retrieval tier are tests/mm's;
+- the retrieval tier's records are planted by hand, with the numbers the expected figures are worked out from."""
 
 from __future__ import annotations
 
@@ -237,7 +235,7 @@ def test_the_subset_and_only_choose_questions(ran):
         chosen("some", {})
 
 
-# -- 9. the report ----------------------------------------------------------------------------------------------------------------
+# -- the report ----------------------------------------------------------------------------------------------------------------
 
 
 def test_several_runs_are_refused_one_at_a_time(ran):
@@ -250,14 +248,14 @@ def test_the_report_counts_the_three_configurations(ran):
     m = figures["agents"]["claude"]["stub/all"]
     assert (m["questions"], m["paired"]) == (10, 10) and m["video"]["n"] == 8 and m["speech"]["n"] == 2
     video = m["video"]
-    assert [video["arms"][a]["correct"] for a in ROLES] == [2, 4, 7]
-    assert video["arms"]["blind"]["unparsed"] == 1 and video["arms"]["control"]["unparsed"] == 0
+    assert [video["configurations"][a]["correct"] for a in ROLES] == [2, 4, 7]
+    assert video["configurations"]["blind"]["unparsed"] == 1 and video["configurations"]["control"]["unparsed"] == 0
     assert [(video[k]["b"], video[k]["c"]) for k in ("tested_control", "control_blind", "tested_blind")] == [(3, 0), (2, 0), (5, 0)]
     assert video["tested_control"]["p"] == mcnemar(3, 0) and video["tested_control"]["diff"] == pytest.approx(3 / 8)
     assert video["tested_control"]["ci"] is None
     assert video["tested_control"]["base"]["correct"] == 4 and video["tested_control"]["other"]["correct"] == 7
     speech = m["speech"]
-    assert [speech["arms"][a]["correct"] for a in ROLES] == [0, 1, 2]
+    assert [speech["configurations"][a]["correct"] for a in ROLES] == [0, 1, 2]
     assert (speech["tested_control"]["b"], speech["tested_control"]["c"]) == (1, 0)
     assert [(a, g["n"]) for a, g in m["ages"].items()] == [(a, 2) for a in choose.AGE_NAMES]
     assert m["categories"]["TaskMaster"] == {"n": 1, "blind": 0, "control": 0, "tested": 1}
@@ -287,23 +285,23 @@ def median_of(values: list[float]) -> float:
 
 def test_the_report_text_has_its_tables(ran):
     text = V8.report([ran.run])[1]
-    for line in ("# EgoLifeQA through the stub bench", "8 video questions (2 aged 0-2h, 2 aged 2-6h, 2 aged 6-24h, 2 aged 24h+;",
-                 "No shortcut probe: a public dataset, so the blind arm is the floor",
-                 "## claude with all: 8 video questions of 10 (paired: done in all three arms)",
+    for line in ("# EgoLifeQA benchmark: with stub and without", "8 video questions (2 aged 0-2h, 2 aged 2-6h, 2 aged 6-24h, 2 aged 24h+;",
+                 "No shortcut probe: a public dataset, so the blind configuration is the floor",
+                 "## claude with all: 8 video questions of 10 (paired: done in all three configurations)",
                  "| blind | 2/8 (25%, 7-59) |", "| files | 4/8 (50%,", "| stub | 7/8 (88%,",
                  "| stub vs files | 8 | +38 pts | 3 / 0 | 0.250 |",
                  "| files vs blind | 8 | +25 pts | 2 / 0 | 0.500 |",
                  "| stub vs blind | 8 | +62 pts | 5 / 0 | 0.062 |",
-                 "A difference is the second arm less the first", "by age (stub vs files; blind is the floor)", "| 0-2h | 2 |",
+                 "A difference is the second configuration less the first", "by age (stub vs files; blind is the floor)", "| 0-2h | 2 |",
                  "The youngest age at which stub leads files: none: at no level with 10 or more paired questions",
                  "too few paired questions at 0-2h (2), 2-6h (2), 6-24h (2), 24h+ (2)", "by category (right / n)",
                  "TaskMaster has few questions in each age", "the 2 speech questions, apart", "Answered from the transcripts alone",
-                 "how each arm worked, and what a correct answer cost", "## The decider tier", "| all | all | 10 |", "| all | speech | 2 |",
+                 "how each configuration worked, and what a correct answer cost", "## The retrieval tier", "| all | all | 10 |", "| all | speech | 2 |",
                  "no fault",
-                 "Every arm saw the clips that ended by each question's horizon H (median 225 s before the question",
+                 "Every configuration saw the clips that ended by each question's horizon H (median 225 s before the question",
                  "Recording times after H in stub tool results: 0 in 10 audited execs; asks started past H (the agent's confusion about "
                  "stub's clock, harmless): 9/10.", "## Read with these",
-                 "EgoLife has been public since 2025: the blind arm measures", "## Appendix: claude with all, one row per question",
+                 "EgoLife has been public since 2025: the blind configuration measures", "## Appendix: claude with all, one row per question",
                  "| ego-001 | 0-2h | EntityLog | video | pass 2 s a0 | pass 2 s a0 | pass 2 s a1 |"):
         assert line in text, line
     assert text.count("| ego-0") == 10
@@ -314,7 +312,7 @@ def test_a_run_with_no_results_reports_none(ran, tmp_path):
     shutil.copytree(ran.run.folder, folder, ignore=lambda where, names: [n for n in names if n in ("results", "execs", "data-manifest.json")])
     figures, text = V8.report([dataclasses.replace(ran.run, folder=folder)])
     assert figures["agents"] == {} and figures["retrieval"] == {} and figures["totals"]["results"] == 0
-    assert "No agent results yet." in text and "No decider results yet." in text
+    assert "No agent results yet." in text and "No retrieval results yet." in text
 
 
 def test_the_report_reads_a_run_with_no_video_question_paired(ran, tmp_path, made_up_ffmpeg):
@@ -330,7 +328,7 @@ def test_the_report_reads_a_run_with_no_video_question_paired(ran, tmp_path, mad
     assert "the 1 speech questions, apart" in text and "| ego-008 | 0-2h | TaskMaster | speech |" in text
 
 
-# -- the review's cases -----------------------------------------------------------------------------------------------------------
+# -- an escape past the horizon -----------------------------------------------------------------------------------------------------------
 
 
 def test_the_result_of_a_files_exec_whose_output_showed_a_recording_past_the_horizon_says_escaped_and_the_blind_one_does_not(

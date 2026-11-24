@@ -35,9 +35,9 @@ def chance(p: float | None) -> str:
     return "-" if p is None else "<0.001" if p < 0.001 else f"{p:.3f}"
 
 
-def kilo(arm: dict) -> str:
+def kilo(side: dict) -> str:
     """A side's tokens in thousands (see `token_total`)."""
-    return "-" if arm["tokens_all"] is None else f"{arm['tokens_all'] / 1000:.0f}"
+    return "-" if side["tokens_all"] is None else f"{side['tokens_all'] / 1000:.0f}"
 
 
 def diff_cell(c: dict) -> str:
@@ -77,9 +77,9 @@ def has_grounding(figures: dict) -> bool:
                for side in ("control", "tested"))
 
 
-def tokens_k(arm: dict) -> float | None:
+def tokens_k(side: dict) -> float | None:
     """A side's mean tokens per exec, in thousands."""
-    return None if arm["tokens_mean"] is None else arm["tokens_mean"] / 1000
+    return None if side["tokens_mean"] is None else side["tokens_mean"] / 1000
 
 
 def known_of(w: dict, key: str, spec: str = ".1f") -> str:
@@ -143,8 +143,8 @@ def worked_lines(figures: dict) -> list[str]:
                          " / ".join(number(w[k]) for k in ("asks", "finds", "looks")), known_of(w, "windows"),
                          known_of(w, "gpu_s"), str(w["max_s"]) if w["known"] else "-", number(w["estimate_s"]),
                          f"{number(w['held_s'])} ({w['alone']} alone)" if w["held_s"] is not None else "-", str(w["beyond"]), "-", "-"])
-    return ["", "## How each arm worked (the media questions, per exec)", "",
-            table(["agent", "model", "arm", "execs", "called ask", "asks / finds / looks", "ask windows", "ask GPU s",
+    return ["", "## How each configuration worked (the media questions, per exec)", "",
+            table(["agent", "model", "configuration", "execs", "called ask", "asks / finds / looks", "ask windows", "ask GPU s",
                    "asks stopped at max_s", "GPU s estimated", "held s (run alone)", "estimated past the timeout", "pictures viewed", "shell commands"], rows)]
 
 
@@ -164,8 +164,8 @@ def cost_lines(figures: dict) -> list[str]:
                 rows.append([agent, variant_of(name), figures["frame"][side], f"{c['correct']}/{c['n']}", cost_cell(c, "s"),
                              cost_cell(c, "tokens_k"), cost_cell(c, "gpu_s") if side == "tested" else "-"])
     return ["", "## Cost per correct answer (the media questions)", "",
-            table(["agent", "model", "arm", "correct (k)", "seconds", "tokens k", "GPU seconds"], rows), "",
-            f"A cost per correct answer is told from {report.MIN_CORRECT} correct answers (k) in the arm; below that it is `-`."]
+            table(["agent", "model", "configuration", "correct (k)", "seconds", "tokens k", "GPU seconds"], rows), "",
+            f"A cost per correct answer is told from {report.MIN_CORRECT} correct answers (k) in the configuration; below that it is `-`."]
 
 
 def verdict_lines(tier: dict) -> list[str]:
@@ -305,7 +305,7 @@ def markdown(figures: dict) -> str:
     else:
         out += ["", "No agent results yet."]
     out += answerable_lines(figures)
-    out += ["", "## The decider tier (each model's yes/no over each needle's source and range, no agent)", ""]
+    out += ["", "## The retrieval tier (each model's yes/no over each needle's source and range, no agent)", ""]
     tier = figures["retrieval"]
     if tier["asks"]:
         rows = []
@@ -318,17 +318,17 @@ def markdown(figures: dict) -> str:
                           "absent with no false sighting", "false sightings per ask", "median s per window", "first ask s"],
                          rows))
         out += ["", ("Templates no model found: " + ", ".join(tier["missed"]) + ". The verdicts below say whether that is the "
-                     "haystack or the models.") if tier["missed"] else "Every template was found by some model."]
+                     "data or the models.") if tier["missed"] else "Every template was found by some model."]
         out += verdict_lines(tier)
     else:
-        out.append("No decider results yet.")
+        out.append("No retrieval results yet.")
     out += summary_lines(figures)
     t = figures["totals"]
     rows_k = sum(len(models) for models in figures["agents"].values())
     low = sum(1 for models in figures["agents"].values() for m in models.values() for c in (m["all"], m["media"])
               if c["p"] is not None and c["p"] < 0.05)
     out += ["", "## Read with these", "",
-            f"- Without {tested} the screen, the microphone and the cameras would not be recorded at all: the {control} arm reads a "
+            f"- Without {tested} the screen, the microphone and the cameras would not be recorded at all: the {control} configuration reads a "
             "week that exists only because the benchmark wrote it.",
             "- The screen changes like a real one while the owner is active: typing (small changes), scrolling (large ones), a cursor that "
             "moves and a clock, up to 2 frames a second, with idle and busy stretches. Its totals and the size of its changes are calibrated "
@@ -341,15 +341,15 @@ def markdown(figures: dict) -> str:
             f"- With about 20 paired questions, p < 0.05 needs at least 6 discordant pairs all one way (McNemar exact: "
             f"mcnemar(6, 0) = {mcnemar(6, 0):.3f}, mcnemar(5, 0) = {mcnemar(5, 0):.4f}). A run with another seed adds new "
             "needles, and `report` pools runs. By hint level there are a few questions each: pool seeds before reading it.",
-            f"- The text and records questions do not depend on the model, so only one model's {tested} arm "
+            f"- The text and records questions do not depend on the model, so only one model's {tested} configuration "
             f"({', '.join(variant_of(n) for n in frame['text_asked_of'])}) is asked them: the other models' rows hold the media questions.",
-            "- The decider tier's recall at p >= 0.5 counts a needle whose best p within 10 s of it, as a sighting or a "
+            "- The retrieval tier's recall at p >= 0.5 counts a needle whose best p within 10 s of it, as a sighting or a "
             "candidate, is 0.5 or more: where it is above the recall at the model's hit, that hit may be set too high.",
             "- Tokens are the input, the output and for Claude the cache it read and wrote (Codex's input already holds its cached "
             "tokens): a size of work, not a bill, since a cached token costs much less. Cost is Claude's list-price estimate; "
             "Codex reports none.",
             f"- The difference is told in points with Newcombe's hybrid score interval for paired data, only from {MIN_DISCORDANT} "
-            "pairs right in one arm only (b + c); below that the interval would exclude 0 where McNemar's exact p does not, so "
+            "pairs right in one configuration only (b + c); below that the interval would exclude 0 where McNemar's exact p does not, so "
             "b and c and the p are given alone. A verdict rests on McNemar's p. A timed-out exec is a wrong answer and is "
             "counted on its own too (the `timed out` columns).",
             f"- An {tested} exec whose ask may need more GPU seconds than {ASK_SHARE:.0%} of the exec's time ({ASK_SHARE * frame['timeout_s']:g} s of "
@@ -363,7 +363,7 @@ def markdown(figures: dict) -> str:
             f"chance alone; {low} of the {2 * rows_k} p values here are.",
             f"- Ask labels with no project (an exec whose questions could leak into another's scope): {t['ambient_labels']}. "
             f"Problems by kind: {kinds_text(t['problems'])}. Results to run again: {t['to_rerun']} of {t['results']}.",
-            "- Paired: a question counts when both arms have a done result. An escaped, timed-out or capped exec is a wrong "
+            "- Paired: a question counts when both configurations have a done result. An escaped, timed-out or capped exec is a wrong "
             "answer; a `setup`, `limit`, `auth` or `error` result did not test the question, is run again by the next "
             "command, and is left out (the `left out` column).",
             *(["- Grounded: the answer is right and the evidence it cites is at the moment the question is about (a video within 10 s, a "

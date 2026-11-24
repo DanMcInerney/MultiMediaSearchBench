@@ -1,7 +1,7 @@
 """A decider for tests: the fake decider (tests/mm/fake_decider.py), which also writes the environment of the process it runs in (a daemon's, the
 model's) to `decider-env.json` in the home when the model loads. It shows what a model would have been given of the agent's environment.
 
-Written for this repository (U13). It is run as `python:<this file>`, so it loads the fake by its path and holds no import of the tests."""
+It is run as `python:<this file>`, so it loads the fake by its path and holds no import of the tests."""
 
 import importlib.util
 import json

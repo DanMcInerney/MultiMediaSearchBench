@@ -1,15 +1,11 @@
-"""Ported from tests/test_bench.py and tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): what the command line did, now
-`mmsb` over any scenario and system, over the scenario `toy` (V7's plan, a dump of three files) and the stand-in system `stub` of
-tests/cli_world.py. What moved, by the plan's 3.2 and 8:
-- `bench.main` is `cli.main`, `agents` is `run`, `decider` is `retrieve`, `--models` is `--configs`, `show_decider` and the system's lines of
-  `show_agents` are told from a system's `preview` (mmsb/core/dryrun.py), `set_timeout` is `RunFolder.with_timeout`, and the build and the
-  ingest have their own tests (tests/test_cli_build.py);
-- the intended differences of an expectation: the arms are configurations (`files`, `stub/all`), a run's estimate counts every configuration
-  at `--jobs` (the old "mm at 1 job" is the system's to lower, and a line of its own says so), the words "ask" and "mm" of the limits line are
-  "its work" and the configuration's name, and a run that was never run has no report (the old one said "No agent results yet");
-- not here: the tests of the agents' own arguments (tests/test_agents.py, test_runner.py), the report's figures (tests/test_report.py), the
-  probe's lines in the report (U5), and what needs mm's daemon (tests/mm).
-Every expected value is the source's, or worked out from what the test gave the command."""
+"""Tests for the command line (mmsb/cli.py and the commands behind it) over any scenario and system, here over the scenario `toy` (V7's plan,
+a dump of three files) and the stand-in system `stub` of tests/cli_world.py. A system's lines in `run`'s dry run are told from its `preview`
+(mmsb/core/dryrun.py); a run's estimate counts every configuration at `--jobs`, and the system may lower that (a line of its own says so); a run
+that was never run has no report.
+
+Not here: the tests of the agents' own arguments (tests/test_agents.py, test_runner.py), the report's figures (tests/test_report.py), the probe's
+lines in the report (tests/test_probe.py), and what needs mm's daemon (tests/mm). Every expected value is worked out from what the test gave
+the command."""
 
 from __future__ import annotations
 
@@ -206,7 +202,7 @@ def test_a_system_that_allows_fewer_execs_at_once_is_told_before_and_while_it_ru
 
 def test_run_names_the_questions_whose_work_may_need_more_gpu_seconds_than_the_exec_has(w, capsys):
     span = sum(b - a for a, b in HEAVY.cost_ranges)
-    # the old test's numbers: 988 s is named, 700 s is (over 675 s, the exec's 900 s less the agent's own turns), 670 s is not
+    # 988 s is named, 700 s is (over 675 s, the exec's 900 s less the agent's own turns), 670 s is not
     for seconds, named in ((988.0, True), (700.0, True), (670.0, False)):
         cli_world.use(w.patch, StubSystem(report=CLEAN, rules=False, rate=seconds / span))
         shutil.rmtree(w.run.folder / "results", ignore_errors=True)
@@ -234,7 +230,7 @@ def test_a_command_that_is_refused_leaves_the_run_json_as_it_was_and_one_that_ru
     before = (w.run.folder / "run.json").read_bytes()
     assert w.main(*argv(w, "--agents", "claude", "--configs", "files,stub/narrow", "--timeout", "1200"), agents=cli_world.agents_of(stub)) == 1
     assert "was made by stub with store_hash s" in capsys.readouterr().err and stub.execs == []
-    assert (w.run.folder / "run.json").read_bytes() == before, "G1's F12: the time given used to be kept before the refusal"
+    assert (w.run.folder / "run.json").read_bytes() == before, "the time given is not kept when the command is refused"
     probe_was(w, {"status": "failed", "failures": ["a: x"]})
     cli_world.use(w.patch, StubSystem(report=CLEAN))
     before = (w.run.folder / "run.json").read_bytes()
@@ -247,13 +243,12 @@ def test_a_command_that_is_refused_leaves_the_run_json_as_it_was_and_one_that_ru
     assert kept.timeout_s == 1200.0 and "stub/narrow" in [c.name for c in kept.configs]
 
 
-def test_a_report_of_a_run_the_old_bench_made_says_what_it_is(w, tmp_path, capsys):
-    old = tmp_path / "20261104-0314-pilot-s1"
-    old.mkdir()
-    shutil.copy2(Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "run.json", old / "run.json")  # as bench.py wrote it: no scenario
-    assert w.main("report", str(old)) == 1
+def test_a_report_of_a_folder_whose_run_json_names_no_scenario_says_what_it_is(w, tmp_path, capsys):
+    other = tmp_path / "20261104-0314-pilot-s1"
+    fs.write_json(other / "run.json", {"seed": 1, "scale": "pilot", "days": ["2026-11-01"]})
+    assert w.main("report", str(other)) == 1
     err = capsys.readouterr().err
-    assert f"error: {old} was made before mmsb (its run.json names no scenario): mmsb reads only the runs it built" in err and "Traceback" not in err
+    assert f"error: {other} is not a run mmsb built (its run.json names no scenario)" in err and "Traceback" not in err
 
 
 # -- probes ------------------------------------------------------------------------------------------------------------------------
@@ -302,7 +297,7 @@ def test_the_commands_say_when_a_runs_probe_failed_or_was_skipped_or_never_ran(w
         lines[label] = warned
     assert "failed the shortcut probe (2 failures, in its shortcuts.md)" in lines["failed"][0] and lines["failed"][0] == lines["failed"][1]
     assert "was built with --no-probe" in lines["skipped"][0]
-    assert "no shortcut probe record (it was built before the probe)" in lines["none"][0]
+    assert "has no shortcut probe record" in lines["none"][0]
 
 
 # -- retrieval ---------------------------------------------------------------------------------------------------------------------

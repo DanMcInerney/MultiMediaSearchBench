@@ -1,15 +1,14 @@
-"""New tests (plan 7.6, oracle neutrality): the core, the scenarios and the systems but mm run with no MultimediaSearch. Three checks.
+"""Neutrality: the core, the scenarios and the systems but mm run with no MultimediaSearch. Three checks.
 
-- A process whose import system refuses `mms`, the tests' helpers `conftest`, `day` and `fake_decider` (and the old root modules, which
-  the editable install would let through unnoticed) imports every module under `mmsb.core`, `mmsb.scenarios` and each system but mm (found
-  by walking the packages, so `mmsb.systems.listing` is in it once it exists), reads mm's system.toml, and sees opening `mm` give "needs
-  the mm extra". Fast: every run.
+- A process whose import system refuses `mms` and the tests' helpers `conftest`, `day` and `fake_decider` imports every module under
+  `mmsb.core`, `mmsb.scenarios` and each system but mm (found by walking the packages, so a system added later is in it), reads mm's
+  system.toml, and sees opening `mm` give "needs the mm extra". Fast: every run.
 - A scan of the source for an import of mms outside mmsb/systems/mm and tests/mm. The scan is of the syntax, not the text: a docstring
   that speaks of MultimediaSearch is not an import.
 - A scan of mmsb/core and mmsb/scenarios for a system by name: an import of mmsb.systems.<name> (the registry, `mmsb.systems` itself, stays) and
   a string equal to the name of a system that has a system.toml (`config.system == "mm"`). The few strings that are a system's name and not the
   system are listed with their reason (EXEMPT); the scan finds each of them there and nowhere else.
-- Slow (`-m slow`): a fresh environment made with `uv sync --frozen --no-default-groups`, in which tests/oracles/neutral_smoke.py builds the
+- Slow (`-m slow`): a fresh environment made with `uv sync --frozen --no-default-groups`, in which tests/neutral_smoke.py builds the
   tiny week of V7, runs its probe, runs a `files` cell with a stand-in agent, writes a report and sees `mm` refused.
 
 The first two fail when a module of the core imports mms, even in a function; the third when anything the command needs is not in the
@@ -34,18 +33,15 @@ from mmsb.core import fs, paths
 
 ROOT = Path(__file__).parents[1]
 MM_PLACES = ("mmsb/systems/mm", "tests/mm")  # where an import of mms is the point
-# the files outside them that import it, and why: a guarded import for the mm cells of a replay when the extra is installed, and a capture
-# tool that records what MultimediaSearch's own skill and instructions held, run in MultimediaSearch's venv
-ALLOWED = {"tests/replay.py": "the replay of an mm exec, behind `mm_installed()`", "tests/oracles/capture_exec.py": "a capture tool, run once"}
 
-# (file, string) of mmsb/core and mmsb/scenarios that is the name of a system and not the system, and why. Words the recorded reports fix are here.
+# (file, string) of mmsb/core and mmsb/scenarios that is the name of a system and not the system, and why.
 EXEMPT = {
-    ("mmsb/core/agents/spec.py", "files"): "an exec with the agent's own tools alone is called the files arm in the checks' messages",
-    ("mmsb/core/config.py", "files"): "the configuration `files` is the agent's own tools: part of the vocabulary of configurations (DESIGN 4)",
-    ("mmsb/core/report.py", "files"): "the control the recorded report compares with is called files",
+    ("mmsb/core/agents/spec.py", "files"): "an exec with the agent's own tools alone is called the files configuration in the checks' messages",
+    ("mmsb/core/config.py", "files"): "the configuration `files` is the agent's own tools: part of the vocabulary of configurations",
+    ("mmsb/core/report.py", "files"): "the control the report compares with is called files",
     ("mmsb/core/runfolder.py", "files"): "run.json's `files` is the hash of the scenario's files, not a system",
     ("mmsb/core/scenario.py", "files"): "the body of the dump key names the scenario's files",
-    ("mmsb/scenarios/v8_egolife/report.py", "files"): "the control the recorded EgoLife report compares with is called files",
+    ("mmsb/scenarios/v8_egolife/report.py", "files"): "the control the EgoLife report compares with is called files",
     ("mmsb/scenarios/v7_screen/media_common.py", "mm"): "PIL's text anchor (middle, middle)",
     ("mmsb/scenarios/v7_screen/media_screen.py", "mm"): "PIL's text anchor (middle, middle)",
     ("mmsb/scenarios/v7_screen/pictures.py", "mm"): "PIL's text anchor (middle, middle)",
@@ -56,8 +52,7 @@ WALK = textwrap.dedent("""\
     import importlib, pkgutil, sys
     from pathlib import Path
 
-    BLOCKED = {"mms", "conftest", "day", "fake_decider", "bench", "claude_run", "codex_run", "egolife", "grade", "haystack",
-               "haystack_media", "shortcuts"}
+    BLOCKED = {"mms", "conftest", "day", "fake_decider"}
 
     class Blocker:
         def find_spec(self, name, path=None, target=None):
@@ -115,12 +110,12 @@ def test_every_module_of_the_core_the_scenarios_and_the_systems_but_mm_imports_w
     assert len(seen) > 60
 
 
-def mms_imports(root: Path, places=MM_PLACES, allowed=ALLOWED) -> list[str]:
-    """The imports of mms in the python files under `root`'s mmsb and tests folders, except in `places` and `allowed`: `file:line`."""
+def mms_imports(root: Path, places=MM_PLACES) -> list[str]:
+    """The imports of mms in the python files under `root`'s mmsb and tests folders, except in `places`: `file:line`."""
     found = []
     for file in sorted(p for folder in ("mmsb", "tests") if (root / folder).is_dir() for p in (root / folder).rglob("*.py")):
         rel = file.relative_to(root).as_posix()
-        if any(rel.startswith(place + "/") for place in places) or rel in allowed:
+        if any(rel.startswith(place + "/") for place in places):
             continue
         for node in ast.walk(ast.parse(file.read_text(encoding="utf-8"), filename=rel)):
             names = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
@@ -130,9 +125,7 @@ def mms_imports(root: Path, places=MM_PLACES, allowed=ALLOWED) -> list[str]:
 
 def test_nothing_imports_mms_outside_mm_and_its_tests():
     assert mms_imports(ROOT) == []
-    everywhere = mms_imports(ROOT, allowed={})
-    for rel in ALLOWED:
-        assert any(found.startswith(rel + ":") for found in everywhere), f"{rel} no longer imports mms: take it off ALLOWED"
+    assert any(found.startswith("tests/mm/") for found in mms_imports(ROOT, places=())), "the places it leaves out are the ones that import it"
 
 
 def test_the_scan_finds_an_import_in_a_function_a_from_import_and_a_dotted_one_and_not_a_word_in_a_docstring(tmp_path):
@@ -147,7 +140,7 @@ def test_the_scan_finds_an_import_in_a_function_a_from_import_and_a_dotted_one_a
     (tmp_path / "mmsb" / "systems" / "mm" / "system.py").write_text("import mms\n")
     (tmp_path / "tests" / "mm" / "test_y.py").write_text("import mms\n")
     assert mms_imports(tmp_path) == ["mmsb/core/dotted.py:1", "mmsb/core/from_.py:1", "mmsb/core/lazy.py:2", "tests/test_x.py:1"]
-    assert mms_imports(tmp_path, allowed={"tests/test_x.py": "x"}) == ["mmsb/core/dotted.py:1", "mmsb/core/from_.py:1", "mmsb/core/lazy.py:2"]
+    assert mms_imports(tmp_path, places=(*MM_PLACES, "tests")) == ["mmsb/core/dotted.py:1", "mmsb/core/from_.py:1", "mmsb/core/lazy.py:2"]
 
 
 def systems_named(root: Path, names, exempt=EXEMPT, places=PLACES) -> tuple[list[str], set]:
@@ -185,7 +178,7 @@ def test_the_core_and_the_scenarios_name_no_system_and_import_none_of_them():
     names = set(systems.infos())
     assert {"files", "mm"} <= names, "the systems there are, read from their system.toml"
     found, met = systems_named(ROOT, names)
-    assert found == [], "a helper of the core that knows a system by name: P1's second system would be treated otherwise"
+    assert found == [], "a helper of the core that knows a system by name: a second system would be treated otherwise"
     assert met == set(EXEMPT), "an exemption nobody uses any more is taken off the list"
 
 
@@ -234,7 +227,7 @@ def test_the_core_runs_in_a_fresh_environment_that_has_no_mms(tmp_path_factory):
         installed = subprocess.run([python, "-I", "-c", "import importlib.util as u; print(u.find_spec('mms'), u.find_spec('pytest'))"],
                                    capture_output=True, text=True, env=env)
         assert installed.stdout.strip() == "None None", (installed.stdout, installed.stderr, listed.stdout)
-        smoke = ROOT / "tests" / "oracles" / "neutral_smoke.py"
+        smoke = ROOT / "tests" / "neutral_smoke.py"
         work = tmp_path_factory.mktemp("neutral")
         done = subprocess.run([python, "-I", str(smoke), str(work)], capture_output=True, text=True, cwd=ROOT, env=env, timeout=900)
         assert done.returncode == 0, (done.stdout[-1500:], done.stderr[-2500:])

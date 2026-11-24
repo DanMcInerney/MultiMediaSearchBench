@@ -6,7 +6,7 @@ knows no system.
 - the agent's own tools alone: the folder the recordings are in, how they are named, and that ffmpeg is on PATH;
 - a system's tools alone: `{holder} has recorded these sources of mine from day 1 to now: ...`, and the system's clock note when it has one
   (`mm's clock reads a later date than now ...`);
-- both: the system's sentence, then the files'. (tests/test_v8.py pins the text.)"""
+- both: the system's sentence, then the files'. (tests/test_v8_view.py pins the text.)"""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""New tests for mmsb/core/cache.py (plan 6.3, DESIGN 8.4): the keys of dumps and stores, a dump or a store made once and found again, made
+"""Tests of mmsb/core/cache.py (DESIGN.md): the keys of dumps and stores, a dump or a store made once and found again, made
 whole or not at all, a dump that changed refused and one that was lost written again and compared, and two commands after one key at once.
 Over `cache_world.Toy`, a scenario of three files that counts its builds, and `Ingester`, a system that counts its ingests. The command
 line over the cache (a build twice, a repeat, the stores of a run) is tests/test_cache_cli.py's, and V7 through mm tests/mm/test_cached_ingest.py's.
@@ -72,11 +72,11 @@ def test_v7s_recipe_holds_the_utc_offsets_of_its_days_and_they_make_another_dump
 
 
 def test_a_store_is_named_by_the_sha256_of_the_system_its_version_its_store_hash_and_the_dump_worked_out_by_hand():
-    system = Ingester(version="fe0ece5", store_hash="h1")
+    system = Ingester(version="3f9c2a1", store_hash="h1")
     description = dataclasses.replace(system.describe("a"), name="mm")
-    text = '{"dump":"abc","store_hash":"h1","system":"mm","version":"fe0ece5"}'
+    text = '{"dump":"abc","store_hash":"h1","system":"mm","version":"3f9c2a1"}'
     assert store_key(description, "abc") == hashlib.sha256(text.encode("utf-8")).hexdigest()
-    assert store_key(description, "abc") == "3a95c9e951892d9d03bcab9a7a170b708f511e44f83b7a3463fe2ab6fa363fde", "(and sha256sum says the same)"
+    assert store_key(description, "abc") == "41e1d5d7dfa9689dae3d5272c88aa1e0ac1118d9624367a1c27e9c67d8d0f425", "(and sha256sum says the same)"
 
 
 def test_the_version_the_store_hash_the_system_and_the_dump_each_make_another_store_and_a_variant_does_not():
@@ -174,8 +174,8 @@ def test_data_written_again_that_is_not_the_dump_is_removed_the_record_is_left_a
         with pytest.raises(RuntimeError, match=r"is not the dump mmb-\w+-data was built with \(3 files differ, the first logs/web\.jsonl\)"):
             cached_dump(Toy(content="v2"), RECIPE, temp, cache)
         assert not made.dump.root.exists() and not part_of(made.dump.root).exists(), f"the {command} command kept nothing of the other bytes"
-        assert bytes_of(made.meta) == record, "the record, the stats too, is as it was"
-    assert cached_dump(Toy(), RECIPE, temp, cache).what == REWRITTEN, "the generator is as it was: the data is written again, and is the dump"
+        assert bytes_of(made.meta) == record, "the record, the stats too, is unchanged"
+    assert cached_dump(Toy(), RECIPE, temp, cache).what == REWRITTEN, "the generator makes the dump's bytes again: the data is written again, and is the dump"
 
 
 def test_a_part_left_by_a_command_that_died_is_removed_aloud_and_never_taken_for_the_dump(where, capsys):

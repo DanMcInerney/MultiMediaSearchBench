@@ -128,7 +128,7 @@ def agents_named(text: str, parser: argparse.ArgumentParser) -> list[str]:
 def check_jobs(jobs: int, gpu_jobs: int, parser: argparse.ArgumentParser) -> None:
     for flag, n in (("--jobs", jobs), ("--gpu-jobs", gpu_jobs)):
         if not 1 <= n <= JOBS_MAX:
-            parser.error(f"{flag} is 1 to {JOBS_MAX}: more crashed the laptop once")
+            parser.error(f"{flag} is 1 to {JOBS_MAX}: more execs at once overload an ordinary computer")
 
 
 def selection_of(args: argparse.Namespace, parser: argparse.ArgumentParser, names: Sequence[str]) -> Selection:

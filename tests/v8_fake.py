@@ -1,7 +1,7 @@
-"""The fake EgoLife download of the V8 tests and the fixtures they share (tests/test_v8.py, tests/test_v8_run.py): a two-day download (tiny
-clips made with ffmpeg, SRT files with the real file's oddities, a QA file of about twenty items; copied from tests/test_egolife.py of
-MultimediaSearch at fe0ece5), the recipe, plan and dump made from it, and the run folder a build writes. A test module imports the fixtures it
-uses; `oracle_file` is autouse, so a module that imports it plans with this file's oracles instead of the 50 the recorded run chose."""
+"""The fake EgoLife download of the V8 tests and the fixtures they share (tests/test_v8.py, tests/test_v8_view.py, tests/test_v8_run.py and
+tests/mm/test_v8_mm.py): a two-day download (tiny clips made with ffmpeg, SRT files with the real file's oddities, a QA file of about twenty
+items), the recipe, plan and dump made from it, and the run folder a build writes. A test module imports the fixtures it uses; `oracle_file` is
+autouse, so a module that imports it plans with this file's oracles instead of the 50 the scenario ships (oracles.json)."""
 
 from __future__ import annotations
 
@@ -32,24 +32,6 @@ BLIND = Config("blind", None, None, False)
 FILES = Config("files", "files", None, True)
 OPTIONS = {"A": "Tasha", "B": "Alice", "C": "Shure", "D": "Lucia"}
 SHADE = "Is shade:200,30,30 in view?"  # the fake decider's own words for the red box of the evidence clip
-WORD = "Does the text have contains:screwdriver ?"
-
-
-DAYS = (date(2026, 10, 29), date(2026, 10, 30))
-
-
-BLIND = Config("blind", None, None, False)
-
-
-FILES = Config("files", "files", None, True)
-
-
-OPTIONS = {"A": "Tasha", "B": "Alice", "C": "Shure", "D": "Lucia"}
-
-
-SHADE = "Is shade:200,30,30 in view?"  # the fake decider's own words for the red box of the evidence clip
-
-
 WORD = "Does the text have contains:screwdriver ?"
 
 
@@ -217,7 +199,7 @@ def offset_of(day: date) -> str:
 
 
 def write_run(folder: Path, recipe: dict, questions, dump: Dump, temp: Path, tag: str = "t8", configs=(BLIND, FILES, STUB)) -> RunFolder:
-    """What U8's build will write: the question file, and a run.json that holds what a RunFolder needs and V8's report reads."""
+    """What a build writes: the question file, and a run.json that holds what a RunFolder needs and V8's report reads."""
     write_questions(folder / "questions.jsonl", questions)
     plan_h, files_h = V8.hashes(recipe)
     fs.write_json(folder / "run.json", {

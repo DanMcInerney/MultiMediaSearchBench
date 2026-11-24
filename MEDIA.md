@@ -72,14 +72,13 @@ holds the same facts as one record each.
   `EgoLifeCap`. The clips are hard-linked into the dump, not copied.
 
 <!-- piles:start -->
-## The piles of media added on 9 November 2026
+## The other piles
 
 `uv run mmsb fetch --scenario NAME` also fetches the sources of these scenarios (`--scenario all` is every scenario, the four
 real ones first). Each source is fetched from where its publisher keeps it, at a fixed commit where it has one, into
-`<sources>\<id>`; `mmsb/fetch_piles.py` is the list. A fetch that stops is continued by running it again. The maintainer decided
-on 4 November 2026 that a licence is not a filter on what is used on this machine; the licence each source states is recorded
-here and in [media/sources.jsonl](media/sources.jsonl) as information, and a dump made from these sources is not for publishing
-without reading it. Sources marked *not scripted yet* were put on disk by the first survey and `mmsb fetch` does not make them.
+`<sources>\<id>`; `mmsb/fetch_piles.py` is the list. A fetch that stops is continued by running it again. The licence each source states is recorded
+here and in [media/sources.jsonl](media/sources.jsonl) as information: read it before you publish anything made from that
+source. `mmsb fetch` does not make the sources marked *not scripted*: each entry says how its folder is made.
 
 | Scenario | Source | Licence | Taken |
 | --- | --- | --- | --- |
@@ -96,8 +95,8 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
 | I9, `i9_nature` | iNaturalist, one observer | CC BY-NC (per photo) | 3,240 observations and their first photos (1.5 GB) |
 | A8, `a8_music` | Free Music Archive (small set) | each track's artist's | the metadata zip and fma_small (8.0 GB) |
 | I1, `i1_camera_roll` | ATM-Bench | CC BY-NC 4.0 | 3,759 photos, their geocoding and the questions (1.3 GB) |
-| I2, `i2_screenshots` | Android in the Wild | not stated | 3,736 screenshots with OCR (1.2 GB; not scripted yet) |
-| I4, `i4_site_photos` | BD3 building defects | CC BY 4.0 | 793 labelled photos (0.3 GB; not scripted yet) |
+| I2, `i2_screenshots` | Android in the Wild | not stated | 3,736 screenshots with OCR (1.2 GB; not scripted) |
+| I4, `i4_site_photos` | BD3 building defects | CC BY 4.0 | 793 labelled photos (0.3 GB; not scripted) |
 | M3, `m3_voicemail` | FTC robocalls | the README says the data itself is public domain; its `LICENSE.md` is CC BY-ND 4.0, so a dump made from it is not for passing on | 1,427 recordings with transcripts (1.15 GB) |
 | A4, `a4_field` | BirdVox-full-night | CC BY 4.0 | unit 3's night of audio, the annotations of six units (0.87 GB) |
 
@@ -109,11 +108,6 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
 - **Credit:** MIT OpenCourseWare, https://ocw.mit.edu/14-01F23, 14.01 Principles of Microeconomics, Fall 2023.
 - **Taken:** the 26 lecture videos (360p MP4, 20.4 h) and the 26 SRT files, in one folder with the publisher's names (2.9 GB).
 - **Truth:** the SRT files: OCW's captions with cue-level times, complete for speech; nothing for what is written on the board.
-- **Considered:** MIT 18.642 Topics in Mathematics with Applications in Finance, Fall 2024
-  ([mit18_642f24](https://archive.org/details/mit18_642f24)) was the first choice for V9 and is dropped: its 22 captions came,
-  but archive.org answered HTTP 460 on every one of its 22 videos, from both of its storage nodes, from 13:38 to 14:51 EST on 9
-  November 2026 (the first fetch and three retries), while other items were served. It is not fetched and not retried; the 22
-  captions stay on disk in `ocw-18642`, unused.
 
 ### MIT OpenCourseWare 6.0002 (A6)
 
@@ -257,8 +251,7 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
 - **From:** [Jingbiao/ATM-Bench](https://huggingface.co/datasets/Jingbiao/ATM-Bench) on Hugging Face, read at commit `78e826dc`.
 - **Licence:** CC BY-NC 4.0, as the card says.
 - **Credit:** the ATM-Bench paper (arXiv 2603.01990).
-- **Taken:** the photos, their geocoding, the question files and the processed-memory files (7,528 files, 1.31 GB): the folder
-  the first survey made, which `mmsb fetch` reproduces and finds complete.
+- **Taken:** the photos, their geocoding, the question files and the processed-memory files (7,528 files, 1.31 GB).
 - **Truth:** 1,013 questions with evidence ids (a third cite emails or videos that are not taken); the file names carry each
   photo's capture second.
 
@@ -268,8 +261,8 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
   Google's public bucket.
 - **Licence:** not stated on the README page that was read.
 - **Credit:** Rawles et al., *Android in the Wild: A Large-Scale Dataset for Android Device Control*.
-- **Taken:** **not scripted yet**: 3,736 screenshots of shards 1 to 12 as PNG with their OCR text and boxes (1.19 GB), made by
-  the first survey; `mmsb fetch` says so and does not make them.
+- **Taken:** **not scripted**: 3,736 screenshots of shards 1 to 12 as PNG with their OCR text and boxes (1.19 GB). `mmsb fetch` says so and
+  does not make them.
 - **Truth:** OCR text and element boxes per screenshot, the goal and device per episode.
 
 ### BD3 building defects (I4)
@@ -278,8 +271,7 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
   Face.
 - **Licence:** CC BY 4.0, as the card says.
 - **Credit:** the BD3 dataset, chandrabhuma/building_defect_vqa.
-- **Taken:** **not scripted yet**: the test split's 793 photos and their labels (0.32 GB), written out of the parquet by the
-  first survey.
+- **Taken:** **not scripted**: the test split's 793 photos and their labels (0.32 GB), written out of the dataset's parquet.
 - **Truth:** one defect class per photo.
 
 ### Robocall audio (M3)
@@ -298,6 +290,5 @@ without reading it. Sources marked *not scripted yet* were put on disk by the fi
 - **Licence:** CC BY 4.0, as the record says.
 - **Credit:** Lostanlen, Salamon, Farnsworth, Kelling and Bello, *BirdVox-full-night: a dataset for avian flight call detection
   in continuous recordings*.
-- **Taken:** the FLAC audio of unit 3, the call annotations of six units, GPS, UTC start times and README (10 files, 0.87 GB),
-  as the first survey made the folder.
+- **Taken:** the FLAC audio of unit 3, the call annotations of six units, GPS, UTC start times and README (10 files, 0.87 GB).
 - **Truth:** timed flight calls of passing migrants (time and frequency, no species).

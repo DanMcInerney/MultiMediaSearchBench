@@ -1,7 +1,6 @@
-"""Ported from tests/test_bench_rules.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the six tests of the fake decider's
-`shade:R,G,B` (the other thirteen are the grader's, tests/test_grade.py). The rules the benchmark's harder haystack leans on, pinned with no agent and
-no daemon: a part of a frame in one shade is found after JPEG and video coding, and not found in a shade 60 away. They are tests/mm's because the
-fake decider is MultimediaSearch's (tests/mm/fake_decider.py, copied) and imports its facts (`mms.decider_d1.ABOUT`). Moved by script, unchanged."""
+"""The fake decider's `shade:R,G,B`: the rule the benchmark's screen and porch questions lean on, pinned with no agent and no daemon: a part of a
+frame in one shade is found after JPEG and video coding, and not found in a shade 60 away. They are tests/mm's because the fake decider
+(tests/mm/fake_decider.py) imports MultimediaSearch's facts (`mms.decider_d1.ABOUT`)."""
 
 from __future__ import annotations
 
@@ -40,14 +39,14 @@ def framed(rgb, share: float = 0.2) -> Image.Image:
 
 
 def jpeg(image: Image.Image) -> Image.Image:
-    """The picture after a JPEG round trip at quality 90 (what a photo of the haystack is saved at)."""
+    """The picture after a JPEG round trip at quality 90 (what a photo of the week is saved at)."""
     buffer = io.BytesIO()
     image.save(buffer, "JPEG", quality=90)
     return Image.open(io.BytesIO(buffer.getvalue())).convert("RGB")
 
 
 def x264(image: Image.Image, folder) -> Image.Image:
-    """The picture after an x264 round trip, as the haystack's screen and porch files are written, decoded by PyAV as the
+    """The picture after an x264 round trip, as the week's screen and porch files are written, decoded by PyAV as the
     reader does."""
     path = folder / "frame.mp4"
     day.vfr_video(path, folder, [(image, 2.0)])

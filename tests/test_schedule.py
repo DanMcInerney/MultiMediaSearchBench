@@ -1,10 +1,10 @@
-"""Tests of side-by-side scheduling (plan 6.4, DESIGN 8.3), written for this repository (U13): the pools on paper (`simulate`), the gate
+"""Tests of side-by-side scheduling (DESIGN.md): the pools on paper (`simulate`), the gate
 their threads wait at, `run_beside`, and the order of a cell's cases. The run loop with them, the rule that keeps the agents off the GPU and the
 command line are tests/test_schedule_run.py's and test_schedule_cli.py's.
 
 The expected values are not the code's: a small timeline worked out by hand (in its comment), laws that every input obeys (checked over
 seeded random runs by a checker that reads only the timeline, and shown to reject planted wrong ones), a simple model run in lockstep (the
-makespan of cells one after another is a list scheduler of a few lines), and the plan's words (which case starts first, who waits)."""
+makespan of cells one after another is a list scheduler of a few lines), and the rules in words (which case starts first, who waits)."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def sequential(lines, durations, pools) -> float:
 
 
 def problems(lines, durations, pools, timeline: Timeline) -> list[str]:
-    """What a timeline gets wrong of the plan's laws: each case once for its duration and started in its cell's order; never more than a
+    """What a timeline gets wrong of the laws of a schedule: each case once for its duration and started in its cell's order; never more than a
     cell's `jobs`, an agent's sessions or the execs at once; never more GPU cells than the GPU's, each holding it for all of its cases, in
     order; and no slot free (or GPU free) while a case (or a cell) that could use it waits. Reads the timeline alone."""
     out, spans = [], timeline.spans
@@ -263,11 +263,11 @@ def test_the_agents_own_tools_are_kept_off_the_gpu_beside_other_cells_or_when_th
     for own in (False, True):
         for description in (None, no_gpu, gpu):
             for beside in (False, True):
-                want = own and (beside or (description is gpu))  # the plan's words (6.4, C11)
+                want = own and (beside or (description is gpu))  # own tools are kept off the GPU beside other cells, or when their system needs it
                 assert agent_off_gpu(own, description, beside) is want, (own, description and description.needs_gpu, beside)
 
 
-def test_pools_are_the_laptops_limits():
+def test_pools_are_the_limits_of_a_run_and_a_pool_beyond_them_is_refused():
     assert Pools.of(["claude", "codex"]) == Pools(cpu=JOBS_MAX, agents={"claude": JOBS_MAX, "codex": JOBS_MAX}, gpu=1) and JOBS_MAX == 4
     for bad in (dict(cpu=0, agents={"a": 1}), dict(cpu=JOBS_MAX + 1, agents={"a": 1}), dict(cpu=1, agents={}),
                 dict(cpu=1, agents={"a": 0}), dict(cpu=1, agents={"a": JOBS_MAX + 1}), dict(cpu=1, agents={"a": 1}, gpu=0)):

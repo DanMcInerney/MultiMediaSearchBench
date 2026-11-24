@@ -1,5 +1,4 @@
-"""The two PDF writers that tests/mm/day.py (copied from tests/day.py of MultimediaSearch at fe0ece5) imports from MultimediaSearch's tests/corpus.py, which is a
-file of 1,100 lines of fixtures for its documents: `pdf` and `text_pdf`, moved from it unchanged."""
+"""The two PDF writers that tests/mm/day.py imports: `pdf` and `text_pdf`."""
 
 import re
 import zlib

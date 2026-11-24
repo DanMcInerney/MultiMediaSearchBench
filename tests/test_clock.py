@@ -1,12 +1,12 @@
-"""The working-time clock (plan 6.5, DESIGN 8.4; written for this repository, U14): `core/clock.py` with a clock and a queue the test moves, the loop
-that waits for a process, the two real agents killing a real process at a limit of a fifth of a second, a queue read live while a process runs,
-the clock starting with the process and not before it (the files an agent makes ready, the gate of a side-by-side run), and the result fields a
-run records. The command that tries the clock on a few cases is tests/test_clock_check.py.
+"""The working-time clock (DESIGN.md): `core/clock.py` with a clock and a queue the test moves, the loop that waits for a process, the two real
+agents killing a real process at a limit of a fifth of a second, a queue read live while a process runs, the clock starting with the process
+and not before it (the files an agent makes ready, the gate of a side-by-side run), and the result fields a run records. The command that
+tries the clock on a few cases is tests/test_clock_check.py.
 
-The expected values are the plan's words (a case at 950 s wall with 100 s queued is not over; at 901 s of working time it is; the wall cap fires
-whatever the queue; no queue figure means the wall and the recorded `timeout: no answer in 900 s`), the pilot's recorded timeouts (their text and
-the 900.3 s they took), a law over generated inputs (over iff working time reaches the limit or the wall reaches the cap, and `left` is the first
-moment it is over), a model of the waiting loop (never longer than a second, never past the time left), and what a test planted."""
+The expected values are the rules in words (a case at 950 s wall with 100 s queued is not over; at 901 s of working time it is; the wall cap
+fires whatever the queue; no queue figure means the wall and the text `timeout: no answer in 900 s`), a law over generated inputs (over iff
+working time reaches the limit or the wall reaches the cap, and `left` is the first moment it is over), a model of the waiting loop (never
+longer than a second, never past the time left), and what a test planted."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ from mmsb.core.runner import Agent
 from mmsb.core.schedule import Pools, SideBySide
 
 pytestmark = pytest.mark.xdist_group("runner")
-RECORDED = fs.read_json(Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "converted" / "results" / "claude" / "files" / "audio-mic-alarm-3.json")
+TIMED_OUT, TIMED_OUT_S = "timeout: no answer in 900 s", 900.3  # what an exec that ran to its limit says and takes
 QUESTIONS = tiny_questions()
 
 
@@ -88,18 +88,17 @@ def test_the_wall_cap_fires_whatever_the_queue():
     assert clocks.WALL_FACTOR == 3.0 and WorkingClock.of(300, moving.queue_s, now=moving).wall_cap_s == 900.0
 
 
-def test_with_no_queue_figure_the_clock_is_the_wall_and_its_text_is_the_recorded_one():
+def test_with_no_queue_figure_the_clock_is_the_wall_and_its_text_names_the_limit_alone():
     moving = Moving(queue=None)
     clock = moving.clock()
-    assert RECORDED["problem"] == "timeout: no answer in 900 s" and RECORDED["seconds"] == 900.3  # (what the pilot's timeouts said and took)
     moving.t = clock.began + 899.5
     assert clock.expired() is None
-    moving.t = clock.began + RECORDED["seconds"]
-    assert clock.expired() == RECORDED["problem"]
-    assert clock.figures() == {"clock": WALL, "working_s": 900.3, "queue_s": None, "wall_s": 900.3}
+    moving.t = clock.began + TIMED_OUT_S
+    assert clock.expired() == TIMED_OUT
+    assert clock.figures() == {"clock": WALL, "working_s": TIMED_OUT_S, "queue_s": None, "wall_s": TIMED_OUT_S}
     moving.queue = 0.0  # a session with no queue says 0.0: the same text, and the clock is the working clock with nothing taken off
-    assert clock.expired() == RECORDED["problem"]
-    assert clock.figures() == {"clock": WORKING, "working_s": 900.3, "queue_s": 0.0, "wall_s": 900.3}
+    assert clock.expired() == TIMED_OUT
+    assert clock.figures() == {"clock": WORKING, "working_s": TIMED_OUT_S, "queue_s": 0.0, "wall_s": TIMED_OUT_S}
 
 
 def test_a_queue_over_the_wall_leaves_no_working_time_and_stays_in_the_figures_for_anyone_to_see():
@@ -117,7 +116,7 @@ def test_a_clock_is_made_of_a_positive_limit_under_a_cap_no_lower_than_it():
 
 
 def test_a_clock_is_over_when_working_time_reaches_the_limit_or_the_wall_reaches_the_cap_and_left_is_the_first_moment_it_is():
-    """The law over generated inputs in quarter seconds (exact in floating point): the model is the plan's sentence, and `left` is the time to the
+    """The law over generated inputs in quarter seconds (exact in floating point): the model is the rule in one sentence, and `left` is the time to the
     first moment the clock is over if the queue stays as it is."""
     rng = random.Random(14)
     for _ in range(3000):
@@ -256,7 +255,7 @@ def test_a_real_process_is_killed_at_a_limit_of_a_fifth_of_a_second_and_the_resu
 
 
 @pytest.mark.parametrize("agent", ["claude", "codex"])
-def test_with_no_queue_figure_the_result_says_wall_and_the_text_is_the_recorded_one(agents, agent):
+def test_with_no_queue_figure_the_result_says_wall_and_the_text_names_the_limit_alone(agents, agent):
     out = agents(agent, timeout_s=0.2, queue_s=unreported)
     assert (out["problem"], out["clock"], out["queue_s"], out["working_s"]) == ("timeout: no answer in 0.2 s", WALL, None, out["seconds"])
 
@@ -334,8 +333,8 @@ def test_the_spec_an_agent_is_given_reads_its_sessions_queue_live_and_with_the_w
     assert readings[2:] == [None, None]
 
 
-def test_a_result_made_before_the_clock_has_none_of_its_fields_and_is_still_done_and_not_asked_again(world):
-    """The recorded runs and the runs of before: `record` makes the result as it was, with none of the clock's fields."""
+def test_a_result_with_none_of_the_clock_fields_is_still_done_and_not_asked_again(world):
+    """`record` makes a result with none of the clock's fields (an agent that reports none)."""
     stub = Stub()
     for config in (FILES, STUB):
         for q in QUESTIONS:

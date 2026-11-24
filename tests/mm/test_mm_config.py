@@ -1,17 +1,12 @@
-"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the tests of the mm arm, which the neutral loop
-(tests/test_runner.py) leaves to the system, over the tiny V7 week ingested by the system (conftest's `week` and `store`) and a daemon with the
-fake decider. What moved, by the plan's 4.5 and 4.6, and what the expectations are:
-- the arm is the configuration `mm/fake` (the system's tools) and `mm/fake+files` (and the agent's own); the `built` run is `fakes.run_of`;
-  `bench.run_arm` is `run_config` over an opened session; `bench.Exec` is a `SessionSpec`; `arm` and `model` are `config`, `system`, `variant`;
-- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmsb.systems.mm.home`, `jobs`), `gpu_estimate` is `Session.estimate`;
+"""The mm system as a configuration of a run: `mm/fake` (the system's tools) and `mm/fake+files` (and the agent's own). The tests that the neutral
+loop (tests/test_runner.py) leaves to the system, over the tiny V7 week ingested by the system (conftest's `week` and `store`) and a daemon with
+the fake decider: a store copied into a home, how many execs run at once, what an ask is given and gives back, what an exec leaves in its home and
+who sees it, the jobs an exec leaves running, and the estimate of a retrieval tier.
+- `copy_home`, `scrub_home`, `quiesce` and the rest are the system's (`mmsb.systems.mm.home`, `jobs`), `Session.estimate` is the GPU seconds of an ask;
 - the ask-job half of `work_of` is `mmsb.systems.mm.audit.work_of`, which `Session.audit` merges over the core's `work`;
 - the oracle's level rules (5 sightings for a `last` question, 50 for a count, `oldest_first` left out of a `last` one) are the question writer's and
   tests/test_v7_questions.py's; here the query they make is what the ask passes.
-Not ported, with reasons: `test_remove_tree_removes_a_junction...` (the core's, tests/test_fs.py); the report, run-folder, stop, resume, files-arm
-and CLI tests (the core's, U4-U6, U8); `test_a_lost_gpu_stops_the_mm_arm...` (a rule of the core keyed on `Description.needs_gpu`, tests/test_runner.py);
-`test_the_real_agents_pass_the_timeout...` (the agents', U3); `test_agents_names_the_questions_whose_ask_may_need_more_gpu_seconds...` prints from a
-dry run (U8): its thresholds are `test_the_flag_for_an_ask_that_cannot_finish...` below.
-Every expected value is the source's or worked out from what the test planted; the changes of an expectation are named where they are."""
+The rule that a lost GPU stops the mm configuration is the core's, keyed on `Description.needs_gpu` (tests/test_runner.py)."""
 
 from __future__ import annotations
 
@@ -50,7 +45,7 @@ from mmsb.core.runner import Agent, run_agents, run_config  # noqa: E402
 from mmsb.systems.mm import estimate, models, system  # noqa: E402
 from mmsb.systems.mm.audit import work_of  # noqa: E402
 from mmsb.systems.mm.daemon import Api, Daemon  # noqa: E402
-from mmsb.systems.mm.estimate import HEAVY_S, arm_jobs, beyond_timeout, window_s  # noqa: E402
+from mmsb.systems.mm.estimate import HEAVY_S, beyond_timeout, config_jobs, window_s  # noqa: E402
 from mmsb.systems.mm.home import COPY_SKIPS, MEDIA_FOLDERS, PROJECT_PREFIX, copy_home, exec_project, kept_items, scrub_home  # noqa: E402
 from mmsb.systems.mm.jobs import cancel_open, open_jobs, quiesce, settle, wait_idle  # noqa: E402
 from mmsb.systems.mm.models import Model, needs_gpu  # noqa: E402
@@ -58,7 +53,7 @@ from mmsb.systems.mm.oracle import ask, ask_params, moment_of, retrieve  # noqa:
 from mmsb.systems.mm.system import MmSession, serve_record  # noqa: E402
 
 AS_OF = ("notes", "config")  # the sources whose files are versions (the dump's text)
-pytestmark = pytest.mark.xdist_group("mm-arm")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
+pytestmark = pytest.mark.xdist_group("mm")  # (this xdist does not keep a group on one worker: each worker that runs a test builds its own week)
 
 
 @pytest.fixture(scope="module")
@@ -79,8 +74,8 @@ def scan(api, **params) -> dict:
 
 
 def go(run, dump, store, agent, configs=None, jobs: int = 2, **kw) -> None:
-    """`run_agents` over `run` with the mm system (the fake decider is its variant `fake`) and the registry for the rest. mm cannot say its queue
-    (decision D3), so more than one exec at once is on the wall clock: these tests are of other things than the clock."""
+    """`run_agents` over `run` with the mm system (the fake decider is its variant `fake`) and the registry for the rest. mm cannot say its queue,
+    so more than one exec at once runs on the wall clock: these tests are of other things than the clock."""
     run_agents(run, {"claude": Agent(agent)}, list(configs or run.configs), dump, lambda name: store, jobs,
                load=lambda name: MM if name == "mm" else systems.load(name), isolation=systems.isolation(), answer_format="line", clock=WALL, **kw)
 
@@ -99,13 +94,13 @@ def call(tool: str, arguments: dict, result=None) -> dict:
 
 
 def job_result(job: str, state: str, windows: int, seconds: float, stopped: str | None = None) -> dict:
-    """What an ask gives back, as the smoke's tools.json shows: the job, its state, and its progress and stop."""
+    """What an ask gives back, as a tools.json shows: the job, its state, and its progress and stop."""
     return {"job": job, "state": state, "error": None, "sightings": [], "candidates": [], "searched": {"scope": "default"},
             **({"stopped": stopped} if stopped else {}), "warnings": [],
             "progress": {"windows": windows, "of_about": 121, "seconds": seconds, "decider": "ready"}}
 
 
-# an mm exec of Codex as the smoke recorded them (find, ask, look: the pictures of `look` left out as a hash)...
+# an mm exec of Codex as its tools.json holds it (find, ask, look: the pictures of `look` left out as a hash)...
 CODEX_MM = [
     call("find", {"sources": ["screen"], "since": "2026-11-01T18:00:00", "limit": 20}, mm_result({"results": [], "next": None})),
     call("ask", {"question": "Is a red error screen visible?", "sources": ["screen"], "limit": 1}, mm_result(job_result("j-3c29", "running", 30, 2.0))),
@@ -119,7 +114,7 @@ CODEX_MM = [
 ]
 
 
-# ...Codex without mm (its `view_image` calls come from its rollout, with no result), and Claude's in both arms (its results are the
+# ...Codex without mm (its `view_image` calls come from its rollout, with no result), and Claude's in both configurations (its results are the
 # blocks, or the text, of the tool)
 CODEX_FILES = [call("shell", {"command": "ls"}, "a.mkv"), call("shell", {"command": "ffmpeg -i a.mkv -vf tile m.jpg"}, ""),
                call("view_image", {"path": "C:\\w\\m.jpg"}), call("shell", {"command": "ffmpeg ..."}, ""), call("view_image", {"path": "c.png"})]
@@ -234,7 +229,7 @@ def test_every_configuration_ran_every_question_the_system_ones_in_a_project_of_
         got = {q.qid: result(run, folder, q.qid) for q in ran.questions}
         assert sorted(p.stem for p in (run.folder / "results" / "claude" / folder).glob("*.json") if p.stem != "ambient-labels") == sorted(got)
         assert all(r["problem"] is None and r["agent"] == "claude" and r["config"] == config_.name for r in got.values())
-        assert all((r["system"], r["variant"]) == (config_.system, config_.variant) and "arm" not in r and "model" not in r for r in got.values())
+        assert all((r["system"], r["variant"]) == (config_.system, config_.variant) for r in got.values())
     sign = result(run, "mm-fake", "image-photo-sign-1")
     assert (sign["passed"], sign["abstained"], sign["seed"], sign["denials"]) == (True, False, 7, 0)
     assert (sign["calls"], sign["tools"], sign["scope_all"]) == (2, {"ask": 1, "find": 1}, 1)
@@ -268,7 +263,7 @@ def test_the_system_ones_see_the_horizon_free_index_and_the_homes_are_one_for_ea
     assert sorted(p.name for p in (ran.run.folder / "homes").iterdir()) == ["claude-fake"], "mm/fake and mm/fake+files share a variant's home"
 
 
-def test_the_decider_tier_scores_the_fake_questions(week, store, tiny, tmp_path, capsys):
+def test_the_retrieval_tier_scores_the_fake_questions(week, store, tiny, tmp_path, capsys):
     recipe, dump, questions = week
     words = by_qid(tiny)
     table = json.loads((store / "windows.json").read_text(encoding="utf-8"))
@@ -286,7 +281,7 @@ def test_the_decider_tier_scores_the_fake_questions(week, store, tiny, tmp_path,
                                                        "asked": sorted(MM.describe("fake").reads)}})
     mine = [q for q in questions if q.qid in {a["qid"] for a in asked}]
 
-    def fake_query(q):  # the fake's own words, as the old `ask_with="fake"`
+    def fake_query(q):  # the fake's own words for each question
         return dataclasses.replace(retrieval.query_of(q), text=words[q.qid]["fake"]["question"])
 
     with fakes.Opened(store, dump, run.folder / "homes") as session:
@@ -309,7 +304,7 @@ def test_the_decider_tier_scores_the_fake_questions(week, store, tiny, tmp_path,
                 assert r["found"] is True and r["top5"] is True and r["in_range"] >= 1 and r["rank"] >= 1, q["qid"]
                 assert r["p"] is not None and r["moments_found"] and r["false"] == 0, q["qid"]
             assert r["windows"] > 0 and r["seconds"] >= 0 and r["wall_s"] >= 0 and r["sightings"] is not None
-        tier = retrieval.decider_figures([run])
+        tier = retrieval.retrieval_figures([run])
         assert tier["missed"] == [] and tier["asks"] == len(asked) and tier["models"]["mm/fake"]["first_s"] is not None
         assert all(t["found"] == t["needles"] and t["absent_clean"] == t["absent"] for t in tier["models"]["mm/fake"]["types"].values())
         text = render.markdown(report.numbers([run]))
@@ -347,7 +342,7 @@ def test_models_are_resolved_and_the_ones_that_are_not_ready_say_why(tmp_path, m
     assert needs_gpu(ready) and not needs_gpu(FAKE_MODEL)
     assert Model("pplx-decider-flash-v1.2", "x", ready.about).slug == "pplx-decider-flash-v1-2"
     # the system: a variant it was given is that model, any other has its facts whether or not it can run (what `describe` and `preview` need),
-    # and a session is opened only over one that is ready, the reason it is not being the error (G1's F9)
+    # and a session is opened only over one that is ready, the reason it is not being the error
     monkeypatch.setattr(models.modelenv, "problem", lambda backend, folder_, envs: None)
     mm =system.Mm(models={"fake": FAKE_MODEL}, models_dir=folder)
     assert mm.model_of("fake") is FAKE_MODEL and mm.model_of("d1-3B").spec == (folder / "d1-3B").resolve().as_posix()
@@ -436,9 +431,9 @@ def model_of(name: str) -> Model:
 
 def test_a_model_slower_than_015_s_a_window_runs_one_exec_at_a_time_and_the_fake_one_as_many_as_asked():
     # a model above 0.15 s a window (mm's estimate from its About) runs one exec at a time
-    jobs = {n: arm_jobs(model_of(n), 3) for n in ("d3-edge", "d1-3B", "h2o-lightning-4b", "d3-mini", "d3-flash", "pplx-decider-flash-v1.2")}
+    jobs = {n: config_jobs(model_of(n), 3) for n in ("d3-edge", "d1-3B", "h2o-lightning-4b", "d3-mini", "d3-flash", "pplx-decider-flash-v1.2")}
     assert jobs == {"d3-edge": 3, "d1-3B": 3, "h2o-lightning-4b": 3, "d3-mini": 1, "d3-flash": 1, "pplx-decider-flash-v1.2": 1}
-    assert 0.15 < window_s(decider.known("d3-mini")[1]) < 0.2 and arm_jobs(FAKE_MODEL, 3) == 3
+    assert 0.15 < window_s(decider.known("d3-mini")[1]) < 0.2 and config_jobs(FAKE_MODEL, 3) == 3
 
 
 def test_a_session_runs_one_exec_at_a_time_for_a_slow_model_and_for_a_horizon_and_the_requested_number_else(week, store, tmp_path):
@@ -522,7 +517,7 @@ class Probing:
 
 
 def labels_left(home: Path, pattern: str = "id:bench-%") -> tuple[int, int, int]:
-    """How many labels, project rows and session rows of the bench's execs an mms home holds."""
+    """How many labels, project rows and session rows of a run's execs an mms home holds."""
     with closing(sqlite3.connect(home / "index.sqlite")) as db:
         return (db.execute("SELECT COUNT(*) FROM labels WHERE project LIKE ?", (pattern,)).fetchone()[0],
                 db.execute("SELECT COUNT(*) FROM projects WHERE id LIKE ?", (pattern,)).fetchone()[0],
@@ -553,14 +548,14 @@ def test_no_exec_sees_a_label_an_earlier_exec_left_and_a_long_exec_holds_the_gpu
         home = session.home
         baseline = kept_items(home)
 
-        def arm(agent, questions_, jobs):
+        def run_cell(agent, questions_, jobs):
             run_config(run, "claude", Agent(agent), S, description, questions_, session, dump, isolation, jobs, Halt(), "line", clock=WALL)
 
         # without the scrub, the later of two execs finds the earlier one's label (so the test below can fail)
         leaky = Probing(first, tiny)
         with monkeypatch.context() as patch:
             patch.setattr(system, "scrub_home", lambda home_, kept, **kw: {})
-            arm(leaky, first, 1)
+            run_cell(leaky, first, 1)
         early, late = sorted(first, key=lambda q: (q.scope.until, q.qid))
         assert leaky.seen[early.qid] == [] and {r["project"] for r in leaky.seen[late.qid]} == {exec_project(early.qid)}
         swept = scrub_home(home, baseline, prefix=PROJECT_PREFIX)
@@ -570,7 +565,7 @@ def test_no_exec_sees_a_label_an_earlier_exec_left_and_a_long_exec_holds_the_gpu
 
         # with it, an exec starts from the store's state: it sees no label of an exec that ended, and leaves none
         agent = Probing(second, tiny, keep_in=second[-1].qid)
-        arm(agent, second, 1)
+        run_cell(agent, second, 1)
         for q in second:
             own = [r for r in agent.after[q.qid] if r["project"] == exec_project(q.qid)]
             rec = result(run, "mm-fake", q.qid)
@@ -588,7 +583,7 @@ def test_no_exec_sees_a_label_an_earlier_exec_left_and_a_long_exec_holds_the_gpu
         assert len(long_ranges) == 2 and not any((q.scope.sources, q.cost_ranges) in long_ranges for q in third if q.qid not in long_ones)
         monkeypatch.setattr(session, "estimate", lambda sources, ranges: 400.0 if (tuple(sources), tuple(map(tuple, ranges))) in long_ranges else 20.0)
         slow = Probing(third, tiny, pause=0.15)
-        arm(slow, third, 3)
+        run_cell(slow, third, 3)
         spans = slow.spans
         assert long_ones <= set(spans), "the long ones are in this part"
 
@@ -862,10 +857,10 @@ def test_a_daemon_is_never_started_over_a_folder_outside_pytests_own_temp_folder
     assert Daemon(tmp_path / "inside").process is None
 
 
-KIND = {"mic": "audio", "logs": "records", "notes": "text", "config": "text"}  # the kind of window a source costs; else video (the old SOURCE_KINDS)
+KIND = {"mic": "audio", "logs": "records", "notes": "text", "config": "text"}  # the kind of window a source costs; else video
 
 
-def test_the_decider_estimate_is_in_minutes_from_the_windows_a_range_holds_at_the_models_seconds_a_window(week, monkeypatch):
+def test_the_retrieval_estimate_is_in_minutes_from_the_windows_a_range_holds_at_the_models_seconds_a_window(week, monkeypatch):
     questions = [q for q in week[2] if q.retrieval is not None]
     assert len(questions) == 18, "every question of the tiny week but the config version has an oracle"
     monkeypatch.setattr(estimate, "windows_in", lambda table, source, ranges: {k: 1000 if k == KIND.get(source, "video") else 0 for k in estimate.COST_KINDS})
@@ -874,6 +869,6 @@ def test_the_decider_estimate_is_in_minutes_from_the_windows_a_range_holds_at_th
     for model in (FAKE_MODEL, slow):
         mine = [q for q in questions if q.tags["modality"] in {"text", "records", *(model.about.reads & {"image", "video", "audio"})}]
         minutes[model.name] = sum(1000 * window_s(model.about, KIND.get(q.retrieval.sources[0], "video")) for q in mine) / 60
-        assert estimate.decider_minutes({"decode_s": {}}, model.about, mine) == pytest.approx(minutes[model.name])
+        assert estimate.retrieval_minutes({"decode_s": {}}, model.about, mine) == pytest.approx(minutes[model.name])
     assert minutes["d3-mini"] > 2 * minutes["fake"] > 0, "the slow model takes longer on the same windows"
     assert estimate.minutes_text(0.4) == "under a minute" and estimate.minutes_text(42.4) == "about 42 min"

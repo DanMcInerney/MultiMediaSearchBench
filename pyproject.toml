@@ -76,5 +76,5 @@ module-name = "mmsb"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Four workers: a GPU run beside a suite of 12 workers hung the laptop's GPU driver and crashed Windows.
+# Four workers: more beside a run that uses the GPU can starve its driver.
 addopts = "-n 4 --dist loadgroup -m 'not slow and not paid and not gpu'"

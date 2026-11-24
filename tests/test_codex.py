@@ -1,7 +1,6 @@
-"""Ported from tests/test_codex.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): the fast tests of the harness of the old Codex recall
-run, which are the table of its graders and the reading of Codex's answers, events and plan use. Not ported:
-`test_codex_recalls_the_day`, the paid run (19 questions to a real `codex exec` over a daemon of the old recall tier, which
-spends the plan's quota); its fixtures went with it. The graders are the ones of `mmsb.core.grade`."""
+"""The fast tests of the Codex agent's harness: a table of graders (19 questions of a day's recall, each with answers it must accept and
+answers it must refuse) and the reading of Codex's answers, events and weekly use. Nothing here starts a real `codex exec`, which spends the
+agent's quota. The graders are the ones of `mmsb.core.grade`."""
 
 from __future__ import annotations
 
@@ -17,8 +16,8 @@ from mmsb.core.agents import codex
 from mmsb.core.answer import answer_of
 from mmsb.core.grade import code, near, norm, numbers, unknown
 
-STOP_AT = 60.0  # percent of the plan's use at which the remaining questions are skipped
-QUOTA: dict = {"used": None, "ran": False}  # the last weekly plan use read, in percent; whether an exec has run
+STOP_AT = 60.0  # percent of the agent's weekly use at which the remaining questions are skipped
+QUOTA: dict = {"used": None, "ran": False}  # the last weekly use read, in percent; whether an exec has run
 
 
 # -- graders ----------------------------------------------------------------------------------------------------------
@@ -36,7 +35,7 @@ def rule_3(a: str) -> bool:
 
 class Question(NamedTuple):
     n: int
-    tier: str  # C1 (find and look, no decider) or C2 (real d1)
+    tier: str  # C1: find and look can answer it; C2: it needs `ask`, with its decision model (d1)
     text: str
     truth: str
     grade: Callable[[str], bool]

@@ -29,7 +29,7 @@ from mmsb.core.grounded import NOT_RECORDED, status_of
 from mmsb.core.probe import probe_of
 from mmsb.core.record import kind_of
 from mmsb.core.retrieval import FOLDER as RETRIEVAL_FOLDER
-from mmsb.core.retrieval import LEVELS, TYPES, decider_figures  # the tier below owns them; core/select.py reads LEVELS here
+from mmsb.core.retrieval import LEVELS, TYPES, retrieval_figures  # the tier below owns them; core/select.py reads LEVELS here
 from mmsb.core.runfolder import COMMIT_KEY, RunFolder, is_done
 from mmsb.core.select import MEDIA
 from mmsb.core.stats import interval, mcnemar, mean, median, pair_counts, ratio, token_total
@@ -80,8 +80,8 @@ def results_of(run: RunFolder) -> dict[str, dict[str, dict[str, dict]]]:
     root = run.folder / "results"
     qids = {q.qid for q in run.questions()}
     for agent in sorted(p for p in root.glob("*") if p.is_dir() and p.name != RETRIEVAL_FOLDER):
-        out[agent.name] = {arm.name: {f.stem: fs.read_json(f) for f in sorted(arm.glob("*.json")) if f.stem in qids}
-                           for arm in sorted(agent.iterdir()) if arm.is_dir()}
+        out[agent.name] = {folder.name: {f.stem: fs.read_json(f) for f in sorted(folder.glob("*.json")) if f.stem in qids}
+                           for folder in sorted(agent.iterdir()) if folder.is_dir()}
     return out
 
 
@@ -195,16 +195,16 @@ def compare(agent: str, tested: Config, types_asked: frozenset[str], control: Co
     rows, asked, left_out, seen = [], 0, 0, False
     kinds: dict[str, Counter] = {"control": Counter(), "tested": Counter()}
     for (questions, results), leaked in zip(loaded, leaks, strict=True):
-        arms = {"control": results.get(agent, {}).get(control.dir, {}), "tested": results.get(agent, {}).get(tested.dir, {})}
-        seen = seen or bool(arms["tested"])
+        sides = {"control": results.get(agent, {}).get(control.dir, {}), "tested": results.get(agent, {}).get(tested.dir, {})}
+        seen = seen or bool(sides["tested"])
         for q in questions:
             if q.tags["modality"] not in types_asked or q.qid in leaked:
                 continue
             asked += 1
-            f, m = arms["control"].get(q.qid), arms["tested"].get(q.qid)
-            for arm, r in (("control", f), ("tested", m)):
+            f, m = sides["control"].get(q.qid), sides["tested"].get(q.qid)
+            for role, r in (("control", f), ("tested", m)):
                 if r is not None and r["problem"]:
-                    kinds[arm][kind_of(r["problem"])] += 1
+                    kinds[role][kind_of(r["problem"])] += 1
             if is_done(f) and is_done(m):
                 rows.append((q, f, m))
             elif (f is not None and not is_done(f)) or (m is not None and not is_done(m)):
@@ -219,7 +219,7 @@ def compare(agent: str, tested: Config, types_asked: frozenset[str], control: Co
     media = [r for r in rows if r[0].tags["modality"] in MEDIA]
     levels = by_level(media)
     return {"questions": asked, "left_out": left_out, "pending": asked - len(rows) - left_out,
-            "kinds": {arm: dict(counts) for arm, counts in kinds.items()}, "all": paired(rows), "media": paired(media),
+            "kinds": {role: dict(counts) for role, counts in kinds.items()}, "all": paired(rows), "media": paired(media),
             "levels": levels, "crossover": crossover(levels), "thin": thin_levels(levels),
             "work": {"control": worked([f for _, f, _ in media]), "tested": worked([m for _, _, m in media])},
             "cost": {"control": per_correct([f for _, f, _ in media]), "tested": per_correct([m for _, _, m in media])},
@@ -239,10 +239,10 @@ def appendix_rows(runs: Sequence[RunFolder], loaded: list[tuple], tested: Sequen
     """Per agent, a row for each question some side ran: qid, level, type, the control's cell and each tested configuration's."""
     out: dict[str, list[dict]] = {}
     for run, (questions, results) in zip(runs, loaded):
-        for agent, arms in results.items():
+        for agent, configs in results.items():
             for q in questions:
-                control_cell = arms.get(control.dir, {}).get(q.qid)
-                cells = {c.name: cell_of(arms[c.dir].get(q.qid)) for c in tested if c.dir in arms and q.qid in arms[c.dir]}
+                control_cell = configs.get(control.dir, {}).get(q.qid)
+                cells = {c.name: cell_of(configs[c.dir].get(q.qid)) for c in tested if c.dir in configs and q.qid in configs[c.dir]}
                 if control_cell is not None or cells:
                     out.setdefault(agent, []).append({"seed": run.seed, "qid": q.qid, "level": q.hint, "type": q.tags["modality"],
                                                       "control": cell_of(control_cell), "tested": cells})
@@ -254,8 +254,8 @@ def agent_models(loaded: list[tuple]) -> dict[str, dict[str, int]]:
     results of two settings pooled by mistake show."""
     out: dict[str, Counter] = {}
     for _, results in loaded:
-        for agent, arms in results.items():
-            for rs in arms.values():
+        for agent, configs in results.items():
+            for rs in configs.values():
                 for r in rs.values():
                     name = str(r.get("agent_model") or "unknown") + (f" at {r['agent_effort']} effort" if r.get("agent_effort") else "")
                     out.setdefault(agent, Counter())[name] += 1
@@ -296,9 +296,9 @@ def answerable(filters: Sequence[Config], loaded: list[tuple]) -> list[dict[str,
     out = []
     for _, results in loaded:
         found: dict[str, set[str]] = {}
-        for agent, arms in results.items():
+        for agent, configs in results.items():
             for f in filters:
-                for qid, r in arms.get(f.dir, {}).items():
+                for qid, r in configs.get(f.dir, {}).items():
                     if r["passed"] and not r["absent"]:
                         found.setdefault(qid, set()).add(agent)
         out.append({qid: sorted(agents) for qid, agents in sorted(found.items())})
@@ -308,7 +308,7 @@ def answerable(filters: Sequence[Config], loaded: list[tuple]) -> list[dict[str,
 def metadata_figures(runs: Sequence[RunFolder], loaded: list[tuple], filters: Sequence[Config], leaks: list[dict[str, list[str]]]) -> dict:
     """`answerable_from_metadata`: the filters, how many questions with something to find they were given a done result for (in all
     the runs, by any agent), and the questions they answered, with the agents."""
-    given = sum(len({qid for arms in results.values() for f in filters for qid, r in arms.get(f.dir, {}).items()
+    given = sum(len({qid for configs in results.values() for f in filters for qid, r in configs.get(f.dir, {}).items()
                      if is_done(r) and not r["absent"]}) for _, results in loaded)
     return {"filters": sorted(f.name for f in filters), "asked": given,
             "questions": [{"run": run.name, "seed": run.seed, "qid": q.qid, "type": q.tags["modality"], "level": q.hint,
@@ -349,7 +349,7 @@ def numbers(runs: Sequence[RunFolder], control: str = "files") -> dict:
         if agent in agents:
             levels = by_level(rows)
             pooled[agent] = {"levels": levels, "crossover": crossover(levels), "thin": thin_levels(levels)}
-    every = [r for _, results in loaded for arms in results.values() for rs in arms.values() for r in rs.values()]
+    every = [r for _, results in loaded for configs in results.values() for rs in configs.values() for r in rs.values()]
     problems = Counter(kind_of(r["problem"]) for r in every if r["problem"])
     ambient = sum(len(fs.read_json(f)) for run in runs for f in (run.folder / "results").glob("*/*/ambient-labels.json"))
     systems = {c.system for c in tested}
@@ -359,7 +359,7 @@ def numbers(runs: Sequence[RunFolder], control: str = "files") -> dict:
                       "text_asked_of": [c.name for c in tested if asked[c] - set(MEDIA)]},
             "agents": agents, "agent_models": agent_models(loaded), "pooled": pooled,
             **({"answerable_from_metadata": metadata_figures(runs, loaded, floors, leaks)} if floors else {}),
-            "retrieval": decider_figures(runs),
+            "retrieval": retrieval_figures(runs),
             "appendix": {a: rows for a, rows in appendix_rows(runs, loaded, tested, controlled).items() if a in agents},
             "totals": {"results": len(every), "problems": dict(problems),
                        "to_rerun": sum(1 for r in every if not is_done(r)), "ambient_labels": ambient}}

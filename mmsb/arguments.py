@@ -20,8 +20,8 @@ from mmsb.scenarios.realdump import sources_root
 OPTIONS = ("scale", "seed", "days", "source", "per_age", "speech")  # what a scenario's recipe may be given; `build` passes those it takes
 DEFAULT_SEED = 1
 JOBS_HELP = f"execs at once of a configuration whose system needs no GPU, at most {JOBS_MAX} (default {JOBS}; a system may allow fewer)"
-GPU_JOBS_HELP = (f"execs at once of a configuration whose system needs the GPU, at most {JOBS_MAX} (default {GPU_JOBS}: several at once crashed "
-                 "the laptop's driver, so more only when asked; a system may allow fewer)")
+GPU_JOBS_HELP = (f"execs at once of a configuration whose system needs the GPU, at most {JOBS_MAX} (default {GPU_JOBS}: several at once compete for "
+                 "GPU memory and can take down the driver, so more only when asked; a system may allow fewer)")
 
 
 def csv(text: str) -> list[str]:

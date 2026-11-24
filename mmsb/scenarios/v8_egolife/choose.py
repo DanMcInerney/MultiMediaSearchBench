@@ -35,7 +35,7 @@ def age_of(item: dict) -> str:
 
 
 def pools(items: Sequence[dict], clips: Sequence[Clip], lines: Sequence[dict], days: int = DAYS) -> tuple[list[dict], list[dict], Counter]:
-    """The questions the bench can ask, `(video, speech, dropped)`. A question is asked when its query is on days 1..`days`, a clip
+    """The questions the benchmark can ask, `(video, speech, dropped)`. A question is asked when its query is on days 1..`days`, a clip
     had ended by then, and each of its targets is inside a clip that ended by the horizon; a speech question (needs sound) also
     when a transcript line that ended by the horizon is within NEAR_S of a target. `dropped` counts the others by why."""
     video, speech, dropped = [], [], Counter()

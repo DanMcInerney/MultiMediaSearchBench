@@ -9,9 +9,8 @@
   A snapshot of those folders would not do: a live Claude Code or Codex session or the mms daemon changes them while the
   suite runs. A process a test starts is not watched: it gets the throwaway environment instead.
 - The same hook refuses to start a real `claude` or `codex` (any program of that name, or any program inside the owner's three
-  folders), which spends the plan or reads the owner's login. A test that needs an agent puts a stand-in in its place (a program of
-  another name, as tests/stand_in_agent.py does), and patches `claude.check_login`; two test runs once reached the real
-  `claude auth status` before a fixture had patched it.
+  folders), which spends the agent's quota or reads the owner's login. A test that needs an agent puts a stand-in in its place (a program of
+  another name, as tests/stand_in_agent.py does), and patches `claude.check_login`, which would run the real `claude auth status`.
 - Markers `slow`, `paid` and `gpu`, which pyproject's addopts leave out of a default run.
 - The mm tests (tests/mm) skip themselves when the mm extra is not installed. The summary says so in a banner, and
   `--require-mm` turns the skip into a failure.
@@ -150,8 +149,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     for line in ("slow: seconds to minutes (a byte-exact build, a fresh environment); run with -m slow",
-                 "paid: starts a real claude or codex agent and spends the plan's quota; run with -m paid",
-                 "gpu: loads a model on the GPU, whose driver here is fragile; run with -m gpu"):
+                 "paid: starts a real claude or codex agent and spends its quota; run with -m paid",
+                 "gpu: loads a model on the GPU, where several at once can take the driver down; run with -m gpu"):
         config.addinivalue_line("markers", line)
     config.pluginmanager.register(MmSkips(config), "mm-skips")
 

@@ -151,7 +151,7 @@ def write_file(f: File, folder: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     spec = f.spec
     stamped = datetime.fromtimestamp(f.t).strftime("%Y-%m-%d %H:%M:%S")
-    with tempfile.TemporaryDirectory(prefix="haystack-") as work_dir:
+    with tempfile.TemporaryDirectory(prefix="mmsb-week-") as work_dir:
         work = Path(work_dir)
         if f.kind == "photo":
             photo_image(spec).save(path, quality=90, exif=exif_of(f.t))

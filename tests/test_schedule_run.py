@@ -1,9 +1,9 @@
-"""The run loop beside other cells (plan 6.4, U13): `run_agents` with `--side-by-side` over the stand-in system of tests/stub_system.py, with
-real threads that wait on `threading.Event`s, not on time; and the same run without it, which is the run of before. Also the rule that keeps
-the agents' own tools off the GPU (plan 6.4, C11), from the specs the run hands the agents to the environment and command line the real agents
-make of them. Written for this repository (U13).
+"""The run loop beside other cells: `run_agents` with `--side-by-side` over the stand-in system of tests/stub_system.py, with
+real threads that wait on `threading.Event`s, not on time; and the same run without it. Also the rule that keeps
+the agents' own tools off the GPU, from the specs the run hands the agents to the environment and command line the real agents
+make of them.
 
-The expected values are the plan's words (a files case finishes while a GPU cell is held open; a second GPU cell waits for the first to end,
+The expected values are the rules (a files case finishes while a GPU cell is held open; a second GPU cell waits for the first to end,
 its `close` included; a Halt stops the cells of its agent and not another's; a lost GPU marks no free cell; `files` has no GPU rule unless it runs
 beside others, `mm+files` always has it), the order the stub is known to run in, and what the test planted. A hang is a failure: each run is
 on a thread the test gives 60 s."""
@@ -34,7 +34,7 @@ N = len(QUESTIONS)
 STUB_FILES = Config("stub/all+files", "stub", "all", True)  # the stand-in system's tools and the agent's own: `mm+files`
 IN_TIME = sorted(QUESTIONS, key=lambda q: (q.scope.until, q.qid))
 LIMIT = {"problem": "limit: weekly", "final": ""}
-GPU_WORDS = {"in:-hwaccel", "in:nvidia-smi"}  # the plan's 6.4: what an agent kept off the GPU may not name (DESIGN 8.3)
+GPU_WORDS = {"in:-hwaccel", "in:nvidia-smi"}  # what an agent kept off the GPU may not name
 NARROW_QIDS = {q.qid for q in QUESTIONS if q.tags["modality"] != "audio"}  # what the variant `narrow` of the stub system reads
 
 
@@ -157,13 +157,13 @@ def test_a_halt_stops_the_other_cells_of_its_agent_from_starting_more_and_not_th
             files_in.set()
             assert halted.wait(WAIT), "the limit of the other cell did not stop this one"
         else:
-            assert files_in.wait(WAIT)  # (the files exec is in flight when the plan runs out)
+            assert files_in.wait(WAIT)  # (the files exec is in flight when the agent's quota runs out)
 
     claude_stub = Hooked(before, by={("stub-all", q.qid): LIMIT for q in QUESTIONS})
     codex_stub = Stub()
     finish(lambda: go(w, {"claude": Agent(claude_stub), "codex": Agent(codex_stub)}, [FILES, STUB], jobs=1, side_by_side=beside("claude", "codex")))
     assert len(claude_stub.qids("files")) == 1 and len(claude_stub.qids("stub-all")) == 1, "the exec in flight ended, no other started"
-    assert len(codex_stub.qids("files")) == len(codex_stub.qids("stub-all")) == N, "another agent's plan is its own"
+    assert len(codex_stub.qids("files")) == len(codex_stub.qids("stub-all")) == N, "another agent's quota is its own"
     assert len(w.system.kinds("open")) == len(w.system.kinds("close")) == 2, "every session that opened was closed"
 
 
@@ -210,7 +210,7 @@ def test_a_lost_gpu_marks_the_cell_that_needs_it_and_no_free_cell(world, monkeyp
     assert all(result(w.run, "claude", "stub-all", f.stem)["problem"].startswith("setup: the GPU was lost") for f in stubbed)
 
 
-# -- without the flag: the run of before ---------------------------------------------------------------------------------------------
+# -- without the flag ---------------------------------------------------------------------------------------------------------------
 
 def test_without_the_flag_no_two_cells_are_ever_running_at_once(world):
     stub = Stub(pause=0.01)
@@ -225,7 +225,7 @@ def test_the_overlap_check_sees_cells_that_do_run_at_once(world):
 
 
 def result_lines() -> list[str]:
-    """The line of each result, as the plan has it (`<agent> <folder> <qid>: pass|FAIL <seconds> s`), in the order of the cells and of time, for
+    """The line of each result, as a run prints it (`<agent> <folder> <qid>: pass|FAIL <seconds> s`), in the order of the cells and of time, for
     the stub: it answers right, but `unknown` to a picture, a video or a sound when it has only its own tools."""
     media = ("image", "video", "audio")
 
@@ -245,12 +245,12 @@ def test_with_the_flag_the_run_says_it_is_on_and_then_prints_the_same_result_lin
     go(world, {"claude": Agent(Stub())}, [FILES, STUB], jobs=1, side_by_side=side)
     first, *rest = capsys.readouterr().out.splitlines()
     assert first.startswith("side by side: on") and "at most 4 execs at once" in first and "4 of claude" in first
-    assert Counter(rest) == Counter(result_lines()), "a cell that needs nothing of the others prints what it printed"
+    assert Counter(rest) == Counter(result_lines()), "a cell that needs nothing of the others prints the lines it prints on its own"
 
 
 def test_the_cells_of_a_run_are_the_configurations_with_no_variant_of_each_agent_then_each_variant_for_each_agent():
-    """The order the loops of `run_agents` had before the flag (bench.py at bb498a6: `for agent: for config with no variant`, then `for variant: for
-    agent: for config of the variant`), which a side-by-side run takes as the order the GPU cells wait their turn in."""
+    """The order of the cells of `run_agents` (`for agent: for config with no variant`, then `for variant: for agent: for config of the
+    variant`), which a side-by-side run takes as the order the GPU cells wait their turn in."""
     x, x_files, y = Config("mm/x", "mm", "x", False), Config("mm/x+files", "mm", "x", True), Config("mm/y", "mm", "y", False)
     configs = [x, FILES, y, x_files]
     got = [(agent, config.name) for agent, config in cells_in_order(["claude", "codex"], configs)]
@@ -264,7 +264,7 @@ def test_the_execs_of_all_the_cells_take_working_folders_of_their_own_and_are_fo
     stub = Hooked(pause=0.03)
     go(world, {"claude": Agent(stub)}, [FILES, STUB, NARROW], jobs=3, side_by_side=beside())
     assert len(stub.ran) == 2 * N + len(NARROW_QIDS)
-    assert most_at_once([(s, e) for _, s, e in stub.ran]) == 4, "three cells of three execs ask for 9: the laptop's 4 are used"
+    assert most_at_once([(s, e) for _, s, e in stub.ran]) == 4, "three cells of three execs ask for 9: the 4 execs at once a run is limited to are used"
     for i, (work, start, end) in enumerate(stub.ran):
         assert not [w for w, s, e in stub.ran[i + 1:] if w == work and s < end and start < e], "two execs at once in one working folder"
 
@@ -342,7 +342,7 @@ def specs_of(w, configs, side=None, jobs=1):
 
 
 @pytest.mark.parametrize(("configs", "gpu_system", "side", "kept"), [
-    ([FILES], False, False, False),  # the recorded cell: no rule, so the recorded goldens stand
+    ([FILES], False, False, False),  # a files cell on its own: no rule
     ([FILES], False, True, True),  # beside other cells
     ([STUB_FILES], True, False, True),  # mm+files: a shell and a GPU job in one cell, with or without the flag
     ([STUB_FILES], True, True, True),

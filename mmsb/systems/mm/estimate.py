@@ -45,7 +45,7 @@ def window_s(about: About, kind: str = "video") -> float:
     return ask_script.window_seconds(kind, reader.profile_of(None, about), about)
 
 
-def arm_jobs(model: Model | None, jobs: int) -> int:
+def config_jobs(model: Model | None, jobs: int) -> int:
     """The execs at once for one (agent, variant): one for a model that takes over SLOW_S a window (parallel execs share one GPU queue, so
     its timeouts would be the queue's fault), else `jobs`."""
     return 1 if model is not None and window_s(model.about) > SLOW_S else jobs
@@ -182,7 +182,7 @@ def estimate_s(table: Mapping, about: About, sources: Sequence[str], ranges: Seq
     return total
 
 
-def decider_minutes(table: Mapping, about: About, questions: Sequence[Question]) -> float:
+def retrieval_minutes(table: Mapping, about: About, questions: Sequence[Question]) -> float:
     """Minutes the retrieval asks of `questions` take a model: the windows of each ask's sources and ranges at the model's seconds a window."""
     return sum(estimate_s(table, about, q.retrieval.sources, q.retrieval.ranges) for q in questions) / 60
 

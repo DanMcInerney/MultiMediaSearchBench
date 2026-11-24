@@ -20,7 +20,7 @@ from mmsb.core.fs import remove_tree
 from mmsb.systems.mm.models import Model
 
 # remember_max_mb: the largest file a home takes. The real piles' largest are A1's day of sound (2,765 MB) and V1's videos (up to 1,133
-# MB); at 500, mms refused every one of them and held nothing of A1 or V1.
+# MB): at mms's default of 500 it would refuse every one of them and hold nothing of A1 or V1.
 SNAPSHOT_CONFIG = "[memory]\nfree_gb = 0\nremember_max_mb = 4000\n\n[decider]\nidle_s = 3600\n"
 COPY_SKIPS = ("daemon.json", "daemon.log*", "daemon.test.log", "daemon.stop", "looks", "fake-decider.jsonl")
 MEDIA_FOLDERS = ("files", "streams")  # what a home keeps of the recordings: a copy of a home links them instead of copying

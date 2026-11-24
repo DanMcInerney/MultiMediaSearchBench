@@ -41,7 +41,7 @@ from mmsb.core.record import DONE_KINDS, kind_of
 from mmsb.core.scenario import Scenario
 
 COMMIT_KEY = "commit"  # run.json's key for the commit of the repository that made the run
-JOBS_MAX = 4  # execs at once, so the working slots; more crashed the laptop once
+JOBS_MAX = 4  # execs at once, so the working slots; more overload an ordinary computer
 ENDS = ('/', '"', " ", "'")  # what ends a folder's name in a path or a command
 HIDDEN_DATA = tuple("-data" + after for after in ENDS)  # the end of a dump's folder name (`mmb-<tag>-data`) in a path or a command
 IN_ONLY = "in:"  # a deny word that starts with this is checked in what the agent runs (a command, a path), not in what it reads

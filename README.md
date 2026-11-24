@@ -305,7 +305,7 @@ Then pass `--configs files,mm` (or `mm+files`, `mm/d1-Omni-2B+files`) to `build`
 - The `mm` extra is a direct reference to [MultimediaSearch](https://github.com/DanMcInerney/MultimediaSearch) at one commit
   (`pyproject.toml`, which `uv.lock` pins as well), so it needs the network and no checkout of it.
 - The model's weights are looked for in `MMS_MODELS`, else `~/.mms/models`, which is where `mms model use <name>` puts them.
-- `mm` runs one exec at a time, because it needs the GPU and the maintainer's laptop driver crashed under three at once.
+- `mm` runs one exec at a time, because several execs of one decision model compete for GPU memory and can take down the driver.
   `--gpu-jobs 2` asks for more, and until MultimediaSearch reports its queue the working clock refuses it (`--clock wall`
   lets it through, with a warning).
 - `uv sync` is exact: it removes an extra you do not ask for. `uv run` does not remove what is installed.

@@ -1,6 +1,5 @@
-"""Ported from MultimediaSearch tests/test_bench.py at fe0ece5 (the junction, frozen-folder and permissions tests), with `bench.` now `fs.`;
-the tests marked new are not from there. Files and folders: JSON written whole, deletion of read-only files and links, the frozen
-data folder."""
+"""Files and folders (mmsb/core/fs.py): JSON written whole, deletion of read-only files and links, the frozen data folder, and the
+permissions of the data files."""
 
 from __future__ import annotations
 
@@ -82,8 +81,8 @@ def test_a_frozen_folder_names_a_change_an_addition_and_a_removal_and_a_link_is_
 
 @pytest.mark.skipif(os.name != "nt", reason="Windows permissions")
 def test_every_data_file_is_left_with_the_permissions_its_folder_gives_so_codexs_sandbox_reads_it(tmp_path):
-    # the pilot's screen, porch and mic files were moved out of a Python temporary folder, kept its owner-only permissions,
-    # and Codex's sandbox could not open one: its files arm answered "unknown" to every video question
+    # a file moved in from a Python temporary folder keeps that folder's owner-only permissions, and Codex's sandbox cannot open it:
+    # the files configuration would answer "unknown" to every video question
     import tempfile
 
     # the data folder sits right in TEMP, as a run's does: pytest's tmp_path is owner-only itself, which hides the fault
@@ -109,9 +108,6 @@ def test_every_data_file_is_left_with_the_permissions_its_folder_gives_so_codexs
         if data.exists():
             fs.remove_tree(data)
 
-
-
-# -- new ----------------------------------------------------------------------------------------------------------------
 
 @pytest.mark.skipif(os.name != "nt", reason="Windows permissions")
 def test_the_permissions_check_still_sees_when_powershell_7_is_its_parent(tmp_path, monkeypatch):

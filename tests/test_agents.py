@@ -1,13 +1,10 @@
-"""Ported from tests/test_agents.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4): the benchmark's two agents, Claude Code and Codex, in
-all four modes of an exec (blind, files, a server, a server and files) (TESTBED.md, Benchmark): the command lines, the checks of what
-a session may use, and the reading of a stream. No real `claude` or `codex` runs: a command line is built and read, an event is made
-up, and the few tests that start a process start a stand-in script that prints made-up events.
+"""Tests for mmsb/core/agents (claude.py, codex.py, common.py, spec.py): the benchmark's two agents, Claude Code and Codex, in all four
+configurations of an exec (blind, files, a server, a server and files): the command lines, the checks of what a session may use, and the
+reading of a stream. No real `claude` or `codex` runs: a command line is built and read, an event is made up, and the few tests that start
+a process start a stand-in script that prints made-up events.
 
-The calls go through a `SessionSpec` (tests/agent_spec.py); the expectations of argv, environment, messages and results are the
-source's. What changed with the move, by the plan's 3.3 and 4.4:
-- the agents get their server and instructions from `Served`, so no test here reads an installed skill or its notes (those assertions
-  are in tests/mm), and the tests that built the home, `notes`, `guidance` or `arm` of the old calls build a spec of the mode instead;
-- a home or a working folder that was missing is not a case any more (the spec has them), and the two refusals about it are gone."""
+The calls go through a `SessionSpec` (tests/agent_spec.py), which holds the server and the instructions a system serves, so no test here
+reads an installed skill or its notes (those assertions are in tests/mm)."""
 
 from __future__ import annotations
 
@@ -34,7 +31,6 @@ from mmsb.core.contract import McpServer, Served
 CONTEXT_FULL = ("Codex ran out of room in the model's context window. Start a new thread or clear earlier history before "
                 "retrying.")  # as codex.exe words it
 MM_TOOLS = ("mcp__mm__ask", "mcp__mm__find", "mcp__mm__look", "mcp__mm__label")  # written by hand: what a session of the server lists
-RECORDED = Path(__file__).parent / "oracles" / "recorded" / "exec"
 STAND_IN = """\
 import json, os, sys, time
 for line in open(sys.argv[1], encoding="utf-8"):
@@ -65,7 +61,7 @@ def lower(path: Path) -> str:
 
 # -- Claude: the command lines and the environment ----------------------------------------------------------------------
 
-def test_claudes_command_lines_give_each_arm_its_tools_and_nothing_of_the_owners(tmp_path, monkeypatch):
+def test_claudes_command_lines_give_each_configuration_its_tools_and_nothing_of_the_owners(tmp_path, monkeypatch):
     spec = spec_of("mm", tmp_path)
     run, work, home, data = spec.run_dir, spec.work, tmp_path / "home", tmp_path / "data"
     argv = claude.prepare(spec, command=["claude"])
@@ -106,10 +102,10 @@ def test_claudes_command_lines_give_each_arm_its_tools_and_nothing_of_the_owners
     argv = claude.argv_of(["claude"], files, name="sonnet", level="high")
     assert after(argv, "--append-system-prompt") == [claude.BASE_FILES]
     assert "--append-system-prompt-file" not in argv and "--max-turns" not in argv
-    # the longest instructions on record (the skill and the notes: 25,862 characters) still fit the command line
-    long = (RECORDED / "claude-mm" / "instructions.md").read_text(encoding="utf-8")
+    # the longest instructions a system serves (a skill and notes of 25,000 characters or more) still fit the command line
+    long = "A line of the skill's notes, which says how to ask. " * 500
     assert len(long) > 25_000
-    on_the_line = served_of(server_of(home, work), parts=(long.split("\n\n", 1)[1],))
+    on_the_line = served_of(server_of(home, work), parts=(long,))
     claude.prepare(spec_of("mm", tmp_path, run_dir=tmp_path / "in-the-line", served=on_the_line), command=["claude"])
     if os.name == "nt":
         too_long = served_of(server_of(home, work), parts=(long, long))
@@ -160,7 +156,7 @@ def fake_git(tmp_path, monkeypatch):
     return root
 
 
-def test_claudes_files_arm_shell_cannot_reach_the_owners_mms(tmp_path, monkeypatch, fake_git):
+def test_claudes_files_configuration_shell_cannot_reach_the_owners_mms(tmp_path, monkeypatch, fake_git):
     """Under `uv run` PATH starts with the repo's venv folder (mms.exe), and MMS_HOME may be the owner's."""
     venv, bin_dir, work = tmp_path / ".venv" / "Scripts", tmp_path / "bin", tmp_path / "w0"
     venv.mkdir(parents=True)
@@ -185,7 +181,7 @@ def test_claudes_files_arm_shell_cannot_reach_the_owners_mms(tmp_path, monkeypat
     assert all(env[k] == v for k, v in claude.ENV_SET.items())
 
     env = claude.env_of(bin_dir)
-    assert str(venv) in env["PATH"] and env["MMS_HOME"] == str(tmp_path / "owners-home"), "the mm arm is as it was"
+    assert str(venv) in env["PATH"] and env["MMS_HOME"] == str(tmp_path / "owners-home"), "the mm configuration keeps the owner's environment"
     with pytest.raises(ValueError, match="working folder"):
         claude.env_of(bin_dir, True)
     with pytest.raises(ValueError, match="isolation"):
@@ -249,7 +245,7 @@ def finished(**fields) -> dict:
                       "cache_creation_input_tokens": 800}, **fields}
 
 
-def test_a_session_that_is_not_the_arms_is_a_setup_problem_and_a_tool_out_of_bounds_an_escape(tmp_path):
+def test_a_session_that_is_not_the_configurations_is_a_setup_problem_and_a_tool_out_of_bounds_an_escape(tmp_path):
     files = {"tools": claude.FILES_TOOLS, "servers": ()}
     assert claude.check_init(init(), spec_of("mm")) is None and claude.check_init(init(**files), spec_of("files")) is None
     assert "Bash" in claude.check_init(init(tools=[*MM_TOOLS, "Bash"]), spec_of("mm"))
@@ -258,9 +254,9 @@ def test_a_session_that_is_not_the_arms_is_a_setup_problem_and_a_tool_out_of_bou
     assert "Gmail" in claude.check_init(init(servers=extra), spec_of("mm"))
     assert "not connected" in claude.check_init(init(servers=[{"name": "mm", "status": "failed"}]), spec_of("mm"))
     assert "not just 'mm'" in claude.check_init(init(servers=[{"name": "other", "status": "connected"}]), spec_of("mm"))
-    assert claude.check_init(init(servers=[]), spec_of("mm")), "no server is not the mm arm"
+    assert claude.check_init(init(servers=[]), spec_of("mm")), "no server is not the mm configuration"
     assert "MCP servers" in claude.check_init(init(tools=claude.FILES_TOOLS), spec_of("files")), "init() has the mm server"
-    assert claude.check_init(init(tools=MM_TOOLS), spec_of("files")), "the mm arm's tools are not the files arm's"
+    assert claude.check_init(init(tools=MM_TOOLS), spec_of("files")), "the mm configuration's tools are not the files configuration's"
     assert claude.check_init(init(plugins=[{"name": "codex", "path": "x"}]), spec_of("mm"))
     assert "API key" in claude.check_init(init(apiKeySource="ANTHROPIC_API_KEY"), spec_of("mm"))
     assert claude.check_init({"type": "system", "subtype": "init"}, spec_of("mm")), "an init that says nothing fails closed"
@@ -271,7 +267,7 @@ def test_a_session_that_is_not_the_arms_is_a_setup_problem_and_a_tool_out_of_bou
     assert "'Write'" in claude.check_event(use("Write", {"file_path": "x"}), spec_of("files", deny=deny))
     assert "'Write'" in claude.check_event(use("Write", {"file_path": "x"}), spec_of("mm"))
     assert claude.check_event(use("mcp__mm__remember", {"path": "x"}), spec_of("mm")), "remember is not offered"
-    assert claude.check_event(use("Read", {"file_path": str(own)}), spec_of("mm")), "the mm arm has no Read"
+    assert claude.check_event(use("Read", {"file_path": str(own)}), spec_of("mm")), "the mm configuration has no Read"
     assert claude.check_event(use("Read", {"file_path": str(own)}), spec_of("files", deny=deny)) is None
     assert claude.check_event(use("Bash", {"command": f"ffmpeg -i {own} -vf fps=1 f%d.png"}), spec_of("files", deny=deny)) is None
     hit = claude.check_event(use("Read", {"file_path": str(tmp_path / "Answers" / "x.json")}), spec_of("files", deny=deny))
@@ -297,11 +293,11 @@ def test_a_session_that_is_not_the_arms_is_a_setup_problem_and_a_tool_out_of_bou
     assert watch(use("Read", {"file_path": ".claude/x"})) == "escaped: Read reached .claude"
 
 
-def test_the_files_arm_may_read_back_its_own_saved_output_and_nothing_else_under_claude():
+def test_the_files_configuration_may_read_back_its_own_saved_output_and_nothing_else_under_claude():
     """A Bash output over Claude Code's limit is saved under ~/.claude/projects/<folder>/<session>/tool-results, and its result
-    names the file (2.1.302): the files arm may read that file back, not another session's or anything else under ~/.claude."""
+    names the file (2.1.302): the files configuration may read that file back, not another session's or anything else under ~/.claude."""
     sid = "eb90273e-5f48-4dad-b3d2-2370a8a15ac1"
-    saved = f"C:\\Users\\dan\\.claude\\projects\\D--mm-bench-temp-mmb-w2\\{sid}\\tool-results\\bbelb0265.txt"
+    saved = f"C:\\Users\\dan\\.claude\\projects\\D--mmsb-data-mmb-w2\\{sid}\\tool-results\\bbelb0265.txt"
     deny = (".claude",)
     big = {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "t1", "content":
            f"<persisted-output>\nOutput too large (2.4MB). Full output saved to: {saved}\n\nPreview (first 2KB):\nInput #0\n"}]}}
@@ -363,7 +359,7 @@ def test_a_limit_a_login_and_a_missing_result_are_told_apart():
     assert problem(finished(is_error=True, result="API Error: 429 rate_limit_error")).startswith("limit: ")
     assert problem(finished(is_error=True, result="Invalid API key \u00b7 Please run /login")).startswith("auth: ")
     assert problem(finished(is_error=True, result="Not logged in")).startswith("auth: ")
-    expired = "Failed to authenticate: OAuth session expired and could not be refreshed"  # seen in the 2026-11-02 smoke
+    expired = "Failed to authenticate: OAuth session expired and could not be refreshed"
     assert problem(finished(is_error=True, result=expired)) == f"auth: {expired}"
     assert problem(finished(is_error=True, result="API Error: 500"), stderr="rate limit exceeded").startswith("limit: ")
     assert problem(None, 3) == "error: claude exited 3 without a result"
@@ -395,9 +391,9 @@ def test_a_limit_a_login_and_a_missing_result_are_told_apart():
     assert claude.used_percent_of([week(rateLimitType="seven_day", utilization="x")]) is None
 
 
-def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_path):
-    deny = (lower(tmp_path / "mm-bench"), ".mms")
-    leak = f"{tmp_path}/mm-bench/run1/results/claude/files/x.json:3: 47"
+def test_output_that_holds_a_deny_string_ends_the_files_configuration_for_both_agents(tmp_path):
+    deny = (lower(tmp_path / "mmsb-runs"), ".mms")
+    leak = f"{tmp_path}/mmsb-runs/run1/results/claude/files/x.json:3: 47"
 
     def returned(content, id: str = "g1") -> dict:
         return {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": id, "content": content}]}}
@@ -407,14 +403,14 @@ def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_
     assert watch(use("Grep", {"pattern": "ERR-731", "path": str(tmp_path / "data")}, "g1")) is None
     assert watch(returned("data/logs/payments.jsonl:12: ERR-731")) is None
     assert watch(returned(leak)) == f"escaped: Grep output reached {deny[0]}"
-    assert watch(returned([{"type": "text", "text": f"see {tmp_path / 'MM-Bench' / 'run1'}"}])) == \
+    assert watch(returned([{"type": "text", "text": f"see {tmp_path / 'MMSB-Runs' / 'run1'}"}])) == \
         f"escaped: Grep output reached {deny[0]}", "a path in a list of blocks, in any case"
     assert watch(returned("/home/dan/.Mms/index.db", "unknown-id")) == "escaped: a tool output reached .mms"
     picture = {"type": "image", "source": {"type": "base64", "data": ".mms" * 20}}
     assert watch(returned([picture, {"type": "text", "text": "ok"}])) is None, "a picture's data is not text"
     watch = claude.watcher(spec_of("mm", deny=deny))
     assert watch(init()) is None and watch(use("mcp__mm__find", {}, "g1")) is None
-    assert watch(returned(leak)) is None, "only the files arm has answers to keep from"
+    assert watch(returned(leak)) is None, "only the files configuration has answers to keep from"
     assert claude.check_result(returned(leak), spec_of("files"), {}) is None
 
     def output(text: str, kind: str = "item.completed") -> dict:
@@ -423,7 +419,7 @@ def test_output_that_holds_a_deny_string_ends_the_files_arm_for_both_agents(tmp_
 
     assert codex.check_event(output("data/logs/payments.jsonl:12: ERR-731"), spec_of("files", deny=deny)) is None
     assert codex.check_event(output(leak), spec_of("files", deny=deny)) == f"shell output reached {deny[0]}"
-    assert codex.check_event(output(f"{tmp_path}\\MM-BENCH\\run1\\x"), spec_of("files", deny=deny)) == \
+    assert codex.check_event(output(f"{tmp_path}\\MMSB-RUNS\\run1\\x"), spec_of("files", deny=deny)) == \
         f"shell output reached {deny[0]}", "backslashes and case do not matter"
     home_file = output("C:/Users/user/.mms/index.db")
     assert codex.check_event(home_file, spec_of("files", deny=deny)) == "shell output reached .mms"
@@ -470,7 +466,7 @@ def test_with_a_server_and_own_tools_only_the_own_tools_are_held_to_the_deny_wor
         assert codex.check_event(item(kind), both) is None, kind
     assert codex.check_event(item("mcp_tool_call", server="mm", tool="find"), both) is None
     for kind in ("file_change", "web_search", "collab_tool_call"):
-        assert "mm's tools or the files arm's" in codex.check_event(item(kind), both), kind
+        assert "mm's tools or the files configuration's" in codex.check_event(item(kind), both), kind
     assert "server 'other'" in codex.check_event(item("mcp_tool_call", server="other", tool="t"), both)
     hit = codex.check_event(item("command_execution", command=f"type {tmp_path}\\Answers\\truth.json"), both)
     assert hit == f"shell reached {deny[0]}"
@@ -568,9 +564,9 @@ def test_claudes_stream_is_read_from_a_process_and_a_setup_problem_an_escape_or_
     assert (tmp_path / "run6" / "mcp.json").is_file() and "--mcp-config" in out["argv"] and "--add-dir" in out["argv"]
 
 
-# -- Codex: the files arm -----------------------------------------------------------------------------------------------
+# -- Codex: the files configuration ------------------------------------------------------------------------------------------
 
-def test_codexs_files_arm_has_its_shell_and_no_mm_and_the_mm_arm_is_pinned_to_its_project(tmp_path):
+def test_codexs_files_configuration_has_its_shell_and_no_mm_and_the_mm_configuration_is_pinned_to_its_project(tmp_path):
     run, work, home = tmp_path / "run", tmp_path / "w0", tmp_path / "home"
     argv = codex.argv_of(["codex"], "m", "high", spec_of("files", tmp_path))
     settings, disabled = settings_of(argv), disabled_of(argv)
@@ -603,7 +599,7 @@ def test_codexs_files_arm_has_its_shell_and_no_mm_and_the_mm_arm_is_pinned_to_it
     assert common.shell_path(None) == os.pathsep.join(common.system_path()), "no bin_dir: the system's folders alone"
 
     argv = codex.argv_of(["codex"], "m", "high", spec_of("mm", tmp_path))
-    assert not any(s.startswith("shell_environment_policy.") for s in settings_of(argv)), "the mm arm has no shell"
+    assert not any(s.startswith("shell_environment_policy.") for s in settings_of(argv)), "the mm configuration has no shell"
     pin = next(s for s in settings_of(argv) if s.startswith("mcp_servers.mm.env."))
     assert pin == f"mcp_servers.mm.env.CLAUDE_PROJECT_DIR='{str(work).replace(chr(92), '/')}'"
     assert "'--tools','ask,find,look,label'" in next(a for a in settings_of(argv) if a.startswith("mcp_servers.mm.args="))
@@ -671,7 +667,7 @@ def test_codexs_problems_are_told_apart_by_what_the_benchmark_does_with_them():
     assert problem([{"type": "turn.completed"}, turn_failed(full)], code=0).startswith("capped: ")
 
 
-def test_codexs_files_arm_may_run_commands_and_nothing_else_and_none_may_reach_the_answers(tmp_path):
+def test_codexs_files_configuration_may_run_commands_and_nothing_else_and_none_may_reach_the_answers(tmp_path):
     deny = (lower(tmp_path / "answers"), ".codex")
 
     def item(kind: str, event: str = "item.started", **fields) -> dict:
@@ -688,9 +684,9 @@ def test_codexs_files_arm_may_run_commands_and_nothing_else_and_none_may_reach_t
         item("command_execution", "item.completed", command="cat ~/.CODEX/auth.json"), spec_of("files", deny=deny))
     assert codex.check_event(item("command_execution", command="cat ~/.codex/auth.json"), spec_of("files")) is None
     for kind in ("mcp_tool_call", "file_change", "web_search", "collab_tool_call"):
-        assert "files arm" in codex.check_event(item(kind, server="mm", tool="find"), spec_of("files", deny=deny))
+        assert "files configuration" in codex.check_event(item(kind, server="mm", tool="find"), spec_of("files", deny=deny))
 
-    # the mm arm is as it was: a command or a file change ends it, and so does a call of another server
+    # the mm configuration has no shell: a command or a file change ends it, and so does a call of another server
     assert codex.check_event(ffmpeg, spec_of("mm"))
     assert codex.check_event(item("file_change"), spec_of("mm", deny=deny))
     assert codex.check_event(item("mcp_tool_call", server="mm", tool="find"), spec_of("mm")) is None
@@ -775,7 +771,7 @@ def test_codexs_files_exec_is_read_from_a_process_and_a_command_at_the_answers_e
 
 
 def test_codex_view_image_calls_are_read_from_the_execs_own_rollout(tmp_path, monkeypatch):
-    """`codex exec --json` has no item for view_image, so the files arm counts them from the rollout file."""
+    """`codex exec --json` has no item for view_image, so the files configuration counts them from the rollout file."""
     picture = r"C:\data\phone\IMG_1.jpg"
     lines = [json.dumps({"type": "session_meta", "payload": {"id": "t1"}}),
              json.dumps({"type": "response_item", "payload": {"type": "function_call", "name": "exec_command",
@@ -807,12 +803,12 @@ def test_claude_login_is_checked_with_auth_status_before_a_run(tmp_path):
         claude.check_login(fake("Usage: claude [options]"))
 
 
-# -- the blind arm: no tools, no server, no recordings ------------------------------------------------------------------
+# -- the blind configuration: no tools, no server, no recordings -------------------------------------------------------------
 
 BLIND = "You answer the user's question from what you know; you have no tools."
 
 
-def test_the_blind_arm_has_one_line_of_instructions_and_no_tools_for_both_agents(tmp_path):
+def test_the_blind_configuration_has_one_line_of_instructions_and_no_tools_for_both_agents(tmp_path):
     assert common.BASE_BLIND == BLIND
     run, work = tmp_path / "run", tmp_path / "w0"
 
@@ -831,7 +827,7 @@ def test_the_blind_arm_has_one_line_of_instructions_and_no_tools_for_both_agents
     assert "--add-dir" not in given and after(given, "--tools") == [""], "no data folder either"
     assert claude.env_of(tmp_path / "bin")["PATH"].startswith(str(tmp_path / "bin"))
 
-    # Codex: the mm arm's read-only settings with every feature off and no server
+    # Codex: the mm configuration's read-only settings with every feature off and no server
     argv = codex.argv_of(["codex"], "m", "high", spec_of("blind", tmp_path))
     settings, disabled = settings_of(argv), disabled_of(argv)
     assert not any(s.startswith(("mcp_servers.", "shell_environment_policy.")) for s in settings) and "--tools" not in argv
@@ -846,7 +842,7 @@ def test_the_blind_arm_has_one_line_of_instructions_and_no_tools_for_both_agents
     assert after(codex.argv_of(["codex"], "m", "high", spec_of("blind", tmp_path, served=held)), "-C")[0] == str(work)
 
 
-def test_a_session_with_a_tool_or_a_server_is_not_the_blind_arms_and_any_tool_use_is_an_escape(tmp_path):
+def test_a_session_with_a_tool_or_a_server_is_not_the_blind_configurations_and_any_tool_use_is_an_escape(tmp_path):
     assert claude.check_init(init(tools=(), servers=()), spec_of("blind")) is None
     assert "Bash" in claude.check_init(init(tools=["Bash"], servers=()), spec_of("blind"))
     assert "mcp__mm__ask" in claude.check_init(init(tools=MM_TOOLS, servers=()), spec_of("blind"))
@@ -855,7 +851,7 @@ def test_a_session_with_a_tool_or_a_server_is_not_the_blind_arms_and_any_tool_us
 
     for name in ("Read", "Bash", "Glob", "mcp__mm__find", "WebSearch"):
         hit = claude.check_event(use(name, {"command": "ffmpeg -i a.mp4", "file_path": "x"}), spec_of("blind"))
-        assert hit and repr(name) in hit and "blind arm" in hit, name
+        assert hit and repr(name) in hit and "blind configuration" in hit, name
     assert claude.check_event({"type": "assistant", "message": {"content": [
         {"type": "server_tool_use", "name": "web_search", "input": {}}]}}, spec_of("blind"))
     assert claude.check_event(says("ANSWER: B"), spec_of("blind")) is None
@@ -873,7 +869,7 @@ def test_a_session_with_a_tool_or_a_server_is_not_the_blind_arms_and_any_tool_us
     for kind in ("command_execution", "mcp_tool_call", "file_change", "web_search", "collab_tool_call"):
         for event in ("item.started", "item.completed"):
             hit = codex.check_event(item(kind, event, server="mm", tool="ask"), spec_of("blind"))
-            assert hit and repr(kind) in hit and "blind arm" in hit, (kind, event)
+            assert hit and repr(kind) in hit and "blind configuration" in hit, (kind, event)
 
 
 def test_a_blind_exec_is_read_from_a_process_and_a_tool_event_ends_it_as_escaped(tmp_path, monkeypatch, stand_in):
@@ -906,11 +902,11 @@ def test_a_blind_exec_is_read_from_a_process_and_a_tool_event_ends_it_as_escaped
     shell = {"type": "item.started", "item": {"type": "command_execution", "command": "ffmpeg -i a.mp4 f.png"}}
     monkeypatch.setattr(codex, "codex_command", lambda: stand_in([{"type": "turn.started"}, shell, said, usage], 60))
     out = codex.ask_codex(spec_of("blind", tmp_path, prompt="Which?", run_dir=tmp_path / "codex-tool", model="gpt-test", effort="high"))
-    assert out["problem"].startswith("escaped: ") and "command_execution" in out["problem"] and "blind arm" in out["problem"]
+    assert out["problem"].startswith("escaped: ") and "command_execution" in out["problem"] and "blind configuration" in out["problem"]
     assert out["seconds"] < 30 and answer_of(out["final"]) is None
 
 
-# -- new with the move: an agent is a function of a SessionSpec that knows no system ------------------------------------------
+# -- an agent is a function of a SessionSpec that knows no system ---------------------------------------------------------------
 
 def test_an_agent_is_a_function_of_a_session_spec_and_the_model_and_effort_default_to_the_agents_own(monkeypatch):
     for ask in (claude.ask_claude, codex.ask_codex):
@@ -921,16 +917,14 @@ def test_an_agent_is_a_function_of_a_session_spec_and_the_model_and_effort_defau
     monkeypatch.setenv("MMSB_CLAUDE_MODEL", "opus")
     monkeypatch.setenv("MMSB_CODEX_EFFORT", "medium")
     assert claude.model() == "opus" and codex.effort() == "medium"
-    monkeypatch.setenv("MM_CLAUDE_MODEL", "old-name")
-    assert claude.model() == "opus", "the old names mean nothing"
     argv = claude.argv_of(["claude"], spec_of("blind"), name=claude.model(), level=claude.effort())
     assert after(argv, "--model") == ["opus"]
 
 
-def test_the_arm_names_in_the_messages_are_blind_files_the_servers_name_and_both():
-    assert [spec_of(m).arm for m in ("blind", "files", "mm", "mm+files")] == ["blind", "files", "mm", "mm+files"]
+def test_the_configuration_names_in_the_messages_are_blind_files_the_servers_name_and_both():
+    assert [spec_of(m).mode for m in ("blind", "files", "mm", "mm+files")] == ["blind", "files", "mm", "mm+files"]
     other = served_of(server_of(Path("home"), Path("w0"), name="listing", tools=("list_files", "file_info")))
-    assert spec_of("mm", served=other).arm == "listing" and spec_of("mm+files", served=other).arm == "listing+files"
+    assert spec_of("mm", served=other).mode == "listing" and spec_of("mm+files", served=other).mode == "listing+files"
     assert claude.session_tools(spec_of("mm", served=other)) == ("mcp__listing__list_files", "mcp__listing__file_info")
     assert "listing's tools" in codex.check_event({"type": "item.started", "item": {"type": "file_change"}}, spec_of("mm", served=other))
 
@@ -939,39 +933,37 @@ NEUTRAL = re.compile(r"\bmm\b|\bmms\b", re.I)
 AGENTS = Path(__file__).parents[1] / "mmsb" / "core" / "agents"
 
 
-def test_no_agent_module_names_mm_or_imports_mms_or_an_old_root_module():
-    """Tools and instructions come from `Served`, so the agents name no system. (The old root modules stay until U8; nothing
-    new may import them.)"""
+def test_no_agent_module_names_mm_or_imports_mms():
+    """Tools and instructions come from `Served`, so the agents name no system."""
     for file in sorted(AGENTS.glob("*.py")):
         found = [m.group(0) for line in file.read_text(encoding="utf-8").splitlines() if (m := NEUTRAL.search(line))]
         assert not found, f"{file.name} names {found}"
         tree = ast.parse(file.read_text(encoding="utf-8"))
         imported = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         imported |= {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module}
-        assert not imported & {"mms", "claude_run", "codex_run", "bench", "egolife", "haystack", "shortcuts"}, file.name
+        assert "mms" not in imported, file.name
 
 
-def test_the_agents_import_without_mms_or_the_old_root_modules_in_a_process_that_refuses_them():
-    """A `sys.meta_path` blocker, because the editable install would make `import claude_run` work: a slip would go unnoticed."""
+def test_the_agents_import_without_mms_or_the_tests_helpers_in_a_process_that_refuses_them():
+    """A `sys.meta_path` blocker: where MultimediaSearch is installed, a slip that imports it would go unnoticed."""
     code = textwrap.dedent("""
         import importlib.abc, sys
 
         class Refuse(importlib.abc.MetaPathFinder):
             def find_spec(self, name, path=None, target=None):
-                if name.split(".")[0] in {"mms", "claude_run", "codex_run", "bench", "egolife", "haystack", "haystack_media",
-                                          "shortcuts", "grade", "conftest", "day", "fake_decider"}:
+                if name.split(".")[0] in {"mms", "conftest", "day", "fake_decider"}:
                     raise ImportError(f"refused: {name}")
 
         sys.meta_path.insert(0, Refuse())
         import mmsb.core.agents.spec, mmsb.core.agents.common, mmsb.core.agents.claude, mmsb.core.agents.codex
-        assert "mms" not in sys.modules and "claude_run" not in sys.modules
+        assert "mms" not in sys.modules
         print("imported")
     """)
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=Path(__file__).parents[1])
     assert done.returncode == 0 and done.stdout.strip() == "imported", done.stderr[-800:]
 
 
-# -- a folder the system handed the agent (G1's F4) ----------------------------------------------------------------------------
+# -- a folder the system handed the agent ---------------------------------------------------------------------------------------
 
 def opens_world(tmp_path: Path) -> tuple[Path, Path, Path, tuple[str, ...]]:
     """A run folder (denied), the home of a system inside it and the `looks` folder of the home, which the system hands the agent."""
@@ -1062,7 +1054,7 @@ def test_the_own_tools_may_open_a_folder_the_system_handed_them_and_nothing_else
     assert ask("climbed")["problem"] == f"escaped: view_image reached {deny[0]}"
 
 
-# -- the effort asked for reaches the command line of each agent (G1's F6) --------------------------------------------------------
+# -- the effort asked for reaches the command line of each agent -----------------------------------------------------------------
 
 def test_the_effort_asked_for_is_on_the_command_line_of_both_agents_and_without_one_each_has_its_own_default(tmp_path, monkeypatch, stand_in, fake_git):
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "codex-home"))

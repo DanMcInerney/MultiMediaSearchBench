@@ -117,7 +117,7 @@ def test_the_deny_words_hold_the_code_and_the_source_names_in_commands_and_the_s
 def test_the_sources_folder_is_set_by_its_variable_and_is_denied_by_its_name(monkeypatch):
     monkeypatch.delenv(realdump.SOURCES_ENV, raising=False)
     assert realdump.sources_root() == paths.HOME / "mmsb-sources" and realdump.source_word() == "mmsb-sources"
-    assert realdump.source_word(Path("D:/bench-data/sources")) == "bench-data", "the maintainer's"
+    assert realdump.source_word(Path("D:/bench-data/sources")) == "bench-data"
     monkeypatch.setenv(realdump.SOURCES_ENV, "/srv/MMSB-Media")
     assert realdump.sources_root() == Path("/srv/MMSB-Media") and realdump.source_word() == "mmsb-media"
     assert realdump.source_word(Path("/srv/clips-store/sources")) == "clips-store", "a folder named `sources` is told by its parent"
@@ -146,7 +146,7 @@ def test_with_no_way_to_the_files_the_prompt_still_offers_unknown():
 
 
 def test_the_probe_finds_a_word_of_a_label_and_reads_only_the_text_of_metadata(tmp_path):
-    """Gate 2: a label is caught by its words too ("microwave" for `Microwave_oven`, "coin" for `Coin_(dropping)`), in a name or in a
+    """A label is caught by its words too ("microwave" for `Microwave_oven`, "coin" for `Coin_(dropping)`), in a name or in a
     WAV's title; in metadata only runs of four printable characters or more are text."""
     title = b"INFO" + b"INAM" + struct.pack("<I", 20) + b"coin drop on table\0\0"
     dump = written(tmp_path / "a", {"folder_01/microwave_beep.wav": wav(), "folder_01/0002.wav": wav(b"LIST" + struct.pack("<I", len(title)) + title),
@@ -163,7 +163,7 @@ SOME_CODE = ('python -c "import wave, numpy as np; x = np.frombuffer(w.readframe
 
 @pytest.mark.parametrize("name", ["v1_security", "i3_trailcam", "a1_home_audio", "m4_samples"])
 def test_no_deny_word_of_a_real_scenario_is_in_ordinary_code(name, tmp_path):
-    """Gate 2: "sins" is in `isinstance`, "meva" in `timevalue`; an agent's own script must not end its exec as an escape."""
+    """A deny word that is part of ordinary code ("sins" is in `isinstance`, "meva" in `timevalue`) would end an agent's own script as an escape."""
     import importlib
 
     from mmsb.core.agents.common import reached

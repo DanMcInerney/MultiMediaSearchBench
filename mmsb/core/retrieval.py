@@ -1,6 +1,6 @@
 """The retrieval tier: each system asked, with no agent, the yes/no of a needle over its source and range, and the ranked moments it
 gives scored against the question's truth. The asking is the system's (`Session.oracle`); the scoring and the records are here. One
-record holds the fields of both scenarios' records, and `decider_figures` turns the records of a run into the tier's figures for the
+record holds the fields of both scenarios' records, and `retrieval_figures` turns the records of a run into the tier's figures for the
 report.
 
     results/retrieval/<Config.dir>/<qid>.json    one record for each question (`retrieval_record`)
@@ -29,13 +29,13 @@ LEVELS = ("part", "day", "week", "time")  # how vague a question's time hint is;
 NEAR_P = 0.5  # a needle's best p from which a miss is a near miss
 
 # the wordings of a verdict on a needle question that a configuration did not find
-SUSPECT = "haystack suspect"
+SUSPECT = "data suspect"
 CALIBRATION = "below its model's hit (calibration)"
 MISS = "this model's miss"
 STOPPED = "stopped on a false sighting before the needle"
 CUT = "cut at max_s before the needle"
-ONE_MODEL = "one model ran: the agent arm's look, or a second family, tells a miss from a haystack fault"
-ONE_FAMILY = "one family ran: the agent arm's look, or a second family, tells a miss from a haystack fault"
+ONE_MODEL = "one model ran: the agent's look, or a second family, tells a miss from a data fault"
+ONE_FAMILY = "one family ran: the agent's look, or a second family, tells a miss from a data fault"
 OUTCOMES = ("found", "near", "stopped", "cut", "missed")
 
 
@@ -169,7 +169,7 @@ def verdicts(rs: list[dict]) -> dict[str, str]:
     return out
 
 
-def decider_figures(runs: Sequence[RunFolder]) -> dict:
+def retrieval_figures(runs: Sequence[RunFolder]) -> dict:
     """The tier's figures: per configuration and type, from the records of all runs, and per template who found it, nearly missed
     it or missed it, with the verdicts."""
     records: dict[str, list[dict]] = {}

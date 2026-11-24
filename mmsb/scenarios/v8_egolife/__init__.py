@@ -54,7 +54,7 @@ WORKERS = 3  # clips measured, and files hashed, at once
 # holds each answer (the same words as V7's: a scenario does not import another), the code that reaches this scenario, the download
 # and the folders of the other slots' recordings. The quotes are as `reached` reads a command: a `"` after a backslash is `/"`.
 DENY_WORDS = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v8_egolife", "from mmsb", "import mmsb")
-DOWNLOAD_WORDS = ("bench-data", PERSON.lower(), IN_ONLY + "egolife")  # the download's: `egolife` only in a command (the transcript says it once)
+DOWNLOAD_WORDS = (PERSON.lower(), IN_ONLY + "egolife")  # the download's: `egolife` only in a command (the transcript says it once)
 RECIPE_KEYS = {"source", "scale", "seed", "days", "per_age", "speech", "utc_offset", "clips"}
 
 
@@ -105,7 +105,7 @@ def hashes(recipe: Mapping[str, object]) -> tuple[str, str]:
 
 
 def pool_counts(recipe: Mapping[str, object]) -> dict:
-    """The questions the bench could ask before choosing (`run.json`'s `pools`): `video` and `speech` counts, and `dropped`, how many of
+    """The questions the benchmark could ask before choosing (`run.json`'s `pools`): `video` and `speech` counts, and `dropped`, how many of
     the others for each reason."""
     source, days = Path(recipe["source"]), len(recipe["days"])
     video, heard, dropped = pools(read_items(source), [clip_of(rel, length) for rel, length in recipe["clips"]],

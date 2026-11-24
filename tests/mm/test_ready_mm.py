@@ -1,6 +1,5 @@
-"""`Mm.check_ready` (mmsb/systems/mm/system.py, the contract's `System.check_ready`): a run of `files,mm/d1-3B` on a machine without torch used to run
-the `files` cells and then fail at `open`; the CLI now asks every configuration's system before any agent starts (tests/test_ready.py), and this
-is mm's answer, with the real `not_ready` of MultimediaSearch over a models folder of a test's own and this environment, which has no torch (the mm-gpu
+"""`Mm.check_ready` (mmsb/systems/mm/system.py, the contract's `System.check_ready`): a run of `files,mm/d1-3B` on a machine without torch is refused
+before any agent starts: the CLI asks every configuration's system (tests/test_ready.py), and this is mm's answer, with the real `not_ready` of MultimediaSearch over a models folder of a test's own and this environment, which has no torch (the mm-gpu
 group is not installed). Nothing is started or loaded."""
 
 from __future__ import annotations

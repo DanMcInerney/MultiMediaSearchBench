@@ -4,8 +4,8 @@ Without `--side-by-side` the cells of a run run one after another and nothing he
 each cell gets a thread (`run_beside`), and what the threads share is `Pools`, made real by `Slots`:
 - the GPU: one cell that needs it at a time holds its token for its whole length (its session's `open` and `close` included), the cells
   that need it taking it in the order they would have run one after another;
-- the working folders: the laptop runs at most `JOBS_MAX` execs at once, and the working slots and the deny words are for that many, so
-  the execs of all the cells together take a slot each from one pool (`Pools.cpu`);
+- the working folders: a run has at most `JOBS_MAX` execs at once (more overload an ordinary computer), and the working slots and the
+  deny words are for that many, so the execs of all the cells together take a slot each from one pool (`Pools.cpu`);
 - each agent's sessions: at most `Pools.agents[agent]` of one agent run at once, in any cells.
 A shared slot goes to the cell that needs the GPU first, then to the earlier cell in the sequential order. `simulate` is the same policy on
 paper, for the estimate a dry run prints, and `agent_off_gpu` is the rule that keeps the agents' own tools off the GPU while it is in use.
@@ -72,7 +72,7 @@ def start_order(pending: Sequence[Case], description: Description | None, expect
 
 @dataclass(frozen=True)
 class Pools:
-    """The most of each that a run uses at once. `cpu`: the laptop's rule of at most `JOBS_MAX` processes at once, which in a run are the
+    """The most of each that a run uses at once. `cpu`: the rule of at most `JOBS_MAX` processes at once, which in a run are the
     execs, each in a working folder of its own. `agents`: the sessions of each agent (its quota and rate limits). `gpu`: the cells that
     hold the GPU."""
 

@@ -227,8 +227,8 @@ def test_no_question_is_about_a_bird_or_asks_for_an_absent_fox(scale, seeds):
 
 def test_the_last_motion_photo_of_the_card_is_a_coyote_and_no_question_asks_for_it():
     """The card's last photo that is not a time-lapse one (all that come after are on the hour) is a coyote's at 13:32:07 on
-    28 February 2014: the list of the files gave the answer to `last-coyote`, which was asked at seed 3 (and the first one is told
-    the same way)."""
+    28 February 2014: the list of the files would give the answer to `last-coyote`, so it is asked at no seed (the first motion photo is
+    told the same way)."""
     card = told(plain_card("2013-09-10", "2014-02-28"))
     motion = [(t, s) for t, _, s in card if not is_timelapse(t)]
     assert motion[-1] == ("2014-02-28 13:32:07", "coyote") and all(is_timelapse(t) for t, _, _ in card if t > motion[-1][0])
@@ -238,8 +238,8 @@ def test_the_last_motion_photo_of_the_card_is_a_coyote_and_no_question_asks_for_
 
 
 def test_no_first_or_last_question_rests_on_a_day_whose_hour_12_is_in_doubt():
-    """A made-up card: the fox's first day has a photo the dataset wrote as 12:xx (noon or the hour after midnight, however it is told
-    now), the bobcat's last day too; a deer's photos are the card's first and last motion photos, so that only the hour decides."""
+    """A made-up card: the fox's first day has a photo the dataset wrote as 12:xx (noon or the hour after midnight, however it is told),
+    the bobcat's last day too; a deer's photos are the card's first and last motion photos, so that only the hour decides."""
     card = [photo(0, "2013-12-16 05:00:00", "empty"), photo(1, "2013-12-16 05:20:10", "deer"), photo(2, "2013-12-16 08:00:00", "fox"),
             photo(3, "2013-12-16 12:10:00", "fox", True), photo(4, "2013-12-17 09:00:00", "fox"), photo(5, "2013-12-17 10:00:00", "bobcat"),
             photo(6, "2013-12-18 06:00:00", "bobcat"), photo(7, "2013-12-18 12:30:00", "bobcat", True), photo(8, "2013-12-18 13:00:00", "empty"),

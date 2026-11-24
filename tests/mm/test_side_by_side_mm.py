@@ -1,9 +1,9 @@
-"""Side-by-side scheduling over the real mm system and its real daemon with the fake decider (plan 6.4, U13): V7's tiny week through `mm/fake` and
+"""Side-by-side scheduling over the real mm system and its real daemon with the fake decider: V7's tiny week through `mm/fake` and
 `files` gives the same results beside each other as one after another; and the agent kept off the GPU does not take the GPU from the model, because
 the model is in mm's daemon, which the run starts with the run's own environment (mmsb/systems/mm/daemon.py), and the server the agent starts does no
-GPU work. Written for this repository (U13); no paid agent runs and no model is loaded.
+GPU work. No paid agent runs and no model is loaded.
 
-Expected values are the plan's words (the same set of results), and what the test planted: a decider that writes the environment of the process it
+Expected values are the same set of results beside each other as one after another, and what the test planted: a decider that writes the environment of the process it
 runs in (tests/mm/env_decider.py) shows what the daemon has, and a stand-in agent run through the real `claude.ask_claude` or `codex.ask_codex`
 (tests/stand_in_agent.py) starts the real server with the environment the real agent made, and writes the `CUDA_VISIBLE_DEVICES` it has."""
 
@@ -25,7 +25,7 @@ import stand_in_agent  # noqa: E402
 from agent_spec import spec_of  # noqa: E402
 from fakes import FILES, S, Opened, Probe, made_up_ffmpeg, run_of  # noqa: E402
 from stub_system import right  # noqa: E402
-from test_mm_arm import asks, by_qid, go, result  # noqa: E402
+from test_mm_config import asks, by_qid, go, result  # noqa: E402
 from test_seam import git  # noqa: E402, F401
 
 from mms import decider_d1  # noqa: E402
@@ -36,7 +36,7 @@ from mmsb.core.schedule import Pools, SideBySide  # noqa: E402
 from mmsb.systems.mm.models import Model  # noqa: E402
 from mmsb.systems.mm.system import Mm  # noqa: E402
 
-pytestmark = pytest.mark.xdist_group("mm-arm")
+pytestmark = pytest.mark.xdist_group("mm")
 ENVS = Model("envs", f"python:{Path(fakes.ROOT / 'env_decider.py')}", decider_d1.ABOUT)  # the fake decider that writes its process's environment
 SYSTEM = Mm(models={"envs": ENVS})
 ENVS_FILES = Config("mm/envs+files", "mm", "envs", True)

@@ -1,8 +1,4 @@
-"""Ported from MultimediaSearch tests/test_haystack_media.py at fe0ece5 (37 of its 39 tests; the other 2 are tests/mm's).
-
-The 2 left out run the real reader's change gate (`reader._video`); `reader` is `frames.py` in the others.
-
-The drawings and sounds of the V7 week (the `media_*` modules): the same spec is the same pixels, samples and
+"""The drawings and sounds of the V7 week (the `media_*` modules): the same spec is the same pixels, samples and
 file bytes; each needle's shade survives the encoder (JPEG for a photo, x264 at the capture's crf for the screen and the porch) at 3%
 or more of the picture while every distractor of its source has under 0.5% of any needle's shade; the needles meet their area floors;
 the alarm's and the doorbell's pitches are the fake decider's `pitch:<hz>` for their own windows and for no distractor's; a VFR screen
@@ -11,7 +7,7 @@ one every half second, one at least every 60 s), with the cursor and the clock d
 drawn from a state's layers (the card, scrolled and typed on, with the decorations pasted over through their mask) is the state's picture
 exactly when nothing has happened; and the writers keep to a throughput target (screen 20 ms a frame, porch 15 ms a frame, microphone
 1 s per 15 minutes of sound), which the tests print (`-s`). What the reader decodes is `frames.py`'s copy of it (tests/mm checks that
-the two agree); the reader's change gate is not copied, and the two tests of it are in tests/mm."""
+the two agree); the reader's change gate is not copied, and tests/mm tests it."""
 
 from __future__ import annotations
 
@@ -48,7 +44,7 @@ from mmsb.scenarios.v7_screen.media_sound import (
 
 
 def packet_duration(path: Path) -> float | None:
-    """How long a media file plays, from its packets (copied from `media.duration` of MultimediaSearch at fe0ece5)."""
+    """How long a media file plays, from its packets."""
     first = last = None
     with av.open(str(path)) as container:
         for packet in container.demux():

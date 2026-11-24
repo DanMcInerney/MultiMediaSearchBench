@@ -1,12 +1,11 @@
-"""Ported from tests/test_bench.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order: the benchmark's run loop with a stub
-agent, over a stand-in system (tests/stub_system.py) instead of a tiny week loaded into a daemon. What moved, by the plan's 3.2 and 4.5:
-- `arm` is the configuration (`files`, `stub/all`: a system with variants, standing for the old mm arm of a fake decider), `Exec` is the
-  `SessionSpec` the agent gets, `Run` is `RunFolder` with a scenario, and the mm-only steps (home, daemon, scrub) are the stub session's;
-- tests that need the daemon, the home, the models or the decider tier are not here but in tests/mm (U7): the home and its copy, the
-  labels and the scrub, the quiesce of jobs, the GPU seconds of an ask, `work_of`'s counts of ask jobs, the window estimate;
-- the report's, the command line's and the build's tests belong to the report, the CLI and the scenarios (U5, U8, U2) and are not here.
-Every expected value is the source's, or written from the plan's table (4.5) and the recorded fields of the pilot's results; the only
-changes of an expectation are `arm` to `config` and the names of the fields it replaced (`arm`, `model`: `config`, `system`, `variant`)."""
+"""The benchmark's run loop (`run_agents`) with a stub agent, over a stand-in system (tests/stub_system.py) instead of a tiny week loaded
+into a daemon. A configuration is `files` or `stub/all` (a system with variants); the agent gets a `SessionSpec`, the run is a `RunFolder`
+with a scenario, and the steps only the mm plug-in has (home, daemon, scrub) are the stub session's.
+Tests that need the daemon, the home, the models or the decision model are in tests/mm: the home and its copy, the labels and the scrub,
+the quiesce of jobs, the GPU seconds of an ask, `work_of`'s counts of ask jobs, the window estimate. The report's, the command line's and
+the build's tests are with the report, the CLI and the scenarios.
+Every expected value is written from the rules the tests state and the fields a result carries (`config`, `system`, `variant`), not read
+back from the runner."""
 
 from __future__ import annotations
 
@@ -40,7 +39,7 @@ N = len(tiny_questions())
 BLIND = Config("blind", None, None, False)
 NARROW = Config("stub/narrow", "stub", "narrow", False)
 MEDIA = Config("stub/media", "stub", "media", False)
-VERSIONED = ("notes", "config")  # the old AS_OF: written here from the plan's words (4.6), not taken from any module
+VERSIONED = ("notes", "config")  # the sources whose files are versions, written here and not taken from any module
 
 
 @pytest.fixture
@@ -92,7 +91,7 @@ def test_every_configuration_is_run_over_its_questions_and_a_second_command_asks
         got = {q: result(run, "claude", folder, q) for q in qids}
         assert sorted(p.stem for p in (run.folder / "results" / "claude" / folder).glob("*.json")) == sorted(qids)
         assert all(r["problem"] is None and r["agent"] == "claude" and r["config"] == config.name for r in got.values())
-        assert all((r["system"], r["variant"]) == (config.system, config.variant) and "arm" not in r and "model" not in r for r in got.values())
+        assert all((r["system"], r["variant"]) == (config.system, config.variant) for r in got.values())
     sign = result(run, "claude", "stub-all", "image-photo-sign-1")
     assert (sign["passed"], sign["abstained"], sign["seed"], sign["denials"], sign["timeout_s"]) == (True, False, 7, 0, 900.0)
     assert (sign["calls"], sign["tools"], sign["scope_all"]) == (2, {"lookup": 1, "fetch": 1}, 1)
@@ -201,7 +200,7 @@ def test_the_gpu_is_checked_before_a_session_opens_only_for_a_system_that_needs_
             gpu.check_gpu(needs)
         gpu.check_gpu(free)
         patch.setattr(gpu, "subprocess", smi("7112, C:\\Windows\\explorer.exe\n"))
-        assert gpu.gpu_busy() is None, "Windows' desktop, as nvidia-smi listed it on 2026-11-06, loads no model"
+        assert gpu.gpu_busy() is None, "Windows' desktop, which nvidia-smi lists, loads no model"
         patch.setattr(gpu, "subprocess", smi("7112, C:\\Windows\\explorer.exe\n1234, C:\\x\\python.exe\n"))
         assert gpu.gpu_busy() == "1234, C:\\x\\python.exe", "and hides nothing beside it"
         patch.setattr(gpu, "subprocess", smi("1234, C:\\x\\python.exe\n5678, C:\\y\\ChatGPT.exe\n9012, C:\\x\\python.exe\n"))
@@ -349,7 +348,7 @@ def test_versioned_questions_run_one_at_a_time_in_time_order_and_the_rest_in_par
 
 
 def test_a_long_exec_holds_the_system_alone_by_the_sessions_rule(world):
-    """The heavy rule is the session's (`admits`); the stub holds it as the plan's 4.6 words it. A range's seconds times `rate` is a
+    """The heavy rule is the session's (`admits`); the stub holds it as a session of a real system does. A range's seconds times `rate` is a
     case's estimate, so the longest ranges are the long ones."""
     long_ones = sorted(tiny_questions(), key=lambda q: -(q.scope.until - q.scope.since))[:2]
     rate = 400.0 / max(q.scope.until - q.scope.since for q in long_ones)
@@ -387,7 +386,7 @@ def test_a_result_holds_the_denials_and_abstains_by_the_questions_own_numbers():
 
 
 def test_a_models_questions_come_from_what_its_system_reads_and_the_run_notes_them(world, capsys):
-    """Each configuration is asked what its system reads (the text and records only the one `controls` names), the pilot has the media
+    """Each configuration is asked what its system reads (the text and records only the one `controls` names), the `pilot` subset has the media
     questions of what the systems read and 3 controls, and systems.json holds what each was asked. The expected sets are written from
     the questions' own modalities."""
     by_modality = {m: {q.qid for q in tiny_questions() if q.tags["modality"] == m} for m in ("image", "video", "audio", "text", "records")}
@@ -408,7 +407,7 @@ def test_a_models_questions_come_from_what_its_system_reads_and_the_run_notes_th
     assert set(free.qids("stub-narrow")) == by_modality["image"] | by_modality["video"] | by_modality["text"] | by_modality["records"]
     assert set(free.qids("stub-media")) == by_modality["image"] | by_modality["video"], "it reads no text"
 
-    # the pilot's media are what the configurations without tools of their own read, and a session may allow fewer jobs
+    # the `pilot` subset's media questions are what the configurations without tools of their own read, and a session may allow fewer jobs
     third, _ = run_of(world.root / "pilot", tag="t7")
     capsys.readouterr()
     limited = types.SimpleNamespace(**{**vars(world), "system": StubSystem(job_limit=1)})
@@ -567,7 +566,7 @@ class Marked:
     name, code, generator = "marked", "M", 1
 
     def view(self, question, slot, dump, temp, key, build):
-        if build:  # (U8: a call that only names the folder, as `run_agents` makes to check its path, makes nothing: it is not noted)
+        if build:  # (a call that only names the folder, as `run_agents` makes to check its path, makes nothing: it is not noted)
             SEAM.append(("view", question.qid, slot))
         return temp / f"view-{slot}"
 
@@ -600,8 +599,8 @@ def test_each_configuration_is_given_what_the_scenarios_view_prompt_and_after_ex
                 "cost_usd": None, "used_percent": 1.0, "model": "stub", "denials": 0}
 
     view = run.temp / "view-0"
-    # the order of the plan's 4.5: the session serves (4), the view is made (5), the prompt (6), the agent runs (7), the scenario's
-    # addition and the session's audit are read (8), and the session is reset (9)
+    # the order of an exec: the session serves, the view is made, the prompt is made, the agent runs, the scenario's addition and the
+    # session's audit are read, and the session is reset
     expected = {"blind": ["prompt", "agent", "after_exec"], "files": ["view", "prompt", "agent", "after_exec"],
                 "stub/all": ["serve", "prompt", "agent", "after_exec", "audit", "reset"],
                 "stub/all+files": ["serve", "view", "prompt", "agent", "after_exec", "audit", "reset"]}
@@ -614,7 +613,7 @@ def test_each_configuration_is_given_what_the_scenarios_view_prompt_and_after_ex
         assert (spec.own_tools, spec.data) == (config.own_tools, data)
         assert spec.prompt == f"{'own' if config.own_tools else 'none'}|{data}|{holder}|{q.qid}|{run.timeout_s:g}" and spec.work == run.slot(0)
         assert spec.deny == run.deny(spec.work, NO_ISOLATION, spec.data) and "in:marked" in spec.deny
-        hidden = "in:" + re.sub(r"[\\/]+", "/", str(run.data).lower())  # (U8: the folder cut from the dump is not the dump, so the dump is denied)
+        hidden = "in:" + re.sub(r"[\\/]+", "/", str(run.data).lower())  # (the folder cut from the dump is not the dump, so the dump is denied)
         assert (hidden in spec.deny) == config.own_tools, "the dump is hidden from the tools that read a folder cut from it, and from no other"
         assert [s[0] for s in SEAM if s[0] not in ("max_jobs", "open", "close", "release")] == expected[config.name],             "the folder is made only for tools of its own"
         assert SEAM[-1][0] == "release" or SEAM[-2][0] == "release", "the scenario puts away what it made when the run ends"
@@ -725,7 +724,7 @@ def test_a_run_prints_what_it_will_run_and_about_how_long_that_takes(world, caps
     assert not (world.run.folder / "results" / "codex").exists(), "it asks nothing"
 
 
-# -- G1's repairs: what the runner records of the system, what it tells it, and what it does when an exec or a close goes wrong -----------------
+# -- what the runner records of the system, what it tells it, and what it does when an exec or a close goes wrong -----------------------------
 
 
 def test_systems_json_notes_each_configurations_description_and_a_changed_configuration_with_results_is_refused(world):

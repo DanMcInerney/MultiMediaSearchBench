@@ -41,7 +41,7 @@ from mmsb.systems import read as read_system_toml
 from mmsb.systems.mm.audit import HorizonLeak, ambient_labels, work_of
 from mmsb.systems.mm.audit import audit as horizon_audit
 from mmsb.systems.mm.daemon import Api, Daemon, wait_for, write_config
-from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, arm_jobs, beyond_timeout, estimate_s, heavy, table_of
+from mmsb.systems.mm.estimate import ASK_SHARE, HEAVY_S, beyond_timeout, config_jobs, estimate_s, heavy, table_of
 from mmsb.systems.mm.home import PROJECT_PREFIX, SNAPSHOT_CONFIG, copy_home, exec_project, kept_items, scrub_home, set_horizon
 from mmsb.systems.mm.jobs import JOB_WAIT_S, quiesce, wait_idle
 from mmsb.systems.mm.load import check_snapshot, load
@@ -129,7 +129,7 @@ def parts_of(model: Model) -> tuple[str, ...]:
 
 def jobs_of(model: Model, cases: Sequence[Case], requested: int) -> int:
     """One exec at a time when a case has a horizon (the cut is the whole home's) or the model is slow, else `requested`."""
-    return 1 if any(c.horizon is not None for c in cases) else arm_jobs(model, requested)
+    return 1 if any(c.horizon is not None for c in cases) else config_jobs(model, requested)
 
 
 def served_of(home: Path, parts: tuple[str, ...], case: Case, context: SessionContext, busy_at_start: int | None) -> Served:

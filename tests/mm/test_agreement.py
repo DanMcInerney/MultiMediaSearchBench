@@ -1,9 +1,9 @@
-"""What is copied from MultimediaSearch, still agrees with it (plan 3.5, 7.4; U7's acceptance). The benchmark's core and V7 run without MultimediaSearch, so they hold
+"""What the benchmark holds a copy of from MultimediaSearch agrees with MultimediaSearch. The benchmark's core and V7 run without MultimediaSearch, so they hold
 small copies of what MultimediaSearch decides: the reader's frames, the fake decider's and the day's constants, the ask script's words, ffmpeg's path, the
 packet duration of a clip, and the share of an exec's time an ask may have. Each is run here beside the original, on the same files and inputs,
 and the expected value is the original's. A change in MultimediaSearch that this finds is a change to take over or to refuse.
 
-Expected values are MultimediaSearch's, from the installed package (fe0ece5 on this machine) and from the copies of its tests (tests/mm/day.py,
+Expected values are MultimediaSearch's, from the installed package and from the copies of its test helpers (tests/mm/day.py,
 tests/mm/fake_decider.py)."""
 
 from __future__ import annotations
@@ -136,4 +136,4 @@ def test_a_window_is_priced_as_mm_prices_it_and_the_records_window_is_the_reader
     for kind in ("video", "audio", "text", "records"):
         assert estimate.window_s(about, kind) == ask_script.window_seconds(kind, reader.profile_of(None, about), about)
     assert estimate.window_s(about, "video") == pytest.approx(0.061) and math.isclose(estimate.window_s(about, "records"), 0.075)
-    assert estimate.SLOW_S < estimate.window_s(decider.known("d3-mini")[1]) < 0.2, "d3-mini is the slow one the pilot ran alone"
+    assert estimate.SLOW_S < estimate.window_s(decider.known("d3-mini")[1]) < 0.2, "d3-mini is the slow one: it runs one exec at a time"

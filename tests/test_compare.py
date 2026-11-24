@@ -1,8 +1,7 @@
-"""`mmsb compare` and decision D1 (plan 9.3, core/compare.py): two runs of the same questions cell by cell, the flips by qid, the band of +-2 and
-McNemar. Over the toy scenario's 19 questions, run once by the stand-in agents of tests/echo_agent.py, whose answers are known without
-running anything: `files` (the agent's own tools only) is right for the 3 text and 3 records questions and the 3 absent ones about
-pictures, video and sound, 9 of 19, and `stub/all` is right for all 19, for each agent. The recorded pilot's own counts (Claude files 23, Claude
-mm 22, Codex files 27, Codex mm 23) and its flips are tests/oracles/test_recorded_repeat.py's."""
+"""`mmsb compare` (core/compare.py): two runs of the same questions cell by cell, the flips by qid, the band of +-2 and McNemar. Over the toy
+scenario's 19 questions, run once by the stand-in agents of tests/echo_agent.py, whose answers are known without running anything: `files` (the
+agent's own tools only) is right for the 3 text and 3 records questions and the 3 absent ones about pictures, video and sound, 9 of 19, and
+`stub/all` is right for all 19, for each agent."""
 
 from __future__ import annotations
 
@@ -54,7 +53,7 @@ def cell(comparison: Comparison, agent: str, config: str) -> Cell:
     return next(c for c in comparison.cells if (c.agent, c.config) == (agent, config))
 
 
-def test_a_run_compared_with_itself_has_no_flips_every_cell_inside_the_band_and_d1s_numbers_hold(pair):
+def test_a_run_compared_with_itself_has_no_flips_every_cell_inside_the_band_and_the_numbers_hold(pair):
     a, b = pair
     c = compare_runs(a, b)
     assert [(x.agent, x.config) for x in c.cells] == [("claude", "files"), ("claude", "stub/all"), ("codex", "files"), ("codex", "stub/all")]
@@ -104,10 +103,10 @@ def test_a_cell_is_inside_the_band_at_exactly_plus_or_minus_2_and_outside_at_3_a
     set_passed(b, "claude", FILES, passed_in(a, "claude", FILES, True)[:6], False)
     x = cell(compare_runs(a, b), "claude", "files")
     assert (x.difference, x.p, x.significant) == (-6, 2 / 2 ** 6, True), "6 flips one way: p = .03125, under .05"
-    assert (BAND, compare.ALPHA) == (2, 0.05), "D1's numbers"
+    assert (BAND, compare.ALPHA) == (2, 0.05), "the band and the level of significance"
 
 
-def test_the_band_and_the_level_of_significance_are_d1s_in_one_place(pair, monkeypatch):
+def test_the_band_and_the_level_of_significance_are_in_one_place(pair, monkeypatch):
     a, b = pair
     set_passed(b, "claude", FILES, passed_in(a, "claude", FILES, True)[:2], False)
     assert cell(compare_runs(a, b), "claude", "files").inside
@@ -169,13 +168,13 @@ def test_the_verdict_lines_are_told_a_then_b_and_a_difference_is_flagged_and_fai
     assert "claude mm/x: DIFFER\n      A none: ...\n      B `day` by accuracy (accuracy +20 pts)" in text and "NO: the verdict lines read the same" in text
 
 
-def test_the_text_says_what_d1_counts_and_what_a_pass_does_not_mean_and_that_the_flips_are_for_a_person(pair):
+def test_the_text_says_what_it_counts_and_what_a_pass_does_not_mean_and_that_the_flips_are_for_a_person(pair):
     a, b = pair
     text = render_comparison(compare_runs(a, b))
-    assert ("D1 (plan 9.3): a cell is inside the band when its correct count is within +-2 of A's; McNemar's p of A against B is under 0.05 in none; "
+    assert ("A cell is inside the band when its correct count is within +-2 of A's; McNemar's p of A against B is under 0.05 in none; "
             "the verdict lines read the same; B has no setup result; every flip is read by a person.") in text
     assert "run once in json; run `line` as well only if a cell falls outside the band." in text
-    assert ("A pass of D1's numbers means no large loss, not that the runs agree: the agents are stochastic, a band of 2 is about 11 points of 19 "
+    assert ("A pass of these numbers means no large loss, not that the runs agree: the agents are stochastic, a band of 2 is about 11 points of 19 "
             "questions, and McNemar's p over so few discordant pairs has little power. Read every flip above, one by one, before calling the runs the same.") in text
     assert "yes: every cell inside the band" in text and "yes: the verdict lines read the same" in text
     assert "codex records no effort" not in text and "claude records no effort in its results, so only its model is compared." in text

@@ -1,5 +1,5 @@
 """The `set` rule (core/grade.py): a "find every one" answer is right with the exact set of dates or files, and its F1 is told beside it;
-and the question file's `grade.items` (core/question.py), which a line written before it existed may leave out."""
+and the question file's `grade.items` (core/question.py), which a line may leave out."""
 
 from __future__ import annotations
 
@@ -70,14 +70,14 @@ def a_question(g: Grade):
                              value="2013-12-16")
 
 
-def test_the_question_file_holds_the_items_and_reads_a_line_written_before_them(tmp_path):
+def test_the_question_file_holds_the_items_and_reads_a_line_without_them(tmp_path):
     file = tmp_path / "questions.jsonl"
     write_questions(file, [a_question(DAYS)])
     (back,) = load_questions(file)
     assert back.grade.items == ("2013-12-16", "2013-12-18")
-    old = dataclasses.asdict(a_question(realdump.grade("count", truth="2")))
-    del old["grade"]["items"]
-    file.write_text(json.dumps(old) + "\n", encoding="utf-8")
+    bare = dataclasses.asdict(a_question(realdump.grade("count", truth="2")))
+    del bare["grade"]["items"]
+    file.write_text(json.dumps(bare) + "\n", encoding="utf-8")
     assert load_questions(file)[0].grade.items == ()
 
 

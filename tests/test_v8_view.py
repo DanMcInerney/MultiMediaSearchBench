@@ -1,34 +1,40 @@
-"""Ported from tests/test_egolife.py of MultimediaSearch at fe0ece5 (plan 7.4, oracle 4), in that file's order, part 2: what an agent with its own tools
-reads in V8 and what it may not reach: the folder of the clips and lines up to a question's horizon, the deny words of the other slots and
-of the download, the prompts, and the tripwire for a recording past the horizon in an exec's output. The scenario's data, plan and build are
-tests/test_v8.py, the run loop and the report tests/test_v8_run.py, over the fake download of tests/v8_fake.py. The messages of the moved
-tests changed with the code they call (see test_v8.py's first lines); a frozen dump is the cache's, so the view tests check that linking
-and unlinking leave the dump as it was."""
+"""V8, part 2: what an agent with its own tools reads in V8 and what it may not reach: the folder of the clips and lines up to a question's
+horizon, the deny words of the other slots and of the download, the prompts, and the tripwire for a recording past the horizon in an exec's
+output. The scenario's data, plan and build are tests/test_v8.py, the run loop and the report tests/test_v8_run.py, over the fake download of
+tests/v8_fake.py. A frozen dump is the cache's, so the view tests check that linking and unlinking leave the dump as it was."""
 
 from __future__ import annotations
 
 import dataclasses
 import json
 import os
+import re
 from pathlib import Path
 
 import pytest
 from agent_spec import server_of
-from test_runfolder import DENY, MM_ISOLATION, between, check_against, posix, run_of, sentinels  # noqa: F401
 from v8_fake import DAYS, V8, built, clip_ends, line_at, lines_by, oracle_file, plan, recipe, source, table, view_files  # noqa: F401
 
+from mmsb import systems
 from mmsb.core import fs, paths
 from mmsb.core.agents.common import command_outputs, reached
 from mmsb.core.contract import Served
-from mmsb.core.runfolder import IN_ONLY, RunFolder
+from mmsb.core.runfolder import IN_ONLY, JOBS_MAX, RunFolder
 from mmsb.core.scenario import Access
 from mmsb.scenarios.v8_egolife import plan as plans
 from mmsb.scenarios.v8_egolife import source as src
 from mmsb.scenarios.v8_egolife.view import files_view, release_views, seen_past_horizon, view_dir
 
 pytestmark = pytest.mark.xdist_group("v8")
+ISOLATION = systems.isolation()  # what the systems' system.toml keep out of an agent's shell
 
-# -- 6. the files arm's view and its deny list -----------------------------------------------------------------------------------
+
+def lowered(word: str) -> str:
+    """A deny word as `RunFolder.deny` gives it: lower case, with one forward slash for each run of slashes."""
+    return re.sub(r"[\\/]+", "/", word.lower())
+
+
+# -- the files configuration's view and its deny list -----------------------------------------------------------------------------------
 
 
 def test_the_files_view_holds_the_clips_and_lines_that_ended_by_h(built, plan, table, tmp_path):
@@ -51,7 +57,7 @@ def test_the_files_view_holds_the_clips_and_lines_that_ended_by_h(built, plan, t
     assert [n for n in view_files(view) if n.startswith("glasses/")] == expect[:2]
     assert len((view / "transcript" / "2026-10-29.jsonl").read_text(encoding="utf-8").splitlines()) == 2
     assert len([n for n in view_files(tmp_path / "d1") if n.startswith("glasses/")]) == 9
-    # deleting the links left the dump as it was: the same files, sizes and times
+    # deleting the links leaves the dump as it was: the same files, sizes and times
     files_view(tmp_path / "d0", dump, ends[0] - 3600)
     assert view_files(tmp_path / "d0") == [] and fs.stats_of(dump.root) == before
 
@@ -87,29 +93,28 @@ def test_a_view_that_cannot_be_removed_is_told_and_does_not_hide_the_error(tmp_p
     assert not view_dir(tmp_path, "abc", 0).exists()
 
 
-@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
-def test_the_deny_words_of_v8_are_the_old_ones_but_for_the_new_folders_and_three_that_name_the_new_package(sentinels):
-    golden = DENY["v8"]["v8"]
-    new = tuple(IN_ONLY + word for word in ("v8_egolife", "from mmsb", "import mmsb"))
-    assert V8.OLD_WORDS == tuple(w.removeprefix(IN_ONLY) for w in between(golden["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0"))
-    for own, key, next_slot in ((None, "none", "in:d:/__temp__/mmb-tag-w0"), (0, "slot0", "in:d:/__temp__/mmb-tag-w1")):
-        old = between(golden[key], "/mm-bench'", next_slot)  # V7's eight words, which the old EgoRun.deny inherited
-        extras = tuple(golden[key][golden[key].index("in:mmb-[") + 1:])  # V8's own, after the last slot word
-        assert extras[:3] == ("bench-data", "a1_jake", "in:egolife") and len(old) == 8 and len(extras) > 20
-        run = run_of(V8)
-        got = run.deny(None if own is None else run.slot(own), MM_ISOLATION)
-        assert set(map(posix, new)) <= set(got) and not set(map(posix, new)) & set(golden[key])
-        check_against(golden[key], tuple(w for w in got if w not in set(map(posix, new))), (*old, *extras))
-        at = got.index("bench-data")
-        assert got[at:at + len(extras)] == extras, "V8's own words, in the old order"
-    assert V8.deny_words([], Path("t"), "k") == (*(IN_ONLY + w for w in (*V8.OLD_WORDS, "v8_egolife", "from mmsb", "import mmsb")),
-                                                 "bench-data", "a1_jake", "in:egolife"), "with no other slot, no folder of recordings"
+def test_the_deny_words_of_v8_are_the_words_of_its_code_the_download_and_the_view_folders_of_the_other_slots(tmp_path):
+    words = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v8_egolife", "from mmsb", "import mmsb")
+    assert V8.DENY_WORDS == words
+    own = tuple(IN_ONLY + word for word in words)
+    assert V8.deny_words([], Path("t"), "k") == (*own, "a1_jake", "in:egolife"), "with no other slot, no folder of recordings"
+    view = lambda k: str(Path("t") / f"mmb-k-d{k}")  # noqa: E731
+    assert V8.deny_words([1, 2], Path("t"), "k") == (
+        *own, "a1_jake", "in:egolife", "mmb-k-d1/glasses", "mmb-k-d1/transcript", "mmb-k-d2/glasses", "mmb-k-d2/transcript",
+        *(IN_ONLY + word for k in (1, 2) for word in (view(k), f"mmb-k-d{k}", f"*-d{k}", f"?-d{k}"))), \
+        "the other slots' folders by path, by name, by glob, and the folders in them"
+    run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, tmp_path / "data", tmp_path / "temp", "t8", 900.0, V8, ())
+    for slot in (None, 0):
+        got = set(run.deny(None if slot is None else run.slot(slot), ISOLATION))
+        others = [k for k in range(JOBS_MAX) if k != slot]
+        assert {lowered(word) for word in V8.deny_words(others, run.temp, run.tag)} <= got, "a run's deny list holds the scenario's words"
+        assert (lowered(IN_ONLY + str(view_dir(run.temp, run.tag, 0))) in got) == (slot is None), "slot 0's own folder of recordings is denied to the others only"
 
 
 def test_the_deny_list_keeps_an_agent_off_the_other_slots_and_the_download_and_not_off_its_own_view(built, tmp_path):
     dump, _ = built
     run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, dump.root, tmp_path / "temp", "t8", 900.0, V8, ())
-    deny = run.deny(run.slot(0), MM_ISOLATION)
+    deny = run.deny(run.slot(0), ISOLATION)
     own, other = view_dir(run.temp, "t8", 0), view_dir(run.temp, "t8", 1)
 
     def stopped(text: str, output: bool = False) -> bool:
@@ -118,7 +123,7 @@ def test_the_deny_list_keeps_an_agent_off_the_other_slots_and_the_download_and_n
     clip = "glasses/2026-10-29/11.09.42.mp4"
     assert not stopped(f"ffmpeg -i {own}/{clip} frame.png") and not stopped(f"Input #0, from '{own}\\glasses\\x.mp4'", output=True)
     assert stopped(f"ffmpeg -i {other}/{clip} frame.png")
-    assert stopped(r"copy D:\bench-data\egolife\A1_JAKE\DAY2\DAY2_A1_JAKE_10050125.mp4 .")
+    assert stopped(r"copy D:\downloads\egolife\A1_JAKE\DAY2\DAY2_A1_JAKE_10050125.mp4 .")
     assert stopped(f"cd ..\\{other.name}") and stopped("dir D:\\mmb-temp\\*-d1") and stopped(f"dir {run.temp}\\mmb-?-d2")
     assert stopped(f"Input #0, from '{other}\\glasses\\x.mp4'", output=True), "ffmpeg echoes the path it reads"
     assert stopped("Directory of D:\\x\\A1_JAKE\\DAY1", output=True) and stopped(f"{other.name}/transcript/2026-10-29.jsonl", output=True)
@@ -126,10 +131,10 @@ def test_the_deny_list_keeps_an_agent_off_the_other_slots_and_the_download_and_n
     assert stopped(str(run.folder)) and stopped(str(run.slot(1)))
     # the dataset's name is refused in a command and not in an output: a transcript line says "EGOlife" and an exec may print it
     assert stopped("cd D:\\egolife-folder") and not stopped("EGOlife都是过日子的人: Everyone here is living their lives.", output=True)
-    assert deny == run.deny(run.slot(0), MM_ISOLATION) and run.deny(run.slot(1), MM_ISOLATION) != deny
-    run.check_paths(MM_ISOLATION)
+    assert deny == run.deny(run.slot(0), ISOLATION) and run.deny(run.slot(1), ISOLATION) != deny
+    run.check_paths(ISOLATION)
     with pytest.raises(ValueError, match="holds 'egolife'"):
-        dataclasses.replace(run, temp=tmp_path / "egolife-temp").check_paths(MM_ISOLATION)
+        dataclasses.replace(run, temp=tmp_path / "egolife-temp").check_paths(ISOLATION)
 
 
 PLAIN = Served(None, None, (), None, None, None, {})
@@ -159,12 +164,12 @@ def test_a_prompt_for_a_system_and_the_files_together_has_both_sentences_and_a_p
 
 def test_a_transcript_line_that_a_files_exec_could_not_print_is_refused_at_build(plan, recipe, tmp_path, monkeypatch):
     run = RunFolder(tmp_path / "runs" / "run", 1, "egolife", DAYS, tmp_path / "data", tmp_path / "temp", "t8", 900.0, V8, ())
-    deny = run.deny(run.slot(0), MM_ISOLATION)
+    deny = run.deny(run.slot(0), ISOLATION)
     plans.check_transcript(plan.logs, deny)
     line = {"start": "2026-10-29T11:09:47.100", "end": "2026-10-29T11:09:50.766", "speaker": "Jake", "zh": "", "en": "x"}
     said = {"2026-10-29": ({**line, "zh": "EGOlife都是过日子的人", "en": "Everyone here is living their lives."},)}
     plans.check_transcript(said, deny)  # "egolife" is refused in a command only
-    for word in ("bench-data", "A1_JAKE", ".claude", str(run.folder)):
+    for word in ("A1_JAKE", ".claude", str(run.folder)):
         with pytest.raises(ValueError, match="2026-10-29T11:09:50.766 holds"):
             plans.check_transcript({"2026-10-29": ({**line, "en": f"look in {word} now"},)}, deny)
     # and a build refuses the download whose transcript holds one of the scenario's own words, before it writes anything
@@ -172,10 +177,10 @@ def test_a_transcript_line_that_a_files_exec_could_not_print_is_refused_at_build
 
     def with_word(source, days):
         lines = real(source, days)
-        return [{**lines[0], "en": "look in bench-data now"}, *lines[1:]]
+        return [{**lines[0], "en": "look in A1_JAKE now"}, *lines[1:]]
 
     monkeypatch.setattr(plans, "read_transcripts", with_word)
-    with pytest.raises(ValueError, match="holds 'bench-data'"):
+    with pytest.raises(ValueError, match="holds 'a1_jake'"):
         V8.build(recipe, tmp_path / "out", 2)
     assert not (tmp_path / "out").exists()
 

@@ -1,4 +1,4 @@
-"""The question file (mmsb/core/question.py; plan 5.1, DESIGN 6.1). New tests; the expected results are what each test plants: a
+"""The question file (mmsb/core/question.py). The expected results are what each test plants: a
 record written by hand that is valid, the same record with one fault, the rows a writer wrote and the reader must give back."""
 
 from __future__ import annotations

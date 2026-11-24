@@ -36,7 +36,7 @@ bottom, so a scroll brings no new colour), the typed text on the app's typing li
 text's whole height, a size, an ink from the app's own palette, and a bold face a little larger than the card's text), the decorations
 pasted over both, then the clock and the cursor (`stamp`). Layers made with no scroll or typing are `screen_state(state)` exactly. A frame
 costs a copy, a roll, a short text and a masked paste.
-The cursor is a white arrow with a black outline, 12x19 px at 1280x720 (about 6x9.5 at the reader's 640x360; on the dev laptop, 3840x2400 at
+The cursor is a white arrow with a black outline, 12x19 px at 1280x720 (about 6x9.5 at the reader's 640x360; on a 3840x2400 display at
 200% with pointer size 2, the owner's own pointer is 0.67 to 1 times that at 640 px). The reader's change gate (a cell of 16 px at 640x360
 moving by more than 6) is sensitive to its size: at this size 87 to 99% of moves are a change, at 0.8 times it 19 to 89%, at 0.67 times
 0 to 78%. `plan.py` plans what the owner does (`state_acts`: idle, light and busy states drawn as a chain, in runs of active

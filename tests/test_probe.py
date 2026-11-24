@@ -1,6 +1,6 @@
-"""New tests for mmsb/core/probe.py: the shortcut probe in a run. The probe itself is the scenario's (tests/test_v7_probe.py and
-tests/test_v7_scenario.py); here a stand-in scenario says what it is asked and what it found. Expected values are the sentences of the
-replaced `probe_line` of bench.py (the wording a run's report and commands print) and what run.json records."""
+"""Tests for mmsb/core/probe.py: the shortcut probe in a run. The probe itself is the scenario's (tests/test_v7_probe.py and
+tests/test_v7_scenario.py); here a stand-in scenario says what it is asked and what it found. Expected values are the sentences a run's report
+and commands print, and what run.json records."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def run_of(tmp_path: Path, scenario) -> RunFolder:
     return RunFolder(tmp_path / "run", 4, "tiny", (date(2026, 10, 30),), tmp_path / "data", tmp_path, "tag", 900.0, scenario, ())
 
 
-def test_the_scenarios_probe_is_asked_over_the_dump_with_the_files_arms_ffmpeg_and_its_outcome_is_what_run_json_records(tmp_path):
+def test_the_scenarios_probe_is_asked_over_the_dump_with_the_files_configurations_ffmpeg_and_its_outcome_is_what_run_json_records(tmp_path):
     scenario = Probing()
     run, dump = run_of(tmp_path, scenario), Dump("k", tmp_path / "data", "stub", (), ())
     assert run_probe(run, {"seed": 4}, dump) == {"status": "passed", "failures": []}
@@ -50,7 +50,7 @@ def test_a_probe_asked_to_be_skipped_is_not_asked_and_is_recorded_as_skipped(tmp
     assert scenario.asked == []
 
 
-def test_the_outcome_a_run_recorded_is_read_back_and_a_run_from_before_the_probe_has_none(tmp_path):
+def test_the_outcome_a_run_recorded_is_read_back_and_a_run_whose_run_json_holds_none_has_none(tmp_path):
     fs.write_json(tmp_path / "with" / "run.json", {"seed": 1, "probe": {"status": "failed", "failures": ["x"]}})
     fs.write_json(tmp_path / "without" / "run.json", {"seed": 1})
     assert probe_of(tmp_path / "with") == {"status": "failed", "failures": ["x"]} and probe_of(tmp_path / "without") is None
@@ -60,10 +60,9 @@ def test_the_outcome_a_run_recorded_is_read_back_and_a_run_from_before_the_probe
 
 def test_a_run_whose_probe_did_not_pass_is_told_apart_from_one_that_did_in_the_words_the_report_and_the_commands_print():
     assert probe_line("r1", {"status": "passed", "failures": []}) is None
-    assert probe_line("r1", None) == ("r1 has no shortcut probe record (it was built before the probe), so nothing says a shortcut cannot "
-                                      "find its needles")
+    assert probe_line("r1", None) == ("r1 has no shortcut probe record, so nothing says a shortcut cannot find its needles")
     assert probe_line("r1", {"status": "skipped", "failures": []}) == ("r1 was built with --no-probe: nothing says a colour filter, frame "
                                                                         "difference, band filter or file size cannot find its needles")
     assert probe_line("r1", {"status": "failed", "failures": ["a", "b"]}) == (
-        "r1 failed the shortcut probe (2 failures, in its shortcuts.md): a shortcut may find its needles, so its files arm may be doing less "
+        "r1 failed the shortcut probe (2 failures, in its shortcuts.md): a shortcut may find its needles, so its files configuration may be doing less "
         "work than an ask")

@@ -1,16 +1,13 @@
-"""New tests for mmsb/scenarios/v7_screen/questions.py and manifest.py: the plan's question dicts written as `Question`s, with the evidence
-of each found in the manifest. Nothing is written to disk but the question file: the manifest is made from the plan with made-up sizes.
+"""Tests for mmsb/scenarios/v7_screen/questions.py and manifest.py: the plan's question dicts written as `Question`s, with the evidence of
+each found in the manifest. Nothing is written to disk but the question file: the manifest is made from the plan with made-up sizes.
 
 Expected values are the plan's own specs (a file's length, a note's text, a state's overlay, a sound's time), a recomputation of the
-definitions in DESIGN 6.1 and plan 5.2, and the recorded pilot's replayed results (tests/oracles/recorded/pilot-s1/replay), which have the
-verdict the pilot gave them."""
+definitions of the tags and the grades, and answers written out with the verdict each should get."""
 
 from __future__ import annotations
 
 import dataclasses
-import json
 from datetime import date, datetime, time, timedelta
-from pathlib import Path
 
 import pytest
 
@@ -22,7 +19,6 @@ from mmsb.scenarios.v7_screen.plan import days_before
 from mmsb.scenarios.v7_screen.questions import questions_of
 from mmsb.scenarios.v7_screen.week import plan as make_plan
 
-REPLAYS = Path(__file__).parent / "oracles" / "recorded" / "pilot-s1" / "replay"
 PILOT_DAYS = [date(2026, 11, 1), date(2026, 11, 2), date(2026, 11, 3)]
 # the kind of file that holds a template's evidence, and the service whose log holds a log template's lines
 FILE_OF = {"note-code": "note", "config-asof": "config", "log-count": "log", "log-last": "log", "photo-sign": "photo", "photo-count": "photo",
@@ -127,7 +123,7 @@ def test_a_questions_evidence_is_the_file_that_shows_the_moment_at_the_seconds_i
 
 
 def moved(plan, template: str, to: list[list[float]]):
-    """The pilot's plan with the one question of `template` that has a needle asked about the moments `to`."""
+    """The pilot-scale plan with the one question of `template` that has a needle asked about the moments `to`."""
     q = next(q for q in plan.questions if q["template"] == template and not q["absent"])
     return dataclasses.replace(plan, questions=({**q, "truth": {**q["truth"], "moments": to}},))
 
@@ -214,10 +210,17 @@ def test_the_retrieval_run_asks_the_oracle_question_of_the_plan_over_its_source_
     assert [q.qid for q in questions if q.retrieval is None] == ["text-config-asof-1"], "only the version asked at a time has no oracle"
 
 
-@pytest.mark.parametrize("path", sorted(REPLAYS.rglob("result.json")), ids=lambda p: "-".join(p.relative_to(REPLAYS).parts[:3]))
-def test_the_recorded_answers_are_graded_as_the_pilot_graded_them(path, written):
-    """The pilot's verdict on an answer is `grade(...) and no problem`: the question written from the plan, graded by its `Grade`, gives it
-    back for all 8 results kept (a count, a number, a time and an absent question, with the files and with mm)."""
-    result = json.loads(path.read_text(encoding="utf-8"))
-    question = next(q for q in written["pilot"][2] if q.qid == result["qid"])
-    assert (grade.grade(question.grade, result["answer"]) and result["problem"] is None) is result["passed"], (result["answer"], result["passed"])
+# an answer to a question of the pilot week, and whether the question's `Grade` accepts it
+GRADED = [("records-log-count-1", "2", True), ("records-log-count-1", "3", False),
+          ("text-config-asof-1", "28", True), ("text-config-asof-1", "29", False),
+          ("records-absent-log-1", "0", True), ("records-absent-log-1", "unknown", True), ("records-absent-log-1", "4", False),
+          ("video-porch-parcel-1", "12:02:53 p.m. on Sunday, 1 November 2026.", True),
+          ("video-porch-parcel-1", "1:30 p.m. on Sunday, 1 November 2026.", False)]
+
+
+@pytest.mark.parametrize("qid, answer, right", GRADED, ids=[f"{qid} {answer}" for qid, answer, _ in GRADED])
+def test_an_answer_is_graded_by_the_question_written_from_the_plan(qid, answer, right, written):
+    """A count, a number, a time and an absent question: the `Grade` of the question written from the plan accepts the right answer and
+    refuses a wrong one."""
+    question = next(q for q in written["pilot"][2] if q.qid == qid)
+    assert grade.grade(question.grade, answer) is right

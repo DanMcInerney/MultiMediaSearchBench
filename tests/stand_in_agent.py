@@ -5,8 +5,8 @@ agent does: Claude's init event lists the tools the server listed (and `plan["ex
 have), Codex's items are `mcp_tool_call`s. What it asks of the server is the test's: the middle of the script, a piece of Python with `call(tool,
 arguments)` (the blocks of the server's answer), `jsons_of(blocks)`, `emit`, `plan`, `name` and `counter` in reach, that sets `final`.
 
-Generalized from tests/mm/seam.py (which the mm system's seam tests use, with its own middle) for the listing system's, so that the plumbing is
-written once. Written for this repository (G1's repair of F4 and shared cause 3)."""
+The plumbing is written once, here: the listing system's tests use it with their own middle, and so do the mm system's seam tests
+(tests/mm/seam.py)."""
 
 from __future__ import annotations
 

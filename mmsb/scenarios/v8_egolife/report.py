@@ -8,7 +8,7 @@ It reads the results the way core/report.py does (`report.results_of`, `report.p
 folder. A figure is keyed by its role, `control` or `tested`; the figure's `frame` has the words the Markdown says for them (the control's
 configuration name and the tested system's). A tested configuration is shown by its variant (`d1-3B` of `mm/d1-3B`).
 
-`run.json` holds, besides what a RunFolder needs, `pools` (the questions the bench could ask before choosing, from the download:
+`run.json` holds, besides what a RunFolder needs, `pools` (the questions the benchmark could ask before choosing, from the download:
 `v8_egolife.pool_counts`) and `decode_s` (seconds the reader decodes a glasses window in here, measured at ingest by the system)."""
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ def unparsed(rs: Sequence[dict]) -> int:
     return sum(1 for r in rs if r["problem"] is None and grade.choice(r["answer"]) is None)
 
 
-def arm_figures(rs: Sequence[dict]) -> dict:
+def config_figures(rs: Sequence[dict]) -> dict:
     return {**report.side(list(rs)), "unparsed": unparsed(rs), "wilson": list(wilson(sum(r["passed"] for r in rs), len(rs)))}
 
 
@@ -66,16 +66,16 @@ def horizon_figures(questions: Sequence[Question], tested: Sequence[dict]) -> di
 def group_figures(rows: list[tuple]) -> dict:
     """The figures of triples `(question, blind, control, tested)` of one set of questions: each configuration, and the three pairings."""
     qs, blind, control, tested = ([r[i] for r in rows] for i in range(4))
-    return {"n": len(rows), "arms": {"blind": arm_figures(blind), "control": arm_figures(control), "tested": arm_figures(tested)},
+    return {"n": len(rows), "configurations": {"blind": config_figures(blind), "control": config_figures(control), "tested": config_figures(tested)},
             "tested_control": duel(control, tested, qs), "control_blind": duel(blind, control, qs), "tested_blind": duel(blind, tested, qs)}
 
 
-def agent_figures(questions: Sequence[Question], arms: dict, control: str, tested: str) -> dict | None:
+def agent_figures(questions: Sequence[Question], by_config: dict, control: str, tested: str) -> dict | None:
     """One agent with one tested configuration: the questions with a done result in all three configurations (a result to run again, or none,
-    leaves a question out), as video and speech; the video ones by age and by category; how each worked; the crossover. `arms`
+    leaves a question out), as video and speech; the video ones by age and by category; how each worked; the crossover. `by_config`
     are the agent's results by configuration folder; `control` and `tested` are the folders of those two."""
     qs = {q.qid: q for q in questions}
-    blind, control_, tested_ = arms.get("blind", {}), arms.get(control, {}), arms.get(tested, {})
+    blind, control_, tested_ = by_config.get("blind", {}), by_config.get(control, {}), by_config.get(tested, {})
     if not tested_:
         return None
     rows = [(q, blind[qid], control_[qid], tested_[qid]) for qid, q in qs.items()
@@ -97,7 +97,7 @@ def agent_figures(questions: Sequence[Question], arms: dict, control: str, teste
                           **{a: report.cell_of(r) for a, r in zip(ROLES, (b, f, m))}} for q, b, f, m in rows]}
 
 
-def decider_recall(records: Sequence[dict]) -> dict:
+def retrieval_recall(records: Sequence[dict]) -> dict:
     """A model's oracle records as recall: at its hit (`found`), at p of 0.5 and 0.3, in the top 5; the median needle p, the
     sightings away from every target, and the median seconds a window."""
     return {"asked": len(records), "found": sum(bool(r["found"]) for r in records),
@@ -108,7 +108,7 @@ def decider_recall(records: Sequence[dict]) -> dict:
             "stopped": sum(1 for r in records if r["stopped"] == "max_s")}
 
 
-def decider_figures(run: RunFolder) -> dict:
+def retrieval_figures(run: RunFolder) -> dict:
     """The retrieval tier per configuration: recall overall, as video and speech, and by category."""
     out = {}
     for folder in sorted((run.folder / "results" / RETRIEVAL_FOLDER).glob("*")):
@@ -116,10 +116,10 @@ def decider_figures(run: RunFolder) -> dict:
         warm_file = folder / "warm.json"
         if records:
             out[records[0]["config"]] = {
-                "first_s": fs.read_json(warm_file)["seconds"] if warm_file.exists() else None, "all": decider_recall(records),
-                "types": {SPEECH_LABEL.get(t, t): decider_recall(of) for t in ("video", "records")
+                "first_s": fs.read_json(warm_file)["seconds"] if warm_file.exists() else None, "all": retrieval_recall(records),
+                "types": {SPEECH_LABEL.get(t, t): retrieval_recall(of) for t in ("video", "records")
                           if (of := [r for r in records if r["type"] == t])},
-                "categories": {c: decider_recall(of) for c in CATEGORIES if (of := [r for r in records if r["template"] == c])}}
+                "categories": {c: retrieval_recall(of) for c in CATEGORIES if (of := [r for r in records if r["template"] == c])}}
     return out
 
 
@@ -134,9 +134,9 @@ def numbers(run: RunFolder, control: str = "files") -> dict:
     if len(controls := [c for c in run.configs if c.name == control]) != 1:
         raise ValueError(f"{run.name} needs the one configuration {control!r} to compare the others with")
     tested = sorted((c for c in run.configs if c.system is not None and c.name != control), key=lambda c: c.name)
-    agents = {agent: {c.name: got for c in tested if (got := agent_figures(questions, arms, controls[0].dir, c.dir))}
-              for agent, arms in results.items()}
-    every = [r for arms in results.values() for rs in arms.values() for r in rs.values()]
+    agents = {agent: {c.name: got for c in tested if (got := agent_figures(questions, by_config, controls[0].dir, c.dir))}
+              for agent, by_config in results.items()}
+    every = [r for by_config in results.values() for rs in by_config.values() for r in rs.values()]
     systems = {c.system for c in tested}
     return {"run": {"name": run.name, "seed": run.seed, "days": len(run.days), "commit": meta[COMMIT_KEY],
                     "timeout_s": run.timeout_s, "decode_s": meta["decode_s"], "pools": meta["pools"],
@@ -145,7 +145,7 @@ def numbers(run: RunFolder, control: str = "files") -> dict:
                     "categories": {c: sum(1 for q in questions if q.tags["template"] == c) for c in CATEGORIES},
                     "horizon": horizon_figures(questions, [])},
             "frame": {"control": control, "tested": systems.pop() if len(systems) == 1 else "tested"},
-            "agents": {a: models for a, models in agents.items() if models}, "retrieval": decider_figures(run),
+            "agents": {a: models for a, models in agents.items() if models}, "retrieval": retrieval_figures(run),
             "totals": {"results": len(every), "problems": dict(Counter(kind_of(r["problem"]) for r in every if r["problem"])),
                        "to_rerun": sum(1 for r in every if not is_done(r))}}
 
@@ -168,12 +168,12 @@ def duel_row(label: str, d: dict) -> list[str]:
     return [label, str(d["n"]), diff_text(d), f"{d['b']} / {d['c']}", render.chance(d["p"])]
 
 
-def arm_table(g: dict, frame: dict) -> list[str]:
+def config_table(g: dict, frame: dict) -> list[str]:
     control, tested = frame["control"], frame["tested"]
     rows = []
-    for role, arm in zip(ROLES, ("blind", control, tested)):
-        a = g["arms"][role]
-        rows.append([arm, right(a["correct"], a["n"], a["wilson"]), render.number(a["median_s"]), render.number(a["median_calls"], ".0f"),
+    for role, name in zip(ROLES, ("blind", control, tested)):
+        a = g["configurations"][role]
+        rows.append([name, right(a["correct"], a["n"], a["wilson"]), render.number(a["median_s"]), render.number(a["median_calls"], ".0f"),
                      render.kilo(a), str(a["timeouts"]), str(a["unparsed"])])
     return [render.table(["configuration", "right (95% interval)", "median s", "median calls", "tokens k", "timed out", "no letter"], rows), "",
             render.table(["pair", "n", "difference (95% CI)", "b / c", "McNemar p"],
@@ -186,7 +186,7 @@ def age_lines(m: dict, frame: dict) -> list[str]:
     control, tested = frame["control"], frame["tested"]
     rows = []
     for name, g in m["ages"].items():
-        a = g["arms"]
+        a = g["configurations"]
         d = g["tested_control"]
         rows.append([name, str(g["n"]), *(right(a[x]["correct"], g["n"]) for x in ROLES), diff_text(d), f"{d['b']} / {d['c']}",
                      render.chance(d["p"]), render.both(a["control"]["median_s"], a["tested"]["median_s"]),
@@ -211,7 +211,7 @@ def work_lines(m: dict, frame: dict) -> list[str]:
                           "shell commands", "correct", "s per correct", "tokens k per correct", "GPU s per correct"], rows)]
 
 
-def decider_lines(tier: dict) -> list[str]:
+def retrieval_lines(tier: dict) -> list[str]:
     if not tier:
         return ["No retrieval results yet."]
     rows = []
@@ -241,8 +241,8 @@ def markdown(figures: dict) -> str:
     """report.md: the tables of `numbers`."""
     r, frame = figures["run"], figures["frame"]
     control, tested = frame["control"], frame["tested"]
-    arms = ("blind", control, tested)
-    out = [f"# EgoLifeQA through the {tested} bench", "",
+    names = ("blind", control, tested)
+    out = [f"# EgoLifeQA benchmark: with {tested} and without", "",
            f"Run {r['name']} (seed {r['seed']}, {r['days']} days, {tested} commit {r['commit']}). {sum(r['video'])} video questions "
            f"({', '.join(f'{n} aged {a}' for a, n in zip(AGE_NAMES, r['video']))}; by category "
            f"{', '.join(f'{c} {n}' for c, n in r['categories'].items())}) and {r['speech']} speech questions, asked as of each "
@@ -256,21 +256,21 @@ def markdown(figures: dict) -> str:
             name = variant_of(config)
             video = m["video"]
             out += ["", f"## {agent} with {name}: {video['n'] if video else 0} video questions of {m['questions']} (paired: done in "
-                        "all three configurations)", "", *(arm_table(video, frame) if video else ["None paired yet."]), "",
+                        "all three configurations)", "", *(config_table(video, frame) if video else ["None paired yet."]), "",
                     f"### {agent} with {name}: by age ({tested} vs {control}; blind is the floor)",
                     "", *age_lines(m, frame), "", f"### {agent} with {name}: by category (right / n)", "",
-                    render.table(["category", "n", *arms], [[c, str(v["n"]), *(str(v[a]) for a in ROLES)]
+                    render.table(["category", "n", *names], [[c, str(v["n"]), *(str(v[a]) for a in ROLES)]
                                                             for c, v in m["categories"].items()]),
                     "", "TaskMaster has few questions in each age: read it as a count, not a rate.", "",
                     f"### {agent} with {name}: the {m['speech']['n'] if m['speech'] else 0} speech questions, apart", ""]
-            out += (arm_table(m["speech"], frame) + ["", f"Answered from the transcripts alone, since {name} does not hear."]
+            out += (config_table(m["speech"], frame) + ["", f"Answered from the transcripts alone, since {name} does not hear."]
                     if m["speech"] else ["None paired yet."])
             out += ["", f"### {agent} with {name}: how each configuration worked, and what a correct answer cost (the video questions)", "",
                     *work_lines(m, frame)]
             out += ["", f"### {agent} with {name}: the horizon, from the {tested} results", "", audit_line(m["horizon"], tested)]
     if not figures["agents"]:
         out += ["", "No agent results yet."]
-    out += ["", "## The retrieval tier (each model's yes/no over each question's evidence, no agent)", "", *decider_lines(figures["retrieval"])]
+    out += ["", "## The retrieval tier (each model's yes/no over each question's evidence, no agent)", "", *retrieval_lines(figures["retrieval"])]
     t = figures["totals"]
     out += ["", "## Read with these", "",
             "- The published scores (GPT-4o 36.2, Gemini-1.5-Pro 36.9 and EGAgent 57.5 in the paper) are on all 500 items and 7 days "
@@ -291,5 +291,5 @@ def markdown(figures: dict) -> str:
             body = [[x["qid"], x["level"], x["template"], x["type"], *(render.cell_text(x[a], "asks") for a in ROLES)]
                     for x in m["appendix"]]
             out += ["", f"## Appendix: {agent} with {variant_of(config)}, one row per question", "",
-                    render.table(["qid", "age", "category", "type", *arms], body)]
+                    render.table(["qid", "age", "category", "type", *names], body)]
     return "\n".join(out) + "\n"

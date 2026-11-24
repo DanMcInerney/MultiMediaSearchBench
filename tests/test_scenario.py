@@ -1,5 +1,5 @@
-"""New tests for mmsb/core/scenario.py (the plan and files hashes) and the session with nothing to run (mmsb/core/contract.py). The
-expected hashes are those of bytes written out here by hand; the V7 plan's recorded hashes are checked in U2 (oracle 1a)."""
+"""Tests for mmsb/core/scenario.py (the plan and files hashes) and the session with nothing to run (mmsb/core/contract.py). The
+expected hashes are those of bytes written out here by hand."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""New tests for the cache as the commands use it (mmsb/core/build.py, mmsb/cli.py, mmsb/core/costing.py; plan 6.3): `mmsb build` twice says
+"""Tests for the cache as the commands use it (mmsb/core/build.py, mmsb/cli.py, mmsb/core/costing.py): `mmsb build` twice says
 `cached` and writes nothing, the stores are copied into each run, two runs of one dump keep their own slots, a lost or changed dump is dealt
 with by every command that reads it, a misdated store still refuses a run, and `mmsb repeat --dry-run` says what is cached and makes nothing.
 Over the scenario `toy` (V7's plan, three files) and the stand-in system `stub`, as tests/test_cli_build.py is. The cache itself is
@@ -197,13 +197,13 @@ def test_the_command_line_has_a_cache_for_build_and_repeat_that_is_the_default_f
     assert "on the volume of --out and --temp, because a store is copied into the run with hard links" in help_text
 
 
-def test_a_run_made_before_the_cache_has_no_cache_and_cannot_be_asked_for_its_data(world):
+def test_a_run_whose_run_json_names_no_cache_cannot_be_asked_for_its_data(world):
     run = built_run(world)
     meta = {k: v for k, v in fs.read_json(run.folder / "run.json").items() if k != "cache"}
     fs.write_json(run.folder / "run.json", meta)
     old = RunFolder.open(run.folder, scenarios.get)
     assert old.cache is None
-    with pytest.raises(ValueError, match="was made before the cache"):
+    with pytest.raises(ValueError, match="run.json names no cache"):
         ensure_data(old, read_dump(old))
 
 

@@ -1,4 +1,4 @@
-"""mm and the working clock (plan 6.5, 8.2, decision D3; written for this repository, U14): MultimediaSearch keeps no per-job wait, so neither of mm's sessions
+"""mm and the working clock: MultimediaSearch keeps no per-job wait, so neither of mm's sessions
 can say how long a case queued for the GPU, and the clock runs on the wall. That is exact at one exec at a time and wrong at several, so the core
 refuses several on the working clock (`mmsb run`, before any agent starts) and `mmsb clock-check` refuses mm altogether until MultimediaSearch reports the
 queue. Over the real system, the tiny week's real store and the fake decider; no agent, no model and no daemon of the owner's.
@@ -6,7 +6,7 @@ queue. Over the real system, the tiny week's real store and the fake decider; no
 mm needs the GPU, so it runs one exec at a time unless `--gpu-jobs` asks for more (core/atonce.py): the defaults are never refused, `--gpu-jobs 2`
 is refused on the working clock, and nothing a refusal says offers the wall clock as the way to keep the several.
 
-The expected values are the plan's words: a session that cannot say its queue says None, the preview as the opened one."""
+A session that cannot say its queue says None, the preview as the opened one."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ from mmsb.systems.mm import models  # noqa: E402
 from mmsb.systems.mm.daemon import Daemon  # noqa: E402
 from mmsb.systems.mm.system import Mm  # noqa: E402
 
-pytestmark = pytest.mark.xdist_group("mm-arm")
+pytestmark = pytest.mark.xdist_group("mm")
 D1 = Config("mm/d1-3B", "mm", "d1-3B", False)
 
 
@@ -62,7 +62,7 @@ def test_neither_session_of_mm_can_say_its_queue_and_more_than_one_exec_at_once_
             with pytest.raises(ValueError, match=r"mm/d1-3B: 2 execs at once on the working clock.*one exec at a time \(--gpu-jobs 1\)") as gpu_refused:
                 check_queue("mm/d1-3B", d1, session, cases[0], 2, WORKING)
             assert "--clock" not in str(refused.value) + str(gpu_refused.value), "no refusal offers the wall clock"
-            with pytest.raises(ValueError, match="decision D3"):
+            with pytest.raises(ValueError, match="the system itself must report the seconds each of its jobs waits"):
                 queued_at_once(D1, d1, session, cases, 3, 2)
             with pytest.raises(ValueError, match=r"one at a time \(--gpu-jobs 1\).*--gpu-jobs 2 or more"):
                 queued_at_once(D1, d1, session, cases, 3, 1)
@@ -103,7 +103,7 @@ def test_mm_runs_one_exec_at_a_time_at_the_defaults_is_refused_at_several_on_the
         assert status == 1 and "mm/d1-3B: 2 execs at once on the working clock" in err and "one exec at a time (--gpu-jobs 1)" in err
         assert "--clock" not in err and "warning" not in out, "no offer of the wall clock, and nothing to warn of: nothing runs"
     status, out, err = command("clock-check", "--config", "mm/d1-3B", "--agents", "claude", "--gpu-jobs", "2")
-    assert status == 1 and "mm/d1-3B's system reports no queue time" in err and "decision D3" in err
+    assert status == 1 and "mm/d1-3B's system reports no queue time" in err and "the system itself must report the seconds each of its jobs waits" in err
     assert not (run.folder / "clock-check").exists() and not (run.folder / "results").exists()
     # at the defaults mm is one exec at a time whatever --jobs says: nothing to refuse, and the dry run says so
     for flags in ((), ("--jobs", "3"), ("--jobs", "4", "--gpu-jobs", "1")):

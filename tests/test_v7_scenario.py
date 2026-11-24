@@ -1,13 +1,12 @@
-"""New tests for the V7 scenario as the runner sees it (mmsb/scenarios/__init__.py and v7_screen/__init__.py, prompt.py): the recipe and
-the time zone it records, the hashes, a week built and measured, the prompts as the pilot recorded them, the words an agent may not
-reach, and the scenario run with MultimediaSearch and the old modules blocked.
+"""Tests for the V7 scenario as the runner sees it (mmsb/scenarios/__init__.py and v7_screen/__init__.py, prompt.py): the recipe and the
+time zone it records, the hashes, a week built and measured, the prompts, the words an agent may not reach, and the scenario run with
+MultimediaSearch absent.
 
-Expected values are the recipe's definition, an independent read of the machine's time zone, the files a build left on disk, the pilot's
-recorded prompts (tests/oracles/recorded/pilot-s1/execs.json), and the golden deny words of the old code (tests/oracles/recorded/exec)."""
+Expected values are the recipe's definition, an independent read of the machine's time zone, the files a build left on disk, prompts written
+out in full, and the deny words as lists."""
 
 from __future__ import annotations
 
-import os
 import ast
 import hashlib
 import json
@@ -21,7 +20,7 @@ from pathlib import Path
 
 import imageio_ffmpeg
 import pytest
-from test_runfolder import DENY, MM_ISOLATION, SENTINEL, between, check_against, posix, run_of, sentinels  # noqa: F401
+from test_runfolder import MM_ISOLATION, posix, run_of, sentinels  # noqa: F401
 
 from mmsb import scenarios
 from mmsb.core import paths
@@ -34,7 +33,6 @@ from mmsb.scenarios.v7_screen.questions import questions_of
 from mmsb.scenarios.v7_screen.week import plan as make_plan
 
 V7 = scenarios.get("v7_screen")
-RECORDED = Path(__file__).parent / "oracles" / "recorded" / "pilot-s1"
 DAYS = ["2026-10-30", "2026-10-31"]
 PROTOCOL = ("recipe", "hashes", "build", "probe", "prompt", "view", "deny_words", "after_exec", "release")
 PLAIN = Served(None, None, (), None, None, None, {})
@@ -98,18 +96,33 @@ def stamp_masked(text: str) -> str:
     return re.sub(r"^It is now [A-Za-z]+ \d\d [A-Za-z]+ \d{4}, \d\d:\d\d\.", "It is now <the time>.", text)
 
 
-def test_the_prompt_is_the_one_the_pilot_recorded_for_each_of_its_110_execs_but_for_the_time(pilot_questions):
-    """Plan 7.3, difference 5: the pilot's prompts were stamped with the real time it asked; a question has its own `now`. Everything
-    else, the week, the sources, how to reach them, the question and how to answer, is the recorded text, with the files and with mm."""
-    execs = json.loads((RECORDED / "execs.json").read_text(encoding="utf-8"))["execs"]
-    data = Path(json.loads((RECORDED / "run.json").read_text(encoding="utf-8"))["data"])
-    asked = [e for e in execs if e["excluded"] is None]
-    assert len(execs) == 110 and len(asked) == 108, "two execs of one question were overwritten by dry runs"
-    for e in asked:
-        access = Access(True, data, PLAIN, "line") if e["dir"] == "files" else Access(False, None, MM, "line")
-        got = V7.prompt(pilot_questions[e["qid"]], access)
-        assert stamp_masked(got) == stamp_masked(e["prompt"]), (e["agent"], e["dir"], e["qid"])
-    assert V7.prompt(pilot_questions["text-note-code-1"], Access(False, None, MM, "line")).startswith("It is now Wednesday 04 November 2026, 12:00. mm has")
+SOURCES = ("screen (my screen recordings), phone (photos and short videos from my phone), porch (the front door camera's motion clips), "
+           "mic (the hallway microphone), notes (my notes), config (the versions of app.toml), logs (the payments, web and auth services' logs)")
+WEEK = "from Sunday 1 November to Tuesday 3 November"
+
+
+def test_the_files_alone_get_the_folder_they_are_in_and_the_system_alone_gets_its_own_sentence(pilot_questions):
+    question = pilot_questions["video-porch-parcel-1"]
+    data = paths.TEMP / "mmb-0123456789-data"
+    assert V7.prompt(question, Access(True, data, PLAIN, "line")) == (
+        f"It is now Wednesday 04 November 2026, 12:00. The files of these sources, {WEEK}, are in {data}, one folder per source; each file is "
+        "named by when it was recorded, and the logs are JSON lines with a ts field. Your working folder is yours to write in. ffmpeg is on "
+        f"PATH (there is no ffprobe). The sources are: {SOURCES}. {question.question} Answer from these files. "
+        "End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it.")
+    assert V7.prompt(question, Access(False, None, MM, "line")) == (
+        f"It is now Wednesday 04 November 2026, 12:00. mm has recorded these sources of mine {WEEK}. The sources are: {SOURCES}. "
+        f"{question.question} Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it.")
+
+
+def test_every_question_of_the_pilot_is_asked_with_its_own_question_and_the_way_to_answer(pilot_questions):
+    assert len(pilot_questions) > 20
+    for qid, question in pilot_questions.items():
+        files = V7.prompt(question, Access(True, paths.TEMP, PLAIN, "line"))
+        system = V7.prompt(question, Access(False, None, MM, "line"))
+        assert files.split(". ")[0] == system.split(". ")[0] and files.startswith("It is now "), qid
+        assert files.endswith(f" {question.question} Answer from these files. End with one line ANSWER: <answer>, or ANSWER: unknown when the files do not hold it."), qid
+        assert system.endswith(f" {question.question} Answer from what mm holds. End with one line ANSWER: <answer>, or ANSWER: unknown when mm does not hold it."), qid
+        assert f"The sources are: {SOURCES}." in files and f"The sources are: {SOURCES}." in system, qid
 
 
 def test_a_system_and_the_files_together_get_both_sentences_and_one_way_to_answer(pilot_questions):
@@ -140,18 +153,15 @@ def test_a_clock_note_ends_the_systems_sentence_and_a_prompt_with_no_way_to_the_
 
 # -- what an agent may not reach ------------------------------------------------------------------------------------------------
 
-@pytest.mark.skipif(os.name != "nt", reason="the recorded deny words and folders are Windows paths")
-def test_the_deny_words_of_v7_are_the_old_eight_and_three_that_name_the_new_package_and_no_folder_of_a_run(sentinels):
-    golden = DENY["v7"]["v7"]
-    old = between(golden["none"], "/mm-bench'", "in:d:/__temp__/mmb-tag-w0")
-    assert len(old) == 8
-    new = tuple(IN_ONLY + word for word in ("v7_screen", "from mmsb", "import mmsb"))
-    assert V7.deny_words([0, 1], Path("t"), "k") == (*old, *new) and V7.deny_words([], Path("t"), "k") == (*old, *new), "whatever the slots"
-    for own, key in ((None, "none"), (0, "slot0")):
+def test_the_deny_words_of_v7_are_the_generators_and_the_truths_keys_as_code_reaches_them_and_the_package_whatever_the_slots(sentinels):
+    words = ("['truth']", '[/"truth/"]', "get('truth'", 'get(/"truth/"', "v7_screen", "from mmsb", "import mmsb")
+    assert V7.DENY_WORDS == words
+    assert V7.deny_words([0, 1], Path("t"), "k") == tuple(IN_ONLY + word for word in words) == V7.deny_words([], Path("t"), "k")
+    for own in (None, 0):
         run = run_of(V7)
         got = run.deny(None if own is None else run.slot(own), MM_ISOLATION)
-        assert set(map(posix, new)) <= set(got) and not set(map(posix, new)) & set(golden[key])
-        check_against(golden[key], tuple(w for w in got if w not in set(map(posix, new))), old)
+        assert set(map(posix, V7.deny_words([], Path("t"), "k"))) <= set(got)
+        assert got.index("in:['truth']") > got.index(".mms"), "after the isolation's words, before the slots'"
 
 
 def test_no_word_is_in_the_path_of_a_folder_a_run_makes_the_default_ones_included(sentinels):
@@ -238,13 +248,12 @@ def test_the_probe_of_a_built_week_passes_and_reports_in_the_run_folder_and_neve
 
 # -- MultimediaSearch absent ---------------------------------------------------------------------------------------------------------------
 
-OLD_MODULES = ("mms", "conftest", "day", "fake_decider", "haystack", "haystack_media", "shortcuts", "grade", "bench", "claude_run",
-               "codex_run", "egolife")
+BLOCKED_MODULES = ("mms", "conftest", "day", "fake_decider")  # MultimediaSearch, and the helpers of the tests that run it
 BLOCKED = f"""
 import sys
 class Blocked:
     def find_spec(self, name, path=None, target=None):
-        if name.split(".")[0] in {OLD_MODULES!r}:
+        if name.split(".")[0] in {BLOCKED_MODULES!r}:
             raise ImportError(f"{{name}} is blocked: V7 must not need it")
 sys.meta_path.insert(0, Blocked())
 import importlib, pkgutil
@@ -259,20 +268,19 @@ print(len(names), *v7.hashes(v7.recipe(scale="tiny", seed=3, days={DAYS!r})))
 """
 
 
-def test_v7_imports_and_plans_with_mms_and_the_old_modules_blocked():
-    """The blocker refuses `mms` and the tests' own `conftest`, `day`, `fake_decider`, and the old root modules, which the editable
-    install would otherwise let `import haystack` find without a word."""
+def test_v7_imports_and_plans_with_mms_and_the_tests_helpers_blocked():
+    """The blocker refuses `mms` and the helper modules of the tests that run it (`conftest`, `day`, `fake_decider`): V7 needs none of them."""
     done = subprocess.run([sys.executable, "-c", BLOCKED], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stderr[-1500:]
     count, plan, files = done.stdout.split()
     assert int(count) >= 14 and (plan, files) == V7.hashes(V7.recipe(scale="tiny", seed=3, days=DAYS)), "and the hashes are those of this process"
 
 
-def test_no_module_of_the_scenario_names_the_old_modules_or_mms():
+def test_no_module_of_the_scenario_imports_mms_or_the_tests_helpers():
     root = Path(__file__).resolve().parents[1] / "mmsb"
     checked = [*(root / "scenarios").rglob("*.py"), root / "core" / "probe.py"]
     for path in checked:
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             names = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
-            assert not [n for n in names if n.split(".")[0] in OLD_MODULES], f"{path.name} imports {names}"
+            assert not [n for n in names if n.split(".")[0] in BLOCKED_MODULES], f"{path.name} imports {names}"
     assert len(checked) >= 20

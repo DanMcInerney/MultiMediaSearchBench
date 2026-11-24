@@ -1,6 +1,6 @@
-"""Setup of the tests of the mm system (tests/mm): copied from tests/conftest.py of MultimediaSearch at fe0ece5 are the two autouse fixtures that keep a test
-off the network and off a real `uv` (`no_hugging_face`, `no_real_uv`), and the names the tests use for the daemon (`Daemon`, `Api`, `write_config`,
-`wait_for` are the system's own, mmsb/systems/mm/daemon.py); `FAKE`, the fake decider, is tests/mm/fakes.py's.
+"""Setup of the tests of the mm system (tests/mm): the two autouse fixtures that keep a test off the network and off a real `uv`
+(`no_hugging_face`, `no_real_uv`), and the names the tests use for the daemon (`Daemon`, `Api`, `write_config`, `wait_for` are the system's
+own, mmsb/systems/mm/daemon.py); `FAKE`, the fake decider, is tests/mm/fakes.py's.
 
 Every test module here starts with `pytest.importorskip("mms")`, which tests/conftest.py counts and says so in its summary when the mm extra
 is not installed (and `--require-mm` makes a failure). This file is read before they are, so it needs nothing of the extra at import: what it
@@ -14,11 +14,8 @@ from __future__ import annotations
 import importlib.util
 import os
 import sys
-from pathlib import Path
 
 import pytest
-
-sys.path.append(str(Path(__file__).parent.parent / "oracles"))  # the helpers of oracle 3 (test_exec.py, capture_exec.py)
 
 if importlib.util.find_spec("mms") is not None:
     from fakes import FAKE  # noqa: F401

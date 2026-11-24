@@ -1,4 +1,4 @@
-"""A decider for tests (TESTBED.md): it answers from content a test knows, in d1's answer shapes. Its facts (`ABOUT`)
+"""A decider for tests: it answers from content a test knows, in d1's answer shapes. Its facts (`ABOUT`)
 are d1's, so what it is handed is what d1 would be handed: it raises a `ValueError` for a file medium, which d1 takes
 none of, and for sound that is not at `ABOUT.audio_rate`.
 
